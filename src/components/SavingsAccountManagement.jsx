@@ -214,6 +214,7 @@ export default function SavingsAccountManagement() {
 
   // State cho export
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportData, setExporData] = useState([]);
   const [exportSuccess, setExportSuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [exportNotification, setExportNotification] = useState({
@@ -556,6 +557,15 @@ export default function SavingsAccountManagement() {
         className="mb-6"
         headerClassName="bg-sky-600"
         renderActions={renderActions}
+        // Bộ lọc trạng thái
+        statusFilters={{
+          status: ['inTerm', 'matured', 'closed']
+        }}
+        // Bộ lọc khoảng thời gian
+        dateRangeFilters={{
+          depositDate: { label: 'Ngày gửi tiền' }
+        }}
+        changeTableData={setExporData}
       />
       {/* Modal chi tiết phiếu gửi tiền */}
       <AnimatePresence>
@@ -619,7 +629,7 @@ export default function SavingsAccountManagement() {
       <ExportDataModal 
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
-        data={filteredAccounts}
+        data={exportData}
         onExport={handleExportData}
         title="Xuất dữ liệu phiếu gửi tiền"
         initialSelectedColumns={[

@@ -468,6 +468,7 @@ export default function CustomerManagement() {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [sortField, setSortField] = useState('fullName');
   const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
+  const [exportData, setExporData] = useState([]);
   
   // State for multi-field search
   const [searchFields, setSearchFields] = useState({
@@ -1863,6 +1864,16 @@ export default function CustomerManagement() {
           headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
           renderActions={renderActions}
           emptyMessage="Không tìm thấy khách hàng nào phù hợp với điều kiện tìm kiếm"
+          // Bộ lọc trạng thái
+          statusFilters={{
+            status: ['active', 'disabled']
+          }}
+          changeTableData={setExporData}
+          // Bộ lọc khoảng thời gian
+          dateRangeFilters={{
+            registrationDate: { label: 'Ngày đăng ký' },
+            birthDate: { label: 'Ngày sinh' }
+          }}
         />
       </motion.div>
 
@@ -2791,7 +2802,7 @@ export default function CustomerManagement() {
       <ExportDataModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
-        data={filteredCustomers}
+        data={exportData}
         onExport={handleExportData}
         title="Xuất dữ liệu khách hàng"
         initialSelectedColumns={[

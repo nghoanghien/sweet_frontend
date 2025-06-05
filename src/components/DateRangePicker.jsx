@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import useMediaQuery from "../hooks/useMediaQuery";
 
 const DateRangePicker = ({
   className = "",
@@ -16,6 +17,8 @@ const DateRangePicker = ({
   startPlaceholder = "DD/MM/YYYY",
   endPlaceholder = "DD/MM/YYYY"
 }) => {
+  // Kiểm tra nếu đang ở chế độ mobile
+  const { isMobile } = useMediaQuery();
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [internalStartDate, setInternalStartDate] = useState(startDate);
@@ -351,7 +354,7 @@ const DateRangePicker = ({
           animate={{ scale: isOpen ? 1.02 : 1 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="flex gap-2 items-center">
+          <div className={`flex ${isMobile ? 'flex-col' : ''} gap-2 items-center`}>
             {/* Start Date Field */}
             <div
               className={`
@@ -402,9 +405,18 @@ const DateRangePicker = ({
               )}
             </div>
             
-            <div className="flex items-center justify-center">
-              <ArrowRight size={20} className="text-gray-400" />
-            </div>
+            {!isMobile && (
+              <div className="flex items-center justify-center">
+                <ArrowRight size={20} className="text-gray-400" />
+              </div>
+            )}
+            {isMobile && (
+              <div className="w-full flex items-center justify-center my-1">
+                <div className="w-1/3 h-px bg-gray-300"></div>
+                <div className="mx-2 text-gray-400 text-xs">đến</div>
+                <div className="w-1/3 h-px bg-gray-300"></div>
+              </div>
+            )}
             
             {/* End Date Field */}
             <div
@@ -707,4 +719,4 @@ const DateRangePicker = ({
   );
 };
 
-export default DateRangePicker; 
+export default DateRangePicker;

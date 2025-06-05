@@ -35,7 +35,7 @@ const SearchFilterBar = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={`relative bg-gradient-to-br from-blue-50/80 to-white rounded-2xl shadow-[0_4px_24px_rgba(0,170,255,0.08)] mb-8 border border-blue-100 overflow-hidden ${className}`}
+      className={`relative bg-gradient-to-br from-blue-50/80 to-white rounded-2xl shadow-[0_4px_24px_rgba(0,170,255,0.08)] mb-0 border border-blue-100 overflow-hidden ${className}`}
     >
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-40 h-40 bg-blue-100/30 rounded-full -mr-20 -mt-20 blur-2xl"></div>
@@ -47,6 +47,7 @@ const SearchFilterBar = ({
         onClick={toggleExpanded}
         whileHover={{ scale: 1.005 }}
         whileTap={{ scale: 0.995 }}
+        transition={{ duration: 0.15}}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">

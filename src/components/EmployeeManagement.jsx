@@ -259,6 +259,7 @@ import React, { useState, useEffect } from 'react';
     const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [sortField, setSortField] = useState('fullName');
     const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
+    const [exportData, setExporData] = useState([]);
     
     // State for multi-field search
     const [searchFields, setSearchFields] = useState({
@@ -1589,6 +1590,16 @@ import React, { useState, useEffect } from 'react';
             headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
             // Custom actions
             renderActions={renderActions}
+            // Bộ lọc trạng thái
+            statusFilters={{
+              status: ['active', 'disabled']
+            }}
+            // Bộ lọc khoảng thời gian
+            dateRangeFilters={{
+              registrationDate: { label: 'Ngày đăng ký' },
+              birthDate: { label: 'Ngày sinh' }
+            }}
+            changeTableData={setExporData}
           />
         </motion.div>
 
@@ -2514,7 +2525,7 @@ import React, { useState, useEffect } from 'react';
         <ExportDataModal
           isOpen={isExportModalOpen}
           onClose={() => setIsExportModalOpen(false)}
-          data={filteredEmployees}
+          data={exportData}
           onExport={handleExportData}
           title="Xuất dữ liệu nhân viên"
           initialSelectedColumns={[
