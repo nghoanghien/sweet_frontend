@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
 
 /**
- * A custom number input component that properly formats decimal numbers
- * and provides validation, fixes the issue with displaying .1 instead of 0.1
+ * A custom number input component that preserves user input
+ * and only formats when necessary
  */
 const NumberInput = ({ 
   value,
@@ -26,36 +26,41 @@ const NumberInput = ({
   highlightChange = false,
   highlightColor = 'green',
   disableDirectInput = false,
+  autoFormat = false, // New prop to control auto-formatting
 }) => {
   // Internal display value (string format)
   const [displayValue, setDisplayValue] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   
-  // Format value for display when the external value changes
+  // Only format when value changes from external source (not from user input)
   useEffect(() => {
+    // Don't format if user is currently typing
+    if (isFocused) return;
+    
     if (value === null || value === undefined || value === '') {
       setDisplayValue('');
       return;
     }
 
-    // Format number to always show proper decimal places
+    // Only format if autoFormat is enabled or value is significantly different
     const numValue = parseFloat(value);
     if (!isNaN(numValue)) {
-      if (allowDecimal) {
-        setDisplayValue(numValue.toFixed(decimalPlaces));
-      } else {
-        setDisplayValue(Math.floor(numValue).toString());
+      const currentNum = parseFloat(displayValue);
+      
+      // Only auto-format if the values are different (external change)
+      if (isNaN(currentNum) || Math.abs(numValue - currentNum) > 0.001) {
+        if (allowDecimal && autoFormat) {
+          setDisplayValue(numValue.toFixed(decimalPlaces));
+        } else {
+          setDisplayValue(numValue.toString());
+        }
       }
-    } else {
-      setDisplayValue('');
     }
-  }, [value, allowDecimal, decimalPlaces]);
+  }, [value, allowDecimal, decimalPlaces, autoFormat, isFocused]);
 
   // Handle input change
   const handleChange = (e) => {
-    // If input is disabled, don't process changes
-    if (disableDirectInput) {
-      return;
-    }
+    if (disableDirectInput) return;
     
     let inputValue = e.target.value;
     
@@ -69,73 +74,74 @@ const NumberInput = ({
     // Replace comma with dot for decimal inputs
     inputValue = inputValue.replace(',', '.');
     
-    // Validate input is a number format
+    // Validate input format
     const regex = allowDecimal ? /^-?\d*\.?\d*$/ : /^-?\d*$/;
     if (!regex.test(inputValue)) {
-      return;
+      return; // Don't update if invalid format
     }
     
-    // Update the display value
+    // Update display value immediately (preserve user input)
     setDisplayValue(inputValue);
     
-    // Parse to number and update parent
-    let numValue;
-    try {
-      numValue = allowDecimal ? parseFloat(inputValue) : parseInt(inputValue);
-    } catch (e) {
-      numValue = NaN;
-    }
+    // Parse and send to parent
+    const numValue = allowDecimal ? parseFloat(inputValue) : parseInt(inputValue);
     
-    // Only send valid numbers to parent
     if (!isNaN(numValue)) {
       onChange(numValue);
-    } else if (inputValue === '' || inputValue === '-' || (allowDecimal && inputValue === '.')) {
-      // Keep display value for incomplete input but send empty value to parent
+    } else if (inputValue === '' || inputValue === '-' || (allowDecimal && (inputValue === '.' || inputValue.endsWith('.')))) {
+      // Keep partial input in display but send empty to parent
       onChange('');
     }
   };
 
-  // Handle blur event (format display)
+  // Handle focus
+  const handleFocus = (e) => {
+    setIsFocused(true);
+  };
+
+  // Handle blur event
   const handleBlur = (e) => {
-    if (displayValue === '') {
+    setIsFocused(false);
+    
+    if (displayValue === '' || displayValue === '-') {
+      setDisplayValue('');
+      onChange('');
+      if (onBlur) onBlur(e);
       return;
     }
     
-    // Format the number properly on blur
-    let numValue;
-    try {
-      numValue = allowDecimal ? parseFloat(displayValue) : parseInt(displayValue);
-    } catch (e) {
-      numValue = NaN;
-    }
+    // Parse the final value
+    const numValue = allowDecimal ? parseFloat(displayValue) : parseInt(displayValue);
     
     if (!isNaN(numValue)) {
-      if (allowDecimal) {
-        // Enforce decimal places on blur
-        setDisplayValue(numValue.toFixed(decimalPlaces));
-      } else {
-        setDisplayValue(numValue.toString());
+      // Apply min/max constraints
+      let finalValue = numValue;
+      if (finalValue < min) {
+        finalValue = min;
+      } else if (finalValue > max) {
+        finalValue = max;
       }
       
-      // Enforce min/max constraints
-      if (numValue < min) {
-        onChange(min);
-      } else if (numValue > max) {
-        onChange(max);
+      // Only format if autoFormat is enabled or value was constrained
+      if (autoFormat || finalValue !== numValue) {
+        if (allowDecimal && autoFormat) {
+          setDisplayValue(finalValue.toFixed(decimalPlaces));
+        } else {
+          setDisplayValue(finalValue.toString());
+        }
       }
+      
+      onChange(finalValue);
     } else {
-      // Invalid number, reset to empty
+      // Invalid input - clear it
       setDisplayValue('');
       onChange('');
     }
     
-    // Call parent onBlur if provided
-    if (onBlur) {
-      onBlur(e);
-    }
+    if (onBlur) onBlur(e);
   };
 
-  // Highlight color classes based on the highlightColor prop
+  // Highlight color classes
   const getHighlightClasses = () => {
     if (!highlightChange) return '';
     
@@ -164,14 +170,12 @@ const NumberInput = ({
         animate={highlightChange ? { scale: 1, boxShadow: '0 0 0 0px #fff' } : {}}
         transition={{ duration: 0.5 }}
       >
-        {/* Prefix (if provided) */}
         {prefix && (
           <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 font-semibold pointer-events-none select-none">
             {prefix}
           </span>
         )}
         
-        {/* Input field */}
         <input
           type="text"
           inputMode="numeric"
@@ -187,17 +191,14 @@ const NumberInput = ({
           `}
           value={displayValue}
           onChange={handleChange}
+          onFocus={handleFocus}
           onBlur={handleBlur}
           onKeyPress={onKeyPress}
           placeholder={placeholder}
-          min={min}
-          max={max}
-          step={step}
           disabled={disableDirectInput}
           readOnly={disableDirectInput}
         />
         
-        {/* Suffix (if provided) */}
         {suffix && (
           <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-blue-500 font-semibold pointer-events-none select-none">
             {suffix}
@@ -205,7 +206,6 @@ const NumberInput = ({
         )}
       </motion.div>
       
-      {/* Error message */}
       <AnimatePresence>
         {error && (
           <motion.p
@@ -223,4 +223,4 @@ const NumberInput = ({
   );
 };
 
-export default NumberInput; 
+export default NumberInput;
