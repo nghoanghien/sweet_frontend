@@ -103,7 +103,7 @@ const SwipeConfirmationModal = ({
           onClick={onClose}
         >
           <motion.div
-            className="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl shadow-xl overflow-hidden z-[71]"
+            className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-xl overflow-hidden z-[71]"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
