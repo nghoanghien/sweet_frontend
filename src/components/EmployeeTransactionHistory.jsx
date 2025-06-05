@@ -270,7 +270,7 @@ function EmployeeTransactionHistory({ employee }) {
                       <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg z-20 translate-x-1 sm:translate-x-0 sticky-date-circle ">
                         <Calendar size={20} className="text-white" />
                       </div>
-                      <div className="ml-1 p-3 rounded-2xl bg-white/70 backdrop-blur-sm sticky-date-info">
+                      <div className="ml-3 py-1 p-3 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl bg-white/70 backdrop-blur-sm sticky-date-info">
                         <h4 className="font-semibold text-gray-800 text-base">
                           {date}
                         </h4>
