@@ -451,7 +451,7 @@ const CalendarDatePicker = ({
                             disabled={!day || (isInFuture && !allowFutureDates) || (isInPast && !allowPastDates)}
                             className={`
                               p-2 text-center rounded-lg text-sm font-medium
-                              ${!day ? "invisible" : ((isInFuture && !allowFutureDates) || (isInPast && !allowPastDates)) ? "cursor-not-allowed bg-gray-100 text-gray-400" : "cursor-pointer"}
+                              ${!day ? "invisible" : ((isInFuture && !allowFutureDates) || (isInPast && !allowPastDates)) ? "cursor-not-allowed text-gray-400" : "cursor-pointer"}
                               ${
                                 day === selectedDay && currentMonth === new Date(internalValue.split('/')[2] || 0, (internalValue.split('/')[1] || 0) - 1, internalValue.split('/')[0] || 0).getMonth() && currentYear === parseInt(internalValue.split('/')[2] || 0)
                                   ? "bg-blue-500 text-white"

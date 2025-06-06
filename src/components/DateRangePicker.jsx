@@ -126,15 +126,34 @@ const DateRangePicker = ({
     return calendarDays;
   };
 
-  // Check if a day is in the selected range
+  // Parse date string to Date object
+  const parseDate = (dateString) => {
+    if (!dateString) return null;
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month, day);
+    }
+    return null;
+  };
+
+  // Check if a day is in the selected range - FIXED VERSION
   const isDayInRange = (day) => {
-    if (!selectedStartDay || !selectedEndDay || !day) return false;
+    if (!selectedStartDay || !selectedEndDay || !day || !internalStartDate || !internalEndDate) return false;
     
-    const startDate = new Date(currentYear, currentMonth, selectedStartDay);
-    const endDate = new Date(currentYear, currentMonth, selectedEndDay);
+    // Parse start and end dates
+    const startDateObj = parseDate(internalStartDate);
+    const endDateObj = parseDate(internalEndDate);
+    
+    if (!startDateObj || !endDateObj) return false;
+    
+    // Create date object for current day in current month/year
     const currentDate = new Date(currentYear, currentMonth, day);
     
-    return currentDate > startDate && currentDate < endDate;
+    // Check if current date is between start and end dates (exclusive)
+    return currentDate > startDateObj && currentDate < endDateObj;
   };
 
   // Check if a date is in the future
@@ -654,16 +673,20 @@ const DateRangePicker = ({
                     {/* Calendar days */}
                     <div className="grid grid-cols-7 gap-1">
                       {generateCalendarDays().map((day, index) => {
+                        // Parse actual dates from stored strings
+                        const startDateObj = parseDate(internalStartDate);
+                        const endDateObj = parseDate(internalEndDate);
+                        
                         // Determine if this day is selected or in range
-                        const isStartDay = day === selectedStartDay && 
-                          currentMonth === (internalStartDate ? parseInt(internalStartDate.split('/')[1], 10) - 1 : -1) && 
-                          currentYear === (internalStartDate ? parseInt(internalStartDate.split('/')[2], 10) : -1);
+                        const isStartDay = startDateObj && day === startDateObj.getDate() && 
+                          currentMonth === startDateObj.getMonth() && 
+                          currentYear === startDateObj.getFullYear();
                         
-                        const isEndDay = day === selectedEndDay && 
-                          currentMonth === (internalEndDate ? parseInt(internalEndDate.split('/')[1], 10) - 1 : -1) && 
-                          currentYear === (internalEndDate ? parseInt(internalEndDate.split('/')[2], 10) : -1);
+                        const isEndDay = endDateObj && day === endDateObj.getDate() && 
+                          currentMonth === endDateObj.getMonth() && 
+                          currentYear === endDateObj.getFullYear();
                         
-                        const isInRange = day && internalStartDate && internalEndDate && isDayInRange(day);
+                        const isInRange = isDayInRange(day);
                         
                         // Check if the date is in the future
                         const isFuture = isFutureDate(day);
@@ -676,7 +699,7 @@ const DateRangePicker = ({
                             disabled={!day || isFuture}
                             className={`
                               p-2 text-center rounded-lg text-sm font-medium
-                              ${!day ? "invisible" : isFuture ? "cursor-not-allowed text-gray-300 bg-gray-50" : "cursor-pointer"}
+                              ${!day ? "invisible" : isFuture ? "cursor-not-allowed text-gray-300" : "cursor-pointer"}
                               ${isStartDay 
                                 ? "bg-blue-500 text-white" 
                                 : isEndDay 
@@ -717,6 +740,6 @@ const DateRangePicker = ({
       </AnimatePresence>
     </motion.div>
   );
-};
-
-export default DateRangePicker;
+ };
+ 
+ export default DateRangePicker;
