@@ -2370,7 +2370,7 @@ export default function Dashboard() {
 
         {/* Main content */}
         <main
-          className={`main-content-scrollbar overflow-auto max-h-[calc(100vh-120px)] p-6 md:p-6 transition-all duration-500 ${
+          className={`main-content-scrollbar overflow-auto max-h-[calc(100vh-60px)] p-6 md:p-6 transition-all duration-500 ${
             cardDetailVisible ? "main-content-with-detail" : ""
           }`}
         >
