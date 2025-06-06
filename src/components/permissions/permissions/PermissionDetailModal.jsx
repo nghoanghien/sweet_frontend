@@ -1,99 +1,466 @@
+
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, Check, Users, Settings } from 'lucide-react';
+import { 
+  X, 
+  CreditCard, 
+  PiggyBank, 
+  Users, 
+  UserCog, 
+  Package, 
+  BarChart3, 
+  Settings, 
+  Shield,
+  Star,
+  Zap,
+  Crown,
+  Gem
+} from 'lucide-react';
 
 const PermissionDetailModal = ({ isOpen, onClose, permission }) => {
   if (!isOpen || !permission) return null;
+
+  // Mapping icons cho từng quyền hạn cụ thể
+  const getPermissionIcon = (permissionId) => {
+    const iconMap = {
+      'perm1': CreditCard,
+      'perm2': PiggyBank,
+      'perm4': Users,
+      'perm5': UserCog,
+      'perm7': Package,
+      'perm8': BarChart3,
+      'perm9': Settings,
+      'perm10': Shield
+    };
+    
+    return iconMap[permissionId] || Shield;
+  };
+
+  // Định nghĩa màu sắc cho từng quyền hạn
+  const getCardColors = (permissionId, type) => {
+    if (type === 'customer') {
+      const customerColors = {
+        'perm1': {
+          primary: '#10b981', // emerald
+          secondary: '#06d6a0',
+          dark: '#047857',
+          accent: '#6ee7b7',
+          light: '#d1fae5'
+        },
+        'perm2': {
+          primary: '#3b82f6', // blue
+          secondary: '#8b5cf6',
+          dark: '#1e40af',
+          accent: '#93c5fd',
+          light: '#dbeafe'
+        }
+      };
+      return customerColors[permissionId] || customerColors['perm1'];
+    } else {
+      const staffColors = {
+        'perm4': {
+          primary: '#f59e0b', // amber
+          secondary: '#ef4444',
+          dark: '#d97706',
+          accent: '#fbbf24',
+          light: '#fef3c7'
+        },
+        'perm5': {
+          primary: '#8b5cf6', // purple
+          secondary: '#3b82f6',
+          dark: '#7c3aed',
+          accent: '#c4b5fd',
+          light: '#ede9fe'
+        },
+        'perm7': {
+          primary: '#f59e0b', // yellow
+          secondary: '#fb923c',
+          dark: '#d97706',
+          accent: '#fed7aa',
+          light: '#fef3c7'
+        },
+        'perm8': {
+          primary: '#14b8a6', // teal
+          secondary: '#06b6d4',
+          dark: '#0f766e',
+          accent: '#7dd3fc',
+          light: '#ccfbf1'
+        },
+        'perm9': {
+          primary: '#6b7280', // gray
+          secondary: '#64748b',
+          dark: '#4b5563',
+          accent: '#d1d5db',
+          light: '#f3f4f6'
+        },
+        'perm10': {
+          primary: '#ef4444', // red
+          secondary: '#ec4899',
+          dark: '#dc2626',
+          accent: '#fca5a5',
+          light: '#fee2e2'
+        }
+      };
+      return staffColors[permissionId] || staffColors['perm4'];
+    }
+  };
+
+  const colors = getCardColors(permission.id, permission.type);
+  const IconComponent = getPermissionIcon(permission.id);
+  const rarity = permission.type === 'customer' ? 'Epic' : 'Legendary';
+  const cost = permission.functions ? permission.functions.length * 10 : 50;
 
   return (
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.3 }}
+          onClick={onClose}
         >
           <motion.div
-            className="bg-white rounded-3xl shadow-xl w-full max-w-2xl max-h-[95vh] flex flex-col overflow-hidden"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative backdrop-blur-sm w-96 max-h-[90vh] cursor-auto overflow-hidden"
+            style={{
+              background: `linear-gradient(145deg, 
+                rgba(255,255,255,0.88) 10%, 
+                rgba(248,250,252,0.85) 30%, 
+                rgba(241,245,249,0.85) 100%
+              )`,
+              border: `2px solid ${colors.primary}40`,
+              borderRadius: '24px',
+              boxShadow: `
+                0 32px 64px rgba(15, 23, 42, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.9),
+                inset 0 -1px 0 rgba(0,0,0,0.05)
+              `
+            }}
+            initial={{ opacity: 0, scale: 0.85, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, scale: 0.9, y: 30 }}
+            transition={{ duration: 0.4, type: "spring", damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className={`px-8 py-6 flex justify-between items-center rounded-t-3xl shadow-[0_4px_30px_rgba(0,170,255,0.12)] border-b-2 border-blue-100
-              bg-gradient-to-r from-blue-500 via-blue-400 to-indigo-600 text-white`}>
-              <div className="flex items-center gap-3">
-                <Shield size={32} className="mr-3 text-white drop-shadow-lg" />
-                <h3 className="text-2xl font-bold tracking-wide drop-shadow">{permission.name}</h3>
-              </div>
-              <motion.button
-                onClick={onClose}
-                className="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-all"
-                whileHover={{ scale: 1.15, rotate: 90 }}
-                whileTap={{ scale: 0.92 }}
+            {/* Background Icon - Large and Faded */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div 
+                className="opacity-[0.09] transform scale-[4] translate-y-8 translate-x-20"
+                style={{ color: colors.primary }}
               >
-                <X size={28} />
-              </motion.button>
+                <IconComponent size={120} strokeWidth={1} />
+              </div>
             </div>
-            
-            {/* Content - Added overflow-y-auto for scrolling */}
-            <div className="p-6 overflow-y-auto">
-              {/* Type badge */}
-              <div className="mb-6 flex items-center">
-                <span className={`px-4 py-2 rounded-2xl text-base font-semibold flex items-center shadow-[0_2px_12px_rgba(0,170,255,0.08)] border border-blue-100
-                  bg-gradient-to-r from-blue-50 via-indigo-50 to-white text-blue-700 gap-2`}>
-                  {permission.type === 'customer' ? (
-                    <><Users size={20} className="mr-2 text-blue-500" />Quyền khách hàng</>
-                  ) : (
-                    <><Settings size={20} className="mr-2 text-indigo-500" />Quyền nhân viên</>
-                  )}
+
+            {/* Animated Border Gradient */}
+            <motion.div 
+              className="absolute inset-0 rounded-[24px] opacity-40 pointer-events-none"
+              style={{
+                background: `conic-gradient(from 0deg, ${colors.primary}40, transparent, ${colors.secondary}40, transparent, ${colors.primary}40)`,
+                padding: '2px',
+                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                maskComposite: 'xor'
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            />
+
+            {/* Floating Rarity Gem */}
+            <motion.div
+              className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20"
+              animate={{ 
+                rotate: [0, 360],
+                y: [0, -2, 0]
+              }}
+              transition={{ 
+                rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                y: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+              }}
+            >
+              <div 
+                className="w-10 h-10 rounded-full flex items-center justify-center shadow-2xl"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                  boxShadow: `0 8px 32px ${colors.primary}60, 0 0 20px ${colors.primary}40`
+                }}
+              >
+                <Gem size={20} className="text-white drop-shadow-lg" />
+              </div>
+            </motion.div>
+
+            {/* Enhanced Close Button */}
+            <motion.button
+              onClick={onClose}
+              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm border border-gray-200/60 flex items-center justify-center z-30 shadow-xl"
+              whileHover={{ 
+                scale: 1.1, 
+                backgroundColor: 'rgba(239,68,68,0.1)',
+                borderColor: '#ef4444'
+              }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+            >
+              <X size={18} className="text-gray-600" />
+            </motion.button>
+
+            {/* Header Section */}
+            <div className="relative p-8 text-center border-b border-gray-200/40">
+              {/* Cost Badge */}
+              <motion.div 
+                className="absolute top-6 left-6 flex items-center gap-2"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-xl backdrop-blur-sm"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                    boxShadow: `0 4px 16px ${colors.primary}40`
+                  }}
+                >
+                  {Math.floor(cost / 10)}
+                </div>
+                <Crown size={18} style={{ color: colors.primary }} className="drop-shadow-sm" />
+              </motion.div>
+
+              {/* Rarity Badge */}
+              <motion.div 
+                className="absolute top-6 right-16 flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-sm"
+                style={{
+                  background: `linear-gradient(90deg, ${colors.light}80, ${colors.primary}20)`,
+                  border: `1px solid ${colors.primary}30`
+                }}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Star size={14} style={{ color: colors.primary }} />
+              </motion.div>
+
+              {/* Enhanced Icon Section */}
+              <motion.div
+                className="relative mx-auto w-28 h-28 rounded-3xl flex items-center justify-center mt-6 mb-6"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                  boxShadow: `
+                    0 16px 40px ${colors.primary}40,
+                    0 8px 16px ${colors.primary}20,
+                    inset 0 2px 0 rgba(255,255,255,0.3),
+                    inset 0 -2px 0 rgba(0,0,0,0.1)
+                  `
+                }}
+                whileHover={{ 
+                  scale: 1.05,
+                  rotate: [0, -3, 3, 0],
+                  boxShadow: `
+                    0 20px 48px ${colors.primary}50,
+                    0 12px 20px ${colors.primary}30,
+                    inset 0 2px 0 rgba(255,255,255,0.4)
+                  `
+                }}
+                transition={{ duration: 0.3 }}
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+              >
+                <div className="text-white drop-shadow-2xl">
+                  <IconComponent size={56} strokeWidth={1.5} />
+                </div>
+                
+                {/* Enhanced Sparkle Effects */}
+                {[...Array(3)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className={`absolute w-4 h-4 ${
+                      i === 0 ? '-top-2 -right-2' : 
+                      i === 1 ? '-bottom-2 -left-2' : 
+                      'top-2 -left-3'
+                    }`}
+                    style={{ color: colors.accent }}
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                      rotate: [0, 180, 360],
+                      opacity: [0.7, 1, 0.7]
+                    }}
+                    transition={{ 
+                      duration: 2 + i,
+                      repeat: Infinity,
+                      delay: i * 0.5,
+                      ease: "easeInOut" 
+                    }}
+                  >
+                    <Zap size={16} />
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Enhanced Title */}
+              <motion.h2 
+                className="text-2xl uppercase font-bold text-gray-600 mb-3 drop-shadow-sm"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                {permission.name}
+              </motion.h2>
+              
+              {/* Enhanced Type Badge */}
+              <motion.div 
+                className="inline-flex items-center gap-3 px-6 py-2 rounded-full text-sm font-medium shadow-lg backdrop-blur-sm"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.light}60, ${colors.primary}20)`,
+                  border: `1px solid ${colors.primary}40`,
+                  color: colors.dark
+                }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <span className="text-lg">
+                  {permission.type === 'customer' ? '👤' : '👨‍💼'}
                 </span>
+                <span className="font-bold">
+                  {permission.type === 'customer' ? 'Khách hàng' : 'Nhân viên'}
+                </span>
+              </motion.div>
+            </div>
+
+            {/* Enhanced Abilities Section with Scroll */}
+            <div className="flex flex-col h-80">
+              <div className="py-0 p-6 pb-0">
+                <motion.div 
+                  className="flex items-center gap-3 mb-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <div 
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` }}
+                  >
+                    <Zap size={16} className="text-white" />
+                  </div>
+                  <h3 className="text-gray-800 font-bold text-lg tracking-wide">CHỨC NĂNG</h3>
+                </motion.div>
               </div>
               
-              {/* Description */}
-              <div className="mb-6">
-                <h4 className="text-base font-semibold text-blue-600 mb-2">Mô tả:</h4>
-                <p className="text-gray-800 italic bg-blue-50/60 rounded-xl p-3 border border-blue-100 shadow-sm">{permission.description}</p>
-              </div>
-              
-              {/* Functions */}
-              <div>
-                <h4 className="text-base font-semibold text-blue-600 mb-3">Chức năng:</h4>
-                <div className="bg-gradient-to-br from-blue-50/80 to-white rounded-2xl p-5 border border-blue-100 shadow-[0_2px_12px_rgba(0,170,255,0.06)]">
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {permission.functions && permission.functions.map((func, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-start"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.12, duration: 0.35 }}
+              {/* Scrollable Functions List */}
+              <div className="flex-1 px-6 pb-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <div className="space-y-3">
+                  {permission.functions && permission.functions.map((func, index) => (
+                    <motion.div
+                      key={index}
+                      className="group flex items-center gap-4 p-4 rounded-xl text-sm shadow-sm backdrop-blur-sm cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.35))',
+                        border: '1px solid rgba(255,255,255,0.3)'
+                      }}
+                      initial={{ opacity: 0, x: -30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.7 + index * 0.1 }}
+                      whileHover={{ 
+                        x: 8,
+                        scale: 1.02,
+                        backgroundColor: `${colors.primary}08`,
+                        borderColor: `${colors.primary}30`
+                      }}
+                    >
+                      <motion.div 
+                        className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                        style={{ backgroundColor: colors.primary }}
+                        whileHover={{ scale: 1.2 }}
+                      />
+                      <span className="text-gray-700 flex-1 font-medium group-hover:text-gray-800 transition-colors">
+                        {func}
+                      </span>
+                      <motion.div
+                        className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ backgroundColor: `${colors.primary}20` }}
                       >
-                        <span className={`p-2 rounded-full mr-3 flex-shrink-0 bg-blue-100 text-blue-600 shadow-sm`}>
-                          <Check size={18} />
-                        </span>
-                        <span className="text-gray-800 font-medium">{func}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
+                        <Zap size={12} style={{ color: colors.primary }} />
+                      </motion.div>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             </div>
-            
-            {/* Footer */}
-            <div className="px-8 py-5 bg-gradient-to-r from-blue-50 via-indigo-50 to-white border-t-2 border-blue-100 flex justify-end rounded-b-3xl">
-              <motion.button
-                onClick={onClose}
-                className="px-6 py-2 bg-blue-100 text-blue-700 rounded-xl font-semibold shadow hover:bg-blue-200 transition-all"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.96 }}
-              >
-                Đóng
-              </motion.button>
+
+            {/* Enhanced Footer Stats */}
+            <motion.div 
+              className="p-6 border-t border-gray-200/40 backdrop-blur-sm md:hidden"
+              style={{
+                background: `linear-gradient(135deg, ${colors.light}40, rgba(255,255,255,0.6))`
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-sm" style={{ backgroundColor: `${colors.primary}10` }}>
+                  <Star size={14} style={{ color: colors.primary }} />
+                  <span className="text-sm font-medium text-gray-700">ID: {permission.id}</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-sm" style={{ backgroundColor: `${colors.primary}10` }}>
+                  <Zap size={14} style={{ color: colors.primary }} />
+                  <span className="text-sm font-medium text-gray-700">
+                    {permission.functions ? permission.functions.length : 0} chức năng
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Enhanced Decorative Elements */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden rounded-[24px]">
+              {/* Floating particles with better animation */}
+              {[...Array(8)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1.5 h-1.5 rounded-full"
+                  style={{
+                    backgroundColor: colors.primary,
+                    left: `${15 + i * 10}%`,
+                    top: `${20 + (i % 3) * 25}%`,
+                    opacity: 0.4
+                  }}
+                  animate={{
+                    y: [0, -30, 0],
+                    x: [0, Math.sin(i) * 10, 0],
+                    opacity: [0.4, 0.8, 0.4],
+                    scale: [1, 1.2, 1]
+                  }}
+                  transition={{
+                    duration: 4 + i * 0.5,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                    ease: "easeInOut"
+                  }}
+                />
+              ))}
             </div>
+
+            {/* Enhanced Holographic overlay */}
+            <motion.div 
+              className="absolute inset-0 rounded-[24px] pointer-events-none"
+              style={{
+                background: 'linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 60%, transparent 80%)',
+                opacity: 0.6
+              }}
+              animate={{ 
+                background: [
+                  'linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 60%, transparent 80%)',
+                  'linear-gradient(225deg, transparent 20%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 60%, transparent 80%)',
+                  'linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 60%, transparent 80%)'
+                ]
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
           </motion.div>
         </motion.div>
       )}
@@ -101,4 +468,4 @@ const PermissionDetailModal = ({ isOpen, onClose, permission }) => {
   );
 };
 
-export default PermissionDetailModal; 
+export default PermissionDetailModal;
