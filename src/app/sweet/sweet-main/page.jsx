@@ -2986,7 +2986,7 @@ export default function Dashboard() {
                       }`}
                     >
                       <div
-                        className={`flex items-center gap-4 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-5 ${
+                        className={`flex items-center gap-4 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-2 ${
                           editMode
                             ? "bg-gradient-to-r from-indigo-500 to-blue-600"
                             : "bg-gradient-to-r from-cyan-500 to-blue-600"
@@ -3077,7 +3077,7 @@ export default function Dashboard() {
                           : "opacity-100 scale-100"
                       }`}
                     >
-                      <div className="flex items-center gap-4 bg-gradient-to-r from-purple-500 to-violet-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-5">
+                      <div className="flex items-center gap-4 bg-gradient-to-r from-purple-500 to-violet-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-2">
                         <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                           <CreditCard size={20} className="text-white" />
                         </div>
@@ -3114,7 +3114,7 @@ export default function Dashboard() {
                     {/* Permanent Address - hide entirely in edit mode */}
                     {!editMode && (
                       <div className="bg-white/90 border border-amber-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500">
-                        <div className="flex items-center gap-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-5">
+                        <div className="flex items-center gap-4 bg-gradient-to-r from-amber-500 to-orange-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-2">
                           <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                             <Home size={20} className="text-white" />
                           </div>
@@ -3183,7 +3183,7 @@ export default function Dashboard() {
                       }`}
                     >
                       <div
-                        className={`flex items-center gap-4 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-5 ${
+                        className={`flex items-center gap-4 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-2 ${
                           editMode
                             ? "bg-gradient-to-r from-indigo-400 via-blue-500 to-indigo-600"
                             : "bg-gradient-to-r from-emerald-500 to-teal-600"
