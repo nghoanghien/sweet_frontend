@@ -48,27 +48,85 @@ const SwipeConfirmationModal = ({
     }, 100);
   };
   
-  // Get icon based on type
-  const getIcon = () => {
-    if (icon) return icon;
+  // Get icon component based on type
+  const getIconComponent = () => {
+    // If custom icon is provided, extract the component from it
+    if (icon && React.isValidElement(icon)) {
+      return icon.type;
+    }
     
     switch(type) {
       case 'warning':
-        return <AlertTriangle className="h-6 w-6 text-amber-500" />;
+        return AlertTriangle;
       case 'danger':
-        return <AlertTriangle className="h-6 w-6 text-red-500" />;
+        return AlertTriangle;
       case 'success':
-        return <Check className="h-6 w-6 text-green-500" />;
+        return Check;
       case 'pink':
-        return <PiggyBank className="h-8 w-8 text-pink-500" />;
+        return PiggyBank;
       case 'unlock': 
-        return <UnlockIcon className="h-6 w-6 text-blue-500" />;
+        return UnlockIcon;
       case 'update':
-        return <FilePen className="h-6 w-6 text-blue-500" />;
+        return FilePen;
       case 'add':
-        return <FilePlus className="h-6 w-6 text-blue-500" />;
+        return FilePlus;
+      case 'withdrawal':
+        return AlertTriangle; // Add withdrawal type
       default:
-        return <AlertTriangle className="h-6 w-6 text-amber-500" />;
+        return AlertTriangle;
+    }
+  };
+
+  // Get icon based on type
+  const getIcon = () => {
+    // If custom icon is provided, use it directly
+    if (icon) return icon;
+    
+    const IconComponent = getIconComponent();
+    
+    switch(type) {
+      case 'warning':
+        return <IconComponent className="h-6 w-6 text-amber-500" />;
+      case 'danger':
+        return <IconComponent className="h-6 w-6 text-red-500" />;
+      case 'success':
+        return <IconComponent className="h-6 w-6 text-green-500" />;
+      case 'pink':
+        return <IconComponent className="h-8 w-8 text-pink-500" />;
+      case 'unlock': 
+        return <IconComponent className="h-6 w-6 text-blue-500" />;
+      case 'update':
+        return <IconComponent className="h-6 w-6 text-blue-500" />;
+      case 'add':
+        return <IconComponent className="h-6 w-6 text-blue-500" />;
+      case 'withdrawal':
+        return <IconComponent className="h-6 w-6 text-blue-500" />;
+      default:
+        return <IconComponent className="h-6 w-6 text-amber-500" />;
+    }
+  };
+
+  // Get background icon color based on type
+  const getBackgroundIconColor = () => {
+    switch(type) {
+      case 'warning':
+        return '#F59E0B';
+      case 'danger':
+        return '#EF4444';
+      case 'success':
+        return '#10B981';
+      case 'pink':
+        return '#EC4899';
+      case 'unlock':
+        return '#3B82F6';
+      case 'update':
+        return '#3B82F6';
+      case 'add':
+        return '#3B82F6';
+      case 'withdrawal':
+        return '#3B82F6';
+      default:
+        return '#F59E0B';
     }
   };
 
@@ -83,13 +141,59 @@ const SwipeConfirmationModal = ({
         return '#10B981';
       case 'pink':
         return '#EC4899';
+      case 'withdrawal':
+        return '#3B82F6';
       default:
         return '#3B82F6';
     }
   };
 
+  // Calculate background icon size and position based on details count
+  const getBackgroundIconProps = () => {
+    if (!confirmDetails) return null;
+    
+    const detailsCount = Object.keys(confirmDetails).length;
+    
+    // Only show background icon if details count >= 3
+    if (detailsCount < 3) return null;
+    
+    // Calculate size and position based on details count
+    let scale, translateY, translateX, opacity;
+    
+    if (detailsCount >= 6) {
+      scale = 4;
+      translateY = 40;
+      translateX = 80;
+      opacity = 0.09;
+    } else if (detailsCount >= 5) {
+      scale = 3;
+      translateY = 30;
+      translateX = 60;
+      opacity = 0.09;
+    } else if (detailsCount >= 4) {
+      scale = 3.2;
+      translateY = 25;
+      translateX = 50;
+      opacity = 0.09;
+    } else { // detailsCount >= 3
+      scale = 3;
+      translateY = 20;
+      translateX = 40;
+      opacity = 0.09;
+    }
+    
+    return {
+      scale,
+      translateY,
+      translateX,
+      opacity
+    };
+  };
+
   // Determine what content to show
   const shouldShowProcessing = showProcessing || (isProcessing && isCompleted);
+  const backgroundIconProps = getBackgroundIconProps();
+  const IconComponent = getIconComponent();
   
   return (
     <AnimatePresence>
@@ -103,7 +207,7 @@ const SwipeConfirmationModal = ({
           onClick={onClose}
         >
           <motion.div
-            className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-xl overflow-hidden z-[71]"
+            className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-xl overflow-hidden z-[71] relative"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -118,9 +222,39 @@ const SwipeConfirmationModal = ({
             }}
             onClick={(e) => e.stopPropagation()}
             layout // This will now work properly
-           
           >
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            {/* Background Icon - Only show if confirmDetails has >= 3 items */}
+            {backgroundIconProps && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                <motion.div
+                  className="transform"
+                  style={{ 
+                    color: getBackgroundIconColor(),
+                    opacity: backgroundIconProps.opacity,
+                    scale: backgroundIconProps.scale,
+                    translateY: backgroundIconProps.translateY,
+                    translateX: backgroundIconProps.translateX
+                  }}
+                  initial={{ 
+                    opacity: 0,
+                    scale: backgroundIconProps.scale * 0.8 
+                  }}
+                  animate={{ 
+                    opacity: backgroundIconProps.opacity,
+                    scale: backgroundIconProps.scale 
+                  }}
+                  transition={{ 
+                    duration: 0.6,
+                    ease: "easeOut",
+                    delay: 0.2
+                  }}
+                >
+                  <IconComponent size={120} strokeWidth={1.7} />
+                </motion.div>
+              </div>
+            )}
+
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between relative z-10">
               <div className="flex items-center">
                 <div className="mr-3 bg-gray-50 p-2 rounded-full">
                   {getIcon()}
@@ -137,8 +271,7 @@ const SwipeConfirmationModal = ({
             </div>
             
             {/* Single container with layout animation - no AnimatePresence here */}
-            <motion.div
-            >
+            <motion.div className="relative z-10">
               {shouldShowProcessing ? (
                 // Processing state with loading spinner
                 <motion.div
@@ -176,7 +309,7 @@ const SwipeConfirmationModal = ({
                   {/* Display confirmation details if provided */}
                   {confirmDetails && (
                     <motion.div 
-                      className="bg-gray-50 rounded-lg p-4 mb-6"
+                      className="rounded-lg p-4 mb-6 relative"
                       layout
                     >
                       {Object.entries(confirmDetails).map(([label, value]) => (

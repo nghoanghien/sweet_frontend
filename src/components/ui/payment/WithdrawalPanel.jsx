@@ -596,7 +596,7 @@ const WithdrawalPanel = ({
         description={`Bạn đang rút ${formatCurrency(parseFloat(withdrawalAmount))} từ tài khoản ${account.accountNumber} và nhận tiền mặt tại quầy.`}
         confirmText="Vuốt để xác nhận rút tiền"
         type="withdrawal"
-        icon={<CreditCard className="h-6 w-6 text-red-500" />}
+        icon={<CreditCard className="h-6 w-6 text-blue-500" />}
         isProcessing={isProcessing}
         confirmDetails={{
           "Số tiền rút": formatCurrency(parseFloat(withdrawalAmount)),
