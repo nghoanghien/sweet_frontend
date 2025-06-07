@@ -337,7 +337,7 @@ const PaymentAccountsNew = ({ customerId }) => {
           ? 'Khi khóa tài khoản, mọi giao dịch sẽ bị tạm dừng cho đến khi tài khoản được mở khóa.' 
           : 'Khi mở khóa tài khoản, tài khoản sẽ hoạt động bình thường trở lại.'}
         confirmText={lockConfirmData.isLocking ? 'Vuốt để khóa tài khoản' : 'Vuốt để mở khóa tài khoản'}
-        type={lockConfirmData.isLocking ? 'warning' : 'success'}
+        type={lockConfirmData.isLocking ? 'warning' : 'unlock'}
         isProcessing={isProcessing}
       />
       

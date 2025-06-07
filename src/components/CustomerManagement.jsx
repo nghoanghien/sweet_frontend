@@ -719,7 +719,7 @@ export default function CustomerManagement() {
         'Trạng thái hiện tại': customer.status === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
         'Trạng thái mới': newStatus === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
       },
-      type: `${newStatus === 'active'} ? 'unlock' ? 'warning'`,
+      type: `${newStatus === 'active' ? 'unlock' : 'warning'}`,
       onConfirm: () => {
         setConfirmationProcessing(true);
 
@@ -1379,6 +1379,7 @@ export default function CustomerManagement() {
           'Trạng thái hiện tại': account.status === "active" ? "Hoạt động" : "Đã khóa",
           'Trạng thái mới': newStatus === "active" ? "Hoạt động" : "Đã khóa",
         },
+        type: `${account.status === "active" ? 'warning' : 'unlock'}`,
         onConfirm: () => {
           setPaymentAccounts(prev => ({
             ...prev,
