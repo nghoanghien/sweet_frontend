@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone } from 'lucide-react';
+import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone, Crown, Star, Eye } from 'lucide-react';
 
 const AccountDetailModal = ({ isOpen, onClose, account }) => {
   if (!isOpen || !account) return null;
@@ -53,12 +53,14 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
   // Hàm chọn màu nền cho avatar dựa trên ID
   const getAvatarColor = (id) => {
     const colors = [
-      'bg-blue-500',
-      'bg-indigo-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-green-500',
-      'bg-teal-500',
+      'from-blue-500 to-indigo-600',
+      'from-indigo-500 to-purple-600',
+      'from-purple-500 to-pink-600',
+      'from-pink-500 to-rose-600',
+      'from-green-500 to-teal-600',
+      'from-teal-500 to-cyan-600',
+      'from-orange-500 to-red-600',
+      'from-yellow-500 to-orange-600',
     ];
     const index = parseInt(id.replace(/[^0-9]/g, '')) % colors.length;
     return colors[index];
@@ -67,152 +69,407 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
   return (
     <AnimatePresence mode="wait">
       {isOpen && (
-        <motion.div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-30"
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.3 }}
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, rgba(0, 0, 0, 0.4) 70%)'
+          }}
         >
+          {/* Animated background particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-2 h-2 bg-blue-400 rounded-full opacity-20"
+                initial={{ 
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
+                }}
+                animate={{ 
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
+                }}
+                transition={{ 
+                  duration: 10 + Math.random() * 10,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              />
+            ))}
+          </div>
+
           <motion.div
-            className="bg-white rounded-3xl shadow-xl w-full max-w-3xl max-h-[95vh] flex flex-col overflow-hidden"
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden relative"
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ 
+              duration: 0.4,
+              type: "spring",
+              stiffness: 300,
+              damping: 30
+            }}
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.95) 100%)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.2)'
+            }}
           >
+            {/* Decorative corner elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
+              <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full"></div>
+              <div className="absolute top-8 right-8 w-8 h-8 bg-gradient-to-br from-indigo-400 to-pink-500 rounded-full"></div>
+            </div>
+
             {/* Header */}
-            <div className="px-8 py-6 flex justify-between items-center rounded-t-3xl shadow-[0_4px_30px_rgba(0,170,255,0.12)] border-b-2 border-blue-100 bg-gradient-to-r from-blue-500 via-blue-400 to-indigo-600 text-white">
-              <div className="flex items-center gap-3">
-                <User size={32} className="mr-3 text-white drop-shadow-lg" />
-                <h3 className="text-2xl font-bold tracking-wide drop-shadow">Chi tiết tài khoản</h3>
+            <motion.div 
+              className="px-8 py-8 flex justify-between items-center rounded-t-3xl bg-gradient-to-r from-blue-500 via-blue-400 to-indigo-600 relative overflow-hidden"
+              style={{
+                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
+              }}
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
+            >
+              {/* Animated background pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-white via-transparent to-white transform -skew-x-12"></div>
+              </div>
+              
+              <div className="flex items-center gap-3 relative z-10">
+                <motion.div
+                  className="p-2 bg-white bg-opacity-20 rounded-xl backdrop-blur-sm"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                >
+                  <Eye size={28} className="text-white drop-shadow-lg" />
+                </motion.div>
+                <div>
+                  <motion.h3 
+                    className="text-xl font-bold tracking-wide drop-shadow text-white"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.3 }}
+                  >
+                    Chi tiết tài khoản
+                  </motion.h3>
+                  <motion.p 
+                    className="text-white text-opacity-80 text-sm"
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                  >
+                    Thông tin và quyền hạn chi tiết
+                  </motion.p>
+                </div>
               </div>
               <motion.button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-all"
-                whileHover={{ scale: 1.15, rotate: 90 }}
-                whileTap={{ scale: 0.92 }}
+                className="p-2 rounded-xl bg-white bg-opacity-20 hover:bg-opacity-30 transition-all backdrop-blur-sm relative z-10"
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400 }}
               >
-                <X size={28} />
+                <X size={24} className="text-white" />
               </motion.button>
-            </div>
+            </motion.div>
             
             {/* Content */}
-            <div className="p-6 overflow-y-auto">
+            <motion.div 
+              className="p-8 overflow-y-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+            >
               {/* Account info */}
-              <div className="flex items-start mb-6">
-                <motion.div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg ${getAvatarColor(account.id)} mr-5`}
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {getInitials(account.name)}
-                </motion.div>
-                <div>
-                  <h4 className="text-xl font-bold text-gray-800">{account.name}</h4>
-                  <p className="text-gray-500 flex items-center mt-1">
-                    <User size={16} className="mr-1" />
-                    {account.email}
-                  </p>
-                  <p className="text-gray-500 flex items-center mt-1">
-                    <Phone size={16} className="mr-1" />
-                    {account.phone}
-                  </p>
-                  <p className="text-gray-500 flex items-center mt-1">
-                    <IdCard size={16} className="mr-1" />
-                    {account.CCCD}
-                  </p>
-                  <div className="flex items-center mt-2 gap-2">
-                    {account.type === 'customer' ? (
-                      <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-2xl text-xs font-semibold flex items-center gap-1 shadow-sm">
-                        <Users size={14} /> Khách hàng
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-2xl text-xs font-semibold flex items-center gap-1 shadow-sm">
-                        <Settings size={14} /> Nhân viên
-                      </span>
-                    )}
-                    <span className="text-gray-300">•</span>
-                    {account.disabled ? (
-                      <span className="px-3 py-1.5 bg-red-100 text-red-700 rounded-2xl text-xs font-semibold flex items-center gap-1 shadow-sm">
-                        <XCircle size={14} /> Vô hiệu hóa
-                      </span>
-                    ) : (
-                      <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-2xl text-xs font-semibold flex items-center gap-1 shadow-sm">
-                        <CheckCircle size={14} /> Hoạt động
-                      </span>
-                    )}
+              <motion.div 
+                className="mb-8"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+              >
+                <div className="flex items-start gap-6">
+                  <motion.div
+                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account.id)} flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Shimmer effect */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20"
+                      initial={{ x: '-100%' }}
+                      animate={{ x: '100%' }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                    />
+                    <span className="relative z-10">{getInitials(account.name)}</span>
+                  </motion.div>
+                  
+                  <div className="flex-1">
+                    <motion.h4 
+                      className="text-2xl font-bold text-gray-800 mb-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4, duration: 0.3 }}
+                    >
+                      {account.name}
+                    </motion.h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <motion.div 
+                        className="flex items-center text-gray-600"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5, duration: 0.3 }}
+                      >
+                        <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                          <User size={16} className="text-blue-600" />
+                        </div>
+                        <span className="font-medium">{account.email}</span>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="flex items-center text-gray-600"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6, duration: 0.3 }}
+                      >
+                        <div className="p-2 bg-green-100 rounded-lg mr-3">
+                          <Phone size={16} className="text-green-600" />
+                        </div>
+                        <span className="font-medium">{account.phone}</span>
+                      </motion.div>
+                      
+                      <motion.div 
+                        className="flex items-center text-gray-600"
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.7, duration: 0.3 }}
+                      >
+                        <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                          <IdCard size={16} className="text-purple-600" />
+                        </div>
+                        <span className="font-medium">{account.CCCD}</span>
+                      </motion.div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <motion.span 
+                        className={`px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-md ${
+                          account.type === 'customer' 
+                            ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                            : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                        }`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.8, duration: 0.3 }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {account.type === 'customer' ? (
+                          <>
+                            <Users size={16} /> Khách hàng
+                          </>
+                        ) : (
+                          <>
+                            <Settings size={16} /> Nhân viên
+                          </>
+                        )}
+                      </motion.span>
+                      
+                      <motion.span 
+                        className={`px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-md ${
+                          account.disabled
+                            ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
+                            : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                        }`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.9, duration: 0.3 }}
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        {account.disabled ? (
+                          <>
+                            <XCircle size={16} /> Vô hiệu hóa
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle size={16} /> Hoạt động
+                          </>
+                        )}
+                      </motion.span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
               {/* Role info */}
-              <div className="mb-6">
-                <h5 className="text-sm font-semibold text-blue-700 mb-2 flex items-center">
-                  <UserCheck size={18} className="mr-2" />Vai trò
+              <motion.div 
+                className="mb-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              >
+                <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <Crown size={20} className="text-blue-600" />
+                  Vai trò
                 </h5>
-                <div className={`p-4 rounded-2xl font-semibold text-base shadow-sm border border-blue-100
-                  ${account.type === 'customer' ? 'bg-blue-50 text-blue-700' : 'bg-indigo-50 text-indigo-700'}`}
+                <motion.div 
+                  className={`p-6 rounded-2xl font-bold text-lg shadow-lg border-2 relative overflow-hidden ${
+                    account.type === 'customer' 
+                      ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 text-blue-700' 
+                      : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200 text-indigo-700'
+                  }`}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  {account.role.name}
-                </div>
-              </div>
+                  {/* Decorative background */}
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-white/30 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
+                  
+                  <div className="flex items-center gap-3 relative z-10">
+                    <div className={`p-3 rounded-xl shadow-md ${
+                      account.type === 'customer'
+                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                    }`}>
+                      <UserCheck size={20} />
+                    </div>
+                    <span>{account.role.name}</span>
+                  </div>
+                </motion.div>
+              </motion.div>
               
               {/* Permissions */}
-              <div>
-                <h5 className="text-sm font-semibold text-blue-700 mb-2 flex items-center">
-                  <Shield size={18} className="mr-2" />Quyền hạn
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.3 }}
+              >
+                <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <Shield size={20} className="text-blue-600" />
+                  Quyền hạn ({permissions.length})
                 </h5>
                 
                 {permissions.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {permissions.map((permission, idx) => (
                       <motion.div
                         key={permission.id}
-                        className="bg-gradient-to-br from-blue-50/80 to-white rounded-2xl p-5 border border-blue-100 shadow-[0_2px_12px_rgba(0,170,255,0.06)]"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.08, duration: 0.35 }}
+                        className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 rounded-2xl p-6 border border-blue-100 shadow-lg relative overflow-hidden group"
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ delay: 0.6 + idx * 0.1, duration: 0.4 }}
+                        whileHover={{ 
+                          scale: 1.02, 
+                          y: -4,
+                          boxShadow: '0 12px 40px rgba(59, 130, 246, 0.15)'
+                        }}
                       >
-                        <div className="flex items-center mb-2">
-                          <Shield size={18} className={`mr-3 ${account.type === 'customer' ? 'text-blue-600' : 'text-indigo-600'}`} />
-                          <p className="font-semibold text-base text-blue-800">{permission.name}</p>
-                        </div>
-                        <div className="pl-7">
-                          <p className="text-sm text-blue-600 mb-2 font-medium">Chức năng:</p>
-                          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {permission.functions.map((func, index) => (
-                              <li key={index} className="text-sm text-gray-700 flex items-start">
-                                <span className={`p-1 rounded-full mr-2 flex-shrink-0 ${account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'}`}>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                </span>
-                                {func}
-                              </li>
-                            ))}
-                          </ul>
+                        {/* Animated background gradient */}
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 1.5 }}
+                        />
+                        
+                        <div className="relative z-10">
+                          <div className="flex items-center mb-4">
+                            <motion.div 
+                              className={`p-3 rounded-xl shadow-md mr-4 ${
+                                account.type === 'customer' 
+                                  ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                              }`}
+                              whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.6 }}
+                            >
+                              <Shield size={18} />
+                            </motion.div>
+                            <h6 className="font-bold text-lg text-gray-800">{permission.name}</h6>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <p className="text-sm font-semibold text-gray-600 flex items-center gap-2">
+                              <Star size={14} className="text-yellow-500" />
+                              Chức năng được phép:
+                            </p>
+                            <div className="grid grid-cols-1 gap-2">
+                              {permission.functions.map((func, index) => (
+                                <motion.div 
+                                  key={index} 
+                                  className="text-sm text-gray-700 flex items-start bg-white/60 p-3 rounded-xl border border-gray-100"
+                                  initial={{ opacity: 0, x: -10 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  transition={{ delay: 0.7 + idx * 0.1 + index * 0.05, duration: 0.3 }}
+                                >
+                                  <motion.div 
+                                    className={`p-1 rounded-full mr-3 flex-shrink-0 ${
+                                      account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'
+                                    }`}
+                                    whileHover={{ scale: 1.2 }}
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                  </motion.div>
+                                  <span className="font-medium">{func}</span>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       </motion.div>
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-gradient-to-br from-blue-50/80 to-white rounded-2xl p-5 border border-blue-100 text-center shadow-sm">
-                    <p className="text-blue-400 font-medium">Tài khoản không có quyền hạn nào</p>
-                  </div>
+                  <motion.div 
+                    className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-8 border border-gray-200 text-center shadow-lg"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6, duration: 0.4 }}
+                  >
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="p-4 bg-gray-200 rounded-full">
+                        <Shield size={32} className="text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 font-semibold text-lg">Tài khoản không có quyền hạn nào</p>
+                      <p className="text-gray-400 text-sm">Liên hệ quản trị viên để cấp quyền</p>
+                    </div>
+                  </motion.div>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
             
             {/* Footer */}
-            <div className="px-8 py-5 bg-gradient-to-r from-blue-50 via-indigo-50 to-white border-t-2 border-blue-100 flex justify-end rounded-b-3xl">
+            <motion.div 
+              className="px-8 py-6 bg-gradient-to-r from-gray-50 via-blue-50 to-indigo-50 border-t border-gray-200 flex justify-end rounded-b-3xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.3 }}
+            >
               <motion.button
                 onClick={onClose}
-                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold shadow hover:bg-gray-200 transition-all"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.96 }}
+                className="px-8 py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-2xl font-semibold shadow-lg relative overflow-hidden group"
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -2,
+                  boxShadow: '0 8px 25px rgba(107, 114, 128, 0.4)'
+                }}
+                whileTap={{ scale: 0.95 }}
               >
-                Đóng
+                {/* Shimmer effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                />
+                <span className="relative z-10">Đóng</span>
               </motion.button>
-            </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       )}
@@ -220,4 +477,4 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
   );
 };
 
-export default AccountDetailModal; 
+export default AccountDetailModal;
