@@ -797,13 +797,6 @@ const SavingsAccounts = ({ customerId }) => {
               key={account.id}
               className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
             >
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-              <div 
-                className={`opacity-[0.09] ${account.iconColor} transform scale-[3] translate-y-16 translate-x-8`}
-              >
-                <PiggyBank size={70} strokeWidth={1.6} />
-              </div>
-            </div>
               <div
                 className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
               >

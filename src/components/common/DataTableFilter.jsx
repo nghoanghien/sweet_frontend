@@ -254,7 +254,7 @@ const DataTableFilter = ({
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
           >
-            <div className="opacity-[0.09] text-blue-400 transform scale-[2] translate-y-6 translate-x-20">
+            <div className="opacity-[0.09] text-purple-400 transform scale-[2] translate-y-6 translate-x-20">
               <Filter size={50} strokeWidth={3.2} />
             </div>
           </motion.div>
