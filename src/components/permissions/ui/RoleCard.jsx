@@ -1,6 +1,18 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { UserCheck, Users, Shield, Edit2, Trash2 } from 'lucide-react';
+import { 
+  UserCheck, 
+  Users, 
+  Shield, 
+  Edit2, 
+  Trash2, 
+  CreditCard, 
+  PiggyBank, 
+  UserCog, 
+  Package, 
+  BarChart3, 
+  Settings 
+} from 'lucide-react';
 
 const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
   // Hàm chọn icon dựa trên loại vai trò
@@ -13,6 +25,22 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       default:
         return <UserCheck className="text-gray-500" size={24} />;
     }
+  };
+
+  // Hàm chọn icon cho quyền hạn
+  const getPermissionIcon = (permissionId) => {
+    const iconMap = {
+      'perm1': CreditCard,
+      'perm2': PiggyBank,
+      'perm4': Users,
+      'perm5': UserCog,
+      'perm7': Package,
+      'perm8': BarChart3,
+      'perm9': Settings,
+      'perm10': Shield
+    };
+   
+    return iconMap[permissionId] || Shield;
   };
 
   return (
@@ -66,16 +94,19 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       <div className="mb-4">
         <p className="text-xs text-gray-500 mb-2 font-medium">Quyền hạn:</p>
         <div className="flex flex-wrap gap-2">
-          {role.permissions.map((permission) => (
-            <motion.div
-              key={permission.id}
-              className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-semibold shadow-sm border border-blue-100 transition-all"
-              whileHover={{ scale: 1.05, backgroundColor: "#dbeafe" }}
-            >
-              <Shield size={14} className="mr-1" />
-              {permission.name}
-            </motion.div>
-          ))}
+          {role.permissions.map((permission) => {
+            const IconComponent = getPermissionIcon(permission.id);
+            return (
+              <motion.div
+                key={permission.id}
+                className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-semibold shadow-sm border border-blue-100 transition-all"
+                whileHover={{ scale: 1.05, backgroundColor: "#dbeafe" }}
+              >
+                <IconComponent size={14} className="mr-1" />
+                {permission.name}
+              </motion.div>
+            );
+          })}
           {role.permissions.length === 0 && (
             <span className="text-xs text-gray-400 italic">
               Không có quyền hạn
@@ -117,4 +148,4 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
   );
 };
 
-export default RoleCard; 
+export default RoleCard;

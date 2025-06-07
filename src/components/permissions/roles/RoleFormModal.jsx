@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, UserCheck, Shield, Users, Settings, Save, PlusCircle } from 'lucide-react';
+import { X, UserCheck, Shield, Users, Settings, Save, PlusCircle, CreditCard, PiggyBank, UserCog, Package, BarChart3 } from 'lucide-react';
 import InputField from '../../ui/custom/Inputfield';
 import SwipeConfirmationModal from '../../ui/SwipeConfirmationModal';
 
@@ -45,12 +45,6 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
     
     // Quyền hạn nhân viên
     {
-      id: 'perm3',
-      name: 'Xem tổng quan ngân hàng',
-      type: 'staff',
-      description: 'Quyền xem thông tin tổng quan về hoạt động ngân hàng'
-    },
-    {
       id: 'perm4',
       name: 'Quản lý khách hàng',
       type: 'staff',
@@ -61,12 +55,6 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
       name: 'Quản lý nhân viên',
       type: 'staff',
       description: 'Quyền quản lý thông tin nhân viên'
-    },
-    {
-      id: 'perm6',
-      name: 'Quản lý phiếu gửi tiền',
-      type: 'staff',
-      description: 'Quyền quản lý các phiếu gửi tiền'
     },
     {
       id: 'perm7',
@@ -93,6 +81,99 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
       description: 'Quyền quản lý vai trò và phân quyền'
     }
   ];
+
+  // Mapping icons cho từng quyền hạn cụ thể
+  const getPermissionIcon = (permissionId) => {
+    const iconMap = {
+      'perm1': CreditCard,
+      'perm2': PiggyBank,
+      'perm4': Users,
+      'perm5': UserCog,
+      'perm6': Shield, // Không có icon riêng nên dùng Shield
+      'perm7': Package,
+      'perm8': BarChart3,
+      'perm9': Settings,
+      'perm10': Shield
+    };
+   
+    return iconMap[permissionId] || Shield;
+  };
+
+  // Định nghĩa màu sắc cho từng quyền hạn
+  const getCardColors = (permissionId, type) => {
+    if (type === 'customer') {
+      const customerColors = {
+        'perm1': {
+          primary: '#10b981', // emerald
+          secondary: '#06d6a0',
+          dark: '#047857',
+          accent: '#6ee7b7',
+          light: '#d1fae5'
+        },
+        'perm2': {
+          primary: '#3b82f6', // blue
+          secondary: '#8b5cf6',
+          dark: '#1e40af',
+          accent: '#93c5fd',
+          light: '#dbeafe'
+        }
+      };
+      return customerColors[permissionId] || customerColors['perm1'];
+    } else {
+      const staffColors = {
+        'perm4': {
+          primary: '#f59e0b', // amber
+          secondary: '#ef4444',
+          dark: '#d97706',
+          accent: '#fbbf24',
+          light: '#fef3c7'
+        },
+        'perm5': {
+          primary: '#8b5cf6', // purple
+          secondary: '#3b82f6',
+          dark: '#7c3aed',
+          accent: '#c4b5fd',
+          light: '#ede9fe'
+        },
+        'perm6': {
+          primary: '#06b6d4', // cyan
+          secondary: '#14b8a6',
+          dark: '#0891b2',
+          accent: '#67e8f9',
+          light: '#cffafe'
+        },
+        'perm7': {
+          primary: '#ec4899',    // pink-500
+          secondary: '#db2777',  // pink-600
+          dark: '#be185d',       // pink-700
+          accent: '#f472b6',     // pink-400
+          light: '#fce7f3'       // pink-100
+        },
+        'perm8': {
+          primary: '#14b8a6', // teal
+          secondary: '#06b6d4',
+          dark: '#0f766e',
+          accent: '#7dd3fc',
+          light: '#ccfbf1'
+        },
+        'perm9': {
+          primary: '#6b7280', // gray
+          secondary: '#64748b',
+          dark: '#4b5563',
+          accent: '#d1d5db',
+          light: '#f3f4f6'
+        },
+        'perm10': {
+          primary: '#ef4444', // red
+          secondary: '#ec4899',
+          dark: '#dc2626',
+          accent: '#fca5a5',
+          light: '#fee2e2'
+        }
+      };
+      return staffColors[permissionId] || staffColors['perm4'];
+    }
+  };
 
   // Cập nhật formData khi role thay đổi
   useEffect(() => {
@@ -376,43 +457,145 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                 </AnimatePresence>
               </div>
               
-              {/* Permissions selection */}
+              {/* Permissions selection - Updated */}
               <div>
                 <label className="block text-base font-semibold text-blue-700 mb-2">Chọn quyền hạn:</label>
                 {errors.permissions && (
                   <p className="mb-2 text-sm text-red-600 font-medium">{errors.permissions}</p>
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto p-1">
-                  {filteredPermissions.map((permission) => (
-                    <motion.div
-                      key={permission.id}
-                      className={`p-4 rounded-2xl border-2 cursor-pointer flex items-start shadow-[0_2px_12px_rgba(0,170,255,0.06)] transition-all
-                        ${isPermissionSelected(permission.id)
-                          ? 'bg-indigo-50 border-indigo-300'
-                          : 'bg-white border-indigo-100 hover:bg-blue-50'}`}
-                      onClick={() => handleTogglePermission(permission)}
-                      whileHover={{ scale: 1.03, boxShadow: '0 0 20px rgba(0,170,255,0.10)' }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div className={`p-2 rounded-full mr-3 shadow-sm
-                        ${isPermissionSelected(permission.id)
-                          ? 'bg-indigo-100 text-indigo-600'
-                          : 'bg-blue-100 text-blue-500'}`}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full p-1">
+                  {filteredPermissions.map((permission) => {
+                    const isSelected = isPermissionSelected(permission.id);
+                    const IconComponent = getPermissionIcon(permission.id);
+                    const colors = getCardColors(permission.id, permission.type);
+                    
+                    return (
+                      <motion.div
+                        key={permission.id}
+                        className={`relative p-4 rounded-2xl border-2 cursor-pointer flex items-start overflow-hidden transition-all duration-300
+                          ${
+                            isSelected
+                              ? "border-transparent shadow-lg"
+                              : "border-gray-200 hover:border-gray-300 bg-white hover:shadow-md"
+                          }`}
+                        style={{
+                          backgroundColor: isSelected ? colors.light : "white",
+                          borderColor: isSelected ? colors.primary : undefined,
+                        }}
+                        onClick={() => handleTogglePermission(permission)}
+                        whileHover={{
+                          scale: 1.02,
+                          boxShadow: isSelected
+                            ? `0 8px 25px ${colors.primary}20`
+                            : "0 4px 20px rgba(0,0,0,0.08)",
+                        }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        <Shield size={18} />
-                      </div>
-                      <div>
-                        <p className={`font-semibold text-base
-                          ${isPermissionSelected(permission.id) ? 'text-indigo-700' : 'text-blue-700'}`}
+                        {/* Background Icon - Large and Faded */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                          <div
+                            className="opacity-[0.1] transform scale-[4] translate-y-4 translate-x-20"
+                            style={{ color: colors.primary }}
+                          >
+                            <IconComponent size={20} strokeWidth={1.8} />
+                          </div>
+                        </div>
+
+                        {/* Background gradient effect khi được chọn */}
+                        {isSelected && (
+                          <motion.div
+                            className="absolute inset-0 opacity-10 rounded-2xl"
+                            style={{
+                              background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                            }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.1 }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        )}
+
+                        {/* Icon container */}
+                        <motion.div
+                          className={`relative z-10 p-3 rounded-xl mr-3 shadow-sm transition-all duration-300`}
+                          style={{
+                            backgroundColor: isSelected
+                              ? `${colors.primary}15`
+                              : "#f8fafc",
+                            color: isSelected ? colors.primary : "#64748b",
+                          }}
+                          whileHover={{
+                            scale: 1.1,
+                            backgroundColor: isSelected
+                              ? `${colors.primary}25`
+                              : "#f1f5f9",
+                          }}
                         >
-                          {permission.name}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {permission.description}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
+                          <IconComponent size={20} />
+                        </motion.div>
+
+                        {/* Content */}
+                        <div className="relative z-10 flex-1">
+                          <motion.p
+                            className={`font-semibold text-base transition-colors duration-300`}
+                            style={{
+                              color: isSelected ? colors.dark : "#374151",
+                            }}
+                          >
+                            {permission.name}
+                          </motion.p>
+                          <p
+                            className={`text-xs mt-1 transition-colors duration-300 ${
+                              isSelected ? "text-gray-600" : "text-gray-500"
+                            }`}
+                          >
+                            {permission.description}
+                          </p>
+                        </div>
+
+                        {/* Selection indicator */}
+                        {isSelected && (
+                          <motion.div
+                            className="absolute top-3 right-3 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
+                            style={{
+                              backgroundColor: colors.primary,
+                              color: "white",
+                            }}
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 500,
+                              damping: 25,
+                            }}
+                          >
+                            <motion.div
+                              initial={{ pathLength: 0 }}
+                              animate={{ pathLength: 1 }}
+                              transition={{ duration: 0.3, delay: 0.1 }}
+                            >
+                              ✓
+                            </motion.div>
+                          </motion.div>
+                        )}
+
+                        {/* Hover effect border */}
+                        <motion.div
+                          className="absolute inset-0 rounded-2xl border-2 border-transparent"
+                          style={{
+                            borderColor: isSelected
+                              ? colors.primary
+                              : "transparent",
+                          }}
+                          whileHover={{
+                            borderColor: isSelected
+                              ? colors.primary
+                              : colors.accent || "#e5e7eb",
+                          }}
+                          transition={{ duration: 0.2 }}
+                        />
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

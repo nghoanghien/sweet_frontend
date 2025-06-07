@@ -50,7 +50,7 @@ const RoleManagement = () => {
     },
     {
       id: 'role2',
-      name: 'Vai trò thanh toán',
+      name: 'Quyền thanh toán',
       type: 'customer',
       description: 'Chỉ có quyền thực hiện các giao dịch thanh toán',
       permissions: [
@@ -61,7 +61,7 @@ const RoleManagement = () => {
     },
     {
       id: 'role3',
-      name: 'Vai trò tiết kiệm',
+      name: 'Quyền tiết kiệm',
       type: 'customer',
       description: 'Có quyền thanh toán và sử dụng các tính năng tiết kiệm',
       permissions: [
