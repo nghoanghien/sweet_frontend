@@ -52,6 +52,7 @@ const sampleSavingsAccounts = [
     receivedInterest: 2500000,
     totalReceivable: 213600000,
     color: "bg-gradient-to-r from-blue-400 to-indigo-500",
+    iconColor: 'text-blue-600',
     status: "active",
     tooltip: "Lãi suất ưu đãi +0.3%"
   },
@@ -74,6 +75,7 @@ const sampleSavingsAccounts = [
     receivedInterest: 3437500,
     totalReceivable: 153437500,
     color: "bg-gradient-to-r from-pink-400 to-purple-500",
+    iconColor: 'text-pink-600',
     status: "active"
   },
   {
@@ -95,6 +97,7 @@ const sampleSavingsAccounts = [
     receivedInterest: 5325000,
     totalReceivable: 342600000,
     color: "bg-gradient-to-r from-green-400 to-teal-500",
+    iconColor: 'text-green-600',
     status: "active",
     tooltip: "VIP - Miễn phí rút tiền trước hạn"
   }
@@ -794,6 +797,13 @@ const SavingsAccounts = ({ customerId }) => {
               key={account.id}
               className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
             >
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div 
+                className={`opacity-[0.09] ${account.iconColor} transform scale-[3] translate-y-16 translate-x-8`}
+              >
+                <PiggyBank size={70} strokeWidth={1.6} />
+              </div>
+            </div>
               <div
                 className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
               >
