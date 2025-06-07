@@ -88,7 +88,7 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
     >
       {/* Background icon */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <div className="opacity-[0.08] transform scale-[6] translate-y-16 translate-x-24">
+        <div className="opacity-[0.07] transform scale-[6] -translate-y-4 translate-x-32">
           {getAccountIcon(account.type)}
         </div>
       </div>
