@@ -92,8 +92,14 @@ const SystemSettings = () => {
           {/* Card nhân viên */}
           <motion.div
             whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(0,170,255,0.10)' }}
-            className="bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(0,170,255,0.06)] border border-blue-50"
+            className="relative bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(0,170,255,0.06)] border border-blue-50"
           >
+            {/* Background Icon - Large and Faded */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div className="opacity-[0.09] text-blue-400 transform scale-[2] translate-y-4 translate-x-20">
+                <User size={50} strokeWidth={3.2} />
+              </div>
+            </div>
             <motion.span
               initial={{ scale: 1 }}
               animate={{ scale: 1.1 }}
@@ -110,8 +116,14 @@ const SystemSettings = () => {
           {/* Card khách hàng */}
           <motion.div
             whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(99,102,241,0.10)' }}
-            className="bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
+            className="relative bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
           >
+            {/* Background Icon - Large and Faded */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div className="opacity-[0.09] text-blue-400 transform scale-[2] translate-y-4 translate-x-20">
+                <UserCheck size={50} strokeWidth={3.2} />
+              </div>
+            </div>
             <motion.span
               initial={{ scale: 1 }}
               animate={{ scale: 1.1 }}
@@ -128,8 +140,14 @@ const SystemSettings = () => {
 
           <motion.div
             whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(99,102,241,0.10)' }}
-            className="bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
+            className="relative bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
           >
+            {/* Background Icon - Large and Faded */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div className="opacity-[0.09] text-blue-400 transform scale-[2] translate-y-8 translate-x-20">
+                <CreditCard size={50} strokeWidth={3.2} />
+              </div>
+            </div>
             <motion.span
               initial={{ scale: 1 }}
               animate={{ scale: 1.1 }}
@@ -146,8 +164,14 @@ const SystemSettings = () => {
 
           <motion.div
             whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(99,102,241,0.10)' }}
-            className="bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
+            className="relative bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
           >
+            {/* Background Icon - Large and Faded */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div className="opacity-[0.09] text-blue-400 transform scale-[2] translate-y-8 translate-x-20">
+                <CreditCard size={50} strokeWidth={3.2} />
+              </div>
+            </div>
             <motion.span
               initial={{ scale: 1 }}
               animate={{ scale: 1.1 }}
@@ -164,8 +188,14 @@ const SystemSettings = () => {
 
           <motion.div
             whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(99,102,241,0.10)' }}
-            className="bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
+            className="relative bg-white/80 rounded-2xl p-5 flex items-center shadow-[0_2px_12px_rgba(99,102,241,0.06)] border border-indigo-50"
           >
+            {/* Background Icon - Large and Faded */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <div className="opacity-[0.09] text-blue-400 transform scale-[2] translate-y-8 translate-x-20">
+                <CreditCard size={50} strokeWidth={3.2} />
+              </div>
+            </div>
             <motion.span
               initial={{ scale: 1 }}
               animate={{ scale: 1.1 }}
