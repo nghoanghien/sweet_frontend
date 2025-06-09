@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Edit, Trash, MoreHorizontal, RefreshCcw, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, Edit, Trash, RefreshCcw } from 'lucide-react';
 import StatusBadge from '../ui/custom/StatusBadge';
 import DataTableFilter from './DataTableFilter';
 

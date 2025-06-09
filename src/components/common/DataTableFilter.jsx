@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
+import { ChevronDown, Filter, X } from 'lucide-react';
 import StatusBadge from '../ui/custom/StatusBadge';
-import DateRangePicker from '../DateRangePicker';
+import DateRangePicker from '../ui/DateRangePicker';
 
 const DataTableFilter = ({
   filters = {},

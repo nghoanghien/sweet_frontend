@@ -1,10 +1,3 @@
-export { default as AccountHeader } from './AccountHeader';
-export { default as SearchAndViewToggle } from './SearchAndViewToggle';
-export { default as EmptySearchResult } from './EmptySearchResult';
-export { default as EmptyAccountState } from './EmptyAccountState';
 export { default as LoadingState } from './LoadingState';
-export { default as AccountCard } from './AccountCard';
-export { default as AccountListItem } from './AccountListItem';
-export { default as NewAccountModal } from './NewAccountModal';
-export { default as AccountDetailDrawer } from './AccountDetailDrawer';
-export { default as SwipeConfirmationModal } from './SwipeConfirmationModal';
+export { default as AccountDetailDrawer } from '../modules/payment-account/components/AccountDetailDrawer';
+export { default as SwipeConfirmationModal } from '../modals/ConfirmationModal/SwipeConfirmationModal';
