@@ -77,37 +77,77 @@ const SwipeConfirmationModal = ({
     }
   };
 
-  // Get icon based on type
+  // Get liquid glass colors based on type
+  const getLiquidGlassTheme = () => {
+    switch(type) {
+      case 'warning':
+        return {
+          accent: 'from-amber-400/20 to-orange-500/20',
+          accentSolid: 'text-amber-500',
+          glow: 'shadow-amber-500/20',
+          border: 'border-amber-200/30',
+          bg: 'bg-amber-50/10'
+        };
+      case 'danger':
+        return {
+          accent: 'from-red-400/20 to-pink-500/20',
+          accentSolid: 'text-red-500',
+          glow: 'shadow-red-500/20',
+          border: 'border-red-200/30',
+          bg: 'bg-red-50/10'
+        };
+      case 'success':
+        return {
+          accent: 'from-emerald-400/20 to-green-500/20',
+          accentSolid: 'text-emerald-500',
+          glow: 'shadow-emerald-500/20',
+          border: 'border-emerald-200/30',
+          bg: 'bg-emerald-50/10'
+        };
+      case 'pink':
+        return {
+          accent: 'from-pink-400/20 to-rose-500/20',
+          accentSolid: 'text-pink-500',
+          glow: 'shadow-pink-500/20',
+          border: 'border-pink-200/30',
+          bg: 'bg-pink-50/10'
+        };
+      case 'unlock':
+      case 'update':
+      case 'add':
+      case 'withdrawal':
+        return {
+          accent: 'from-blue-400/20 to-cyan-500/20',
+          accentSolid: 'text-blue-500',
+          glow: 'shadow-blue-500/20',
+          border: 'border-blue-200/30',
+          bg: 'bg-blue-50/10'
+        };
+      default:
+        return {
+          accent: 'from-slate-400/20 to-gray-500/20',
+          accentSolid: 'text-slate-500',
+          glow: 'shadow-slate-500/20',
+          border: 'border-slate-200/30',
+          bg: 'bg-slate-50/10'
+        };
+    }
+  };
+
+  // Get icon based on type with liquid glass styling
   const getIcon = () => {
     // If custom icon is provided, use it directly
     if (icon) return icon;
     
     const IconComponent = getIconComponent();
+    const theme = getLiquidGlassTheme();
     
-    switch(type) {
-      case 'warning':
-        return <IconComponent className="h-6 w-6 text-amber-500" />;
-      case 'danger':
-        return <IconComponent className="h-6 w-6 text-red-500" />;
-      case 'success':
-        return <IconComponent className="h-6 w-6 text-green-500" />;
-      case 'pink':
-        return <IconComponent className="h-8 w-8 text-pink-500" />;
-      case 'unlock': 
-        return <IconComponent className="h-6 w-6 text-blue-500" />;
-      case 'update':
-        return <IconComponent className="h-6 w-6 text-blue-500" />;
-      case 'add':
-        return <IconComponent className="h-6 w-6 text-blue-500" />;
-      case 'withdrawal':
-        return <IconComponent className="h-6 w-6 text-blue-500" />;
-      default:
-        return <IconComponent className="h-6 w-6 text-amber-500" />;
-    }
+    return <IconComponent className={`h-6 w-6 ${theme.accentSolid} drop-shadow-sm`} />;
   };
 
   // Get background icon color based on type
   const getBackgroundIconColor = () => {
+    const theme = getLiquidGlassTheme();
     switch(type) {
       case 'warning':
         return '#F59E0B';
@@ -118,34 +158,18 @@ const SwipeConfirmationModal = ({
       case 'pink':
         return '#EC4899';
       case 'unlock':
-        return '#3B82F6';
       case 'update':
-        return '#3B82F6';
       case 'add':
-        return '#3B82F6';
       case 'withdrawal':
         return '#3B82F6';
       default:
-        return '#F59E0B';
+        return '#64748B';
     }
   };
 
   // Get spinner color based on type
   const getSpinnerColor = () => {
-    switch(type) {
-      case 'warning':
-        return '#F59E0B';
-      case 'danger':
-        return '#EF4444';
-      case 'success':
-        return '#10B981';
-      case 'pink':
-        return '#EC4899';
-      case 'withdrawal':
-        return '#3B82F6';
-      default:
-        return '#3B82F6';
-    }
+    return getBackgroundIconColor();
   };
 
   // Calculate background icon size and position based on details count
@@ -164,22 +188,22 @@ const SwipeConfirmationModal = ({
       scale = 4;
       translateY = 40;
       translateX = 80;
-      opacity = 0.09;
+      opacity = 0.06;
     } else if (detailsCount >= 5) {
       scale = 3;
       translateY = 30;
       translateX = 60;
-      opacity = 0.09;
+      opacity = 0.06;
     } else if (detailsCount >= 4) {
       scale = 3.2;
       translateY = 25;
       translateX = 50;
-      opacity = 0.09;
+      opacity = 0.06;
     } else { // detailsCount >= 3
       scale = 3;
       translateY = 20;
       translateX = 40;
-      opacity = 0.09;
+      opacity = 0.06;
     }
     
     return {
@@ -194,35 +218,68 @@ const SwipeConfirmationModal = ({
   const shouldShowProcessing = showProcessing || (isProcessing && isCompleted);
   const backgroundIconProps = getBackgroundIconProps();
   const IconComponent = getIconComponent();
+  const theme = getLiquidGlassTheme();
   
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          className="fixed inset-0 bg-black/30 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center"
+          initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+          animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
+          exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           onClick={onClose}
         >
           <motion.div
-            className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl shadow-xl overflow-hidden z-[71] relative"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            className={`
+              relative w-full max-w-md mx-2 sm:mx-0
+              bg-white/20 backdrop-blur-xl
+              border-0 border-white/30 ${theme.border}
+              rounded-t-3xl sm:rounded-3xl
+              shadow-2xl ${theme.glow}
+              overflow-hidden z-[71]
+              before:absolute before:inset-0 
+              before:bg-gradient-to-br before:${theme.accent}
+              before:opacity-60 before:pointer-events-none
+            `}
+            initial={{ 
+              y: '100%', 
+              scale: 0.9,
+              opacity: 0,
+              rotateX: 10
+            }}
+            animate={{ 
+              y: 0, 
+              scale: 1,
+              opacity: 1,
+              rotateX: 0
+            }}
+            exit={{ 
+              y: '100%', 
+              scale: 0.95,
+              opacity: 0,
+              rotateX: -5
+            }}
             transition={{ 
               type: "spring",
-              stiffness: 300,
-              damping: 30,
+              stiffness: 200,
+              damping: 25,
               layout: { 
-                duration: 0.4,
-                ease: "easeInOut"
+                duration: 0.5,
+                ease: [0.4, 0, 0.2, 1]
               }
             }}
             onClick={(e) => e.stopPropagation()}
-            layout // This will now work properly
+            layout
+            style={{
+              transformStyle: 'preserve-3d'
+            }}
           >
+            {/* Liquid Glass Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-white/5 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
+            
             {/* Background Icon - Only show if confirmDetails has >= 3 items */}
             {backgroundIconProps && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
@@ -233,65 +290,116 @@ const SwipeConfirmationModal = ({
                     opacity: backgroundIconProps.opacity,
                     scale: backgroundIconProps.scale,
                     translateY: backgroundIconProps.translateY,
-                    translateX: backgroundIconProps.translateX
+                    translateX: backgroundIconProps.translateX,
+                    filter: 'blur(0.5px)'
                   }}
                   initial={{ 
                     opacity: 0,
-                    scale: backgroundIconProps.scale * 0.8 
+                    scale: backgroundIconProps.scale * 0.7,
+                    rotate: -10
                   }}
                   animate={{ 
                     opacity: backgroundIconProps.opacity,
-                    scale: backgroundIconProps.scale 
+                    scale: backgroundIconProps.scale,
+                    rotate: 0
                   }}
                   transition={{ 
-                    duration: 0.6,
-                    ease: "easeOut",
-                    delay: 0.2
+                    duration: 0.8,
+                    ease: [0.4, 0, 0.2, 1],
+                    delay: 0.3
                   }}
                 >
-                  <IconComponent size={120} strokeWidth={1.7} />
+                  <IconComponent size={120} strokeWidth={1.2} />
                 </motion.div>
               </div>
             )}
 
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between relative z-10">
+            {/* Header */}
+            <motion.div 
+              className="p-6 border-b border-white/30 flex items-center justify-between relative z-10"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
               <div className="flex items-center">
-                <div className="mr-3 bg-gray-50 p-2 rounded-full">
+                <motion.div 
+                  className={`
+                    mr-4 p-3 rounded-2xl
+                    bg-white/10 backdrop-blur-sm
+                    border border-white/20
+                    ${theme.bg}
+                  `}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
                   {getIcon()}
-                </div>
-                <h3 className="text-lg font-medium text-gray-800">{title}</h3>
+                </motion.div>
+                <h3 className="text-lg font-semibold text-gray-800 tracking-wide drop-shadow-sm">
+                  {title}
+                </h3>
               </div>
-              <button 
+              <motion.button 
                 onClick={onClose}
-                className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                className={`
+                  p-2 rounded-xl
+                  bg-white/5 hover:bg-white/10
+                  border border-white/10 hover:border-white/20
+                  backdrop-blur-sm
+                  transition-all duration-300
+                  group
+                `}
                 disabled={isCompleted || isProcessing}
+                whileHover={{ scale: 1.05, rotate: 90 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                <X size={18} className="text-gray-500" />
-              </button>
-            </div>
+                <X size={18} className="text-gray-600 group-hover:text-gray-800 transition-colors" />
+              </motion.button>
+            </motion.div>
             
-            {/* Single container with layout animation - no AnimatePresence here */}
+            {/* Content Container */}
             <motion.div className="relative z-10">
               {shouldShowProcessing ? (
                 // Processing state with loading spinner
                 <motion.div
-                  className="p-8 flex flex-col items-center justify-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-10 flex flex-col items-center justify-center"
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ 
-                    duration: 0.3,
-                    ease: "easeOut"
+                    duration: 0.5,
+                    ease: [0.4, 0, 0.2, 1]
                   }}
                 >
-                  <LoadingSpinner
-                    size={56} 
-                    color={getSpinnerColor()} 
-                  />
+                  <motion.div
+                    className={`
+                      p-4 rounded-2xl mb-6
+                      bg-white/5 backdrop-blur-sm
+                      border border-white/10
+                    `}
+                    animate={{ 
+                      boxShadow: [
+                        `0 0 20px ${getSpinnerColor()}20`,
+                        `0 0 30px ${getSpinnerColor()}30`,
+                        `0 0 20px ${getSpinnerColor()}20`
+                      ]
+                    }}
+                    transition={{ 
+                      repeat: Infinity, 
+                      duration: 2,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <LoadingSpinner
+                      size={56} 
+                      color={getSpinnerColor()} 
+                    />
+                  </motion.div>
                   <motion.p 
-                    className="text-gray-600 mt-4 text-center"
+                    className="text-gray-700 text-center font-medium tracking-wide drop-shadow-sm"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
                   >
                     Sweet đang xử lý, sẽ xong ngay thôi...
                   </motion.p>
@@ -299,43 +407,88 @@ const SwipeConfirmationModal = ({
               ) : (
                 // Normal state with description and swipe component  
                 <motion.div
-                  className="p-5"
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2 }}
+                  className="p-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <p className="text-gray-600 mb-6">{description}</p>
+                  <motion.p 
+                    className="text-gray-700 mb-8 text-center leading-relaxed drop-shadow-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                  >
+                    {description}
+                  </motion.p>
                   
                   {/* Display confirmation details if provided */}
                   {confirmDetails && (
                     <motion.div 
-                      className="rounded-lg p-4 mb-6 relative"
+                      className={`
+                        rounded-2xl p-5 mb-8 relative
+                        bg-white/5 backdrop-blur-sm
+                        border border-white/10
+                        ${theme.bg}
+                      `}
                       layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, delay: 0.4 }}
                     >
-                      {Object.entries(confirmDetails).map(([label, value]) => (
-                        <div key={label} className="flex justify-between mb-2 last:mb-0">
-                          <span className="text-gray-600">{label}:</span>
-                          <span className="font-medium text-gray-800">{value}</span>
-                        </div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl pointer-events-none" />
+                      {Object.entries(confirmDetails).map(([label, value], index) => (
+                        <motion.div 
+                          key={label} 
+                          className="flex justify-between items-center py-2 first:pt-0 last:pb-0 relative z-10"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 + index * 0.1, duration: 0.3 }}
+                        >
+                          <span className="text-gray-500 font-medium">{label}:</span>
+                          <span className="font-semibold text-gray-700 tracking-wide drop-shadow-sm">{value}</span>
+                        </motion.div>
                       ))}
                     </motion.div>
                   )}
                   
-                  <div className="flex justify-center mb-4">
+                  <motion.div 
+                    className="flex justify-center mb-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6, duration: 0.4 }}
+                  >
                     <SwipeToConfirm 
                       onComplete={handleConfirmComplete}
                       text={isCompleted ? 'Đã xác nhận!' : confirmText}
                       disabled={isCompleted || isProcessing}
                       type={type}
                     />
-                  </div>
+                  </motion.div>
                   
-                  <div className="text-xs text-gray-500 text-center">
-                    {isCompleted ? 'Đang chuẩn bị xử lý...' : 'Vuốt nút sang phải để xác nhận'}
-                  </div>
+                  <motion.div 
+                    className="text-sm text-gray-600 text-center font-normal drop-shadow-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7, duration: 0.4 }}
+                  >
+                    {isCompleted ? (
+                      <motion.span
+                        animate={{ opacity: [0.6, 1, 0.6] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="text-gray-700"
+                      >
+                        Đang chuẩn bị xử lý...
+                      </motion.span>
+                    ) : (
+                      'Vuốt nút sang phải để xác nhận'
+                    )}
+                  </motion.div>
                 </motion.div>
               )}
             </motion.div>
+
+            {/* Bottom Glow Effect */}
+            <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent`} />
           </motion.div>
         </motion.div>
       )}
