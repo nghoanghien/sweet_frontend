@@ -1,46 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, UserCheck, Shield, Users, Settings, Save, PlusCircle, CreditCard, PiggyBank, UserCog, Package, BarChart3, Crown, Sparkles, Zap } from 'lucide-react';
-
+import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
 // Mock SwipeConfirmationModal component
-const SwipeConfirmationModal = ({ isOpen, onClose, onConfirm, title, description, type, confirmDetails, isProcessing }) => {
-  if (!isOpen) return null;
-  
-  return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl p-6 max-w-md mx-4">
-        <h3 className="text-lg font-bold mb-2">{title}</h3>
-        <p className="text-gray-600 mb-4">{description}</p>
-        {confirmDetails && (
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm">
-            {Object.entries(confirmDetails).map(([key, value]) => (
-              <div key={key} className="flex justify-between">
-                <span className="font-medium">{key}:</span>
-                <span>{value}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="flex gap-3">
-          <button 
-            onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-            disabled={isProcessing}
-          >
-            Hủy
-          </button>
-          <button 
-            onClick={onConfirm}
-            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg"
-            disabled={isProcessing}
-          >
-            {isProcessing ? 'Đang xử lý...' : 'Xác nhận'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
   // State cho form
