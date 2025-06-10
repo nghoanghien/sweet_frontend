@@ -191,9 +191,9 @@ const ExportNotification = ({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className={`relative overflow-hidden rounded-3xl bg-gradient-to-r ${getNotificationColor()} p-[2px] ${getNotificationShadow()} w-full sm:w-[500px] mx-auto pointer-events-auto`}
+            className={`relative overflow-hidden rounded-3xl p-[2px] ${getNotificationShadow()} w-full sm:w-[500px] mx-auto pointer-events-auto`}
           >
-            <div className="relative rounded-[calc(1.5rem-2px)] bg-white p-5 flex items-center space-x-4 shadow-inner">
+            <div className="relative rounded-[calc(1.5rem-2px)] bg-white/60 backdrop-blur-md p-5 flex items-center space-x-4 shadow-inner">
               {/* Icon with circle background */}
               <div className="relative flex-shrink-0">
                 <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${getNotificationBgColor()} flex items-center justify-center shadow-[0_4px_16px_rgba(52,211,153,0.18)]`}>
@@ -220,13 +220,13 @@ const ExportNotification = ({
                   >
                     {getFormatIcon()}
                   </motion.div>
-                  <span className="text-xs text-blue-600 font-semibold bg-blue-50 rounded px-2 py-0.5 shadow-sm">{getFormatText()}</span>
+                  <span className="text-xs text-blue-600 font-semibold backdrop-blur-sm bg-blue-100/40 rounded-xl px-2 py-0.5 shadow-sm">{getFormatText()}</span>
                 </div>
               </div>
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-3 right-3 p-2 rounded-full hover:bg-blue-50 transition-colors shadow"
+                className="absolute bg-white/50 top-3 right-3 p-2 rounded-full hover:bg-blue-50 transition-colors shadow"
                 aria-label="Đóng thông báo"
               >
                 <X size={20} className="text-blue-400" />
