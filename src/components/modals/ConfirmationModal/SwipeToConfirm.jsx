@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronsRight } from 'lucide-react';
+import styles from './SwipeToConfirm.module.css';
 
 const SwipeToConfirm = ({ 
   onComplete, 
@@ -146,7 +147,7 @@ const SwipeToConfirm = ({
       }}
     >
       {/* Shimmering overlay effect */}
-      <div className="absolute inset-0 z-0 shimmer-overlay" />
+      <div className={`absolute inset-0 z-0 ${styles.shimmerOverlay}`} />
       
       {/* Touch/click capture area */}
       <div 
@@ -170,8 +171,8 @@ const SwipeToConfirm = ({
         }}
       >
         <div className="bg-white rounded-full h-11 w-11 flex items-center justify-center shadow-md overflow-hidden">
-          <div className="shimmer-container">
-            <ChevronsRight size={28} className="text-neutral-700 shimmer-icon" strokeWidth={2.5} />
+          <div className={styles.shimmerContainer}>
+            <ChevronsRight size={28} className={`text-neutral-700 ${styles.shimmerIcon}`} strokeWidth={2.5} />
           </div>
         </div>
       </div>
@@ -180,79 +181,8 @@ const SwipeToConfirm = ({
       <span className="flex-grow text-center text-white text-lg font-semibold pl-10 pr-4">
         {text}
       </span>
-      
-      {/* CSS for the shimmer effects */}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% {
-            background-position: 200% 0;
-          }
-          100% {
-            background-position: -200% 0;
-          }
-        }
-        
-        .shimmer-overlay {
-          background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.4) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 3s infinite linear;
-        }
-        
-        .shimmer-text {
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .shimmer-text::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.4) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite linear;
-        }
-        
-        .shimmer-icon {
-          position: relative;
-        }
-        
-        .shimmer-container {
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .shimmer-container::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite linear;
-        }
-      `}</style>
     </div>
   );
 };
 
-export default SwipeToConfirm; 
+export default SwipeToConfirm;
