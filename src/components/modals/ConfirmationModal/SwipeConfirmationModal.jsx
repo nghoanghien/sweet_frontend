@@ -188,22 +188,22 @@ const SwipeConfirmationModal = ({
       scale = 4;
       translateY = 40;
       translateX = 80;
-      opacity = 0.06;
+      opacity = 0.07;
     } else if (detailsCount >= 5) {
       scale = 3;
       translateY = 30;
       translateX = 60;
-      opacity = 0.06;
+      opacity = 0.07;
     } else if (detailsCount >= 4) {
       scale = 3.2;
       translateY = 25;
       translateX = 50;
-      opacity = 0.06;
+      opacity = 0.07;
     } else { // detailsCount >= 3
       scale = 3;
       translateY = 20;
       translateX = 40;
-      opacity = 0.06;
+      opacity = 0.07;
     }
     
     return {
@@ -235,9 +235,10 @@ const SwipeConfirmationModal = ({
             className={`
               relative w-full max-w-md mx-2 sm:mx-0
               bg-white/20 backdrop-blur-xl
+              shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.3)] 
               border-0 border-white/30 ${theme.border}
               rounded-t-3xl sm:rounded-3xl
-              shadow-2xl ${theme.glow}
+              shadow-2xl 
               overflow-hidden z-[71]
               before:absolute before:inset-0 
               before:bg-gradient-to-br before:${theme.accent}
@@ -309,7 +310,7 @@ const SwipeConfirmationModal = ({
                     delay: 0.3
                   }}
                 >
-                  <IconComponent size={120} strokeWidth={1.2} />
+                  <IconComponent size={120} strokeWidth={1.8} />
                 </motion.div>
               </div>
             )}
@@ -325,7 +326,8 @@ const SwipeConfirmationModal = ({
                 <motion.div 
                   className={`
                     mr-4 p-3 rounded-2xl
-                    bg-white/10 backdrop-blur-sm
+                    shadow-[inset_0_0_10px_6px_rgba(255,255,255,0.2)] 
+                    bg-white/10
                     border border-white/20
                     ${theme.bg}
                   `}
@@ -344,8 +346,8 @@ const SwipeConfirmationModal = ({
                 className={`
                   p-2 rounded-xl
                   bg-white/5 hover:bg-white/10
-                  border border-white/10 hover:border-white/20
-                  backdrop-blur-sm
+                                shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.4)] 
+
                   transition-all duration-300
                   group
                 `}
@@ -425,9 +427,10 @@ const SwipeConfirmationModal = ({
                   {confirmDetails && (
                     <motion.div 
                       className={`
-                        rounded-2xl p-5 mb-8 relative
-                        bg-white/5 backdrop-blur-sm
-                        border border-white/10
+                        rounded-3xl pt-3 p-5 mb-8 relative
+                        bg-white/5 
+                        shadow-[inset_0_0_8px_4px_rgba(255,255,255,0.2)] 
+
                         ${theme.bg}
                       `}
                       layout
@@ -435,7 +438,7 @@ const SwipeConfirmationModal = ({
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: 0.4 }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl pointer-events-none" />
                       {Object.entries(confirmDetails).map(([label, value], index) => (
                         <motion.div 
                           key={label} 
@@ -487,8 +490,6 @@ const SwipeConfirmationModal = ({
               )}
             </motion.div>
 
-            {/* Bottom Glow Effect */}
-            <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent`} />
           </motion.div>
         </motion.div>
       )}

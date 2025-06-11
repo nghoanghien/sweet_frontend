@@ -7,15 +7,17 @@ function NavItem({ icon, text, expanded, active, onClick }) {
 
   return (
     <div 
-      className={`flex items-center px-4 py-3 my-1 cursor-pointer transition-colors rounded-xl ${
-        active ? "bg-white/20 backdrop-blur-sm text-white" : "text-indigo-100 hover:bg-white/10 hover:text-white"
+      className={`flex items-center px-4 py-3 my-1 cursor-pointer transition-all duration-300 rounded-xl ${
+        active 
+          ? "bg-white/20 backdrop-blur-sm text-white shadow-[inset_0_0_16px_10px_rgba(255,255,255,0.5)]" 
+          : "text-indigo-100 hover:bg-white/10 hover:text-white hover:shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.35)]"
       }`}
       onClick={onClick}
     >
       <div className={`${expanded ? "" : "mx-auto"}`}>
         {icon}
       </div>
-      {expanded && <span className="ml-3 text-sm font-medium">{text}</span>}
+      {expanded && <span className="ml-3 text-sm font-medium text-gray-600">{text}</span>}
     </div>
   );
 }

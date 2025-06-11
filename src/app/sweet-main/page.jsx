@@ -47,7 +47,6 @@ import SavingsProductManagement from "../admin/saving-products-management/Saving
 import SalesReportPage from '../admin/sales/SalesReportPage';
 import PermissionManagement from '../admin/permissions/PermissionManagement';
 import SystemSettings from '../admin/settings/SystemSettings';
-import NavItem from '@/components/ui/custom/NavItem';
 import MobileNavItem from '@/components/ui/custom/MobileNavItem';
 import SavingsAccountManagement from '../admin/saving-accounts-management/SavingsAccountManagement';
 import FilterableAccountTransactionList from "@/components/modules/payment-account/components/FilterableAccountTransactionList";
@@ -60,7 +59,8 @@ import SavingAccountDetail from "@/components/modules/saving-account/components/
 import NewSavingsAccountModal from "@/components/modules/create-new-saving-account/NewSavingsAccountModal";
 import AnimatedTabNavigation from "@/components/ui/custom/AnimatedTabNavigation";
 import DetailInfo from "@/components/modules/saving-account/components/DetailInfo";
-import ProfileModal from '@/components/modals/ProfileModal/ProfileModal'
+import ProfileModal from '@/components/modals/ProfileModal/ProfileModal';
+import LiquidGlassNavigation from './LiquidGlassNavigation';
 // Add custom scrollbar styles
 const scrollbarStyles = `
   /* Hide scrollbar by default */
@@ -1018,35 +1018,6 @@ export default function Dashboard() {
     return progressPercentage;
   };
   
-  // Get transaction type information with icon and style
-  const getSavingsTransactionTypeInfo = (transaction) => {
-    if (transaction.isDeposit) {
-      return {
-        icon: <ArrowDownLeft size={14} className="text-green-500 mr-1" />,
-        textColor: 'text-green-600',
-        bgColor: 'bg-green-100'
-      };
-    } else if (transaction.isInterest) {
-      return {
-        icon: <DollarSign size={14} className="text-blue-500 mr-1" />,
-        textColor: 'text-blue-600',
-        bgColor: 'bg-blue-100'
-      };
-    } else if (transaction.isSystem) {
-      return {
-        icon: <CheckCircle size={14} className="text-indigo-500 mr-1" />,
-        textColor: 'text-indigo-600',
-        bgColor: 'bg-indigo-100'
-      };
-    } else {
-      return {
-        icon: <FileText size={14} className="text-gray-500 mr-1" />,
-        textColor: 'text-gray-600',
-        bgColor: 'bg-gray-100'
-      };
-    }
-  };
-  
   // Add state for savings account creation modal
   const [savingsAccountModalOpen, setSavingsAccountModalOpen] = useState(false);
   const [savingsAccountModalAnimating, setSavingsAccountModalAnimating] = useState(false);
@@ -1530,65 +1501,6 @@ export default function Dashboard() {
     });
   };
   
-  // Handle savings form input changes
-  const handleSavingsInputChange = (field, value) => {
-    setSavingsData(prev => {
-      const newData = { ...prev, [field]: value };
-      
-      // If changing interest payment type, reset term if not available
-      if (field === "interestPaymentType") {
-        const availableTerms = availableTermsByInterestType[value];
-        if (!availableTerms.includes(newData.term)) {
-          newData.term = availableTerms[0];
-        }
-        
-        // Reset maturity option if not end_of_term
-        if (value !== "end_of_term") {
-          newData.maturityOption = "receive_all";
-        }
-      }
-      
-      return newData;
-    });
-    
-    // Clear validation error for this field if any
-    if (savingsValidationErrors[field]) {
-      setSavingsValidationErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
-  
-  // Validate savings form data
-  const validateSavingsForm = () => {
-    const errors = {};
-    
-    if (!savingsData.sourceAccount) {
-      errors.sourceAccount = "Vui lòng chọn tài khoản nguồn";
-    }
-    
-    if (!savingsData.targetAccount) {
-      errors.targetAccount = "Vui lòng chọn tài khoản nhận";
-    }
-    
-    if (!savingsData.amount) {
-      errors.amount = "Vui lòng nhập số tiền";
-    } else if (parseFloat(savingsData.amount) < 100000) {
-      errors.amount = "Số tiền tối thiểu là 100.000đ";
-    } else {
-      // Check if source account has enough balance
-      const sourceAccount = paymentAccounts.find(acc => acc.id === parseInt(savingsData.sourceAccount));
-      if (sourceAccount && sourceAccount.balance < parseFloat(savingsData.amount)) {
-        errors.amount = "Số dư tài khoản không đủ";
-      }
-    }
-    
-    setSavingsValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-  
   // Create new savings account
   const createSavingsAccount = (formData, calculatedInterest) => {
     
@@ -1781,131 +1693,33 @@ export default function Dashboard() {
 
       {/* Navigation sidebar - Desktop */}
       {!isMobile && (
-        <div
-          className={`nav-container flex rounded-tr-3xl rounded-br-3xl flex-col bg-[#1E3E62] transition-all duration-300 ease-in-out backdrop-blur-lg shadow-xl ${
-            navHovered ? "w-64" : "w-20"
-          } h-full fixed left-0 top-0 z-40`}
-          onMouseEnter={() => setNavHovered(true)}
-          onMouseLeave={() => setNavHovered(false)}
-        >
-          {/* Profile section */}
-          <div
-            className="flex items-center p-6 border-b border-indigo-500/30 cursor-pointer hover:bg-white/20 hover:rounded-3xl transition-colors"
-            onClick={toggleProfileModal}
-          >
-            {navHovered ? (
-              <>
-                <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-                  <User size={20} className="text-white" />
-                </div>
-                <div className="ml-3 text-white text-sm">
-                  <p className="font-semibold">{profileData.fullName}</p>
-                  <p className="text-xs text-indigo-200">{profileData.email}</p>
-                </div>
-              </>
-            ) : (
-              <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto">
-                <User size={20} className="text-white" />
-              </div>
-            )}
-          </div>
+        <LiquidGlassNavigation
+        profileData={profileData}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onProfileClick={toggleProfileModal}
+        onLogout={() => setActiveSection("logout")}
+        customerMenuItems={[
+          { id: "overview", icon: Home, text: "Trang chủ" },
+          { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" }
+        ]}
+        adminMenuItems={[
+          { id: "customers", icon: Users, text: "Quản lý khách hàng" },
+          { id: "employees", icon: User, text: "Quản lý nhân viên" },
+          { id: "deposit-slips", icon: Receipt, text: "Quản lý phiếu gửi tiền" },
+          { id: "savings-products", icon: PiggyBank, text: "Quản lý sản phẩm tiết kiệm" },
+          { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số" },
+          { id: "settings", icon: Settings, text: "Cài đặt hệ thống" },
+          { id: "permissions", icon: Lock, text: "Quản lý phân quyền" }
+        ]}
+        customerSectionTitle="Dành cho khách hàng"
+        adminSectionTitle="Dành cho Quản trị viên" 
+        logoutText="Đăng xuất"
+        showAdminSection={true}
+      />
 
-          {/* Navigation items */}
-          <div className="flex-1 py-6 px-3 flex flex-col overflow-hidden">
-            {/* Customer Group */}
-            <div className={`mb-4 ${navHovered ? "px-4" : "text-center"}`}>
-              <p className="text-xs text-indigo-200 uppercase font-medium mb-2">
-                {navHovered ? "Dành cho khách hàng" : "KH"}
-              </p>
-            </div>
-
-            <NavItem
-              icon={<Home size={20} />}
-              text="Trang chủ"
-              expanded={navHovered}
-              active={activeSection === "overview"}
-              onClick={() => setActiveSection("overview")}
-            />
-            <NavItem
-              icon={<Wallet size={20} />}
-              text="Quản lý tiền gửi"
-              expanded={navHovered}
-              active={activeSection === "deposits"}
-              onClick={() => setActiveSection("deposits")}
-            />
-
-            {/* Admin Group */}
-            <div className={`mt-8 mb-4 ${navHovered ? "px-4" : "text-center"}`}>
-              <p className="text-xs text-indigo-200 uppercase font-medium mb-2">
-                {navHovered ? "Dành cho Quản trị viên" : "QTV"}
-              </p>
-            </div>
-
-            {/* Admin menu with custom scrollbar */}
-            <div className="custom-scrollbar overflow-y-auto pr-1 flex-1 scroll-smooth">
-              <NavItem
-                icon={<Users size={20} />}
-                text="Quản lý khách hàng"
-                expanded={navHovered}
-                active={activeSection === "customers"}
-                onClick={() => setActiveSection("customers")}
-              />
-              <NavItem
-                icon={<User size={20} />}
-                text="Quản lý nhân viên"
-                expanded={navHovered}
-                active={activeSection === "employees"}
-                onClick={() => setActiveSection("employees")}
-              />
-              <NavItem
-                icon={<Receipt size={20} />}
-                text="Quản lý phiếu gửi tiền"
-                expanded={navHovered}
-                active={activeSection === "deposit-slips"}
-                onClick={() => setActiveSection("deposit-slips")}
-              />
-              <NavItem
-                icon={<PiggyBank size={20} />}
-                text="Quản lý sản phẩm tiết kiệm"
-                expanded={navHovered}
-                active={activeSection === "savings-products"}
-                onClick={() => setActiveSection("savings-products")}
-              />
-              <NavItem
-                icon={<LineChart size={20} />}
-                text="Báo cáo doanh số"
-                expanded={navHovered}
-                active={activeSection === "sales-reports"}
-                onClick={() => setActiveSection("sales-reports")}
-              />
-              <NavItem
-                icon={<Settings size={20} />}
-                text="Cài đặt hệ thống"
-                expanded={navHovered}
-                active={activeSection === "settings"}
-                onClick={() => setActiveSection("settings")}
-              />
-              <NavItem
-                icon={<Lock size={20} />}
-                text="Quản lý phân quyền"
-                expanded={navHovered}
-                active={activeSection === "permissions"}
-                onClick={() => setActiveSection("permissions")}
-              />
-            </div>
-          </div>
-
-          {/* Bottom section */}
-          <div className="p-4 border-t border-indigo-500/30">
-            <NavItem
-              icon={<LogOut size={20} />}
-              text="Đăng xuất"
-              expanded={navHovered}
-              active={activeSection === "logout"}
-              onClick={() => setActiveSection("logout")}
-            />
-          </div>
-        </div>
+      
+      
       )}
 
       {/* Mobile Navigation (Slide-in menu) */}
@@ -2058,7 +1872,7 @@ export default function Dashboard() {
       {/* Main content area */}
       <div
         className={`flex-1 transition-all duration-300 ease-in-out ${
-          !isMobile && navHovered ? "ml-64" : !isMobile ? "ml-20" : "ml-0"
+          !isMobile && navHovered ? "ml-20" : !isMobile ? "ml-20" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
         {/* Header */}
