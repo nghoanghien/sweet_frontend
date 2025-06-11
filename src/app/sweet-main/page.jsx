@@ -1869,14 +1869,17 @@ export default function Dashboard() {
         </div>
       )}
 
+      <div className="fixed top-0 left-0 right-0">
+        {/* Header */}
+        <ModernHeader activeSection={activeSection} />
+      </div>
+
       {/* Main content area */}
       <div
-        className={`flex-1 transition-all duration-300 ease-in-out ${
+        className={`flex-1 transition-all duration-300 ease-in-out mt-14 ${
           !isMobile && navHovered ? "ml-28" : !isMobile ? "ml-28" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
-        {/* Header */}
-        <ModernHeader activeSection={activeSection} />
 
         {/* Main content */}
         <main
