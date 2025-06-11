@@ -4,10 +4,8 @@ import { useState, useEffect } from "react";
 import { 
   Home, 
   Settings, 
-  LogOut, 
   Calendar,
   User,
-  Menu,
   X,
   Users,
   CreditCard,
@@ -26,10 +24,6 @@ import {
   LockIcon,
   UnlockIcon,
   ArrowUpRight,
-  ArrowDownLeft,
-  Smartphone,
-  Globe,
-  Building,
   FileText as FileIcon,
   DollarSign,
   TrendingUp,
@@ -47,7 +41,6 @@ import SavingsProductManagement from "../admin/saving-products-management/Saving
 import SalesReportPage from '../admin/sales/SalesReportPage';
 import PermissionManagement from '../admin/permissions/PermissionManagement';
 import SystemSettings from '../admin/settings/SystemSettings';
-import MobileNavItem from '@/components/ui/custom/MobileNavItem';
 import SavingsAccountManagement from '../admin/saving-accounts-management/SavingsAccountManagement';
 import FilterableAccountTransactionList from "@/components/modules/payment-account/components/FilterableAccountTransactionList";
 import FilterableTransactionList from "@/components/modules/saving-account/components/FilterableTransactionList";

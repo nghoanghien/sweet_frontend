@@ -224,7 +224,7 @@ const SwipeConfirmationModal = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/30 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center"
+          className="fixed inset-0 bg-black/20 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center"
           initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
           animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
           exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
@@ -235,7 +235,7 @@ const SwipeConfirmationModal = ({
             className={`
               relative w-full max-w-md mx-2 sm:mx-0
               bg-white/20 backdrop-blur-xl
-              shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.3)] 
+              shadow-[inset_0_0_16px_8px_rgba(255,255,255,0.3)] 
               border-0 border-white/30 ${theme.border}
               rounded-t-3xl sm:rounded-3xl
               shadow-2xl 
@@ -278,8 +278,6 @@ const SwipeConfirmationModal = ({
             }}
           >
             {/* Liquid Glass Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-white/5 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
             
             {/* Background Icon - Only show if confirmDetails has >= 3 items */}
             {backgroundIconProps && (
