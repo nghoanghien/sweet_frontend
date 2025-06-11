@@ -1190,7 +1190,7 @@ import React, { useState, useEffect } from 'react';
     
     // Render component UI
     return (
-      <div className="container mx-auto -mx-1 sm:px-3 md:px-4 lg:px-6 xl:px-8">
+      <div className="container mx-auto -mx-1 sm:px-3 md:px-4 lg:px-6 xl:pl-2 xl:px-8">
         <style jsx global>{`
           /* Animation classes */
           @keyframes fadeIn {

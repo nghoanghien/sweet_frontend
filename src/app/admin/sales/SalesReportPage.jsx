@@ -216,7 +216,7 @@ const SalesReportPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-0 md:p-6 max-w-7xl">
+    <div className="container mx-auto p-0 md:pl-0 md:p-6 max-w-7xl">
       <AnimatePresence mode="wait">
         {!selectedReport ? (
           // Reports List View

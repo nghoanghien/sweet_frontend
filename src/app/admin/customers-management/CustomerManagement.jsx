@@ -1232,34 +1232,11 @@ export default function CustomerManagement() {
     return Math.min(Math.max(progress, 0), 100); // Ensure progress is between 0-100
   };
 
-  // Open payment account detail
-  const openAccountDetail = (customerId, accountId) => {
-    setSelectedCustomer(customers.find(c => c.id === customerId));
-    setSelectedAccountId(accountId);
-    setAccountDetailVisible(true);
-  };
-
-  // Close payment account detail
-  const closeAccountDetail = () => {
-    setAccountDetailVisible(false);
-    setTimeout(() => {
-      setSelectedAccountId(null);
-    }, 300);
-  };
-
   // Open savings account detail
   const openSavingsDetail = (customerId, savingsId) => {
     setSelectedCustomer(customers.find(c => c.id === customerId));
     setSelectedSavingsId(savingsId);
     setSavingsDetailVisible(true);
-  };
-
-  // Close savings account detail
-  const closeSavingsDetail = () => {
-    setSavingsDetailVisible(false);
-    setTimeout(() => {
-      setSelectedSavingsId(null);
-    }, 300);
   };
 
   // Functions for confirmation modal
@@ -1387,9 +1364,6 @@ export default function CustomerManagement() {
     }
   };
 
-  // Function to toggle mobile menu
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-
   // Add state for export data modal
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
@@ -1441,7 +1415,7 @@ export default function CustomerManagement() {
   
   // Render component UI
   return (
-    <div className="container mx-auto sm:px-3 md:px-4 lg:px-6 xl:px-8">
+    <div className="container mx-auto sm:px-3 md:px-4 lg:pl-2 lg:px-6 xl:pl-2 xl:px-8">
       <style jsx global>{`
         /* Animation classes */
         @keyframes fadeIn {
