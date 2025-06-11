@@ -61,6 +61,7 @@ import AnimatedTabNavigation from "@/components/ui/custom/AnimatedTabNavigation"
 import DetailInfo from "@/components/modules/saving-account/components/DetailInfo";
 import ProfileModal from '@/components/modals/ProfileModal/ProfileModal';
 import LiquidGlassNavigation from './LiquidGlassNavigation';
+import LiquidGlassMobileNavigation from './LiquidGlassMobileNavigation'
 // Add custom scrollbar styles
 const scrollbarStyles = `
   /* Hide scrollbar by default */
@@ -1663,12 +1664,6 @@ export default function Dashboard() {
       calculateSavingsInterest();
     }
   }, [savingsData]);
-  
-  // Add function to truncate text with ellipsis
-  const truncateText = (text, maxLength) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength) + '...';
-  };
     
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
@@ -1676,20 +1671,6 @@ export default function Dashboard() {
       <style jsx global>
         {scrollbarStyles}
       </style>
-
-      {/* Mobile menu button */}
-      {isMobile && (
-        <button
-          className="fixed top-4 left-4 z-50 bg-white p-2 rounded-full shadow-lg"
-          onClick={toggleMobileMenu}
-        >
-          {mobileMenuOpen ? (
-            <X size={24} className="text-slate-700" />
-          ) : (
-            <Menu size={24} className="text-slate-700" />
-          )}
-        </button>
-      )}
 
       {/* Navigation sidebar - Desktop */}
       {!isMobile && (
@@ -1724,149 +1705,20 @@ export default function Dashboard() {
 
       {/* Mobile Navigation (Slide-in menu) */}
       {isMobile && (
-        <div
-          className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300 ${
-            mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div
-            className={`nav-container fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-indigo-600 to-purple-700 shadow-xl transition-transform duration-300 ease-in-out rounded-tr-3xl rounded-br-3xl p-6 ${
-              mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Profile section */}
-            <div
-              className="flex items-center pb-6 border-b border-indigo-500/30 cursor-pointer hover:bg-indigo-600/40 transition-colors"
-              onClick={toggleProfileModal}
-            >
-              <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-                <User size={20} className="text-white" />
-              </div>
-              <div className="ml-3 text-white text-sm">
-                <p className="font-semibold">{profileData.fullName}</p>
-                <p className="text-xs text-indigo-200">{profileData.email}</p>
-              </div>
-            </div>
-
-            {/* Navigation items */}
-            <div className="py-6 flex flex-col h-[calc(100%-130px)]">
-              {/* Customer Group */}
-              <div className="mb-4">
-                <p className="text-xs text-indigo-200 uppercase font-medium mb-2">
-                  Dành cho khách hàng
-                </p>
-              </div>
-
-              <MobileNavItem
-                icon={<Home size={20} />}
-                text="Trang chủ"
-                active={activeSection === "overview"}
-                onClick={() => {
-                  setActiveSection("overview");
-                  setMobileMenuOpen(false);
-                }}
-              />
-              <MobileNavItem
-                icon={<Wallet size={20} />}
-                text="Quản lý tiền gửi"
-                active={activeSection === "deposits"}
-                onClick={() => {
-                  setActiveSection("deposits");
-                  setMobileMenuOpen(false);
-                }}
-              />
-
-              {/* Admin Group */}
-              <div className="mt-8 mb-4">
-                <p className="text-xs text-indigo-200 uppercase font-medium mb-2">
-                  Dành cho Quản trị viên
-                </p>
-              </div>
-
-              {/* Admin menu with custom scrollbar */}
-              <div className="custom-scrollbar overflow-y-auto pr-1 flex-1 scroll-smooth">
-                <MobileNavItem
-                  icon={<Users size={20} />}
-                  text="Quản lý khách hàng"
-                  active={activeSection === "customers"}
-                  onClick={() => {
-                    setActiveSection("customers");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-                <MobileNavItem
-                  icon={<User size={20} />}
-                  text="Quản lý nhân viên"
-                  active={activeSection === "employees"}
-                  onClick={() => {
-                    setActiveSection("employees");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-                <MobileNavItem
-                  icon={<PiggyBank size={20} />}
-                  text="Quản lý sản phẩm tiết kiệm"
-                  active={activeSection === "savings-products"}
-                  onClick={() => {
-                    setActiveSection("savings-products");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-                <MobileNavItem
-                  icon={<Receipt size={20} />}
-                  text="Quản lý phiếu gửi tiền"
-                  active={activeSection === "deposit-slips"}
-                  onClick={() => {
-                    setActiveSection("deposit-slips");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-                <MobileNavItem
-                  icon={<LineChart size={20} />}
-                  text="Báo cáo doanh số"
-                  active={activeSection === "sales-reports"}
-                  onClick={() => {
-                    setActiveSection("sales-reports");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-                <MobileNavItem
-                  icon={<Settings size={20} />}
-                  text="Cài đặt hệ thống"
-                  active={activeSection === "settings"}
-                  onClick={() => {
-                    setActiveSection("settings");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-                <MobileNavItem
-                  icon={<Lock size={20} />}
-                  text="Quản lý phân quyền"
-                  active={activeSection === "permissions"}
-                  onClick={() => {
-                    setActiveSection("permissions");
-                    setMobileMenuOpen(false);
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Bottom section */}
-            <div className="pt-4 border-t border-indigo-500/30">
-              <MobileNavItem
-                icon={<LogOut size={20} />}
-                text="Đăng xuất"
-                active={activeSection === "logout"}
-                onClick={() => {
-                  setActiveSection("logout");
-                  setMobileMenuOpen(false);
-                }}
-              />
-            </div>
-          </div>
-        </div>
+        <LiquidGlassMobileNavigation
+        profileData={profileData}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+        onProfileClick={toggleProfileModal}
+        onLogout={() => {
+          setActiveSection("logout");
+          // Thêm logic logout của bạn ở đây
+        }}
+        customerSectionTitle="Dành cho khách hàng"
+        adminSectionTitle="Dành cho Quản trị viên"
+        logoutText="Đăng xuất"
+        showAdminSection={true}
+      />
       )}
 
       <div className="fixed top-0 left-0 right-0">
@@ -3621,56 +3473,6 @@ export default function Dashboard() {
                 />
               </div>
               )}
-              {/* <div className="flex border-b border-gray-200 pt-2">
-                <button
-                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center ${
-                    savingsRightPanelContent === "transactions"
-                      ? "text-indigo-600 border-b-2 border-indigo-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  } ${
-                    withdrawalPanelVisible
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }`}
-                  onClick={() => switchSavingsRightPanel("transactions")}
-                  disabled={withdrawalPanelVisible}
-                >
-                  <History size={14} className="mr-2" />
-                  Lịch sử giao dịch
-                </button>
-                <button
-                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center ${
-                    savingsRightPanelContent === "interest"
-                      ? "text-indigo-600 border-b-2 border-indigo-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  } ${
-                    withdrawalPanelVisible
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }`}
-                  onClick={() => switchSavingsRightPanel("interest")}
-                  disabled={withdrawalPanelVisible}
-                >
-                  <DollarSign size={14} className="mr-2" />
-                  Lịch sử trả lãi
-                </button>
-                <button
-                  className={`flex-1 py-3 text-sm font-medium flex items-center justify-center ${
-                    savingsRightPanelContent === "withdrawals"
-                      ? "text-indigo-600 border-b-2 border-indigo-600"
-                      : "text-gray-500 hover:text-gray-700"
-                  } ${
-                    withdrawalPanelVisible
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }`}
-                  onClick={() => switchSavingsRightPanel("withdrawals")}
-                  disabled={withdrawalPanelVisible}
-                >
-                  <ArrowUpRight size={14} className="mr-2" />
-                  Lịch sử rút tiền
-                </button>
-              </div> */}
 
               {/* Panel content based on selected tab */}
               <div
