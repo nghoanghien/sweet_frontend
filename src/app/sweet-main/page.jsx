@@ -1872,7 +1872,7 @@ export default function Dashboard() {
       {/* Main content area */}
       <div
         className={`flex-1 transition-all duration-300 ease-in-out ${
-          !isMobile && navHovered ? "ml-20" : !isMobile ? "ml-20" : "ml-0"
+          !isMobile && navHovered ? "ml-28" : !isMobile ? "ml-28" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
         {/* Header */}

@@ -150,9 +150,9 @@ const LiquidGlassNavigation = ({
       `}</style>
 
       <div
-        className={`nav-container liquid-glass-container flex rounded-tr-3xl rounded-br-3xl flex-col transition-all duration-500 ease-out backdrop-blur-sm shadow-2xl ${
-          navHovered ? "w-72" : "w-20"
-        } h-full fixed left-0 top-0 z-50 overflow-hidden`}
+        className={`nav-container liquid-glass-container flex rounded-3xl flex-col transition-all duration-500 ease-out backdrop-blur-sm shadow-2xl ${
+          navHovered ? "w-72 bottom-6 top-6" : "w-20 bottom-24 top-24"
+        } fixed left-6 z-50 overflow-hidden`}
         style={{
           background: navHovered 
             ? 'linear-gradient(135deg, rgba(30, 62, 98, 0.15) 0%, rgba(59, 130, 246, 0.1) 50%, rgba(147, 51, 234, 0.08) 100%)'
@@ -182,7 +182,7 @@ const LiquidGlassNavigation = ({
       
         {/* Profile section */}
         <div
-          className="profile-section relative flex items-center p-6 border-b border-white/10 cursor-pointer group transition-all duration-300 liquid-glass-nav-item shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.3)]"
+          className="profile-section relative flex items-center p-6 border-b border-white/10 cursor-pointer group transition-all duration-300 liquid-glass-nav-item shadow-[inset_0_0_18px_12px_rgba(255,255,255,0.4)]"
           style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)'
           }}
@@ -241,7 +241,7 @@ const LiquidGlassNavigation = ({
             return (
               <NavItem
                 key={item.id}
-                icon={<IconComponent size={20} className="text-gray-700" />}
+                icon={<IconComponent size={20} className="text-gray-600" strokeWidth={2.3} />}
                 text={item.text}
                 expanded={navHovered}
                 active={activeSection === item.id}
@@ -262,7 +262,7 @@ const LiquidGlassNavigation = ({
         
               {/* Admin menu with enhanced scrollbar */}
               <div 
-                className="liquid-glass-scrollbar overflow-y-auto pr-2 flex-1 scroll-smooth"
+                className="liquid-glass-scrollbar overflow-y-auto flex-1 scroll-smooth"
                 style={{
                   scrollbarWidth: 'none',
                   scrollbarColor: 'rgba(34, 211, 238, 0.4) transparent'
@@ -273,7 +273,7 @@ const LiquidGlassNavigation = ({
                   return (
                     <NavItem
                       key={item.id}
-                      icon={<IconComponent size={20} className="text-gray-700" />}
+                      icon={<IconComponent size={20} className="text-gray-600" strokeWidth={2.3}/>}
                       text={item.text}
                       expanded={navHovered}
                       active={activeSection === item.id}
@@ -289,13 +289,13 @@ const LiquidGlassNavigation = ({
       
         {/* Bottom section */}
         <div 
-          className="relative p-4 border-t border-white/10"
+          className="relative p-4 border-t border-white/30"
           style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)'
           }}
         >
           <NavItem
-            icon={<LogOut size={20} className="text-gray-700" />}
+            icon={<LogOut size={20} className="text-gray-600" strokeWidth={2.3} />}
             text={logoutText}
             expanded={navHovered}
             active={activeSection === "logout"}

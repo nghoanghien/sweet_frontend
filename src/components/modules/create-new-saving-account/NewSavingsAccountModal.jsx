@@ -1265,43 +1265,7 @@ const interestRateData = {
                                 <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
                               </div>
               
-                              {/* Floating liquid orbs */}
-                              {formData.interestPaymentType === key && (
-                                <>
-                                  <motion.div
-                                    className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-gradient-to-br from-purple-400/30 to-pink-400/30 backdrop-blur-sm border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]"
-                                    initial={{ opacity: 0, scale: 0 }}
-                                    animate={{ 
-                                      opacity: 1, 
-                                      scale: 1,
-                                      y: [0, -5, 0],
-                                      rotate: [0, 180, 360]
-                                    }}
-                                    transition={{ 
-                                      duration: 0.6, 
-                                      delay: 0.1,
-                                      y: { duration: 3, repeat: Infinity },
-                                      rotate: { duration: 8, repeat: Infinity }
-                                    }}
-                                  />
-                                  <motion.div
-                                    className="absolute -bottom-2 -left-2 w-12 h-12 rounded-full bg-gradient-to-br from-pink-400/30 to-rose-400/30 backdrop-blur-sm border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]"
-                                    initial={{ opacity: 0, scale: 0 }}
-                                    animate={{ 
-                                      opacity: 1, 
-                                      scale: 1,
-                                      x: [0, 3, 0],
-                                      rotate: [0, -90, 0]
-                                    }}
-                                    transition={{ 
-                                      duration: 0.6, 
-                                      delay: 0.2,
-                                      x: { duration: 4, repeat: Infinity },
-                                      rotate: { duration: 6, repeat: Infinity }
-                                    }}
-                                  />
-                                </>
-                              )}
+                             
               
                               <div className="flex items-start gap-4 relative z-10 p-4">
                                 <div
@@ -1348,7 +1312,7 @@ const interestRateData = {
                                   {(key === "monthly" ||
                                     key === "quarterly" ||
                                     key === "yearly") && (
-                                    <div className="mt-2 p-2 backdrop-blur-md bg-gradient-to-br from-pink-50/80 to-rose-50/80 border border-pink-200/30 rounded-lg shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]">
+                                    <div className="mt-2 p-2 backdrop-blur-md bg-gradient-to-br from-pink-50/80 to-rose-50/80 border border-pink-200/30 rounded-lg">
                                       <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent" />
                                       <p className="text-xs text-pink-700 flex items-center gap-1 relative">
                                         <AlertCircle size={12} />
@@ -1396,24 +1360,6 @@ const interestRateData = {
                               <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
                               <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
                             </div>
-              
-                            {formData.maturityOption === option && (
-                              <motion.div
-                                className="absolute -top-3 -right-3 w-14 h-14 rounded-full bg-gradient-to-br from-pink-400/30 to-rose-400/30 backdrop-blur-sm border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)]"
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ 
-                                  opacity: 1, 
-                                  scale: 1,
-                                  rotate: [0, 360],
-                                  y: [0, -3, 0]
-                                }}
-                                transition={{ 
-                                  duration: 0.5,
-                                  rotate: { duration: 6, repeat: Infinity },
-                                  y: { duration: 2, repeat: Infinity }
-                                }}
-                              />
-                            )}
               
                             <div className="flex items-center gap-4 relative z-10 p-4">
                               <div
@@ -1547,43 +1493,7 @@ const interestRateData = {
                                   <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
                                 </div>
               
-                                {/* Floating liquid orbs */}
-                                {formData.term === term && (
-                                  <>
-                                    <motion.div
-                                      className="absolute -top-3 -right-3 w-12 h-12 rounded-full bg-gradient-to-br from-pink-400/30 to-rose-400/30 backdrop-blur-sm border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)]"
-                                      initial={{ opacity: 0, scale: 0 }}
-                                      animate={{ 
-                                        opacity: 1, 
-                                        scale: 1,
-                                        rotate: [0, 180, 360],
-                                        y: [0, -2, 0]
-                                      }}
-                                      transition={{
-                                        duration: 0.5,
-                                        delay: 0.1,
-                                        rotate: { duration: 8, repeat: Infinity },
-                                        y: { duration: 3, repeat: Infinity }
-                                      }}
-                                    />
-                                    <motion.div
-                                      className="absolute -bottom-2 -left-2 w-8 h-8 rounded-full bg-gradient-to-br from-pink-400/30 to-rose-400/30 backdrop-blur-sm border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)]"
-                                      initial={{ opacity: 0, scale: 0 }}
-                                      animate={{ 
-                                        opacity: 1, 
-                                        scale: 1,
-                                        rotate: [0, -90, 0],
-                                        x: [0, 2, 0]
-                                      }}
-                                      transition={{
-                                        duration: 0.5,
-                                        delay: 0.2,
-                                        rotate: { duration: 6, repeat: Infinity },
-                                        x: { duration: 4, repeat: Infinity }
-                                      }}
-                                    />
-                                  </>
-                                )}
+                                
               
                                 {/* Liquid glass star badge */}
                                 {isHighestRate && (
