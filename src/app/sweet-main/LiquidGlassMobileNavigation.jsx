@@ -279,26 +279,118 @@ const AssistiveTouchNavigation = ({
     
     // Special case for admin-only with 3 items (triangle layout)
     if (!isCustomer && isAdmin && currentLevel === 'main' && itemCount === 3) {
-      return { gridSize: 2, isTriangle: true };
+      return { gridSize: 2, isTriangle: true, isStaggered: false };
+    }
+    
+    // Special case for admin menu - use staggered layout
+    if (currentLevel === 'admin') {
+      return { gridSize: 3, isTriangle: false, isStaggered: true };
     }
     
     // Regular grid layout
     if (itemCount <= 4) {
-      return { gridSize: 2, isTriangle: false };
+      return { gridSize: 2, isTriangle: false, isStaggered: false };
     } else {
-      return { gridSize: 3, isTriangle: false };
+      return { gridSize: 3, isTriangle: false, isStaggered: false };
     }
   };
 
-  const { gridSize, isTriangle } = getGridLayout();
-  const menuWidth = gridSize === 2 ? 200 : 280;
-  const menuHeight = isTriangle ? 160 : Math.ceil(menuItems.length / gridSize) * 80 + (currentLevel !== 'main' ? 60 : 40);
+  const { gridSize, isTriangle, isStaggered } = getGridLayout();
+  
+  // Calculate menu dimensions
+  const getMenuDimensions = () => {
+    if (isTriangle) {
+      return { width: 200, height: 160 };
+    }
+    
+    if (isStaggered) {
+      const rows = Math.ceil(menuItems.length / 3) + (menuItems.length > 3 ? 1 : 0); // Extra row for staggered layout
+      return { width: 280, height: Math.max(rows * 80, 240) };
+    }
+    
+    const width = gridSize === 2 ? 200 : 280;
+    const rows = Math.ceil(menuItems.length / gridSize);
+    const height = rows * 80;
+    
+    return { width, height };
+  };
+
+  const { width: menuWidth, height: menuHeight } = getMenuDimensions();
+
+  // Render staggered layout for admin menu
+  const renderStaggeredLayout = () => {
+    const rows = [];
+    let itemIndex = 0;
+    
+    // First row: 3 items
+    if (itemIndex < menuItems.length) {
+      const firstRowItems = menuItems.slice(itemIndex, itemIndex + 3);
+      rows.push(
+        <div key="row-0" className="flex justify-center gap-6">
+          {firstRowItems.map((item, index) => renderMenuItem(item, itemIndex + index))}
+        </div>
+      );
+      itemIndex += 3;
+    }
+    
+    // Second row: 2 items centered
+    if (itemIndex < menuItems.length) {
+      const secondRowItems = menuItems.slice(itemIndex, itemIndex + 2);
+      rows.push(
+        <div key="row-1" className="flex justify-center gap-6">
+          {secondRowItems.map((item, index) => renderMenuItem(item, itemIndex + index))}
+        </div>
+      );
+      itemIndex += 2;
+    }
+    
+    // Third row and beyond: remaining items in groups of 3
+    while (itemIndex < menuItems.length) {
+      const rowItems = menuItems.slice(itemIndex, itemIndex + 3);
+      const rowIndex = Math.floor((itemIndex - 5) / 3) + 2;
+      rows.push(
+        <div key={`row-${rowIndex}`} className="flex justify-center gap-6">
+          {rowItems.map((item, index) => renderMenuItem(item, itemIndex + index))}
+        </div>
+      );
+      itemIndex += 3;
+    }
+    
+    return <div className="flex flex-col gap-6">{rows}</div>;
+  };
+
+  // Render individual menu item
+  const renderMenuItem = (item, index) => {
+    const IconComponent = item.icon;
+    const isActive = activeSection === item.id;
+    
+    return (
+      <div
+        key={`${currentLevel}-${item.id}-${index}`}
+        className={`bg-white/50 backdrop-blur-sm border border-white shadow-[0_0_25px_rgba(0,0,0,0.3)] menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
+          item.isLogout ? 'logout' : ''
+        } ${isActive ? 'ring-2 ring-blue-400 bg-sky-500/20 border-0' : ''}`}
+        onClick={() => handleMenuItemClick(item)}
+      >
+        <IconComponent 
+          size={32} 
+          className={`mb-1 ${item.isLogout ? 'text-red-500' : 'text-gray-700'}`} 
+          strokeWidth={1.9}
+        />
+        <span className={`text-xs font-semibold text-center leading-tight ${
+          item.isLogout ? 'text-red-500' : 'text-gray-700'
+        }`} style={{ fontSize: '10px' }}>
+          {item.text}
+        </span>
+      </div>
+    );
+  };
 
   return (
     <>
       <style jsx>{`
         .assistive-touch-button {
-          background: rgba(240, 202, 180, 0.45);
+          background: rgba(211, 159, 101, 0.45);
           backdrop-filter: blur(15px);
           border: 1px solid rgba(255, 255, 255, 0.8);
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
@@ -334,7 +426,7 @@ const AssistiveTouchNavigation = ({
 
         .menu-container {
           background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(5px);
+          backdrop-filter: blur(4px);
           border: 1px solid rgba(255, 255, 255, 0.3);
           box-shadow: 
               0 25px 80px rgba(0, 0, 0, 0.15),
@@ -530,89 +622,24 @@ const AssistiveTouchNavigation = ({
               </div>
             )}
 
-            {/* Menu Grid or Triangle Layout */}
+            {/* Menu Layout */}
             {isTriangle ? (
               <div className="triangle-layout">
                 <div className="triangle-top">
                   {(() => {
                     const item = menuItems[0];
-                    const IconComponent = item.icon;
-                    const isActive = activeSection === item.id;
-                    
-                    return (
-                      <div
-                        className={`bg-black/5 backdrop-blur-sm menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
-                          isActive ? 'ring-2 ring-blue-400' : ''
-                        }`}
-                        onClick={() => handleMenuItemClick(item)}
-                      >
-                        <IconComponent 
-                          size={32} 
-                          className="mb-1 text-gray-700" 
-                          strokeWidth={1.9}
-                        />
-                        <span className="text-xs font-semibold text-center leading-tight text-gray-700" style={{ fontSize: '10px' }}>
-                          {item.text}
-                        </span>
-                      </div>
-                    );
+                    return renderMenuItem(item, 0);
                   })()}
                 </div>
                 <div className="triangle-bottom">
-                  {menuItems.slice(1).map((item, index) => {
-                    const IconComponent = item.icon;
-                    const isActive = activeSection === item.id;
-                    
-                    return (
-                      <div
-                        key={`${currentLevel}-${item.id}-${index + 1}`}
-                        className={`bg-black/5 backdrop-blur-sm menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
-                          item.isLogout ? 'logout' : ''
-                        } ${isActive ? 'ring-2 ring-blue-400' : ''}`}
-                        onClick={() => handleMenuItemClick(item)}
-                      >
-                        <IconComponent 
-                          size={32} 
-                          className={`mb-1 ${item.isLogout ? 'text-red-500' : 'text-gray-700'}`} 
-                          strokeWidth={1.9}
-                        />
-                        <span className={`text-xs font-semibold text-center leading-tight ${
-                          item.isLogout ? 'text-red-500' : 'text-gray-700'
-                        }`} style={{ fontSize: '10px' }}>
-                          {item.text}
-                        </span>
-                      </div>
-                    );
-                  })}
+                  {menuItems.slice(1).map((item, index) => renderMenuItem(item, index + 1))}
                 </div>
               </div>
+            ) : isStaggered ? (
+              renderStaggeredLayout()
             ) : (
               <div className={`grid gap-6 ${gridSize === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                {menuItems.map((item, index) => {
-                  const IconComponent = item.icon;
-                  const isActive = activeSection === item.id;
-                  
-                  return (
-                    <div
-                      key={`${currentLevel}-${item.id}-${index}`}
-                      className={`bg-black/5 backdrop-blur-sm menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
-                        item.isLogout ? 'logout' : ''
-                      } ${isActive ? 'ring-2 ring-blue-400' : ''}`}
-                      onClick={() => handleMenuItemClick(item)}
-                    >
-                      <IconComponent 
-                        size={32} 
-                        className={`mb-1 ${item.isLogout ? 'text-red-500' : 'text-gray-700'}`} 
-                        strokeWidth={1.9}
-                      />
-                      <span className={`text-xs font-semibold text-center leading-tight ${
-                        item.isLogout ? 'text-red-500' : 'text-gray-700'
-                      }`} style={{ fontSize: '10px' }}>
-                        {item.text}
-                      </span>
-                    </div>
-                  );
-                })}
+                {menuItems.map((item, index) => renderMenuItem(item, index))}
               </div>
             )}
           </div>
