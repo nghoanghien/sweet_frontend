@@ -2184,10 +2184,13 @@ export default function Dashboard() {
                 overflow: "visible",
               }}
               exit={{ width: 0, opacity: 0, padding: 0, overflow: "hidden" }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{ duration: 0.4, ease: "easeInOut", type: "spring", stiffness: 100, damping: 15 }}
+              layoutId="savings-account-modal"
             >
-              <Plus size={16} className="mr-2" />
-              <span className="font-medium">Mở tài khoản tiền gửi</span>
+              <motion.div layoutId="savings-icon" className="mr-2">
+                <Plus size={16} />
+              </motion.div>
+              <motion.span layoutId="savings-title" className="font-medium">Mở tài khoản tiền gửi</motion.span>
             </motion.button>
           )}
         </AnimatePresence>
@@ -3628,19 +3631,11 @@ export default function Dashboard() {
 
       <AnimatePresence>
         {savingsAccountModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
-          >
-            <NewSavingsAccountModal
-              isOpen={savingsAccountModalOpen}
-              onClose={toggleSavingsAccountModal}
-              onCreateAccount={createSavingsAccount}
-            />
-          </motion.div>
+          <NewSavingsAccountModal
+            isOpen={savingsAccountModalOpen}
+            onClose={toggleSavingsAccountModal}
+            onCreateAccount={createSavingsAccount}
+          />
         )}
       </AnimatePresence>
 
