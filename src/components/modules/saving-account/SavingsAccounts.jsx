@@ -740,31 +740,43 @@ const SavingsAccounts = ({ customerId }) => {
             </motion.button>
 
             {/* Nút mở sổ mới */}
-            <motion.button
-              onClick={() => setIsNewAccountModalOpen(true)}
-              className="relative group bg-gradient-to-r from-pink-100 via-pink-300 to-rose-100 backdrop-blur-xl py-3 px-5 rounded-2xl shadow-lg border border-pink-200 flex items-center justify-center space-x-2 text-sm font-medium text-gray-700 overflow-hidden"
-              whileHover={{
-                boxShadow: "0 15px 30px -8px rgba(236, 72, 153, 0.25)",
-                y: -2,
-                scale: 1.02,
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{
-                duration: 0.2,
-                type: "spring",
-                stiffness: 400,
-                damping: 25,
-              }}
-            >
-              {/* Nền loang màu nhạt bên trong */}
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-100/40 via-transparent to-rose-100/40 opacity-60 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-200/20 to-rose-200/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+            <AnimatePresence>
+              <motion.button
+                onClick={() => setIsNewAccountModalOpen(true)}
+                className="relative group bg-gradient-to-r from-pink-100 via-pink-300 to-rose-100 backdrop-blur-xl py-3 px-5 rounded-2xl shadow-lg border border-pink-200 flex items-center justify-center space-x-2 text-sm font-medium text-gray-700 overflow-hidden"
+                whileHover={{
+                  boxShadow: "0 15px 30px -8px rgba(236, 72, 153, 0.25)",
+                  y: -2,
+                  scale: 1.02,
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{
+                  duration: 0.2,
+                  ease: "easeInOut",
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15,
+                }}
+                layoutId="savings-account-modal"
+              >
+                {/* Nền loang màu nhạt bên trong */}
+                <div className="absolute inset-0 bg-gradient-to-br from-pink-100/40 via-transparent to-rose-100/40 opacity-60 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-200/20 to-rose-200/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
 
-              <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-md">
-                <Plus size={14} className="text-white" />
-              </div>
-              <span className="relative text-rose-600 text-md font-semibold">Mở tiết kiệm</span>
-            </motion.button>
+                <motion.div
+                  className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center shadow-md"
+                  layoutId="savings-icon"
+                >
+                  <Plus size={14} className="text-white" />
+                </motion.div>
+                <motion.span
+                  layoutId="savings-title"
+                  className="relative text-rose-600 text-md font-semibold"
+                >
+                  Mở tiết kiệm
+                </motion.span>
+              </motion.button>
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -1001,24 +1013,13 @@ const SavingsAccounts = ({ customerId }) => {
         </div>
       </div>
 
-      <AnimatePresence>
-        {isNewAccountModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md"
-          >
+      
             <NewSavingsAccountModal
               isOpen={isNewAccountModalOpen}
               onClose={() => setIsNewAccountModalOpen(false)}
               onCreateAccount={prepareNewAccount}
               isAdmin={true}
             />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Drawer chi tiết tài khoản */}
       <SavingsAccountDetailDrawer
