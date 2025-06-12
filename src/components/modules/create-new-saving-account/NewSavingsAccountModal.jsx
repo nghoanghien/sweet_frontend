@@ -489,6 +489,7 @@ const interestRateData = {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="bg-white/95 backdrop-blur-sm rounded-3xl w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl border border-pink-100 flex flex-col"
             onClick={(e) => e.stopPropagation()}
+            layoutId="savings-account-modal"
           >
             {/* Header */}
             <div className="relative p-6 bg-gradient-to-r from-pink-500 to-rose-400 text-white">
@@ -498,12 +499,12 @@ const interestRateData = {
 
               <div className="flex justify-between items-center relative z-10">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30">
+                  <motion.div layoutId="savings-icon" className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30">
                     <PiggyBank size={18} className="text-white" />
-                  </div>
-                  <h2 className="text-lg font-semibold tracking-wide">
+                  </motion.div>
+                  <motion.h2 layoutId="savings-title" className="text-lg font-semibold tracking-wide">
                     Mở tài khoản tiền gửi
-                  </h2>
+                  </motion.h2>
                 </div>
                 <button
                   onClick={onClose}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
   User, 
   Home, 
@@ -181,12 +182,13 @@ const LiquidGlassNavigation = ({
         />
       
         {/* Profile section */}
-        <div
-          className="profile-section relative flex items-center p-6 border-b border-white/10 cursor-pointer group transition-all duration-300 liquid-glass-nav-item shadow-[inset_0_0_18px_12px_rgba(255,255,255,0.4)]"
+        <motion.div
+          className="profile-section relative flex items-center p-6 border-b border-white/30 cursor-pointer group transition-all duration-300 liquid-glass-nav-item shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.1)]"
           style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)'
           }}
           onClick={onProfileClick}
+          layoutId="profile-section"
         >
           <div 
             className="absolute inset-0 rounded-t-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -198,23 +200,24 @@ const LiquidGlassNavigation = ({
           
           {navHovered ? (
             <>
-              <div 
+              <motion.div 
                 className="relative h-12 w-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.3)]"
                 style={{
                   background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%)',
                   backdropFilter: 'blur(15px)',
                   border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
+                layoutId="profile-avatar"
               >
                 <User size={22} className="text-gray-700 drop-shadow-sm" />
-              </div>
+              </motion.div>
               <div className="relative ml-4">
-                <p className="font-semibold text-sm text-gray-800 tracking-wide drop-shadow-sm">{profileData.fullName}</p>
-                <p className="text-xs text-gray-600 drop-shadow-sm tracking-wide">{profileData.email}</p>
+                <motion.p layoutId="profile-name" className="font-semibold text-sm text-gray-800 tracking-wide drop-shadow-sm">{profileData.fullName}</motion.p>
+                <motion.p layoutId="profile-email" className="text-xs text-gray-600 drop-shadow-sm tracking-wide">{profileData.email}</motion.p>
               </div>
             </>
           ) : (
-            <div 
+            <motion.div 
               className="relative h-12 w-12 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300 shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.3)]"
               style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%)',
@@ -223,9 +226,9 @@ const LiquidGlassNavigation = ({
               }}
             >
               <User size={22} className="text-gray-700 drop-shadow-sm" />
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       
         {/* Navigation items */}
         <div className="relative flex-1 py-6 px-3 flex flex-col overflow-hidden">

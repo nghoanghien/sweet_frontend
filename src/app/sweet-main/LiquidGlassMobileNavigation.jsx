@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   User, 
   Home, 
@@ -360,31 +361,55 @@ const AssistiveTouchNavigation = ({
   };
 
   // Render individual menu item
-  const renderMenuItem = (item, index) => {
-    const IconComponent = item.icon;
-    const isActive = activeSection === item.id;
-    
+  // Render individual menu item
+const renderMenuItem = (item, index) => {
+  const IconComponent = item.icon;
+  const isActive = activeSection === item.id;
+  
+  const className = `bg-white/50 backdrop-blur-sm border border-white shadow-[0_0_20px_rgba(0,0,0,0.1)] menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
+    item.isLogout ? 'logout' : ''
+  } ${isActive ? 'ring-2 ring-blue-400 bg-sky-500/20 border-0' : ''}`;
+  
+  const content = (
+    <>
+      <IconComponent 
+        size={32} 
+        className={`mb-1 ${item.isLogout ? 'text-red-500' : 'text-gray-700'}`} 
+        strokeWidth={1.9}
+      />
+      <span className={`text-xs font-semibold text-center leading-tight ${
+        item.isLogout ? 'text-red-500' : 'text-gray-700'
+      }`} style={{ fontSize: '10px' }}>
+        {item.text}
+      </span>
+    </>
+  );
+  
+  // Sử dụng motion.div cho item có id là "profile"
+  if (item.id === 'profile') {
     return (
-      <div
+      <motion.div
         key={`${currentLevel}-${item.id}-${index}`}
-        className={`bg-white/50 backdrop-blur-sm border border-white shadow-[0_0_25px_rgba(0,0,0,0.3)] menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
-          item.isLogout ? 'logout' : ''
-        } ${isActive ? 'ring-2 ring-blue-400 bg-sky-500/20 border-0' : ''}`}
+        layoutId="profile-section"
+        className={className}
         onClick={() => handleMenuItemClick(item)}
       >
-        <IconComponent 
-          size={32} 
-          className={`mb-1 ${item.isLogout ? 'text-red-500' : 'text-gray-700'}`} 
-          strokeWidth={1.9}
-        />
-        <span className={`text-xs font-semibold text-center leading-tight ${
-          item.isLogout ? 'text-red-500' : 'text-gray-700'
-        }`} style={{ fontSize: '10px' }}>
-          {item.text}
-        </span>
-      </div>
+        {content}
+      </motion.div>
     );
-  };
+  }
+  
+  // Sử dụng div thông thường cho các item khác
+  return (
+    <div
+      key={`${currentLevel}-${item.id}-${index}`}
+      className={className}
+      onClick={() => handleMenuItemClick(item)}
+    >
+      {content}
+    </div>
+  );
+};
 
   return (
     <>

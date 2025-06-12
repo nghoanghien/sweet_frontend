@@ -182,6 +182,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
+
           >
             {/* Liquid Glass Background */}
             <div
@@ -215,6 +216,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                 stiffness: 300,
                 damping: 30,
               }}
+              layoutId="profile-section" // Add layoutId for shared element transition
             >
               {/* Liquid Glass Card */}
               <div className="bg-white/20 backdrop-blur-2xl border border-white/30 rounded-3xl shadow-2xl overflow-hidden">
@@ -233,23 +235,35 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                   <div className="flex justify-between items-center relative z-10">
                     <div className="flex items-center gap-4">
                       {/* Glass Avatar */}
-                      <div className="relative">
+                      <motion.div className="relative" layoutId="profile-avatar">
                         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/40 to-blue-100/30 backdrop-blur-lg border border-white/40 flex items-center justify-center shadow-lg">
                           <User size={28} className="text-blue-600" />
                         </div>
                         <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-blue-400/20 to-indigo-500/10 blur opacity-60" />
-                      </div>
+                      </motion.div>
 
                       <div>
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
+                        <motion.h2 
+                          className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent"
+                          layoutId="profile-title"
+                        >
                           Thông tin cá nhân
-                        </h2>
+                        </motion.h2>
                         <div className="flex items-center mt-1">
                           <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-green-500 mr-2 shadow-lg" />
-                          <p className="text-gray-600 font-medium">
+                          <motion.p 
+                            className="text-gray-600 font-medium"
+                            layoutId="profile-name"
+                          >
                             {profileData.fullName}
-                          </p>
+                          </motion.p>
                         </div>
+                        <motion.p 
+                          className="text-gray-500 text-sm mt-1"
+                          layoutId="profile-email"
+                        >
+                          {profileData.email}
+                        </motion.p>
                       </div>
                     </div>
 
@@ -750,7 +764,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
         onConfirm={handleConfirmSave}
         title="Xác nhận thay đổi"
         description="Bạn có chắc chắn muốn cập nhật thông tin cá nhân?"
-        confirmText="Vuốt để xác nhận"
+        confirmText="Quẹt để xác nhận"
         type="update"
         isProcessing={isProcessing}
         confirmDetails={{
