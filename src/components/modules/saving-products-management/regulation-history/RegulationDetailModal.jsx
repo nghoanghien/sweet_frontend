@@ -97,27 +97,32 @@ const RegulationDetailModal = ({
           onClick={onClose}
         >
           <motion.div
+            layoutId={`regulation-card-${regulation.id}`}
             className="relative bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,170,255,0.13)] border-2 border-blue-100 w-full max-w-4xl max-h-[96vh] flex flex-col overflow-hidden"
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-5 flex items-center justify-between rounded-t-3xl shadow-[0_4px_24px_rgba(0,170,255,0.10)] sticky top-0 z-10">
-              <motion.h2
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
+            <motion.div 
+              layoutId={`regulation-header-${regulation.id}`}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-5 flex items-center justify-between rounded-t-3xl shadow-[0_4px_24px_rgba(0,170,255,0.10)] sticky top-0 z-10"
+            >
+              <motion.div
+                layoutId={`regulation-title-${regulation.id}`}
                 className="text-white text-lg sm:text-2xl font-bold flex items-center gap-2"
               >
                 <BookOpen size={24} className="opacity-90 drop-shadow" />
-                <span className="truncate">Quy định #{regulation.id.replace('reg', '')}</span>
-              </motion.h2>
+                <motion.span 
+                  layoutId={`regulation-id-${regulation.id}`}
+                  className="truncate"
+                >
+                  Quy định #{regulation.id.replace('reg', '')}
+                </motion.span>
+              </motion.div>
               <div className="flex items-center gap-2">
                 {canCancel && !regulation.isCancelled && (
                   <motion.button
+                    layoutId={`regulation-cancel-button-${regulation.id}`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={(e) => {
@@ -127,7 +132,7 @@ const RegulationDetailModal = ({
                     className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl shadow-[0_4px_20px_rgba(239,68,68,0.13)] font-semibold tracking-wide flex items-center gap-2"
                   >
                     <Ban size={18} />
-                    
+                    Hủy quy định
                   </motion.button>
                 )}
                 <motion.button
@@ -145,21 +150,27 @@ const RegulationDetailModal = ({
                   <X size={24} className="text-white/90" />
                 </button>
               </div>
-            </div>
+            </motion.div>
             
             {/* Content - Scrollable */}
             <div className="flex-1 overflow-y-auto p-2 sm:p-6 max-h-[calc(96vh-110px)]">
               {/* Status indicator */}
               <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <span className={`px-4 py-1.5 rounded-full text-base font-bold shadow-sm ${status.color}`}>
+                  <motion.span 
+                    layoutId={`regulation-status-${regulation.id}`}
+                    className={`px-4 py-1.5 rounded-full text-base font-bold shadow-sm ${status.color}`}
+                  >
                     {status.label}
-                  </span>
+                  </motion.span>
                 </div>
-                <div className="flex items-center text-base text-blue-700 font-semibold">
+                <motion.div 
+                  layoutId={`regulation-creator-${regulation.id}`}
+                  className="flex items-center text-base text-blue-700 font-semibold"
+                >
                   <User size={18} className="mr-2" />
                   Người tạo: {regulation.creator.name}
-                </div>
+                </motion.div>
               </div>
               
               {/* General information */}
@@ -170,9 +181,12 @@ const RegulationDetailModal = ({
                     <Calendar className="text-indigo-600 mr-2" size={20} />
                     <h3 className="text-sm font-bold text-gray-800">Ngày áp dụng</h3>
                   </div>
-                  <p className="text-lg font-bold text-blue-900">
+                  <motion.p 
+                    layoutId={`regulation-date-${regulation.id}`}
+                    className="text-lg font-bold text-blue-900"
+                  >
                     {formatDate(regulation.applicationDate)}
-                  </p>
+                  </motion.p>
                 </div>
                 {/* Minimum deposit */}
                 <div className="bg-gradient-to-br from-blue-50/80 to-white p-5 rounded-2xl border border-blue-100 shadow-[0_4px_24px_rgba(0,170,255,0.08)]">
@@ -180,9 +194,12 @@ const RegulationDetailModal = ({
                     <DollarSign className="text-indigo-600 mr-2" size={20} />
                     <h3 className="text-sm font-bold text-gray-800">Số tiền gửi tối thiểu</h3>
                   </div>
-                  <p className="text-lg font-bold text-blue-900">
+                  <motion.p 
+                    layoutId={`regulation-min-deposit-${regulation.id}`}
+                    className="text-lg font-bold text-blue-900"
+                  >
                     {formatCurrency(regulation.minimumDeposit)}
-                  </p>
+                  </motion.p>
                 </div>
                 {/* No-term rate */}
                 <div className="bg-gradient-to-br from-blue-50/80 to-white p-5 rounded-2xl border border-blue-100 shadow-[0_4px_24px_rgba(0,170,255,0.08)]">
@@ -190,28 +207,43 @@ const RegulationDetailModal = ({
                     <TrendingUp className="text-indigo-600 mr-2" size={20} />
                     <h3 className="text-sm font-bold text-gray-800">Lãi suất không kỳ hạn</h3>
                   </div>
-                  <p className="text-lg font-bold text-blue-900">
+                  <motion.p 
+                    layoutId={`regulation-no-term-rate-${regulation.id}`}
+                    className="text-lg font-bold text-blue-900"
+                  >
                     {regulation.noTermRate}%
-                  </p>
+                  </motion.p>
                 </div>
               </div>
               {/* Description */}
               {regulation.description && (
-                <div className="mb-6 text-base text-blue-700 italic bg-blue-50/60 rounded-2xl p-4 border border-blue-100 shadow-sm">
+                <motion.div 
+                  layoutId={`regulation-description-${regulation.id}`}
+                  className="mb-6 text-base text-blue-700 italic bg-blue-50/60 rounded-2xl p-4 border border-blue-100 shadow-sm"
+                >
                   {regulation.description}
-                </div>
+                </motion.div>
               )}
               
               {/* Savings type toggle */}
-              {regulation.savingsTypes.length > 1 && (
-                <div className="mb-4 flex justify-center">
+              <motion.div 
+                className="mb-4 flex justify-center"
+              >
+                {regulation.savingsTypes.length > 1 ? (
                   <SavingsTypeToggle
                     savingsTypes={regulation.savingsTypes}
                     activeSavingsType={activeSavingsType}
                     onToggle={setActiveSavingsType}
                   />
-                </div>
-              )}
+                ) : regulation.savingsTypes.map(type => (
+                  <span 
+                    key={type.id} 
+                    className="bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full font-semibold shadow-sm border border-blue-100"
+                  >
+                    {type.name}
+                  </span>
+                ))}
+              </motion.div>
               
               {/* Interest rate table */}
               {activeSavingsTypeDetails && (
@@ -232,8 +264,12 @@ const RegulationDetailModal = ({
             </div>
             
             {/* Footer */}
-            <div className="bg-gray-50 px-6 py-4 flex justify-end border-t">
+            <motion.div 
+              layoutId={`regulation-footer-${regulation.id}`}
+              className="bg-gray-50 px-6 py-4 flex justify-end border-t"
+            >
               <motion.button
+                layoutId={`regulation-view-button-${regulation.id}`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onClose}
@@ -241,7 +277,7 @@ const RegulationDetailModal = ({
               >
                 Đóng
               </motion.button>
-            </div>
+            </motion.div>
           </motion.div>
         </motion.div>
       )}
@@ -249,4 +285,4 @@ const RegulationDetailModal = ({
   );
 };
 
-export default RegulationDetailModal; 
+export default RegulationDetailModal;
