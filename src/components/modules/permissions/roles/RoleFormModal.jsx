@@ -371,18 +371,17 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/20 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          onClick={onClose}
         >
           <motion.div
             className="bg-white rounded-xl sm:rounded-3xl shadow-2xl w-full max-w-4xl max-h-[98vh] sm:max-h-[95vh] flex flex-col overflow-hidden relative"
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 10 }}
-            transition={{ duration: 0.2 }}
+            
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
+            layoutId={isEditing ? `role-card-${role.id}` : 'add-role-modal'}
             style={{
               background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",

@@ -224,16 +224,19 @@ const RoleManagement = () => {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <motion.h3 
+          <motion.h3
             className="text-2xl font-bold text-indigo-700 flex items-center gap-2 drop-shadow"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <UserCheck size={28} className="text-indigo-500 mr-2 drop-shadow-lg" />
+            <UserCheck
+              size={28}
+              className="text-indigo-500 mr-2 drop-shadow-lg"
+            />
             Quản lý vai trò
           </motion.h3>
-          <motion.p 
+          <motion.p
             className="text-sm text-gray-500 mt-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -242,31 +245,49 @@ const RoleManagement = () => {
             Tạo và quản lý các vai trò trong hệ thống
           </motion.p>
         </div>
-        
+
         {/* Add role button */}
+        <AnimatePresence>
         <motion.button
           onClick={handleAddRole}
           className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
-          whileHover={{ scale: 1.08, boxShadow: '0 0 16px rgba(0,170,255,0.18)' }}
+          whileHover={{
+            scale: 1.08,
+            boxShadow: "0 0 16px rgba(0,170,255,0.18)",
+          }}
           whileTap={{ scale: 0.96 }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
+          layoutId="add-role-modal"
+          transition={{
+            layout: {
+              type: "spring",
+              damping: 17,
+              stiffness: 100,
+            },
+            opacity: {
+              duration: 0.3,
+            }
+          }}
         >
           <Plus size={20} className="mr-2" />
           Thêm vai trò
         </motion.button>
+        </AnimatePresence>
       </div>
-      
+
       {/* Search and filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <motion.div 
+        <motion.div
           className="relative flex-grow"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         >
-          <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400" />
+          <Search
+            size={20}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400"
+          />
           <input
             type="text"
             placeholder="Tìm kiếm vai trò..."
@@ -275,46 +296,52 @@ const RoleManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           className="flex gap-2"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
           <button
-            onClick={() => setFilter('all')}
+            onClick={() => setFilter("all")}
             className={`px-4 py-2 rounded-2xl flex items-center gap-2 text-base font-semibold shadow transition-all
-              ${filter === 'all'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]'
-                : 'bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100'}`}
+              ${
+                filter === "all"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]"
+                  : "bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100"
+              }`}
           >
             <Filter size={18} />
             Tất cả
           </button>
           <button
-            onClick={() => setFilter('customer')}
+            onClick={() => setFilter("customer")}
             className={`px-4 py-2 rounded-2xl flex items-center gap-2 text-base font-semibold shadow transition-all
-              ${filter === 'customer'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]'
-                : 'bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100'}`}
+              ${
+                filter === "customer"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]"
+                  : "bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100"
+              }`}
           >
             <Users size={18} />
             Khách hàng
           </button>
           <button
-            onClick={() => setFilter('staff')}
+            onClick={() => setFilter("staff")}
             className={`px-4 py-2 rounded-2xl flex items-center gap-2 text-base font-semibold shadow transition-all
-              ${filter === 'staff'
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]'
-                : 'bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100'}`}
+              ${
+                filter === "staff"
+                  ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]"
+                  : "bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100"
+              }`}
           >
             <Settings size={18} />
             Nhân viên
           </button>
         </motion.div>
       </div>
-      
+
       {/* Role cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRoles.map((role, index) => (
@@ -322,7 +349,10 @@ const RoleManagement = () => {
             key={role.id}
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(0,170,255,0.10)' }}
+            whileHover={{
+              scale: 1.03,
+              boxShadow: "0 0 30px rgba(0,170,255,0.10)",
+            }}
             transition={{ delay: index * 0.08, duration: 0.4 }}
           >
             <RoleCard
@@ -333,7 +363,7 @@ const RoleManagement = () => {
             />
           </motion.div>
         ))}
-        
+
         {filteredRoles.length === 0 && (
           <motion.div
             className="text-center py-10 text-blue-400 col-span-full"
@@ -356,25 +386,15 @@ const RoleManagement = () => {
         autoHideDuration={5000}
       />
 
-      <AnimatePresence mode="wait">
-        {showFormModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black backdrop-blur-sm bg-opacity-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <RoleFormModal
-              isOpen={showFormModal}
-              onClose={() => setShowFormModal(false)}
-              onSave={handleSaveRole}
-              role={selectedRole}
-              isEditing={isEditing}
-            />
-          </motion.div>
-        )}
+      <RoleFormModal
+        isOpen={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        onSave={handleSaveRole}
+        role={selectedRole}
+        isEditing={isEditing}
+      />
 
+      <AnimatePresence mode="wait">
         {showDeleteModal && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black backdrop-blur-sm bg-opacity-40"

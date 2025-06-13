@@ -92,15 +92,15 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
   const hasHiddenPermissions = hiddenPermissions.length > 0;
 
   return (
-    <motion.div
-      className={`bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} relative transition-all duration-300`}
+    <AnimatePresence mode="wait">
+      <motion.div
+      className={`bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} relative`}
       whileHover={{
         scale: 1.02,
         boxShadow: cardStyle.hoverShadow,
       }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      layoutId={`role-card-${role.id}`}
+      transition={{ duration: 0.4, type: "spring", stiffness: 100, damping: 15 }}
     >
       {/* Background icon */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
@@ -255,6 +255,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
         )}
       </div>
     </motion.div>
+    </AnimatePresence>
   );
 };
 
