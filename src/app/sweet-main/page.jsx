@@ -3609,7 +3609,7 @@ export default function Dashboard() {
 
       {/* Savings Account Detail Drawer */}
       <div
-        className={`fixed inset-0 bg-black/30 backdrop-blur-sm z-[60] transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-[60] transition-opacity duration-300 ${
           savingsDetailVisible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSavingsDetailDrawer}
