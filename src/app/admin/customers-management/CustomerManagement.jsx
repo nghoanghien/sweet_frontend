@@ -1778,14 +1778,14 @@ export default function CustomerManagement() {
       </div>
 
       {/* Customer Detail Modal */}
-      <AnimatePresence mode="sync">
+      <AnimatePresence mode="wait">
         {isModalOpen && selectedCustomer && (
           <motion.div
             key="customer-detail-modal"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onAnimationComplete={(definition) => {
               // Reset data when exit animation completes
@@ -1799,23 +1799,27 @@ export default function CustomerManagement() {
             }}
           >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+              animate={{ opacity: 1, backdropFilter: "blur(4px)" }}
+              exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+              transition={{ duration: 0.4 }}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm"
               onClick={closeModal}
             ></motion.div>
 
             <motion.div
+              layoutId={selectedCustomer ? `row-${selectedCustomer.id}` : ""}
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 40 }}
+              layout
               transition={{
                 type: "spring",
                 damping: 25,
                 stiffness: 300,
-                duration: 0.6,
+                layout: { duration: 0.6, type: "spring" },
+                opacity: { duration: 0.8 },
+                scale: { duration: 0.6 }
               }}
               className="bg-white rounded-2xl w-full max-w-7xl shadow-2xl flex flex-col h-[90vh] relative z-10"
               style={{ scrollbarWidth: "none" }}

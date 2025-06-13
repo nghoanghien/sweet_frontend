@@ -273,7 +273,7 @@ const DataTable = ({
         ease: 'easeOut'
       }
     }),
-    exit: { opacity: 0, y: -20, transition: { duration: 0.2 } }
+    exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: 'easeInOut' } }
   };
 
   return (
@@ -371,6 +371,11 @@ const DataTable = ({
                       className="hover:bg-blue-50/60 transition-colors cursor-pointer"
                       onClick={() => onRowClick && onRowClick(item)}
                       layoutId={`row-${item[keyField]}`}
+                      layout
+                      transition={{
+                        layout: { type: "spring", damping: 15, stiffness: 100 },
+                        opacity: { duration: 0.6 }
+                      }}
                     >
                       {columns.map((column) => {
                         // Render special components based on column type

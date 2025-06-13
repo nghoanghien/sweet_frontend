@@ -1613,7 +1613,7 @@ import React, { useState, useEffect } from 'react';
         </div>
 
         {/* Employee Detail Modal */}
-        <AnimatePresence mode="sync">
+        <AnimatePresence mode="wait">
           {isModalOpen && selectedEmployee && (
             <motion.div
               key="employee-detail-modal"
@@ -1636,12 +1636,16 @@ import React, { useState, useEffect } from 'react';
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ 
+                  duration: 0.5,
+                  backdropFilter: { duration: 0.3 }
+                }}
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={closeModal}
               ></motion.div>
 
               <motion.div
+                layoutId={`row-${selectedEmployee.id}`}
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 40 }}
@@ -1650,6 +1654,9 @@ import React, { useState, useEffect } from 'react';
                   damping: 25,
                   stiffness: 300,
                   duration: 0.6,
+                  layout: { type: "spring", damping: 30, stiffness: 200 },
+                  opacity: { duration: 0.3 },
+                  scale: { duration: 0.4 }
                 }}
                 className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[90vh] relative z-10"
                 style={{ scrollbarWidth: "none" }}
