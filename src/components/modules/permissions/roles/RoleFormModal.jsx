@@ -602,7 +602,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
 
                 {/* Permissions selection với change tracking */}
                 <div>
-                  <div className="flex flex-col md:flex-col items-center justify-between mb-6">
+                  <div className="flex flex-col md:flex-row items-center justify-between mb-6">
                     <div className="flex mb-4 md:mb-0 items-center gap-4 group">
                       <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-sm opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>

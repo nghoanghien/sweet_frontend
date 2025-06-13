@@ -81,19 +81,17 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-40"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          onClick={onClose}
         >
           <motion.div
             className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden"
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            layoutId={`detail-account-${account.id}`}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Header - đơn giản hóa */}
             <div className="px-8 py-6 flex justify-between items-center bg-gradient-to-r from-blue-500 to-indigo-600">

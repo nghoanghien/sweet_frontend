@@ -392,7 +392,7 @@ const AccountManagement = () => {
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <motion.h3 
+          <motion.h3
             className="text-2xl font-bold text-blue-700 flex items-center gap-2 drop-shadow"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -401,7 +401,7 @@ const AccountManagement = () => {
             <Users size={28} className="text-blue-500 mr-2 drop-shadow-lg" />
             Quản lý tài khoản
           </motion.h3>
-          <motion.p 
+          <motion.p
             className="text-sm text-gray-500 mt-1"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -410,12 +410,15 @@ const AccountManagement = () => {
             Tạo và quản lý các tài khoản trong hệ thống
           </motion.p>
         </div>
-        
+
         {/* Add account button */}
         <motion.button
           onClick={handleAddAccount}
           className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
-          whileHover={{ scale: 1.08, boxShadow: '0 0 16px rgba(0,170,255,0.18)' }}
+          whileHover={{
+            scale: 1.08,
+            boxShadow: "0 0 16px rgba(0,170,255,0.18)",
+          }}
           whileTap={{ scale: 0.96 }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -425,17 +428,20 @@ const AccountManagement = () => {
           Thêm tài khoản
         </motion.button>
       </div>
-      
+
       {/* Search and filter */}
       <div className="flex flex-col sm:flex-row justify-between gap-3 mb-6">
         <div className="flex flex-col sm:flex-row gap-3 flex-grow">
-          <motion.div 
+          <motion.div
             className="relative flex-grow"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400" />
+            <Search
+              size={20}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-400"
+            />
             <input
               type="text"
               placeholder="Tìm kiếm tài khoản..."
@@ -444,40 +450,42 @@ const AccountManagement = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="flex gap-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
             <button
-              onClick={() => setFilter('all')}
+              onClick={() => setFilter("all")}
               className={`px-4 py-2 rounded-2xl flex items-center gap-2 text-base font-semibold shadow transition-all
-                ${filter === 'all'
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]'
-                  : 'bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100'}`}
+                ${
+                  filter === "all"
+                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)]"
+                    : "bg-gray-100 text-gray-600 hover:bg-blue-50 border border-blue-100"
+                }`}
             >
               <Filter size={18} />
               Tất cả
             </button>
             <button
-              onClick={() => setFilter('customer')}
+              onClick={() => setFilter("customer")}
               className={`px-3 py-2 rounded-xl flex items-center gap-1 text-sm ${
-                filter === 'customer'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                filter === "customer"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               <Users size={16} />
               Khách hàng
             </button>
             <button
-              onClick={() => setFilter('staff')}
+              onClick={() => setFilter("staff")}
               className={`px-3 py-2 rounded-xl flex items-center gap-1 text-sm ${
-                filter === 'staff'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                filter === "staff"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               <Settings size={16} />
@@ -485,44 +493,51 @@ const AccountManagement = () => {
             </button>
           </motion.div>
         </div>
-        
+
         {/* View mode toggle */}
-        <motion.div 
+        <motion.div
           className="flex gap-1 bg-gray-100 p-1 rounded-xl shadow-sm"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
           <button
-            onClick={() => setViewMode('grid')}
+            onClick={() => setViewMode("grid")}
             className={`p-2 rounded-xl font-semibold text-base transition-all
-              ${viewMode === 'grid'
-                ? 'bg-white text-blue-600 shadow-md'
-                : 'text-gray-600 hover:bg-gray-200'}`}
+              ${
+                viewMode === "grid"
+                  ? "bg-white text-blue-600 shadow-md"
+                  : "text-gray-600 hover:bg-gray-200"
+              }`}
           >
             <Grid size={20} />
           </button>
           <button
-            onClick={() => setViewMode('list')}
+            onClick={() => setViewMode("list")}
             className={`p-2 rounded-xl font-semibold text-base transition-all
-              ${viewMode === 'list'
-                ? 'bg-white text-blue-600 shadow-md'
-                : 'text-gray-600 hover:bg-gray-200'}`}
+              ${
+                viewMode === "list"
+                  ? "bg-white text-blue-600 shadow-md"
+                  : "text-gray-600 hover:bg-gray-200"
+              }`}
           >
             <List size={20} />
           </button>
         </motion.div>
       </div>
-      
+
       {/* Account list */}
-      {viewMode === 'grid' ? (
+      {viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAccounts.map((account, index) => (
             <motion.div
               key={account.id}
               initial={{ opacity: 0, y: 24, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              whileHover={{ scale: 1.03, boxShadow: '0 0 30px rgba(0,170,255,0.10)' }}
+              whileHover={{
+                scale: 1.03,
+                boxShadow: "0 0 30px rgba(0,170,255,0.10)",
+              }}
               transition={{ delay: index * 0.08, duration: 0.4 }}
             >
               <AccountCard
@@ -534,7 +549,7 @@ const AccountManagement = () => {
               />
             </motion.div>
           ))}
-          
+
           {filteredAccounts.length === 0 && (
             <motion.div
               className="text-center py-10 text-blue-400 col-span-full"
@@ -552,22 +567,40 @@ const AccountManagement = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Tài khoản
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Loại
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Vai trò
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     SĐT
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Trạng thái
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Thao tác
                   </th>
                 </tr>
@@ -584,10 +617,13 @@ const AccountManagement = () => {
                     delay={index * 0.05}
                   />
                 ))}
-                
+
                 {filteredAccounts.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-6 py-10 text-center text-gray-500">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-10 text-center text-gray-500"
+                    >
                       Không tìm thấy tài khoản nào phù hợp
                     </td>
                   </tr>
@@ -597,7 +633,7 @@ const AccountManagement = () => {
           </div>
         </div>
       )}
-      
+
       {/* Account form modal */}
       {/* Account detail modal */}
       <AccountDetailModal
@@ -605,7 +641,7 @@ const AccountManagement = () => {
         onClose={() => setShowDetailModal(false)}
         account={selectedAccount}
       />
-      
+
       {/* Reset password modal */}
       <ResetPasswordModal
         isOpen={showResetPasswordModal}
@@ -635,61 +671,23 @@ const AccountManagement = () => {
         format={notification.format}
         autoHideDuration={5000}
       />
-      
-      <AnimatePresence mode="wait">
-        {showFormModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-opacity-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <AccountFormModal
-              isOpen={showFormModal}
-              onClose={() => setShowFormModal(false)}
-              onSave={handleSaveAccount}
-              account={selectedAccount}
-              accountList={accountsList}
-              isEditing={isEditing}
-              rolesList={rolesList}
-            />
-          </motion.div>
-        )}
 
-        {showDetailModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-opacity-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <AccountDetailModal
-              isOpen={showDetailModal}
-              onClose={() => setShowDetailModal(false)}
-              account={selectedAccount}
-            />
-          </motion.div>
-        )}
+      <AccountFormModal
+        isOpen={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        onSave={handleSaveAccount}
+        account={selectedAccount}
+        accountList={accountsList}
+        isEditing={isEditing}
+        rolesList={rolesList}
+      />
 
-        {showResetPasswordModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-opacity-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ResetPasswordModal
-              isOpen={showResetPasswordModal}
-              onClose={() => setShowResetPasswordModal(false)}
-              onConfirm={handleConfirmResetPassword}
-              account={selectedAccount}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ResetPasswordModal
+        isOpen={showResetPasswordModal}
+        onClose={() => setShowResetPasswordModal(false)}
+        onConfirm={handleConfirmResetPassword}
+        account={selectedAccount}
+      />
     </div>
   );
 };

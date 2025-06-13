@@ -228,6 +228,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
           style={{
             background: 'radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, rgba(0, 0, 0, 0.4) 70%)'
           }}
+          onClick={onClose}
         >
           {/* Animated background particles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -257,17 +258,14 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ 
-              duration: 0.4,
-              type: "spring",
-              stiffness: 300,
-              damping: 30
-            }}
+            layoutId={isEditing ? `edit-account-${account.id}` : ''}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
             style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.95) 100%)',
               backdropFilter: 'blur(10px)',
               border: '1px solid rgba(255,255,255,0.2)'
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Decorative corner elements */}
             <div className="absolute top-0 right-0 w-32 h-32 opacity-10">

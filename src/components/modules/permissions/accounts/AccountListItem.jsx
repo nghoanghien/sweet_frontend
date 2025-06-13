@@ -93,6 +93,8 @@ const AccountListItem = ({ account, onView, onEdit, onDisable, onResetPassword, 
             className="p-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm"
             whileHover={{ scale: 1.12 }}
             whileTap={{ scale: 0.92 }}
+            layoutId={`detail-account-${account.id}`}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
           >
             <Eye size={18} />
           </motion.button>
@@ -102,6 +104,8 @@ const AccountListItem = ({ account, onView, onEdit, onDisable, onResetPassword, 
             className="p-2 rounded-xl bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm"
             whileHover={{ scale: 1.12 }}
             whileTap={{ scale: 0.92 }}
+            layoutId={`edit-account-${account.id}`}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
           >
             <Edit2 size={18} />
           </motion.button>
@@ -111,6 +115,8 @@ const AccountListItem = ({ account, onView, onEdit, onDisable, onResetPassword, 
             className="p-2 rounded-xl bg-amber-100 text-amber-600 hover:bg-amber-200 shadow-sm"
             whileHover={{ scale: 1.12 }}
             whileTap={{ scale: 0.92 }}
+            layoutId={`resetPassword-account-${account.id}`}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
           >
             <Lock size={18} />
           </motion.button>
