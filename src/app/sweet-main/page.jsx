@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Home, 
-  Settings, 
+import {
+  Home,
+  Settings,
   Calendar,
   User,
   X,
@@ -35,13 +35,13 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { SwipeConfirmationModal } from "@/components/ui";
 import ExportNotification from "@/components/common/ExportNotification";
-import CustomerManagement from "../admin/customers-management/CustomerManagement"
-import EmployeeManagement from "../admin/employees-management/EmployeeManagement"
-import SavingsProductManagement from "../admin/saving-products-management/SavingsProductManagement"
-import SalesReportPage from '../admin/sales/SalesReportPage';
-import PermissionManagement from '../admin/permissions/PermissionManagement';
-import SystemSettings from '../admin/settings/SystemSettings';
-import SavingsAccountManagement from '../admin/saving-accounts-management/SavingsAccountManagement';
+import CustomerManagement from "../admin/customers-management/CustomerManagement";
+import EmployeeManagement from "../admin/employees-management/EmployeeManagement";
+import SavingsProductManagement from "../admin/saving-products-management/SavingsProductManagement";
+import SalesReportPage from "../admin/sales/SalesReportPage";
+import PermissionManagement from "../admin/permissions/PermissionManagement";
+import SystemSettings from "../admin/settings/SystemSettings";
+import SavingsAccountManagement from "../admin/saving-accounts-management/SavingsAccountManagement";
 import FilterableAccountTransactionList from "@/components/modules/payment-account/components/FilterableAccountTransactionList";
 import FilterableTransactionList from "@/components/modules/saving-account/components/FilterableTransactionList";
 import FilterableInterestList from "@/components/modules/saving-account/components/FilterableInterestList";
@@ -52,9 +52,9 @@ import SavingAccountDetail from "@/components/modules/saving-account/components/
 import NewSavingsAccountModal from "@/components/modules/create-new-saving-account/NewSavingsAccountModal";
 import AnimatedTabNavigation from "@/components/ui/custom/AnimatedTabNavigation";
 import DetailInfo from "@/components/modules/saving-account/components/DetailInfo";
-import ProfileModal from '@/components/modals/ProfileModal/ProfileModal';
-import LiquidGlassNavigation from './LiquidGlassNavigation';
-import LiquidGlassMobileNavigation from './LiquidGlassMobileNavigation'
+import ProfileModal from "@/components/modals/ProfileModal/ProfileModal";
+import LiquidGlassNavigation from "./LiquidGlassNavigation";
+import LiquidGlassMobileNavigation from "./LiquidGlassMobileNavigation";
 // Add custom scrollbar styles
 const scrollbarStyles = `
   /* Hide scrollbar by default */
@@ -209,16 +209,16 @@ export default function Dashboard() {
   const [rightPanelContent, setRightPanelContent] = useState("notifications");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileModalAnimating, setProfileModalAnimating] = useState(false);
-  
+
   // State for notifications
   const [notificationVisible, setNotificationVisible] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [notificationType, setNotificationType] = useState('success');
-  const [notificationFormat, setNotificationFormat] = useState('');
-  
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationType, setNotificationType] = useState("success");
+  const [notificationFormat, setNotificationFormat] = useState("");
+
   // Add state for hiding sensitive account information
   const [hiddenAccountInfo, setHiddenAccountInfo] = useState({});
-    
+
   // State for storing accounts, now as a state instead of a constant
   const [paymentAccounts, setPaymentAccounts] = useState([
     {
@@ -228,16 +228,16 @@ export default function Dashboard() {
       balance: 15000000,
       creationDate: "20/04/2022",
       color: "bg-gradient-to-r from-blue-400 to-indigo-500",
-      icon: <CreditCard size={24} className="text-white" />
-    }
+      icon: <CreditCard size={24} className="text-white" />,
+    },
   ]);
-  
+
   // State for managing account actions dropdown
   const [accountActionMenuOpen, setAccountActionMenuOpen] = useState(null);
 
   // State for mobile action bar visibility
   const [mobileActionBarVisible, setMobileActionBarVisible] = useState(true);
-  
+
   // Account colors for rotation
   const accountColors = [
     "bg-gradient-to-r from-blue-400 to-indigo-500",
@@ -247,9 +247,9 @@ export default function Dashboard() {
     "bg-gradient-to-r from-red-400 to-rose-500",
     "bg-gradient-to-r from-sky-400 to-blue-500",
     "bg-gradient-to-r from-violet-400 to-purple-500",
-    "bg-gradient-to-r from-emerald-400 to-green-500"
+    "bg-gradient-to-r from-emerald-400 to-green-500",
   ];
-  
+
   // State for storing savings accounts
   const [savingsAccounts, setSavingsAccounts] = useState([
     {
@@ -272,7 +272,7 @@ export default function Dashboard() {
       totalReceivable: 213600000,
       color: "bg-gradient-to-r from-blue-400 to-indigo-500",
       icon: <PiggyBank size={24} className="text-white" />,
-      tooltip: "Lãi suất ưu đãi +0.3%"
+      tooltip: "Lãi suất ưu đãi +0.3%",
     },
     {
       id: 2,
@@ -293,7 +293,7 @@ export default function Dashboard() {
       receivedInterest: 3437500,
       totalReceivable: 153437500,
       color: "bg-gradient-to-r from-pink-400 to-purple-500",
-      icon: <PiggyBank size={24} className="text-white" />
+      icon: <PiggyBank size={24} className="text-white" />,
     },
     {
       id: 3,
@@ -315,17 +315,19 @@ export default function Dashboard() {
       totalReceivable: 342600000,
       color: "bg-gradient-to-r from-green-400 to-teal-500",
       icon: <PiggyBank size={24} className="text-white" />,
-      tooltip: "VIP - Miễn phí rút tiền trước hạn"
-    }
+      tooltip: "VIP - Miễn phí rút tiền trước hạn",
+    },
   ]);
-  
+
   // State for savings account detail drawer
   const [savingsDetailVisible, setSavingsDetailVisible] = useState(false);
   const [selectedSavingsId, setSelectedSavingsId] = useState(null);
-  const [savingsCardDetailVisible, setSavingsCardDetailVisible] = useState(false);
+  const [savingsCardDetailVisible, setSavingsCardDetailVisible] =
+    useState(false);
   const [selectedSavingsDetail, setSelectedSavingsDetail] = useState(null);
-  const [savingsRightPanelContent, setSavingsRightPanelContent] = useState("transactions");
-  
+  const [savingsRightPanelContent, setSavingsRightPanelContent] =
+    useState("transactions");
+
   // State for savings account transaction history
   const [savingsTransactionHistory, setSavingsTransactionHistory] = useState({
     1: [
@@ -338,7 +340,7 @@ export default function Dashboard() {
         content: "Gửi tiền tiết kiệm kỳ hạn 12 tháng",
         isDeposit: true,
         interestAmount: 0,
-        balanceAfter: 200000000
+        balanceAfter: 200000000,
       },
       {
         id: 2,
@@ -349,8 +351,8 @@ export default function Dashboard() {
         content: "Xác nhận mở sổ tiết kiệm thành công",
         isSystem: true,
         interestAmount: 0,
-        balanceAfter: 200000000
-      }
+        balanceAfter: 200000000,
+      },
     ],
     2: [
       {
@@ -362,7 +364,7 @@ export default function Dashboard() {
         content: "Gửi tiền tiết kiệm kỳ hạn 6 tháng",
         isDeposit: true,
         interestAmount: 0,
-        balanceAfter: 150000000
+        balanceAfter: 150000000,
       },
       {
         id: 2,
@@ -373,7 +375,7 @@ export default function Dashboard() {
         content: "Xác nhận mở sổ tiết kiệm thành công",
         isSystem: true,
         interestAmount: 0,
-        balanceAfter: 150000000
+        balanceAfter: 150000000,
       },
       {
         id: 3,
@@ -384,7 +386,7 @@ export default function Dashboard() {
         content: "Trả lãi tiền gửi tiết kiệm kỳ 1",
         isInterest: true,
         interestAmount: 687500,
-        balanceAfter: 150000000
+        balanceAfter: 150000000,
       },
       {
         id: 4,
@@ -395,7 +397,7 @@ export default function Dashboard() {
         content: "Trả lãi tiền gửi tiết kiệm kỳ 2",
         isInterest: true,
         interestAmount: 687500,
-        balanceAfter: 150000000
+        balanceAfter: 150000000,
       },
       {
         id: 5,
@@ -406,7 +408,7 @@ export default function Dashboard() {
         content: "Trả lãi tiền gửi tiết kiệm kỳ 3",
         isInterest: true,
         interestAmount: 687500,
-        balanceAfter: 150000000
+        balanceAfter: 150000000,
       },
       {
         id: 6,
@@ -417,7 +419,7 @@ export default function Dashboard() {
         content: "Trả lãi tiền gửi tiết kiệm kỳ 4",
         isInterest: true,
         interestAmount: 687500,
-        balanceAfter: 150000000
+        balanceAfter: 150000000,
       },
       {
         id: 7,
@@ -428,8 +430,8 @@ export default function Dashboard() {
         content: "Trả lãi tiền gửi tiết kiệm kỳ 5",
         isInterest: true,
         interestAmount: 687500,
-        balanceAfter: 150000000
-      }
+        balanceAfter: 150000000,
+      },
     ],
     3: [
       {
@@ -441,7 +443,7 @@ export default function Dashboard() {
         content: "Gửi tiền tiết kiệm kỳ hạn 24 tháng",
         isDeposit: true,
         interestAmount: 0,
-        balanceAfter: 300000000
+        balanceAfter: 300000000,
       },
       {
         id: 2,
@@ -452,7 +454,7 @@ export default function Dashboard() {
         content: "Xác nhận mở sổ tiết kiệm thành công",
         isSystem: true,
         interestAmount: 0,
-        balanceAfter: 300000000
+        balanceAfter: 300000000,
       },
       {
         id: 3,
@@ -463,11 +465,11 @@ export default function Dashboard() {
         content: "Trả lãi tiền gửi tiết kiệm quý 1",
         isInterest: true,
         interestAmount: 5325000,
-        balanceAfter: 300000000
-      }
-    ]
+        balanceAfter: 300000000,
+      },
+    ],
   });
-  
+
   // State for savings interest history
   const [savingsInterestHistory, setSavingsInterestHistory] = useState({
     1: [],
@@ -479,7 +481,7 @@ export default function Dashboard() {
         amount: 687500,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đã thanh toán",
-        targetAccount: "12345678901"
+        targetAccount: "12345678901",
       },
       {
         id: 2,
@@ -488,7 +490,7 @@ export default function Dashboard() {
         amount: 687500,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đã thanh toán",
-        targetAccount: "12345678901"
+        targetAccount: "12345678901",
       },
       {
         id: 3,
@@ -497,7 +499,7 @@ export default function Dashboard() {
         amount: 687500,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đã thanh toán",
-        targetAccount: "12345678901"
+        targetAccount: "12345678901",
       },
       {
         id: 4,
@@ -506,7 +508,7 @@ export default function Dashboard() {
         amount: 687500,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đã thanh toán",
-        targetAccount: "12345678901"
+        targetAccount: "12345678901",
       },
       {
         id: 5,
@@ -515,7 +517,7 @@ export default function Dashboard() {
         amount: 687500,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đã thanh toán",
-        targetAccount: "12345678901"
+        targetAccount: "12345678901",
       },
       {
         id: 6,
@@ -524,8 +526,8 @@ export default function Dashboard() {
         amount: 687500,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đợi thanh toán",
-        targetAccount: "12345678901"
-      }
+        targetAccount: "12345678901",
+      },
     ],
     3: [
       {
@@ -535,7 +537,7 @@ export default function Dashboard() {
         amount: 5325000,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đã thanh toán",
-        targetAccount: "98765432109"
+        targetAccount: "98765432109",
       },
       {
         id: 2,
@@ -544,40 +546,40 @@ export default function Dashboard() {
         amount: 5325000,
         method: "Chuyển vào tài khoản thanh toán",
         status: "Đợi thanh toán",
-        targetAccount: "98765432109"
-      }
-    ]
+        targetAccount: "98765432109",
+      },
+    ],
   });
-  
+
   // State for savings withdrawal history
   const [savingsWithdrawalHistory, setSavingsWithdrawalHistory] = useState({
     1: [],
     2: [],
-    3: []
+    3: [],
   });
-  
+
   // State for withdrawal panel
   const [withdrawalPanelVisible, setWithdrawalPanelVisible] = useState(false);
-  const [withdrawalType, setWithdrawalType] = useState('partial'); // 'full' or 'partial'
-  const [withdrawalAmount, setWithdrawalAmount] = useState('');
+  const [withdrawalType, setWithdrawalType] = useState("partial"); // 'full' or 'partial'
+  const [withdrawalAmount, setWithdrawalAmount] = useState("");
   const [withdrawalData, setWithdrawalData] = useState({
     originalAmount: 0,
     withdrawAmount: 0,
     withdrawalInterest: 0,
     totalWithdrawal: 0,
     remainingBalance: 0,
-    expectedInterest: 0
+    expectedInterest: 0,
   });
-  
+
   // Generate current date in DD/MM/YYYY format
   const getCurrentDate = () => {
     const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
     const year = now.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  
+
   // Add state for swipe confirmation modals
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
@@ -589,7 +591,7 @@ export default function Dashboard() {
     isProcessing: false,
     onConfirm: null,
   });
-  
+
   // Function to open the confirmation modal
   const openConfirmationModal = ({
     title,
@@ -597,7 +599,7 @@ export default function Dashboard() {
     confirmText = "Quẹt để xác nhận",
     confirmDetails = null,
     type,
-    onConfirm
+    onConfirm,
   }) => {
     setConfirmationModal({
       isOpen: true,
@@ -607,140 +609,152 @@ export default function Dashboard() {
       confirmDetails,
       type,
       isProcessing: false,
-      onConfirm
+      onConfirm,
     });
   };
-  
+
   // Function to close the confirmation modal
   const closeConfirmationModal = () => {
-    setConfirmationModal(prev => ({
+    setConfirmationModal((prev) => ({
       ...prev,
-      isOpen: false
+      isOpen: false,
     }));
   };
-  
+
   // Function to set the modal to processing state
   const setConfirmationProcessing = (isProcessing) => {
-    setConfirmationModal(prev => ({
+    setConfirmationModal((prev) => ({
       ...prev,
-      isProcessing
+      isProcessing,
     }));
   };
-  
+
   // Function to close notification
   const handleCloseNotification = () => {
     setNotificationVisible(false);
   };
-  
+
   // Toggle account status between active and locked
   const toggleAccountStatus = (accountId, accountStatus) => {
     openConfirmationModal({
-      title: `${accountStatus === "active" ? 'Xác nhận khóa tài khoản' : 'Xác nhận mở khóa tài khoản'}`,
-      description: `${accountStatus === 'active' 
-        ? 'Khi khóa tài khoản, mọi giao dịch sẽ bị tạm dừng cho đến khi tài khoản được mở khóa.' 
-        : 'Khi mở khóa tài khoản, tài khoản sẽ hoạt động bình thường trở lại.'
+      title: `${
+        accountStatus === "active"
+          ? "Xác nhận khóa tài khoản"
+          : "Xác nhận mở khóa tài khoản"
       }`,
-      confirmText: `${accountStatus === "active" 
-        ? 'Quẹt để khóa tài khoản' 
-        : 'Quẹt để mở khóa tài khoản'
+      description: `${
+        accountStatus === "active"
+          ? "Khi khóa tài khoản, mọi giao dịch sẽ bị tạm dừng cho đến khi tài khoản được mở khóa."
+          : "Khi mở khóa tài khoản, tài khoản sẽ hoạt động bình thường trở lại."
       }`,
-      type: `${accountStatus === 'active' ? 'warning' : 'unlock'}`,
+      confirmText: `${
+        accountStatus === "active"
+          ? "Quẹt để khóa tài khoản"
+          : "Quẹt để mở khóa tài khoản"
+      }`,
+      type: `${accountStatus === "active" ? "warning" : "unlock"}`,
       onConfirm: () => {
         // Set processing state
         setConfirmationProcessing(true);
-        
+
         // Process the account creation after a short delay
         setTimeout(() => {
-          
-          setPaymentAccounts(accounts => accounts.map(account => {
-            if (account.id === accountId) {
-              // Toggle between active and locked, but don't touch permanent_locked
-              if (account.status === "permanent_locked") return account;
-              
-              return {
-                ...account,
-                status: account.status === "active" ? "locked" : "active"
-              };
-            }
-            return account;
-          }));
-          
+          setPaymentAccounts((accounts) =>
+            accounts.map((account) => {
+              if (account.id === accountId) {
+                // Toggle between active and locked, but don't touch permanent_locked
+                if (account.status === "permanent_locked") return account;
+
+                return {
+                  ...account,
+                  status: account.status === "active" ? "locked" : "active",
+                };
+              }
+              return account;
+            })
+          );
+
           // Close any open action menu
           setAccountActionMenuOpen(null);
-          
+
           // Close modals and reset form
           closeConfirmationModal();
-          
+
           // Show success notification
-          setNotificationMessage(accountStatus === "active" 
-            ? 'Tài khoản đã được khóa thành công!' 
-            : 'Tài khoản đã được mở khóa thành công!'
+          setNotificationMessage(
+            accountStatus === "active"
+              ? "Tài khoản đã được khóa thành công!"
+              : "Tài khoản đã được mở khóa thành công!"
           );
-          setNotificationFormat(accountStatus === "active"
-            ? 'Khóa thành công'
-            : 'Mở khóa thành công'
-          )
-          setNotificationType('success');
+          setNotificationFormat(
+            accountStatus === "active"
+              ? "Khóa thành công"
+              : "Mở khóa thành công"
+          );
+          setNotificationType("success");
           setNotificationVisible(true);
         }, 2000);
-      }
+      },
     });
   };
-  
+
   // Toggle visibility for an account's sensitive information
   const toggleAccountVisibility = (accountId) => {
-    setHiddenAccountInfo(prev => ({
+    setHiddenAccountInfo((prev) => ({
       ...prev,
-      [accountId]: !prev[accountId]
+      [accountId]: !prev[accountId],
     }));
   };
-  
+
   // Format currency as VND
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   // Get status information (text and icon) based on status code
   const getStatusInfo = (status) => {
-    switch(status) {
-      case 'active':
-        return { 
-          icon: <CheckCircle size={14} className="text-green-500 mr-1" />, 
-          text: 'Hoạt động',
-          textColor: 'text-green-600',
-          bgColor: 'bg-green-100'
+    switch (status) {
+      case "active":
+        return {
+          icon: <CheckCircle size={14} className="text-green-500 mr-1" />,
+          text: "Hoạt động",
+          textColor: "text-green-600",
+          bgColor: "bg-green-100",
         };
-      case 'locked':
-        return { 
-          icon: <AlertCircle size={14} className="text-amber-500 mr-1" />, 
-          text: 'Tạm khóa',
-          textColor: 'text-amber-600',
-          bgColor: 'bg-amber-100'
+      case "locked":
+        return {
+          icon: <AlertCircle size={14} className="text-amber-500 mr-1" />,
+          text: "Tạm khóa",
+          textColor: "text-amber-600",
+          bgColor: "bg-amber-100",
         };
-      case 'permanent_locked':
-        return { 
-          icon: <XCircle size={14} className="text-red-500 mr-1" />, 
-          text: 'Khóa vĩnh viễn',
-          textColor: 'text-red-600',
-          bgColor: 'bg-red-100'
+      case "permanent_locked":
+        return {
+          icon: <XCircle size={14} className="text-red-500 mr-1" />,
+          text: "Khóa vĩnh viễn",
+          textColor: "text-red-600",
+          bgColor: "bg-red-100",
         };
       default:
-        return { 
-          icon: <AlertCircle size={14} className="text-gray-500 mr-1" />, 
-          text: 'Không xác định',
-          textColor: 'text-gray-600',
-          bgColor: 'bg-gray-100'
+        return {
+          icon: <AlertCircle size={14} className="text-gray-500 mr-1" />,
+          text: "Không xác định",
+          textColor: "text-gray-600",
+          bgColor: "bg-gray-100",
         };
     }
   };
-  
+
   // Mask account number except last 4 digits
   const maskAccountNumber = (accountNumber) => {
     const lastFourDigits = accountNumber.slice(-4);
-    const maskedPart = accountNumber.slice(0, -4).replace(/\d/g, '•');
+    const maskedPart = accountNumber.slice(0, -4).replace(/\d/g, "•");
     return maskedPart + lastFourDigits;
   };
-  
+
   const [profileData, setProfileData] = useState({
     fullName: "Nguyễn Hoàng Hiến",
     dateOfBirth: "15/08/1990",
@@ -752,33 +766,33 @@ export default function Dashboard() {
       district: "Cầu Giấy",
       ward: "Dịch Vọng Hậu",
       street: "Trần Thái Tông",
-      houseNumber: "108"
+      houseNumber: "108",
     },
     contactAddress: {
       province: "Hà Nội",
       district: "Cầu Giấy",
       ward: "Dịch Vọng Hậu",
       street: "Trần Thái Tông",
-      houseNumber: "108"
+      houseNumber: "108",
     },
     accountCreated: "05/02/2022",
-    accountType: "Premium"
+    accountType: "Premium",
   });
- 
+
   // Check if viewing on mobile device
   useEffect(() => {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     // Initial check
     checkIfMobile();
-    
+
     // Add event listener
-    window.addEventListener('resize', checkIfMobile);
-    
+    window.addEventListener("resize", checkIfMobile);
+
     // Cleanup
-    return () => window.removeEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
 
   // Reset animation state after modal opens
@@ -794,40 +808,53 @@ export default function Dashboard() {
   // Add scroll detection for elegant scrollbars
   useEffect(() => {
     if (profileModalOpen) {
-      const mainScrollable = document.querySelector('.elegant-scrollbar.has-scroll');
-      const scrollIndicator = document.querySelector('.scroll-indicator');
-      
+      const mainScrollable = document.querySelector(
+        ".elegant-scrollbar.has-scroll"
+      );
+      const scrollIndicator = document.querySelector(".scroll-indicator");
+
       if (mainScrollable && scrollIndicator) {
         // Check if content is scrollable
-        const isScrollable = mainScrollable.scrollHeight > mainScrollable.clientHeight;
-        
+        const isScrollable =
+          mainScrollable.scrollHeight > mainScrollable.clientHeight;
+
         // Initially hide scroll indicator if at bottom
-        const isAtBottom = Math.abs(mainScrollable.scrollHeight - mainScrollable.scrollTop - mainScrollable.clientHeight) < 10;
+        const isAtBottom =
+          Math.abs(
+            mainScrollable.scrollHeight -
+              mainScrollable.scrollTop -
+              mainScrollable.clientHeight
+          ) < 10;
         if (isAtBottom) {
-          scrollIndicator.style.opacity = '0';
+          scrollIndicator.style.opacity = "0";
         }
-        
+
         // Add event listener for scroll position
         const handleScroll = () => {
-          const isAtBottom = Math.abs(mainScrollable.scrollHeight - mainScrollable.scrollTop - mainScrollable.clientHeight) < 10;
-          
+          const isAtBottom =
+            Math.abs(
+              mainScrollable.scrollHeight -
+                mainScrollable.scrollTop -
+                mainScrollable.clientHeight
+            ) < 10;
+
           if (isAtBottom) {
-            scrollIndicator.style.opacity = '0';
+            scrollIndicator.style.opacity = "0";
           } else {
-            scrollIndicator.style.opacity = '1';
+            scrollIndicator.style.opacity = "1";
           }
         };
-        
+
         // Set initial fade status
         if (!isScrollable) {
-          scrollIndicator.style.opacity = '0';
+          scrollIndicator.style.opacity = "0";
         }
-        
+
         // Add and remove event listener
-        mainScrollable.addEventListener('scroll', handleScroll);
-        
+        mainScrollable.addEventListener("scroll", handleScroll);
+
         return () => {
-          mainScrollable.removeEventListener('scroll', handleScroll);
+          mainScrollable.removeEventListener("scroll", handleScroll);
         };
       }
     }
@@ -840,9 +867,7 @@ export default function Dashboard() {
     if (!profileModalOpen) {
       // Opening the modal
       setProfileModalOpen(true);
-
     } else if (profileModalOpen) {
-      
       setProfileModalOpen(false);
     }
   };
@@ -850,7 +875,7 @@ export default function Dashboard() {
   // Thêm state quản lý drawer
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState(null);
-  
+
   // Dữ liệu giao dịch mẫu cho mỗi tài khoản
   const [transactionHistoryData, setTransactionHistoryData] = useState({
     1: [
@@ -862,7 +887,7 @@ export default function Dashboard() {
         amount: 5000000,
         balanceAfter: 20000000,
         content: "Chuyển tiền thanh toán dự án website",
-        isIncoming: true
+        isIncoming: true,
       },
       {
         id: 2,
@@ -872,7 +897,7 @@ export default function Dashboard() {
         amount: 1500000,
         balanceAfter: 15000000,
         content: "Chuyển tiền học phí",
-        isIncoming: false
+        isIncoming: false,
       },
       {
         id: 3,
@@ -882,7 +907,7 @@ export default function Dashboard() {
         amount: 850000,
         balanceAfter: 16500000,
         content: "Thanh toán hóa đơn điện tháng 5",
-        isIncoming: false
+        isIncoming: false,
       },
       {
         id: 4,
@@ -892,9 +917,9 @@ export default function Dashboard() {
         amount: 17350000,
         balanceAfter: 17350000,
         content: "Lương tháng 4/2023",
-        isIncoming: true
-      }
-    ]
+        isIncoming: true,
+      },
+    ],
   });
 
   // Thêm state để quản lý hiển thị thẻ tài khoản chi tiết
@@ -905,14 +930,14 @@ export default function Dashboard() {
   const openTransactionDrawer = (accountId) => {
     // Lưu tài khoản được chọn
     setSelectedAccountId(accountId);
-    
+
     // Tìm thông tin tài khoản chi tiết
-    const accountDetail = paymentAccounts.find(acc => acc.id === accountId);
+    const accountDetail = paymentAccounts.find((acc) => acc.id === accountId);
     setSelectedCardDetail(accountDetail);
-    
+
     // Hiển thị drawer và thẻ chi tiết
     setDrawerVisible(true);
-    
+
     // Đợi một chút để có hiệu ứng lần lượt
     setTimeout(() => {
       setCardDetailVisible(true);
@@ -923,10 +948,10 @@ export default function Dashboard() {
   const closeTransactionDrawer = () => {
     // Đóng thẻ chi tiết trước, sau đó mới đóng drawer
     setCardDetailVisible(false);
-    
+
     setTimeout(() => {
       setDrawerVisible(false);
-      
+
       // Reset các state sau khi animation hoàn tất
       setTimeout(() => {
         setSelectedAccountId(null);
@@ -934,87 +959,75 @@ export default function Dashboard() {
       }, 300);
     }, 200);
   };
-  
-  // Open savings account detail drawer
-  const openSavingsDetailDrawer = (savingsId) => {
-    // Save the selected savings account
-    setSelectedSavingsId(savingsId);
-    
-    // Find detailed savings account information
-    const savingsDetail = savingsAccounts.find(acc => acc.id === savingsId);
-    setSelectedSavingsDetail(savingsDetail);
-    
-    // Show drawer and card detail with animation
-    setSavingsDetailVisible(true);
 
+  // Simplified version
+  const openSavingsDetailDrawer = (savingsId) => {
+    setSelectedSavingsId(savingsId);
+    const savingsDetail = savingsAccounts.find((acc) => acc.id === savingsId);
+    setSelectedSavingsDetail(savingsDetail);
+    setSavingsCardDetailVisible(true);
+    setSavingsDetailVisible(true);
     setWithdrawalPanelVisible(false);
-    
-    // Wait a bit for sequential animation
-    setTimeout(() => {
-      setSavingsCardDetailVisible(true);
-    }, 100);
-    
-    // Set default right panel content
     setSavingsRightPanelContent("transactions");
   };
-  
-  // Close savings account detail drawer
+
   const closeSavingsDetailDrawer = () => {
-    // Close card detail first, then close drawer
     setSavingsCardDetailVisible(false);
-    
-    setTimeout(() => {
+    // Reset after animation
       setSavingsDetailVisible(false);
-      
-      // Reset states after animation completes
-      setTimeout(() => {
-        setSelectedSavingsId(null);
-        setSelectedSavingsDetail(null);
-      }, 300);
-    }, 200);
+      setSelectedSavingsId(null);
+      setSelectedSavingsDetail(null);
   };
-  
+
   // Switch between right panel content types for savings
   const switchSavingsRightPanel = (contentType) => {
     // Don't allow switching if withdrawal panel is visible
     if (withdrawalPanelVisible) return;
-    
+
     // If changing from one tab to another, fade out current content first
     if (savingsRightPanelContent !== contentType) {
-      const currentPanelContent = document.querySelector('.savings-panel-content');
+      const currentPanelContent = document.querySelector(
+        ".savings-panel-content"
+      );
       if (currentPanelContent) {
-        currentPanelContent.classList.remove('animate-fadeInSlideUp');
-        currentPanelContent.classList.add('animate-fadeOutSlideDown');
-        
+        currentPanelContent.classList.remove("animate-fadeInSlideUp");
+        currentPanelContent.classList.add("animate-fadeOutSlideDown");
+
         // After animation completes, switch to new content
         setTimeout(() => {
           setSavingsRightPanelContent(contentType);
-          
+
           // Force a new animation cycle by removing and adding the class after a tiny delay
           setTimeout(() => {
-            const newPanelContent = document.querySelector('.savings-panel-content');
+            const newPanelContent = document.querySelector(
+              ".savings-panel-content"
+            );
             if (newPanelContent) {
-              newPanelContent.classList.remove('animate-fadeOutSlideDown');
-              newPanelContent.classList.add('animate-fadeInSlideUp');
+              newPanelContent.classList.remove("animate-fadeOutSlideDown");
+              newPanelContent.classList.add("animate-fadeInSlideUp");
             }
-          },);
-        }, );
+          });
+        });
       } else {
         setSavingsRightPanelContent(contentType);
       }
     }
   };
-  
+
   // Calculate progress percentage for term completion
   const calculateTermProgress = (daysRemaining, termDays) => {
     // Reverse the logic: more days remaining means more progress (longer colored bar)
-    const progressPercentage = Math.min(100, Math.max(0, (daysRemaining / termDays) * 100));
+    const progressPercentage = Math.min(
+      100,
+      Math.max(0, (daysRemaining / termDays) * 100)
+    );
     return progressPercentage;
   };
-  
+
   // Add state for savings account creation modal
   const [savingsAccountModalOpen, setSavingsAccountModalOpen] = useState(false);
-  const [savingsAccountModalAnimating, setSavingsAccountModalAnimating] = useState(false);
+  const [savingsAccountModalAnimating, setSavingsAccountModalAnimating] =
+    useState(false);
   const [savingsData, setSavingsData] = useState({
     depositType: "standard", // standard or flexible
     sourceAccount: "",
@@ -1023,22 +1036,22 @@ export default function Dashboard() {
     interestPaymentType: "end_of_term", // end_of_term, monthly, quarterly, yearly
     term: "1_month", // 1_month, 3_months, 6_months, 9_months, 12_months, 18_months, 24_months, 36_months
     maturityOption: "receive_all", // receive_all, rollover_principal, rollover_all (only for end_of_term)
-    nickname: "" // Added nickname field for custom naming
+    nickname: "", // Added nickname field for custom naming
   });
-  
+
   // State for modal steps
   const [savingsModalStep, setSavingsModalStep] = useState(1);
-  
+
   // State for calculated interest rates and amounts
   const [calculatedInterest, setCalculatedInterest] = useState({
     rate: 0,
     interestAmount: 0,
-    totalAmount: 0
+    totalAmount: 0,
   });
-  
+
   // State for validation errors
   const [savingsValidationErrors, setSavingsValidationErrors] = useState({});
-  
+
   // Interest rate data based on deposit type, interest payment type, and term
   const interestRateData = {
     standard: {
@@ -1050,7 +1063,7 @@ export default function Dashboard() {
         "12_months": 6.8,
         "18_months": 6.9,
         "24_months": 7.1,
-        "36_months": 7.2
+        "36_months": 7.2,
       },
       monthly: {
         "3_months": 3.3,
@@ -1059,7 +1072,7 @@ export default function Dashboard() {
         "12_months": 6.5,
         "18_months": 6.6,
         "24_months": 6.8,
-        "36_months": 6.9
+        "36_months": 6.9,
       },
       quarterly: {
         "6_months": 4.7,
@@ -1067,14 +1080,14 @@ export default function Dashboard() {
         "12_months": 6.6,
         "18_months": 6.7,
         "24_months": 6.9,
-        "36_months": 7.0
+        "36_months": 7.0,
       },
       yearly: {
         "12_months": 6.7,
         "18_months": 6.8,
         "24_months": 7.0,
-        "36_months": 7.1
-      }
+        "36_months": 7.1,
+      },
     },
     flexible: {
       end_of_term: {
@@ -1085,7 +1098,7 @@ export default function Dashboard() {
         "12_months": 6.3,
         "18_months": 6.4,
         "24_months": 6.6,
-        "36_months": 6.7
+        "36_months": 6.7,
       },
       monthly: {
         "3_months": 3.1,
@@ -1094,7 +1107,7 @@ export default function Dashboard() {
         "12_months": 6.1,
         "18_months": 6.2,
         "24_months": 6.4,
-        "36_months": 6.5
+        "36_months": 6.5,
       },
       quarterly: {
         "6_months": 4.4,
@@ -1102,17 +1115,17 @@ export default function Dashboard() {
         "12_months": 6.2,
         "18_months": 6.3,
         "24_months": 6.5,
-        "36_months": 6.6
+        "36_months": 6.6,
       },
       yearly: {
         "12_months": 6.2,
         "18_months": 6.3,
         "24_months": 6.5,
-        "36_months": 6.6
-      }
-    }
+        "36_months": 6.6,
+      },
+    },
   };
-  
+
   // Term display names
   const termDisplayNames = {
     "1_month": "1 tháng",
@@ -1122,23 +1135,47 @@ export default function Dashboard() {
     "12_months": "12 tháng",
     "18_months": "18 tháng",
     "24_months": "24 tháng",
-    "36_months": "36 tháng"
+    "36_months": "36 tháng",
   };
-  
+
   // Interest payment type display names
   const interestPaymentTypeDisplayNames = {
-    "end_of_term": "Cuối kỳ",
-    "monthly": "Hàng tháng",
-    "quarterly": "Hàng quý",
-    "yearly": "Đầu kỳ"
+    end_of_term: "Cuối kỳ",
+    monthly: "Hàng tháng",
+    quarterly: "Hàng quý",
+    yearly: "Đầu kỳ",
   };
-  
+
   // Available terms based on interest payment type
   const availableTermsByInterestType = {
-    end_of_term: ["1_month", "3_months", "6_months", "9_months", "12_months", "18_months", "24_months", "36_months"],
-    monthly: ["3_months", "6_months", "9_months", "12_months", "18_months", "24_months", "36_months"],
-    quarterly: ["6_months", "9_months", "12_months", "18_months", "24_months", "36_months"],
-    yearly: ["12_months", "18_months", "24_months", "36_months"]
+    end_of_term: [
+      "1_month",
+      "3_months",
+      "6_months",
+      "9_months",
+      "12_months",
+      "18_months",
+      "24_months",
+      "36_months",
+    ],
+    monthly: [
+      "3_months",
+      "6_months",
+      "9_months",
+      "12_months",
+      "18_months",
+      "24_months",
+      "36_months",
+    ],
+    quarterly: [
+      "6_months",
+      "9_months",
+      "12_months",
+      "18_months",
+      "24_months",
+      "36_months",
+    ],
+    yearly: ["12_months", "18_months", "24_months", "36_months"],
   };
 
   // Toggle savings account creation modal
@@ -1147,7 +1184,7 @@ export default function Dashboard() {
       // Opening the modal
       setSavingsAccountModalAnimating(true);
       setSavingsAccountModalOpen(true);
-      
+
       // Reset data and steps
       setSavingsData({
         depositType: "standard",
@@ -1157,11 +1194,11 @@ export default function Dashboard() {
         interestPaymentType: "end_of_term",
         term: "1_month",
         maturityOption: "receive_all",
-        nickname: "" // Reset nickname field
+        nickname: "", // Reset nickname field
       });
       setSavingsModalStep(1);
       setSavingsValidationErrors({});
-      
+
       // Reset animation state after opening
       setTimeout(() => {
         setSavingsAccountModalAnimating(false);
@@ -1169,17 +1206,21 @@ export default function Dashboard() {
     } else if (savingsAccountModalOpen && !savingsAccountModalAnimating) {
       // Closing the modal - start exit animation
       setSavingsAccountModalAnimating(true);
-      
+
       // Apply exit animation
-      const modalOverlay = document.getElementById('savingsAccountModalOverlay');
-      const modalContent = document.getElementById('savingsAccountModalContent');
-      
+      const modalOverlay = document.getElementById(
+        "savingsAccountModalOverlay"
+      );
+      const modalContent = document.getElementById(
+        "savingsAccountModalContent"
+      );
+
       if (modalOverlay && modalContent) {
-        modalOverlay.classList.remove('modal-enter');
-        modalContent.classList.remove('modal-enter-content');
-        modalOverlay.classList.add('modal-exit');
-        modalContent.classList.add('modal-exit-content');
-        
+        modalOverlay.classList.remove("modal-enter");
+        modalContent.classList.remove("modal-enter-content");
+        modalOverlay.classList.add("modal-exit");
+        modalContent.classList.add("modal-exit-content");
+
         // Wait for animation to complete before removing from DOM
         setTimeout(() => {
           setSavingsAccountModalOpen(false);
@@ -1192,183 +1233,218 @@ export default function Dashboard() {
       }
     }
   };
-  
+
   // Calculate interest based on current form data
   const calculateSavingsInterest = () => {
     const { depositType, interestPaymentType, term, amount } = savingsData;
-    
+
     // Get interest rate
-    const interestRate = interestRateData[depositType][interestPaymentType][term] || 0;
-    
+    const interestRate =
+      interestRateData[depositType][interestPaymentType][term] || 0;
+
     // Calculate interest amount based on payment type
     const amountValue = parseFloat(amount) || 0;
     let interestAmount = 0;
-    const termMonths = parseInt(term.split('_')[0]) || (term === "1_month" ? 1 : 0);
-    
+    const termMonths =
+      parseInt(term.split("_")[0]) || (term === "1_month" ? 1 : 0);
+
     // End of term: simple interest calculation
     if (interestPaymentType === "end_of_term") {
-      interestAmount = (amountValue * interestRate * termMonths / 12) / 100;
-    } 
+      interestAmount = (amountValue * interestRate * termMonths) / 12 / 100;
+    }
     // Monthly, quarterly, yearly: compound interest calculation
     else {
-      const periodsPerYear = interestPaymentType === "monthly" ? 12 : 
-                            interestPaymentType === "quarterly" ? 4 : 1;
-      
-      const periodsTotal = periodsPerYear * termMonths / 12;
+      const periodsPerYear =
+        interestPaymentType === "monthly"
+          ? 12
+          : interestPaymentType === "quarterly"
+          ? 4
+          : 1;
+
+      const periodsTotal = (periodsPerYear * termMonths) / 12;
       const ratePerPeriod = interestRate / periodsPerYear / 100;
-      
+
       interestAmount = 0;
       let remainingPrincipal = amountValue;
-      
+
       for (let i = 1; i <= periodsTotal; i++) {
         const periodInterest = remainingPrincipal * ratePerPeriod;
         interestAmount += periodInterest;
       }
     }
-    
+
     setCalculatedInterest({
       rate: interestRate,
       interestAmount: interestAmount,
-      totalAmount: amountValue + interestAmount
+      totalAmount: amountValue + interestAmount,
     });
   };
-  
+
   // Calculate early withdrawal interest based on savings account type and interest payment frequency
-  const calculateEarlyWithdrawalInterest = (savings, withdrawalAmountValue = null) => {
+  const calculateEarlyWithdrawalInterest = (
+    savings,
+    withdrawalAmountValue = null
+  ) => {
     // Sử dụng remainingAmount nếu có, nếu không thì sử dụng amount
-    const currentAmount = typeof savings.remainingAmount !== 'undefined' ? savings.remainingAmount : savings.amount;
-    const { amount, interestRate, interestFrequency, daysRemaining, termDays } = savings;
+    const currentAmount =
+      typeof savings.remainingAmount !== "undefined"
+        ? savings.remainingAmount
+        : savings.amount;
+    const { amount, interestRate, interestFrequency, daysRemaining, termDays } =
+      savings;
     const daysPassed = termDays - daysRemaining;
     const isFullWithdrawal = withdrawalAmountValue === null;
-    
+
     // Amount to be withdrawn - either full amount or partial amount
-    const withdrawAmount = isFullWithdrawal ? currentAmount : Math.min(withdrawalAmountValue, currentAmount);
-    
+    const withdrawAmount = isFullWithdrawal
+      ? currentAmount
+      : Math.min(withdrawalAmountValue, currentAmount);
+
     // For standard deposits, we only allow full withdrawal
     if (savings.depositType === "Tiền gửi tiêu chuẩn" && !isFullWithdrawal) {
       return null;
     }
-    
+
     // Calculate the interest for early withdrawal based on frequency
     let withdrawalInterest = 0;
-    let remainingBalance = isFullWithdrawal ? 0 : currentAmount - withdrawAmount;
+    let remainingBalance = isFullWithdrawal
+      ? 0
+      : currentAmount - withdrawAmount;
     let expectedInterest = 0;
-    
+
     // Calculate using no-term interest rate (0.1%) instead of the original rate
-    const noTermRate = 0.1; 
-    
+    const noTermRate = 0.1;
+
     // Tính lãi đơn với lãi suất không kỳ hạn cho số ngày đã gửi
-    withdrawalInterest = (withdrawAmount * noTermRate * daysPassed / 365) / 100;
-    
+    withdrawalInterest = (withdrawAmount * noTermRate * daysPassed) / 365 / 100;
+
     // Tính toán lãi dự kiến nếu khách hàng chờ đến khi đáo hạn
     if (!isFullWithdrawal) {
       // Nếu rút một phần, tính lãi dự kiến cho phần còn lại
-      expectedInterest = (remainingBalance * interestRate * termDays / 365) / 100;
+      expectedInterest =
+        (remainingBalance * interestRate * termDays) / 365 / 100;
     } else {
       // Nếu rút toàn bộ, không có lãi dự kiến
       expectedInterest = 0;
     }
-    
+
     return {
       originalAmount: amount,
       withdrawAmount,
       withdrawalInterest,
       totalWithdrawal: withdrawAmount + withdrawalInterest,
       remainingBalance,
-      expectedInterest
+      expectedInterest,
     };
   };
-  
+
   // Toggle withdrawal panel
   const toggleWithdrawalPanel = () => {
     if (withdrawalPanelVisible) {
       // First hide the withdrawal panel with animation
       setWithdrawalPanelVisible(false);
       setMobileActionBarVisible(true); // Show action bar when closing withdrawal panel
-      
+
       // After the exit animation, reset states
       setTimeout(() => {
-        if (selectedSavingsDetail.depositType === 'Tiền gửi tiêu chuẩn') {
-          setWithdrawalType('full');
+        if (selectedSavingsDetail.depositType === "Tiền gửi tiêu chuẩn") {
+          setWithdrawalType("full");
         }
-        setWithdrawalType('partial');
-        setWithdrawalAmount('');
+        setWithdrawalType("partial");
+        setWithdrawalAmount("");
         setWithdrawalData({
           originalAmount: 0,
           withdrawAmount: 0,
           withdrawalInterest: 0,
           totalWithdrawal: 0,
           remainingBalance: 0,
-          expectedInterest: 0
+          expectedInterest: 0,
         });
       }, 300);
     } else {
       // Keep track of the current panel content so we can restore it later
       // First fade out the current content
-      const currentPanelContent = document.querySelector('.savings-panel-content');
+      const currentPanelContent = document.querySelector(
+        ".savings-panel-content"
+      );
       if (currentPanelContent) {
-        currentPanelContent.classList.add('animate-fadeOutSlideDown');
+        currentPanelContent.classList.add("animate-fadeOutSlideDown");
       }
 
-      setMobileActionBarVisible(false); 
-      
+      setMobileActionBarVisible(false);
+
       // After a short delay, initialize and show the withdrawal panel
       setTimeout(() => {
         // Check if it's a standard deposit and set withdrawal type accordingly
-        const isStandardDeposit = selectedSavingsDetail && selectedSavingsDetail.depositType === "Tiền gửi tiêu chuẩn";
-        setWithdrawalType(isStandardDeposit ? 'full' : 'partial');
-        
+        const isStandardDeposit =
+          selectedSavingsDetail &&
+          selectedSavingsDetail.depositType === "Tiền gửi tiêu chuẩn";
+        setWithdrawalType(isStandardDeposit ? "full" : "partial");
+
         // Khởi tạo panel rút tiền với rút toàn bộ hoặc một phần dựa trên loại tiết kiệm
-        const withdrawalCalc = calculateEarlyWithdrawalInterest(selectedSavingsDetail, isStandardDeposit ? null : 100000);
+        const withdrawalCalc = calculateEarlyWithdrawalInterest(
+          selectedSavingsDetail,
+          isStandardDeposit ? null : 100000
+        );
         setWithdrawalData(withdrawalCalc);
-        
+
         // Set initial withdrawal amount for partial withdrawals
         if (!isStandardDeposit) {
-          setWithdrawalAmount('100000');
+          setWithdrawalAmount("100000");
         } else {
-          setWithdrawalAmount('');
+          setWithdrawalAmount("");
         }
-        
+
         setWithdrawalPanelVisible(true);
       }, 200);
     }
   };
-  
+
   const handleWithdrawalTypeChange = (type) => {
     // Check if it's a standard deposit
-    const isStandardDeposit = selectedSavingsDetail && selectedSavingsDetail.depositType === "Tiền gửi tiêu chuẩn";
-    
+    const isStandardDeposit =
+      selectedSavingsDetail &&
+      selectedSavingsDetail.depositType === "Tiền gửi tiêu chuẩn";
+
     // If it's a standard deposit, only allow full withdrawal
-    if (isStandardDeposit && type === 'partial') {
+    if (isStandardDeposit && type === "partial") {
       return;
     }
-    
+
     setWithdrawalType(type);
-    
-    if (type === 'full') {
+
+    if (type === "full") {
       // Reset số tiền rút và tính toán lại dựa trên toàn bộ số tiền
-      setWithdrawalAmount('');
-      const withdrawalCalc = calculateEarlyWithdrawalInterest(selectedSavingsDetail);
+      setWithdrawalAmount("");
+      const withdrawalCalc = calculateEarlyWithdrawalInterest(
+        selectedSavingsDetail
+      );
       setWithdrawalData(withdrawalCalc);
     } else {
       // Khởi tạo với số tiền rút tối thiểu cho việc rút một phần
-      setWithdrawalAmount('100000');
-      const withdrawalCalc = calculateEarlyWithdrawalInterest(selectedSavingsDetail, 100000);
+      setWithdrawalAmount("100000");
+      const withdrawalCalc = calculateEarlyWithdrawalInterest(
+        selectedSavingsDetail,
+        100000
+      );
       setWithdrawalData(withdrawalCalc);
     }
   };
-  
+
   // Handle withdrawal amount input change
   const handleWithdrawalAmountChange = (value) => {
     setWithdrawalAmount(value);
-    
+
     // Xác thực số tiền và tính toán lãi suất ngay lập tức cho bất kỳ giá trị nào
     const numValue = parseFloat(value) || 0;
-    
+
     // Tính toán lãi suất ngay cả khi số tiền chưa đạt mức tối thiểu
     // để người dùng có thể thấy kết quả ngay khi nhập
     if (numValue > 0) {
-      const withdrawalCalc = calculateEarlyWithdrawalInterest(selectedSavingsDetail, numValue);
+      const withdrawalCalc = calculateEarlyWithdrawalInterest(
+        selectedSavingsDetail,
+        numValue
+      );
       setWithdrawalData(withdrawalCalc);
     } else {
       // Nếu không có giá trị hoặc giá trị không hợp lệ, đặt lãi về 0
@@ -1378,39 +1454,49 @@ export default function Dashboard() {
         withdrawalInterest: 0,
         totalWithdrawal: numValue,
         remainingBalance: selectedSavingsDetail.amount - numValue,
-        expectedInterest: 0
+        expectedInterest: 0,
       });
     }
   };
-  
+
   // Confirm early withdrawal
   const confirmEarlyWithdrawal = () => {
     // Format the currency values for display
-    const formattedWithdrawnAmount = formatCurrency(withdrawalData.withdrawAmount);
-    const formattedInterestAmount = formatCurrency(withdrawalData.withdrawalInterest);
-    const formattedTotalWithdrawal = formatCurrency(withdrawalData.totalWithdrawal);
-    
+    const formattedWithdrawnAmount = formatCurrency(
+      withdrawalData.withdrawAmount
+    );
+    const formattedInterestAmount = formatCurrency(
+      withdrawalData.withdrawalInterest
+    );
+    const formattedTotalWithdrawal = formatCurrency(
+      withdrawalData.totalWithdrawal
+    );
+
     // Show confirmation modal
     openConfirmationModal({
       title: "Xác nhận rút tiền tiết kiệm",
-      description: `Bạn đang rút ${withdrawalType === 'full' ? 'toàn bộ' : 'một phần'} tiền từ tài khoản tiết kiệm.`,
+      description: `Bạn đang rút ${
+        withdrawalType === "full" ? "toàn bộ" : "một phần"
+      } tiền từ tài khoản tiết kiệm.`,
       confirmText: "Quẹt để rút tiền",
       confirmDetails: {
         "Số tiền gốc": formattedWithdrawnAmount,
         "Lãi rút trước hạn": formattedInterestAmount,
-        "Tổng tiền nhận": formattedTotalWithdrawal
+        "Tổng tiền nhận": formattedTotalWithdrawal,
       },
       type: "warning",
       onConfirm: () => {
         // Set processing state
         setConfirmationProcessing(true);
-        
+
         // Process the withdrawal after a short delay
         setTimeout(() => {
           // Create a timestamp for the withdrawal
           const now = new Date();
-          const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} - ${getCurrentDate()}`;
-          
+          const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(
+            now.getMinutes()
+          ).padStart(2, "0")} - ${getCurrentDate()}`;
+
           // Create new withdrawal history entry
           const newWithdrawalEntry = {
             id: (savingsWithdrawalHistory[selectedSavingsId]?.length || 0) + 1,
@@ -1418,91 +1504,110 @@ export default function Dashboard() {
             withdrawnAmount: withdrawalData.withdrawAmount,
             interestAmount: withdrawalData.withdrawalInterest,
             remainingBalance: withdrawalData.remainingBalance,
-            isPartial: withdrawalType === 'partial',
+            isPartial: withdrawalType === "partial",
             channel: "Internet Banking",
-            status: "Thành công"
+            status: "Thành công",
           };
-          
+
           // Update withdrawal history
-          setSavingsWithdrawalHistory(prev => ({
+          setSavingsWithdrawalHistory((prev) => ({
             ...prev,
-            [selectedSavingsId]: [...(prev[selectedSavingsId] || []), newWithdrawalEntry]
+            [selectedSavingsId]: [
+              ...(prev[selectedSavingsId] || []),
+              newWithdrawalEntry,
+            ],
           }));
-          
+
           // Update the savings account balance if partial withdrawal
-          if (withdrawalType === 'partial') {
-            setSavingsAccounts(accounts => 
-              accounts.map(acc => {
+          if (withdrawalType === "partial") {
+            setSavingsAccounts((accounts) =>
+              accounts.map((acc) => {
                 if (acc.id === selectedSavingsId) {
                   return {
                     ...acc,
                     remainingAmount: withdrawalData.remainingBalance,
-                    totalReceivable: withdrawalData.remainingBalance + withdrawalData.expectedInterest
+                    totalReceivable:
+                      withdrawalData.remainingBalance +
+                      withdrawalData.expectedInterest,
                   };
                 }
                 return acc;
               })
             );
-            
+
             // Update selected savings detail
-            setSelectedSavingsDetail(prev => ({
+            setSelectedSavingsDetail((prev) => ({
               ...prev,
               remainingAmount: withdrawalData.remainingBalance,
-              totalReceivable: withdrawalData.remainingBalance + withdrawalData.expectedInterest
+              totalReceivable:
+                withdrawalData.remainingBalance +
+                withdrawalData.expectedInterest,
             }));
           } else {
             // For full withdrawal, remove the account from the list
-            setSavingsAccounts(accounts => 
-              accounts.filter(acc => acc.id !== selectedSavingsId)
+            setSavingsAccounts((accounts) =>
+              accounts.filter((acc) => acc.id !== selectedSavingsId)
             );
-            
+
             // Close the drawer after successful withdrawal
             closeSavingsDetailDrawer();
           }
-          
+
           // Add amount to a payment account (first one for simplicity)
-          setPaymentAccounts(accounts => {
+          setPaymentAccounts((accounts) => {
             if (accounts.length > 0) {
               const firstAccount = accounts[0];
               const updatedAccounts = [...accounts];
               updatedAccounts[0] = {
                 ...firstAccount,
-                balance: firstAccount.balance + withdrawalData.totalWithdrawal
+                balance: firstAccount.balance + withdrawalData.totalWithdrawal,
               };
               return updatedAccounts;
             }
             return accounts;
           });
-          
+
           // Close both modals
           closeConfirmationModal();
           toggleWithdrawalPanel();
-          
+
           // Open withdrawal history tab after successful withdrawal
           switchSavingsRightPanel("withdrawals");
-          
+
           // Show success notification
-          const message = 'Rút tiền thành công';
-          const format = withdrawalType === 'full' 
-            ? `Rút toàn bộ tiền từ tài khoản tiết kiệm "${selectedSavingsDetail.nickname}" thành công: ${formatCurrency(withdrawalData.totalWithdrawal)}`
-            : `Rút tiền từ tài khoản tiết kiệm "${selectedSavingsDetail.nickname}" thành công: ${formatCurrency(withdrawalData.totalWithdrawal)}`;
+          const message = "Rút tiền thành công";
+          const format =
+            withdrawalType === "full"
+              ? `Rút toàn bộ tiền từ tài khoản tiết kiệm "${
+                  selectedSavingsDetail.nickname
+                }" thành công: ${formatCurrency(
+                  withdrawalData.totalWithdrawal
+                )}`
+              : `Rút tiền từ tài khoản tiết kiệm "${
+                  selectedSavingsDetail.nickname
+                }" thành công: ${formatCurrency(
+                  withdrawalData.totalWithdrawal
+                )}`;
           setNotificationMessage(message);
           setNotificationFormat(format);
-          setNotificationType('success');
+          setNotificationType("success");
           setNotificationVisible(true);
         }, 2000);
-      }
+      },
     });
   };
-  
+
   // Create new savings account
   const createSavingsAccount = (formData, calculatedInterest) => {
-    
     // Format amount for display
     const formattedAmount = formatCurrency(parseFloat(formData.amount));
-    const sourceAccount = paymentAccounts.find(acc => acc.id === parseInt(formData.sourceAccount));
-    const sourceAccountName = sourceAccount ? `${maskAccountNumber(sourceAccount.accountNumber)}` : '';
-    
+    const sourceAccount = paymentAccounts.find(
+      (acc) => acc.id === parseInt(formData.sourceAccount)
+    );
+    const sourceAccountName = sourceAccount
+      ? `${maskAccountNumber(sourceAccount.accountNumber)}`
+      : "";
+
     // Show confirmation modal
     openConfirmationModal({
       title: "Xác nhận mở tài khoản tiết kiệm",
@@ -1512,64 +1617,89 @@ export default function Dashboard() {
         "Số tiền gửi": formattedAmount,
         "Từ tài khoản": sourceAccountName,
         "Kỳ hạn": termDisplayNames[formData.term],
-        "Lãi suất": `${calculatedInterest.rate}%/năm`
+        "Lãi suất": `${calculatedInterest.rate}%/năm`,
       },
-      type: 'pink',
+      type: "pink",
       onConfirm: () => {
         // Set processing state
         setConfirmationProcessing(true);
-        
+
         // Process the account creation after a short delay
         setTimeout(() => {
           // Generate new savings account ID
-          const newId = savingsAccounts.length > 0 ? Math.max(...savingsAccounts.map(acc => acc.id)) + 1 : 1;
-          
+          const newId =
+            savingsAccounts.length > 0
+              ? Math.max(...savingsAccounts.map((acc) => acc.id)) + 1
+              : 1;
+
           // Convert term to days and get display name
           const termValue = formData.term;
-          const termMonths = parseInt(termValue.split('_')[0]) || (termValue === "1_month" ? 1 : 0);
+          const termMonths =
+            parseInt(termValue.split("_")[0]) ||
+            (termValue === "1_month" ? 1 : 0);
           const termDays = termMonths * 30; // Approximate
-          
+
           // Get a random color from account colors
-          const randomColorIndex = Math.floor(Math.random() * accountColors.length);
-          
+          const randomColorIndex = Math.floor(
+            Math.random() * accountColors.length
+          );
+
           // Create end date from current date + term
           const startDate = getCurrentDate();
           const currentDate = new Date();
           const endDate = new Date(currentDate);
           endDate.setMonth(currentDate.getMonth() + termMonths);
-          const formattedEndDate = `${String(endDate.getDate()).padStart(2, '0')}/${String(endDate.getMonth() + 1).padStart(2, '0')}/${endDate.getFullYear()}`;
-          
+          const formattedEndDate = `${String(endDate.getDate()).padStart(
+            2,
+            "0"
+          )}/${String(endDate.getMonth() + 1).padStart(
+            2,
+            "0"
+          )}/${endDate.getFullYear()}`;
+
           // Use custom nickname if provided, otherwise default based on term
-          const nickname = formData.nickname ? formData.nickname : `Tiết kiệm ${termDisplayNames[termValue]}`;
-          
+          const nickname = formData.nickname
+            ? formData.nickname
+            : `Tiết kiệm ${termDisplayNames[termValue]}`;
+
           // Generate deposit number (format: TK + year + month + sequential number)
-          const depositNumber = `TK${currentDate.getFullYear()}${String(currentDate.getMonth() + 1).padStart(2, '0')}${String(newId).padStart(4, '0')}`;
-          
+          const depositNumber = `TK${currentDate.getFullYear()}${String(
+            currentDate.getMonth() + 1
+          ).padStart(2, "0")}${String(newId).padStart(4, "0")}`;
+
           // Create transaction history entry
           const transactionEntry = {
             id: 1,
-            time: `${String(currentDate.getHours()).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')} - ${startDate}`,
+            time: `${String(currentDate.getHours()).padStart(2, "0")}:${String(
+              currentDate.getMinutes()
+            ).padStart(2, "0")} - ${startDate}`,
             type: "Gửi tiền",
             channel: "Internet Banking",
             amount: parseFloat(formData.amount),
             content: `Gửi tiền tiết kiệm kỳ hạn ${termDisplayNames[termValue]}`,
             isDeposit: true,
             interestAmount: 0,
-            balanceAfter: parseFloat(formData.amount)
+            balanceAfter: parseFloat(formData.amount),
           };
-          
+
           const confirmationEntry = {
             id: 2,
-            time: `${String(currentDate.getHours() + 1).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')} - ${startDate}`,
+            time: `${String(currentDate.getHours() + 1).padStart(
+              2,
+              "0"
+            )}:${String(currentDate.getMinutes()).padStart(
+              2,
+              "0"
+            )} - ${startDate}`,
             type: "Xác nhận mở sổ",
             channel: "Hệ thống",
             amount: 0,
             content: "Xác nhận mở sổ tiết kiệm thành công",
             isSystem: true,
             interestAmount: 0,
-            balanceAfter: parseFloat(formData.amount)
+            balanceAfter: parseFloat(formData.amount),
           };
-          
+
           // Create new savings account object
           const newSavingsAccount = {
             id: newId,
@@ -1582,51 +1712,64 @@ export default function Dashboard() {
             startDate: startDate,
             endDate: formattedEndDate,
             daysRemaining: termDays - 10, // Simulate some days passed
-            accountNumber: `TK${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-            depositType: formData.depositType === "standard" ? "Tiền gửi tiêu chuẩn" : "Rút gốc linh hoạt",
-            interestFrequency: interestPaymentTypeDisplayNames[formData.interestPaymentType],
-            maturityOption: formData.maturityOption === "receive_all" ? "Nhận cả gốc và lãi" : 
-                           formData.maturityOption === "rollover_principal" ? "Tái tục gốc" : "Tự động tái tục gốc và lãi",
+            accountNumber: `TK${Math.floor(
+              1000000000 + Math.random() * 9000000000
+            )}`,
+            depositType:
+              formData.depositType === "standard"
+                ? "Tiền gửi tiêu chuẩn"
+                : "Rút gốc linh hoạt",
+            interestFrequency:
+              interestPaymentTypeDisplayNames[formData.interestPaymentType],
+            maturityOption:
+              formData.maturityOption === "receive_all"
+                ? "Nhận cả gốc và lãi"
+                : formData.maturityOption === "rollover_principal"
+                ? "Tái tục gốc"
+                : "Tự động tái tục gốc và lãi",
             receivedInterest: 0,
-            totalReceivable: parseFloat(formData.amount) + calculatedInterest.interestAmount,
+            totalReceivable:
+              parseFloat(formData.amount) + calculatedInterest.interestAmount,
             color: accountColors[randomColorIndex],
-            icon: <PiggyBank size={24} className="text-white" />
+            icon: <PiggyBank size={24} className="text-white" />,
           };
-          
+
           // Update savings accounts array
           setSavingsAccounts([...savingsAccounts, newSavingsAccount]);
-          
+
           // Add transaction history
-          setSavingsTransactionHistory(prev => ({
+          setSavingsTransactionHistory((prev) => ({
             ...prev,
-            [newId]: [transactionEntry, confirmationEntry]
+            [newId]: [transactionEntry, confirmationEntry],
           }));
-          
+
           // Initialize interest history and withdrawal history for the new account
-          setSavingsInterestHistory(prev => ({
+          setSavingsInterestHistory((prev) => ({
             ...prev,
-            [newId]: []
+            [newId]: [],
           }));
-          setSavingsWithdrawalHistory(prev => ({
+          setSavingsWithdrawalHistory((prev) => ({
             ...prev,
-            [newId]: []
+            [newId]: [],
           }));
-          
+
           // Deduct amount from source account
-          setPaymentAccounts(accounts => accounts.map(account => {
-            if (account.id === parseInt(formData.sourceAccount)) {
-              return {
-                ...account,
-                balance: account.balance - parseFloat(formData.amount)
-              };
-            }
-            return account;
-          }));
-          
+          setPaymentAccounts((accounts) =>
+            accounts.map((account) => {
+              if (account.id === parseInt(formData.sourceAccount)) {
+                return {
+                  ...account,
+                  balance: account.balance - parseFloat(formData.amount),
+                };
+              }
+              return account;
+            })
+          );
+
           // Close modals and reset form
           closeConfirmationModal();
           toggleSavingsAccountModal();
-          
+
           // Reset savings form
           setSavingsData({
             nickname: "",
@@ -1636,18 +1779,20 @@ export default function Dashboard() {
             term: "1_month",
             interestPaymentType: "end_of_term",
             depositType: "standard",
-            maturityOption: "receive_all"
+            maturityOption: "receive_all",
           });
-          
+
           setSavingsValidationErrors({});
-          
+
           // Show success notification
-          setNotificationMessage('Mở tài khoản tiết kiệm thành công')
-          setNotificationFormat(`Tài khoản tiết kiệm "${nickname}" đã được mở thành công với số tiền ${formattedAmount}.`);
-          setNotificationType('success');
+          setNotificationMessage("Mở tài khoản tiết kiệm thành công");
+          setNotificationFormat(
+            `Tài khoản tiết kiệm "${nickname}" đã được mở thành công với số tiền ${formattedAmount}.`
+          );
+          setNotificationType("success");
           setNotificationVisible(true);
         }, 2000);
-      }
+      },
     });
   };
 
@@ -1657,7 +1802,7 @@ export default function Dashboard() {
       calculateSavingsInterest();
     }
   }, [savingsData]);
-    
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
       {/* Inject custom scrollbar styles */}
@@ -1668,50 +1813,55 @@ export default function Dashboard() {
       {/* Navigation sidebar - Desktop */}
       {!isMobile && (
         <LiquidGlassNavigation
-        profileData={profileData}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        onProfileClick={toggleProfileModal}
-        onLogout={() => setActiveSection("logout")}
-        customerMenuItems={[
-          { id: "overview", icon: Home, text: "Trang chủ" },
-          { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" }
-        ]}
-        adminMenuItems={[
-          { id: "customers", icon: Users, text: "Quản lý khách hàng" },
-          { id: "employees", icon: User, text: "Quản lý nhân viên" },
-          { id: "deposit-slips", icon: Receipt, text: "Quản lý phiếu gửi tiền" },
-          { id: "savings-products", icon: PiggyBank, text: "Quản lý sản phẩm tiết kiệm" },
-          { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số" },
-          { id: "settings", icon: Settings, text: "Cài đặt hệ thống" },
-          { id: "permissions", icon: Lock, text: "Quản lý phân quyền" }
-        ]}
-        customerSectionTitle="Dành cho khách hàng"
-        adminSectionTitle="Dành cho Quản trị viên" 
-        logoutText="Đăng xuất"
-        showAdminSection={true}
-      />
-
-      
-      
+          profileData={profileData}
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          onProfileClick={toggleProfileModal}
+          onLogout={() => setActiveSection("logout")}
+          customerMenuItems={[
+            { id: "overview", icon: Home, text: "Trang chủ" },
+            { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" },
+          ]}
+          adminMenuItems={[
+            { id: "customers", icon: Users, text: "Quản lý khách hàng" },
+            { id: "employees", icon: User, text: "Quản lý nhân viên" },
+            {
+              id: "deposit-slips",
+              icon: Receipt,
+              text: "Quản lý phiếu gửi tiền",
+            },
+            {
+              id: "savings-products",
+              icon: PiggyBank,
+              text: "Quản lý sản phẩm tiết kiệm",
+            },
+            { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số" },
+            { id: "settings", icon: Settings, text: "Cài đặt hệ thống" },
+            { id: "permissions", icon: Lock, text: "Quản lý phân quyền" },
+          ]}
+          customerSectionTitle="Dành cho khách hàng"
+          adminSectionTitle="Dành cho Quản trị viên"
+          logoutText="Đăng xuất"
+          showAdminSection={true}
+        />
       )}
 
       {/* Mobile Navigation (Slide-in menu) */}
       {isMobile && (
         <LiquidGlassMobileNavigation
-        profileData={profileData}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-        onProfileClick={toggleProfileModal}
-        onLogout={() => {
-          setActiveSection("logout");
-          // Thêm logic logout của bạn ở đây
-        }}
-        customerSectionTitle="Dành cho khách hàng"
-        adminSectionTitle="Dành cho Quản trị viên"
-        logoutText="Đăng xuất"
-        showAdminSection={true}
-      />
+          profileData={profileData}
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+          onProfileClick={toggleProfileModal}
+          onLogout={() => {
+            setActiveSection("logout");
+            // Thêm logic logout của bạn ở đây
+          }}
+          customerSectionTitle="Dành cho khách hàng"
+          adminSectionTitle="Dành cho Quản trị viên"
+          logoutText="Đăng xuất"
+          showAdminSection={true}
+        />
       )}
 
       <div className="fixed top-0 left-0 right-0">
@@ -1725,7 +1875,6 @@ export default function Dashboard() {
           !isMobile && navHovered ? "ml-28" : !isMobile ? "ml-28" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
-
         {/* Main content */}
         <main
           className={`main-content-scrollbar overflow-auto max-h-[calc(100vh-60px)] p-6 md:p-6 transition-all duration-500 ${
@@ -2018,133 +2167,160 @@ export default function Dashboard() {
 
               {/* Savings accounts grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
-                {savingsAccounts.map((account) => (
-                  <div
-                    key={account.id}
-                    className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
-                  >
-                    <div
-                      className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                <AnimatePresence>
+                  {savingsAccounts.map((account) => (
+                    <motion.div
+                      key={account.id}
+                      layoutId={`savings-card-${account.id}`}
+                      className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group cursor-pointer"
+                      onClick={() => openSavingsDetailDrawer(account.id)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15,
+                      }}
                     >
-                      {/* Hiệu ứng hover */}
-                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
+                      <motion.div
+                        layoutId={`savings-header-${account.id}`}
+                        className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                      >
+                        {/* Hiệu ứng hover */}
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
 
-                      <div className="flex justify-between items-start relative z-10">
-                        <div className="flex items-center space-x-3">
-                          <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-                            {account.icon}
+                        <div className="flex justify-between items-start relative z-10">
+                          <div className="flex items-center space-x-3">
+                            <motion.div
+                              layoutId={`savings-icon-${account.id}`}
+                              className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center"
+                            >
+                              {account.icon}
+                            </motion.div>
+                            <div className="text-white">
+                              <motion.h3
+                                layoutId={`savings-title-${account.id}`}
+                                className="font-medium text-sm group-hover:text-white/95"
+                              >
+                                {account.nickname}
+                              </motion.h3>
+                              <motion.p
+                                layoutId={`savings-number-${account.id}`}
+                                className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white"
+                              >
+                                {account.depositNumber}
+                              </motion.p>
+                            </div>
                           </div>
-                          <div className="text-white">
-                            <h3 className="font-medium text-sm group-hover:text-white/95">
-                              {account.nickname}
-                            </h3>
-                            <p className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white">
-                              {account.depositNumber}
+
+                          <div className="flex items-center space-x-1">
+                            {/* Eye toggle button */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleAccountVisibility(account.id);
+                              }}
+                              className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
+                              aria-label={
+                                hiddenAccountInfo[account.id]
+                                  ? "Hiển thị thông tin"
+                                  : "Ẩn thông tin"
+                              }
+                            >
+                              {hiddenAccountInfo[account.id] ? (
+                                <EyeOff size={16} className="text-white" />
+                              ) : (
+                                <Eye size={16} className="text-white" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      <motion.div
+                        layoutId={`savings-content-${account.id}`}
+                        className="p-4 relative overflow-hidden group-hover:bg-gradient-to-b from-white to-gray-50"
+                      >
+                        {/* Shimmer effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer-effect opacity-0 group-hover:opacity-100"></div>
+
+                        {/* Key information */}
+                        <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
+                          <div className="flex flex-col">
+                            <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
+                              Kỳ hạn
+                            </p>
+                            <p className="text-sm font-medium text-slate-800">
+                              {account.term}
                             </p>
                           </div>
+
+                          <div className="flex flex-col">
+                            <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
+                              Số tiền gửi
+                            </p>
+                            <motion.p className="text-sm font-medium text-slate-800">
+                              {hiddenAccountInfo[account.id] ? (
+                                <span className="text-slate-400">••••••••</span>
+                              ) : (
+                                <span className="animate-fadeIn">
+                                  {formatCurrency(
+                                    typeof account.remainingAmount !==
+                                      "undefined"
+                                      ? account.remainingAmount
+                                      : account.amount
+                                  )}
+                                </span>
+                              )}
+                            </motion.p>
+                          </div>
                         </div>
 
-                        <div className="flex items-center space-x-1">
-                          {/* Eye toggle button */}
-                          <button
-                            onClick={() => toggleAccountVisibility(account.id)}
-                            className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
-                            aria-label={
-                              hiddenAccountInfo[account.id]
-                                ? "Hiển thị thông tin"
-                                : "Ẩn thông tin"
-                            }
+                        {/* Tiến trình kỳ hạn */}
+                        <div className="mb-3 relative z-10">
+                          <div className="flex justify-between text-xs mb-1.5">
+                            <span className="text-slate-600">
+                              Ngày đáo hạn: {account.endDate}
+                            </span>
+                            <span className="text-indigo-600 font-medium">
+                              {account.daysRemaining} ngày nữa
+                            </span>
+                          </div>
+                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${account.color}`}
+                              style={{
+                                width: `${calculateTermProgress(
+                                  account.daysRemaining,
+                                  account.termDays
+                                )}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        {/* Bottom info */}
+                        <div className="border-t border-slate-100 pt-3 flex justify-between items-center relative z-10">
+                          <div className="flex items-center space-x-1 text-xs text-slate-500">
+                            <Calendar
+                              size={12}
+                              className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
+                            />
+                            <span className="group-hover:text-slate-600 transition-colors duration-300">
+                              {account.startDate}
+                            </span>
+                          </div>
+                          <span
+                            className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300`}
                           >
-                            {hiddenAccountInfo[account.id] ? (
-                              <EyeOff size={16} className="text-white" />
-                            ) : (
-                              <Eye size={16} className="text-white" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4 relative overflow-hidden group-hover:bg-gradient-to-b from-white to-gray-50 transition-all duration-500">
-                      {/* Shimmer effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer-effect opacity-0 group-hover:opacity-100"></div>
-
-                      {/* Key information */}
-                      <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
-                        <div className="flex flex-col">
-                          <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
-                            Kỳ hạn
-                          </p>
-                          <p className="text-sm font-medium text-slate-800">
-                            {account.term}
-                          </p>
-                        </div>
-
-                        <div className="flex flex-col">
-                          <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
-                            Số tiền gửi
-                          </p>
-                          <p className="text-sm font-medium text-slate-800">
-                            {hiddenAccountInfo[account.id] ? (
-                              <span className="text-slate-400">••••••••</span>
-                            ) : (
-                              <span className="animate-fadeIn">
-                                {formatCurrency(
-                                  typeof account.remainingAmount !== "undefined"
-                                    ? account.remainingAmount
-                                    : account.amount
-                                )}
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Tiến trình kỳ hạn */}
-                      <div className="mb-3 relative z-10">
-                        <div className="flex justify-between text-xs mb-1.5">
-                          <span className="text-slate-600">
-                            Ngày đáo hạn: {account.endDate}
-                          </span>
-                          <span className="text-indigo-600 font-medium">
-                            {account.daysRemaining} ngày nữa
+                            Chi tiết
                           </span>
                         </div>
-                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${account.color}`}
-                            style={{
-                              width: `${calculateTermProgress(
-                                account.daysRemaining,
-                                account.termDays
-                              )}%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-
-                      {/* Bottom info */}
-                      <div className="border-t border-slate-100 pt-3 flex justify-between items-center relative z-10">
-                        <div className="flex items-center space-x-1 text-xs text-slate-500">
-                          <Calendar
-                            size={12}
-                            className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
-                          />
-                          <span className="group-hover:text-slate-600 transition-colors duration-300">
-                            {account.startDate}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => openSavingsDetailDrawer(account.id)}
-                          className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300 transform group-hover:scale-105 hover:translate-y-[-2px]`}
-                        >
-                          Chi tiết
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                      </motion.div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
             </>
           ) : activeSection === "customers" ? (
@@ -2184,25 +2360,29 @@ export default function Dashboard() {
                 overflow: "visible",
               }}
               exit={{ width: 0, opacity: 0, padding: 0, overflow: "hidden" }}
-              transition={{ duration: 0.4, ease: "easeInOut", type: "spring", stiffness: 100, damping: 15 }}
+              transition={{
+                duration: 0.4,
+                ease: "easeInOut",
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+              }}
               layoutId="savings-account-modal"
             >
               <motion.div layoutId="savings-icon" className="mr-2">
                 <Plus size={16} />
               </motion.div>
-              <motion.span layoutId="savings-title" className="font-medium">Mở tài khoản tiền gửi</motion.span>
+              <motion.span layoutId="savings-title" className="font-medium">
+                Mở tài khoản tiền gửi
+              </motion.span>
             </motion.button>
           )}
         </AnimatePresence>
       </div>
 
       {/* Profile Modal */}
-     
-        <ProfileModal 
-          isOpen={profileModalOpen} 
-          onClose={toggleProfileModal}
-        />
-     
+
+      <ProfileModal isOpen={profileModalOpen} onClose={toggleProfileModal} />
 
       {/* Add animation keyframes */}
       <style jsx global>{`
@@ -3171,153 +3351,181 @@ export default function Dashboard() {
       </div>
 
       {/* Chi tiết thẻ tiết kiệm ở giữa màn hình */}
-      <div
-        className={`fixed inset-0 z-[61] pointer-events-none hidden md:flex items-center justify-center transition-opacity duration-300 ${
-          savingsCardDetailVisible ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        <div
-          className={`w-full max-w-3xl transition-all duration-500 transform ${
-            savingsCardDetailVisible
-              ? "translate-y-0 scale-100"
-              : "translate-y-8 scale-95"
-          } ${savingsDetailVisible ? "mr-[500px] sm:mr-96" : "mr-0"}`}
-          style={{
-            transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
-            pointerEvents: savingsCardDetailVisible ? "auto" : "none",
-          }}
-        >
-          {selectedSavingsDetail && (
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden card-detail-animate mx-4">
-              {/* Header */}
-              <div
-                className={`p-6 ${selectedSavingsDetail.color} relative overflow-hidden`}
-              >
-                {/* Background effects */}
-                <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-br from-white/5 to-transparent"></div>
-                <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 backdrop-blur-md"></div>
-                <div className="absolute -left-4 -bottom-4 w-16 h-16 rounded-full bg-white/10 backdrop-blur-md"></div>
+      <AnimatePresence>
+        {savingsCardDetailVisible && selectedSavingsDetail && (
+          <motion.div
+            className="hidden pointer-events-none sm:fixed sm:inset-0 sm:z-[61] sm:flex sm:items-center sm:justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Main card với shared element transition */}
+            <motion.div
+              layoutId={`savings-card-${selectedSavingsDetail.id}`}
+              className={`w-full max-w-3xl mx-4 ${
+                savingsDetailVisible ? "mr-[500px] sm:mr-96" : "mr-0"
+              }`}
+              style={{
+                pointerEvents: savingsCardDetailVisible ? "auto" : "none",
+              }}
+            >
+              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                {/* Header */}
+                <motion.div
+                  layoutId={`savings-header-${selectedSavingsDetail.id}`}
+                  className={`p-6 ${selectedSavingsDetail.color} relative overflow-hidden`}
+                >
+                  {/* Background effects */}
+                  <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+                  <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 backdrop-blur-md"></div>
+                  <div className="absolute -left-4 -bottom-4 w-16 h-16 rounded-full bg-white/10 backdrop-blur-md"></div>
 
-                <div className="relative flex items-start justify-between z-10">
-                  <div className="flex items-center">
-                    <div className="h-16 w-16 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                      <PiggyBank size={30} className="text-white" />
+                  <div className="relative flex items-start justify-between z-10">
+                    <div className="flex items-center">
+                      <motion.div
+                        layoutId={`savings-icon-${selectedSavingsDetail.id}`}
+                        className="h-16 w-16 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center"
+                      >
+                        <PiggyBank size={30} className="text-white" />
+                      </motion.div>
+                      <div className="ml-4 text-white">
+                        <motion.h2
+                          layoutId={`savings-title-${selectedSavingsDetail.id}`}
+                          className="text-xl font-semibold"
+                        >
+                          {selectedSavingsDetail.nickname}
+                        </motion.h2>
+                        <motion.p
+                          layoutId={`savings-number-${selectedSavingsDetail.id}`}
+                          className="text-white/80 mt-1"
+                        >
+                          {selectedSavingsDetail.depositNumber}
+                        </motion.p>
+                      </div>
                     </div>
-                    <div className="ml-4 text-white">
-                      <h2 className="text-xl font-semibold">
-                        {selectedSavingsDetail.nickname}
-                      </h2>
-                      <p className="text-white/80 mt-1">
-                        {selectedSavingsDetail.depositNumber}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() =>
-                        toggleAccountVisibility(selectedSavingsDetail.id)
-                      }
-                      className="rounded-full p-2 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300"
-                    >
-                      {hiddenAccountInfo[selectedSavingsDetail.id] ? (
-                        <EyeOff size={18} className="text-white" />
-                      ) : (
-                        <Eye size={18} className="text-white" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Thông tin số tiền */}
-                <div className="mt-6 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-white/80 text-sm">Số tiền gửi</p>
-                      <h3 className="text-2xl font-bold text-white mt-1">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() =>
+                          toggleAccountVisibility(selectedSavingsDetail.id)
+                        }
+                        className="rounded-full p-2 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300"
+                      >
                         {hiddenAccountInfo[selectedSavingsDetail.id] ? (
-                          <span className="text-white/60">••••••••</span>
+                          <EyeOff size={18} className="text-white" />
                         ) : (
-                          formatCurrency(selectedSavingsDetail.remainingAmount)
+                          <Eye size={18} className="text-white" />
                         )}
-                      </h3>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-white/80 text-sm">Lãi suất</p>
-                      <p className="text-xl font-semibold text-white mt-1">
-                        {selectedSavingsDetail.interestRate}%/năm
-                      </p>
+                      </button>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Thông tin chi tiết */}
-              <div className="p-6">
-                <SavingAccountDetail
-                  account={selectedSavingsDetail}
-                  isHidden={hiddenAccountInfo[selectedSavingsDetail.id]}
-                  formatCurrency={formatCurrency}
-                />
-
-                {/* Các hành động */}
-                <div className="mt-6 flex flex-wrap gap-4 justify-center md:flex hidden">
-                  <motion.button
-                    className="relative group bg-gradient-to-br from-amber-50/80 via-white/90 to-orange-100/60 backdrop-blur-2xl px-5 py-3 rounded-2xl shadow-md border border-amber-200/50 flex items-center text-sm font-semibold text-amber-600 overflow-hidden min-w-[110px] justify-center"
-                    onClick={toggleWithdrawalPanel}
-                    whileHover={{
-                      boxShadow: "0 15px 35px -10px rgba(215, 168, 13, 0.3)",
-                      y: -2,
-                      scale: 1.03,
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{
-                      duration: 0.3,
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 25,
-                    }}
+                  {/* Thông tin số tiền */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="mt-6 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-amber-200/30 to-orange-300/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-100/40 via-orange-50/30 to-transparent opacity-60 group-hover:opacity-90 transition-all duration-400"></div>
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
-
-                    <div className="relative w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md mr-2 group-hover:shadow-lg transition-shadow duration-300">
-                      <ArrowUpRight size={14} className="text-white" />
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="text-white/80 text-sm">Số tiền gửi</p>
+                        <motion.h3
+                          layoutId={`savings-amount-${selectedSavingsDetail.id}`}
+                          className="text-2xl font-bold text-white mt-1"
+                        >
+                          {hiddenAccountInfo[selectedSavingsDetail.id] ? (
+                            <span className="text-white/60">••••••••</span>
+                          ) : (
+                            formatCurrency(
+                              selectedSavingsDetail.remainingAmount
+                            )
+                          )}
+                        </motion.h3>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white/80 text-sm">Lãi suất</p>
+                        <p className="text-xl font-semibold text-white mt-1">
+                          {selectedSavingsDetail.interestRate}%/năm
+                        </p>
+                      </div>
                     </div>
-                    <span className="relative">Rút tiền</span>
-                  </motion.button>
+                  </motion.div>
+                </motion.div>
 
-                  <motion.button
-                    className="relative group bg-gradient-to-br from-gray-50/80 via-white/90 to-slate-100/60 backdrop-blur-2xl px-5 py-3 rounded-2xl shadow-md border border-gray-200/50 flex items-center text-sm font-semibold text-gray-600 overflow-hidden min-w-[100px] justify-center"
-                    onClick={closeSavingsDetailDrawer}
-                    whileHover={{
-                      boxShadow: "0 15px 35px -10px rgba(107, 114, 128, 0.3)",
-                      y: -2,
-                      scale: 1.03,
-                    }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{
-                      duration: 0.3,
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 25,
-                    }}
+                {/* Thông tin chi tiết */}
+                <motion.div
+                  layoutId={`savings-content-${selectedSavingsDetail.id}`}
+                  className="p-6"
+                >
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-gray-200/30 to-slate-300/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100/40 via-slate-50/30 to-transparent opacity-60 group-hover:opacity-90 transition-all duration-400"></div>
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+                    <SavingAccountDetail
+                      account={selectedSavingsDetail}
+                      isHidden={hiddenAccountInfo[selectedSavingsDetail.id]}
+                      formatCurrency={formatCurrency}
+                    />
+                  </motion.div>
 
-                    <div className="relative w-7 h-7 rounded-xl bg-gradient-to-br from-gray-400 to-slate-500 flex items-center justify-center shadow-md mr-2 group-hover:shadow-lg transition-shadow duration-300">
-                      <X size={14} className="text-white" />
-                    </div>
-                    <span className="relative">Đóng</span>
-                  </motion.button>
-                </div>
+                  {/* Các hành động */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="mt-6 flex flex-wrap gap-4 justify-center md:flex hidden"
+                  >
+                    <motion.button
+                      className="relative group bg-gradient-to-br from-amber-50/80 via-white/90 to-orange-100/60 backdrop-blur-2xl px-5 py-3 rounded-2xl shadow-md border border-amber-200/50 flex items-center text-sm font-semibold text-amber-600 overflow-hidden min-w-[110px] justify-center"
+                      onClick={toggleWithdrawalPanel}
+                      whileHover={{
+                        boxShadow: "0 15px 35px -10px rgba(215, 168, 13, 0.3)",
+                        y: -2,
+                        scale: 1.03,
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-amber-200/30 to-orange-300/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-amber-100/40 via-orange-50/30 to-transparent opacity-60 group-hover:opacity-90 transition-all duration-400"></div>
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
 
-                {/* Tab action only visible on mobile */}
-                {
-                  <div className="fixed bottom-6 left-8 right-8 bg-black/5 backdrop-blur-md rounded-3xl p-2 flex justify-around md:hidden z-[70]">
+                      <div className="relative w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md mr-2 group-hover:shadow-lg transition-shadow duration-300">
+                        <ArrowUpRight size={14} className="text-white" />
+                      </div>
+                      <span className="relative">Rút tiền</span>
+                    </motion.button>
+
+                    <motion.button
+                      className="relative group bg-gradient-to-br from-gray-50/80 via-white/90 to-slate-100/60 backdrop-blur-2xl px-5 py-3 rounded-2xl shadow-md border border-gray-200/50 flex items-center text-sm font-semibold text-gray-600 overflow-hidden min-w-[100px] justify-center"
+                      onClick={closeSavingsDetailDrawer}
+                      whileHover={{
+                        boxShadow: "0 15px 35px -10px rgba(107, 114, 128, 0.3)",
+                        y: -2,
+                        scale: 1.03,
+                      }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-gray-200/30 to-slate-300/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-gray-100/40 via-slate-50/30 to-transparent opacity-60 group-hover:opacity-90 transition-all duration-400"></div>
+                      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+
+                      <div className="relative w-7 h-7 rounded-xl bg-gradient-to-br from-gray-400 to-slate-500 flex items-center justify-center shadow-md mr-2 group-hover:shadow-lg transition-shadow duration-300">
+                        <X size={14} className="text-white" />
+                      </div>
+                      <span className="relative">Đóng</span>
+                    </motion.button>
+                  </motion.div>
+
+                  {/* Tab action only visible on mobile */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="fixed bottom-6 left-8 right-8 bg-black/5 backdrop-blur-md rounded-3xl p-2 flex justify-around md:hidden z-[70]"
+                  >
                     <motion.button
                       className="relative group flex flex-col items-center justify-center px-4 py-2 rounded-2xl overflow-hidden min-w-[70px]"
                       onClick={toggleWithdrawalPanel}
@@ -3391,23 +3599,23 @@ export default function Dashboard() {
                         Đóng
                       </span>
                     </motion.button>
-                  </div>
-                }
+                  </motion.div>
+                </motion.div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Savings Account Detail Drawer */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/30 backdrop-blur-sm z-[60] transition-opacity duration-300 ${
           savingsDetailVisible ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSavingsDetailDrawer}
       >
         <div
-          className={`fixed top-0 bottom-0 right-0 w-full sm:w-96 md:w-[500px] bg-white shadow-2xl transition-transform duration-500 transform ${
+          className={`fixed top-0 bottom-0 right-0 w-full sm:w-96 md:w-[500px] bg-white shadow-2xl transition-transform duration-[1200ms] transform ${
             savingsDetailVisible ? "translate-x-0" : "translate-x-full"
           } rounded-l-3xl overflow-hidden z-[61]`}
           style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
@@ -3449,25 +3657,33 @@ export default function Dashboard() {
               {/* Tab navigation */}
               {!withdrawalPanelVisible && (
                 <div className="flex bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20">
-                <AnimatedTabNavigation
-                  activeTab={savingsRightPanelContent}
-                  onTabChange={switchSavingsRightPanel}
-                  haveChevron={false}
-                  alwaysMini={true}
-                  tabs={[
-                    { id: "transactions", label: "Giao dịch", icon: History},
-                    { id: "interest", label: "Lịch sử trả lãi", icon: DollarSign},
-                    { id: "withdrawals", label: "Lịch sử rút tiền", icon: ArrowUpRight},
-                    { id: "details", label: "Chi tiết", icon: Info}
-                  ]}
-                  variant='indigo'
-                  className={`${
-                    withdrawalPanelVisible
-                      ? "opacity-50 pointer-events-none"
-                      : ""
-                  }`}
-                />
-              </div>
+                  <AnimatedTabNavigation
+                    activeTab={savingsRightPanelContent}
+                    onTabChange={switchSavingsRightPanel}
+                    haveChevron={false}
+                    alwaysMini={true}
+                    tabs={[
+                      { id: "transactions", label: "Giao dịch", icon: History },
+                      {
+                        id: "interest",
+                        label: "Lịch sử trả lãi",
+                        icon: DollarSign,
+                      },
+                      {
+                        id: "withdrawals",
+                        label: "Lịch sử rút tiền",
+                        icon: ArrowUpRight,
+                      },
+                      { id: "details", label: "Chi tiết", icon: Info },
+                    ]}
+                    variant="indigo"
+                    className={`${
+                      withdrawalPanelVisible
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                    }`}
+                  />
+                </div>
               )}
 
               {/* Panel content based on selected tab */}
@@ -3528,7 +3744,7 @@ export default function Dashboard() {
 
                     {/* Detail Information */}
                     {savingsRightPanelContent === "details" && (
-                      <DetailInfo 
+                      <DetailInfo
                         account={savingsAccounts[selectedSavingsId]}
                       />
                     )}

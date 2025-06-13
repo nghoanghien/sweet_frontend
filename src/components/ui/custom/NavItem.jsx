@@ -17,7 +17,7 @@ function NavItem({ icon, text, expanded, active, onClick }) {
       <div className={`${expanded ? "" : "mx-auto"}`}>
         {icon}
       </div>
-      {expanded && <span className="ml-3 text-sm font-semibold text-gray-600">{text}</span>}
+      {expanded && <span className="ml-3 text-sm font-semibold text-gray-600 whitespace-nowrap overflow-hidden">{text}</span>}
     </div>
   );
 }
