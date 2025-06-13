@@ -1881,8 +1881,16 @@ export default function Dashboard() {
             cardDetailVisible ? "main-content-with-detail" : ""
           }`}
         >
-          {activeSection === "overview" ? (
-            <>
+          <AnimatePresence mode="wait">
+            {activeSection === "overview" ? (
+              <motion.div
+                key="overview"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
               <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                   <div>
@@ -2042,9 +2050,16 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            </>
-          ) : activeSection === "deposits" ? (
-            <>
+              </motion.div>
+            ) : activeSection === "deposits" ? (
+              <motion.div
+                key="deposits"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
               <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                   <div>
@@ -2322,26 +2337,97 @@ export default function Dashboard() {
                   ))}
                 </AnimatePresence>
               </div>
-            </>
-          ) : activeSection === "customers" ? (
-            <CustomerManagement />
-          ) : activeSection === "employees" ? (
-            <EmployeeManagement />
-          ) : activeSection === "savings-products" ? (
-            <SavingsProductManagement />
-          ) : activeSection === "sales-reports" ? (
-            <SalesReportPage />
-          ) : activeSection === "permissions" ? (
-            <PermissionManagement />
-          ) : activeSection === "settings" ? (
-            <SystemSettings />
-          ) : activeSection === "deposit-slips" ? (
-            <SavingsAccountManagement />
-          ) : (
-            <div>
-              <h1>404 Not Found</h1>
-            </div>
-          )}
+              </motion.div>
+            ) : activeSection === "customers" ? (
+              <motion.div
+                key="customers"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <CustomerManagement />
+              </motion.div>
+            ) : activeSection === "employees" ? (
+              <motion.div
+                key="employees"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <EmployeeManagement />
+              </motion.div>
+            ) : activeSection === "savings-products" ? (
+              <motion.div
+                key="savings-products"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <SavingsProductManagement />
+              </motion.div>
+            ) : activeSection === "sales-reports" ? (
+              <motion.div
+                key="sales-reports"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <SalesReportPage />
+              </motion.div>
+            ) : activeSection === "permissions" ? (
+              <motion.div
+                key="permissions"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <PermissionManagement />
+              </motion.div>
+            ) : activeSection === "settings" ? (
+              <motion.div
+                key="settings"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <SystemSettings />
+              </motion.div>
+            ) : activeSection === "deposit-slips" ? (
+              <motion.div
+                key="deposit-slips"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <SavingsAccountManagement />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="not-found"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="w-full"
+              >
+                <h1>404 Not Found</h1>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
 
