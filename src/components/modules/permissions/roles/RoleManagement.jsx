@@ -248,31 +248,31 @@ const RoleManagement = () => {
 
         {/* Add role button */}
         <AnimatePresence>
-        <motion.button
-          onClick={handleAddRole}
-          className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
-          whileHover={{
-            scale: 1.08,
-            boxShadow: "0 0 16px rgba(0,170,255,0.18)",
-          }}
-          whileTap={{ scale: 0.96 }}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          layoutId="add-role-modal"
-          transition={{
-            layout: {
-              type: "spring",
-              damping: 17,
-              stiffness: 100,
-            },
-            opacity: {
-              duration: 0.3,
-            }
-          }}
-        >
-          <Plus size={20} className="mr-2" />
-          Thêm vai trò
-        </motion.button>
+          <motion.button
+            onClick={handleAddRole}
+            className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
+            whileHover={{
+              scale: 1.08,
+              boxShadow: "0 0 16px rgba(0,170,255,0.18)",
+            }}
+            whileTap={{ scale: 0.96 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            layoutId="add-role-modal"
+            transition={{
+              layout: {
+                type: "spring",
+                damping: 17,
+                stiffness: 100,
+              },
+              opacity: {
+                duration: 0.3,
+              },
+            }}
+          >
+            <Plus size={20} className="mr-2" />
+            Thêm vai trò
+          </motion.button>
         </AnimatePresence>
       </div>
 
@@ -394,24 +394,12 @@ const RoleManagement = () => {
         isEditing={isEditing}
       />
 
-      <AnimatePresence mode="wait">
-        {showDeleteModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black backdrop-blur-sm bg-opacity-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <DeleteRoleModal
+<DeleteRoleModal
               isOpen={showDeleteModal}
               onClose={() => setShowDeleteModal(false)}
               onConfirm={handleConfirmDelete}
               role={selectedRole}
             />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

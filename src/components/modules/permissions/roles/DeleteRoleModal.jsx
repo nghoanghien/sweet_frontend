@@ -87,18 +87,21 @@ const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
+          onClick={onClose}
         >
           <motion.div
             className="bg-white rounded-3xl shadow-xl w-full max-w-md max-h-[95vh] flex flex-col overflow-hidden"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.3 }}
+            layoutId={`delete-role-${role.id}`}
+            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="px-8 py-6 flex justify-between items-center rounded-t-3xl shadow-[0_4px_30px_rgba(239,68,68,0.12)] border-b-2 border-red-100 bg-gradient-to-r from-red-500 via-red-400 to-rose-600 text-white">

@@ -248,10 +248,19 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
               className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 shadow-sm transition-colors duration-200"
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
+              layoutId={`delete-role-${role.id}`}
+              transition={{
+                layout: {
+                  type: "spring",
+                  damping: 16,
+                  stiffness: 100,
+                }
+              }}
             >
               <Trash2 size={18} />
             </motion.button>
           </div>
+          
         )}
       </div>
     </motion.div>

@@ -386,6 +386,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
               background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
             }}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Simplified decorative elements */}
             <div className="absolute top-0 right-0 w-20 sm:w-32 h-20 sm:h-32 bg-gradient-to-br from-blue-200/20 to-purple-300/20 rounded-full blur-2xl transform translate-x-8 -translate-y-8"></div>
