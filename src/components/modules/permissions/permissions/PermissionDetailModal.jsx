@@ -160,7 +160,7 @@ const PermissionDetailModal = ({ isOpen, onClose, permission }) => {
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed backdrop-blur-sm inset-0 z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -186,11 +186,12 @@ const PermissionDetailModal = ({ isOpen, onClose, permission }) => {
             initial={{ opacity: 0, scale: 0.85, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 30 }}
+            layoutId={`permission-card-${permission.id}`}
             transition={{
               duration: 0.4,
               type: "spring",
               damping: 25,
-              stiffness: 300,
+              stiffness: 250,
             }}
             onClick={(e) => e.stopPropagation()}
           >

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { 
   CreditCard, 
   PiggyBank, 
@@ -110,134 +110,142 @@ const PermissionCard = ({ permission, onClick }) => {
   const colors = getCardColors(permission.id, permission.type);
 
   return (
-    <motion.div
-      onClick={onClick}
-      className={`
+    <AnimatePresence mode="wait">
+      <motion.div
+        onClick={onClick}
+        className={`
         relative bg-gradient-to-br from-amber-50/90 via-yellow-50/80 to-orange-50/90
-        rounded-2xl cursor-pointer transition-all duration-300
+        rounded-3xl cursor-pointer
         border-4 ${colors.border}
         shadow-[0_8px_32px_rgba(0,0,0,0.12)]
         hover:${colors.glow}
         overflow-hidden
         backdrop-blur-sm
       `}
-      whileHover={{
-        scale: 1.02,
-        y: -8,
-        transition: { duration: 0.2 },
-      }}
-      whileTap={{ scale: 0.98 }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-        <div
-          className="opacity-[0.11] transform scale-[7] md:scale-[9] translate-y-12 translate-x-20"
-          style={{ color: colors.primary }}
-        >
-          {getPermissionIcon(permission.id, permission.type)}
+        whileHover={{
+          scale: 1.02,
+          y: -8,
+          transition: { duration: 0.2 },
+        }}
+        whileTap={{ scale: 0.98 }}
+        initial={{ opacity: 0, y: 20, borderRadius: 24 }}
+        animate={{ opacity: 1, y: 0, borderRadius: 24 }}
+        layoutId={`permission-card-${permission.id}`}
+        transition={{
+          duration: 0.2,
+          type: "spring",
+          damping: 16,
+          stiffness: 100,
+        }}
+      >
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+          <div
+            className="opacity-[0.11] transform scale-[7] md:scale-[9] translate-y-12 translate-x-20"
+            style={{ color: colors.primary }}
+          >
+            {getPermissionIcon(permission.id, permission.type)}
+          </div>
         </div>
-      </div>
 
-      {/* Decorative border effect */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-20 rounded-xl`}
-      />
+        {/* Decorative border effect */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-20 rounded-xl`}
+        />
 
-      {/* Corner ornaments */}
-      <div className="absolute top-2 left-2 w-6 h-6 border-l-4 border-t-4 border-amber-400 rounded-tl-lg opacity-60" />
-      <div className="absolute top-2 right-2 w-6 h-6 border-r-4 border-t-4 border-amber-400 rounded-tr-lg opacity-60" />
-      <div className="absolute bottom-2 left-2 w-6 h-6 border-l-4 border-b-4 border-amber-400 rounded-bl-lg opacity-60" />
-      <div className="absolute bottom-2 right-2 w-6 h-6 border-r-4 border-b-4 border-amber-400 rounded-br-lg opacity-60" />
+        {/* Corner ornaments */}
+        <div className="absolute top-2 left-2 w-6 h-6 border-l-4 border-t-4 border-amber-400 rounded-tl-lg opacity-60" />
+        <div className="absolute top-2 right-2 w-6 h-6 border-r-4 border-t-4 border-amber-400 rounded-tr-lg opacity-60" />
+        <div className="absolute bottom-2 left-2 w-6 h-6 border-l-4 border-b-4 border-amber-400 rounded-bl-lg opacity-60" />
+        <div className="absolute bottom-2 right-2 w-6 h-6 border-r-4 border-b-4 border-amber-400 rounded-br-lg opacity-60" />
 
-      {/* Main content */}
-      <div className="relative p-6">
-        <div className="flex items-center justify-between mb-4">
-          {/* Icon section */}
-          <motion.div
-            className={`
+        {/* Main content */}
+        <div className="relative p-6">
+          <div className="flex items-center justify-between mb-4">
+            {/* Icon section */}
+            <motion.div
+              className={`
               p-4 rounded-2xl bg-gradient-to-br ${colors.gradient}
               shadow-[0_4px_20px_rgba(0,0,0,0.25)]
               border-3 border-white/30
               ${colors.icon}
             `}
-            whileHover={{
-              rotate: [0, -10, 10, -5, 0],
-              scale: 1.1,
-            }}
-            transition={{ duration: 0.5 }}
-          >
-            {getPermissionIcon(permission.id, permission.type)}
-          </motion.div>
+              whileHover={{
+                rotate: [0, -10, 10, -5, 0],
+                scale: 1.1,
+              }}
+              transition={{ duration: 0.5 }}
+            >
+              {getPermissionIcon(permission.id, permission.type)}
+            </motion.div>
 
-          {/* Type badge */}
-          <div className="flex items-center gap-2">
-            <motion.span
-              className={`
+            {/* Type badge */}
+            <div className="flex items-center gap-2">
+              <motion.span
+                className={`
                 px-4 py-2 rounded-full text-sm font-bold
                 bg-gradient-to-r ${colors.gradient} text-white
                 shadow-[0_4px_15px_rgba(0,0,0,0.2)]
                 border-2 border-white/20
               `}
-              whileHover={{ scale: 1.05 }}
-            >
-              {permission.type === "customer"
-                ? "👤 Khách hàng"
-                : "👨‍💼 Nhân viên"}
-            </motion.span>
-            <ChevronRight size={24} className="text-amber-600" />
+                whileHover={{ scale: 1.05 }}
+              >
+                {permission.type === "customer"
+                  ? "👤 Khách hàng"
+                  : "👨‍💼 Nhân viên"}
+              </motion.span>
+              <ChevronRight size={24} className="text-amber-600" />
+            </div>
           </div>
-        </div>
 
-        {/* Title and description */}
-        <div className="mb-4">
-          <h3 className="font-bold text-xl text-gray-800 mb-2 drop-shadow-sm">
-            {permission.name}
-          </h3>
-          <p className="text-sm text-gray-600 italic leading-relaxed">
-            {permission.description}
-          </p>
-        </div>
+          {/* Title and description */}
+          <div className="mb-4">
+            <h3 className="font-bold text-xl text-gray-800 mb-2 drop-shadow-sm">
+              {permission.name}
+            </h3>
+            <p className="text-sm text-gray-600 italic leading-relaxed">
+              {permission.description}
+            </p>
+          </div>
 
-        {/* Functions tags */}
-        <div className="flex flex-wrap gap-2">
-          {permission.functions &&
-            permission.functions.slice(0, 3).map((func, index) => (
-              <motion.span
-                key={index}
-                className={`
+          {/* Functions tags */}
+          <div className="flex flex-wrap gap-2">
+            {permission.functions &&
+              permission.functions.slice(0, 3).map((func, index) => (
+                <motion.span
+                  key={index}
+                  className={`
                 px-3 py-1.5 text-xs font-semibold rounded-lg
                 bg-gradient-to-r from-amber-100 to-yellow-100
                 text-amber-800 border border-amber-200
                 shadow-[0_2px_8px_rgba(0,0,0,0.1)]
               `}
-                whileHover={{
-                  scale: 1.05,
-                  backgroundColor: "#fef3c7",
-                }}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                {func}
-              </motion.span>
-            ))}
-          {permission.functions && permission.functions.length > 3 && (
-            <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-gray-600 border border-gray-200">
-              +{permission.functions.length - 3} khác
-            </span>
-          )}
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#fef3c7",
+                  }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  {func}
+                </motion.span>
+              ))}
+            {permission.functions && permission.functions.length > 3 && (
+              <span className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 text-gray-600 border border-gray-200">
+                +{permission.functions.length - 3} khác
+              </span>
+            )}
+          </div>
+
+          {/* Decorative elements */}
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-300 to-amber-400 rounded-full opacity-20" />
+          <div className="absolute -bottom-3 -left-3 w-12 h-12 bg-gradient-to-br from-orange-300 to-red-400 rounded-full opacity-15" />
         </div>
 
-        {/* Decorative elements */}
-        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-yellow-300 to-amber-400 rounded-full opacity-20" />
-        <div className="absolute -bottom-3 -left-3 w-12 h-12 bg-gradient-to-br from-orange-300 to-red-400 rounded-full opacity-15" />
-      </div>
-
-      {/* Subtle texture overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/5 rounded-xl pointer-events-none" />
-    </motion.div>
+        {/* Subtle texture overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/5 rounded-xl pointer-events-none" />
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

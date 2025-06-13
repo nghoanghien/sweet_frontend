@@ -246,25 +246,14 @@ const PermissionList = () => {
           </motion.div>
         )}
       </div>
-      
-      {/* Permission detail modal */}
-      <AnimatePresence mode="wait">
-        {showDetailModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black backdrop-blur-sm bg-opacity-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <PermissionDetailModal
+
+      <PermissionDetailModal
               isOpen={showDetailModal}
               onClose={() => setShowDetailModal(false)}
               permission={selectedPermission}
             />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      
+     
     </div>
   );
 };
