@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, User, DollarSign, TrendingUp, Star, AlertCircle, Ban, Eye } from 'lucide-react';
+import { Calendar, User, DollarSign, TrendingUp, Ban, Eye } from 'lucide-react';
 
 const RegulationCard = ({ regulation, onClick, isActive, onCancelClick, canCancel, onViewDetail }) => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
   
   // Format date for display
   const formatDate = (dateString) => {
@@ -134,7 +133,7 @@ const RegulationCard = ({ regulation, onClick, isActive, onCancelClick, canCance
         
         {/* Status badge - positioned bottom right of header */}
         <motion.div 
-          className={`absolute bottom-0 right-0 transform translate-y-1/2 mr-4 px-4 py-2 rounded-full text-base font-bold shadow-lg border-2 border-white ${status.color} ${status.textColor} drop-shadow`}
+          className={`absolute bottom-0 right-0 transform translate-y-1/2 mr-4 px-3 sm:px-4 py-2 rounded-full text-sm sm:text-base font-semibold sm:font-bold shadow-lg border sm:border-2 border-white ${status.color} ${status.textColor} drop-shadow`}
         > 
           {status.label}
         </motion.div>
@@ -143,12 +142,12 @@ const RegulationCard = ({ regulation, onClick, isActive, onCancelClick, canCance
       {/* Creator Info - Overlapping header and content */}
       <motion.div 
         layoutId={`regulation-creator-${regulation.id}`}
-        className="relative flex items-center bg-white pl-3 pr-4 py-2 rounded-2xl shadow-md mt-[-28px] ml-4 w-fit z-10 max-w-[calc(100%-1rem)] border border-blue-100"
+        className="relative flex items-center bg-white pl-3 pr-3 sm:pr-4 py-2 rounded-2xl shadow-md mt-[-28px] ml-4 w-fit z-10 max-w-[calc(100%-1rem)] border border-blue-100"
       >
-        <div className="w-8 h-8 bg-indigo-100 text-indigo-800 rounded-full mr-3 flex-shrink-0 flex items-center justify-center">
+        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-indigo-100 text-indigo-800 rounded-full mr-1 sm:mr-3 flex-shrink-0 flex items-center justify-center">
           <User size={16} />
         </div>
-        <span className="text-base font-semibold text-blue-800 truncate" title={regulation.creator.name}>
+        <span className="text-sm sm:text-base font-semibold text-blue-800 truncate" title={regulation.creator.name}>
           {regulation.creator.name}
         </span>
       </motion.div>

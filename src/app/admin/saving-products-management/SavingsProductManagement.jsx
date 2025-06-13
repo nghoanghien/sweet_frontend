@@ -66,7 +66,7 @@ const SavingsProductManagement = () => {
   };
 
   return (
-    <div className="container mx-auto md:pl-0 p-3 md:p-6 max-w-7xl">
+    <div className="container mx-auto md:pl-0 p-0 md:p-6 max-w-7xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
           Quản lý sản phẩm tiết kiệm

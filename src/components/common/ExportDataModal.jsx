@@ -712,7 +712,7 @@ const ExportDataModal = ({
             {/* Header */}
             <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-[0_4px_20px_rgba(66,99,235,0.25)]">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">{title} <span className="text-sm">(Dữ liệu xuất ra sẽ bao gồm {data.length} bản ghi đã được lọc trước đó ở phần tìm kiếm)</span></h2>
+                <h2 className="text-2xl font-bold">{title} <span className="text-sm hidden sm:block">(Dữ liệu xuất ra sẽ bao gồm {data.length} bản ghi đã được lọc trước đó ở phần tìm kiếm)</span></h2>
                 <motion.button 
                   onClick={onClose}
                   className="p-2 rounded-full hover:bg-white/30 transition-colors"
@@ -1272,7 +1272,7 @@ const ExportDataModal = ({
                           </span>
                         </h4>
                         <div className="space-y-4">
-                          <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                             <motion.div 
                               className="p-3.5 bg-white rounded-lg border border-blue-100/50 transition-all duration-200 group"
                               whileHover={{ 
@@ -1373,10 +1373,10 @@ const ExportDataModal = ({
                 whileHover={{ scale: 1.03, y: -1 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={onClose}
-                className="px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.1)]"
+                className="px-4 md:px-6 py-3 bg-white text-gray-700 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.1)]"
                 disabled={isProcessing}
               >
-                <span className="flex items-center">
+                <span className="flex items-center font-semibold">
                   <X size={18} className="mr-2" />
                   Hủy bỏ
                 </span>

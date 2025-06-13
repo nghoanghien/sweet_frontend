@@ -2225,14 +2225,14 @@ const interestRateData = {
               <div className="flex justify-between">
                 {step > 1 ? (
                   <motion.button
-                    className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium text-sm flex items-center relative overflow-hidden group"
+                    className="px-2 md:px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium text-sm flex items-center relative overflow-hidden group"
                     onClick={handlePreviousStep}
                     whileHover={{ x: -2 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-200/50 to-gray-300/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                     <motion.span
-                      className="relative z-10 mr-2"
+                      className="relative z-10 mr-1"
                       initial={{ x: 0 }}
                       whileHover={{ x: -2 }}
                       transition={{
@@ -2273,7 +2273,7 @@ const interestRateData = {
                   </motion.button>
                 ) : (
                   <motion.button
-                    className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:shadow-md transition-all duration-200 font-medium text-sm flex items-center relative overflow-hidden group"
+                    className="px-4 md:px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:shadow-md transition-all duration-200 font-medium text-sm flex items-center relative overflow-hidden group"
                     onClick={handleConfirm}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

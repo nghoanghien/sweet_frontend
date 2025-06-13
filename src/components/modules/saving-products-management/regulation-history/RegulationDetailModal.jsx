@@ -98,7 +98,7 @@ const RegulationDetailModal = ({
         >
           <motion.div
             layoutId={`regulation-card-${regulation.id}`}
-            className="relative bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,170,255,0.13)] border-2 border-blue-100 w-full max-w-4xl max-h-[96vh] flex flex-col overflow-hidden"
+            className="relative bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,170,255,0.13)] border-2 border-blue-100 mx-3 md:mx-0 w-full max-w-4xl max-h-[96vh] flex flex-col overflow-hidden"
             transition={{ type: "spring", damping: 25 }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -132,16 +132,9 @@ const RegulationDetailModal = ({
                     className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl shadow-[0_4px_20px_rgba(239,68,68,0.13)] font-semibold tracking-wide flex items-center gap-2"
                   >
                     <Ban size={18} />
-                    Hủy quy định
+                    <span className='hidden sm:flex'>Hủy quy định</span>
                   </motion.button>
                 )}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-full hover:bg-white/20 transition-colors"
-                >
-                  <Download size={20} className="text-white/90" />
-                </motion.button>
                 <button 
                   onClick={onClose}
                   className="p-2 rounded-full hover:bg-white/20 transition-colors ml-2"
@@ -273,7 +266,7 @@ const RegulationDetailModal = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 bg-gray-100 font-semibold text-gray-600 border border-gray-300 hover:bg-gray-100 rounded-2xl transition-colors"
               >
                 Đóng
               </motion.button>

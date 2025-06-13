@@ -293,8 +293,8 @@ const SalesReportPage = () => {
             exit={{ opacity: 0, y: -30, scale: 0.98 }}
             transition={{ duration: 0.35, ease: 'easeInOut' }}
           >
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+              <div className="flex mb-4 md:mb-0 items-center">
                 <motion.button
                   whileHover={{ scale: 1.05, x: -3 }}
                   whileTap={{ scale: 0.95 }}

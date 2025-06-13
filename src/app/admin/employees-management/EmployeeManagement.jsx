@@ -314,10 +314,7 @@ import React, { useState, useEffect } from 'react';
         sortable: true,
         formatter: (value, item) => (
           <div className="flex items-center">
-            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-              <User size={16} />
-            </div>
-            <div className="ml-3">
+            <div className="">
               <div className="text-sm font-medium text-gray-900">{value}</div>
             </div>
           </div>
@@ -1944,7 +1941,7 @@ import React, { useState, useEffect } from 'react';
                       className="relative group mt-6"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-purple-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                      <div className="relative bg-white/90 border border-indigo-200/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500">
+                      <div className="relative bg-white/90 border border-indigo-200/50 rounded-3xl px-4 md:px-6 p-6 md:p-8 shadow-lg hover:shadow-xl transition-all duration-500">
                         {/* Nhóm: Thông tin có thể chỉnh sửa */}
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
@@ -2120,7 +2117,7 @@ import React, { useState, useEffect } from 'react';
                                 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={cancelEdit}
-                                className="px-6 py-3 font-medium bg-gray-300 text-gray-700 rounded-xl transition-all duration-300 shadow-md"
+                                className="px-4 md:px-6 py-3 font-semibold bg-gray-300 text-gray-700 rounded-xl transition-all duration-300 shadow-md"
                               >
                                 Hủy bỏ
                               </motion.button>
@@ -2132,7 +2129,7 @@ import React, { useState, useEffect } from 'react';
                                 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={saveEmployeeChanges}
-                                className="px-6 py-3 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                                className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
                               >
                                 <Save size={16} className="mr-2" />
                                 Lưu thay đổi
@@ -2154,7 +2151,7 @@ import React, { useState, useEffect } from 'react';
                                 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={closeModal}
-                                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl transition-all duration-300 shadow-md"
+                                className="px-6 py-3 bg-gray-300 font-semibold text-gray-600 rounded-xl transition-all duration-300 shadow-md"
                               >
                                 Đóng
                               </motion.button>
@@ -2166,7 +2163,7 @@ import React, { useState, useEffect } from 'react';
                                 }}
                                 whileTap={{ scale: 0.95 }}
                                 onClick={() => enableEditMode(selectedEmployee)}
-                                className="px-6 py-3 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                                className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
                               >
                                 <Edit size={16} className="mr-2" />
                                 Chỉnh sửa
@@ -2452,7 +2449,7 @@ import React, { useState, useEffect } from 'react';
                         whileHover={{ scale: 1.05, backgroundColor: "#9ca3af" }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleAddEmployeeModalOpen}
-                        className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl transition-all duration-300 shadow-md"
+                        className="px-6 py-3 bg-gray-300 text-gray-500 rounded-xl transition-all duration-300 shadow-md"
                       >
                         Hủy bỏ
                       </motion.button>
@@ -2464,7 +2461,7 @@ import React, { useState, useEffect } from 'react';
                         }}
                         whileTap={{ scale: 0.95 }}
                         onClick={addNewEmployee}
-                        className="px-6 py-3 font-medium bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                        className="px-4 md:px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
                       >
                         <Plus size={16} className="mr-2 font-medium" />
                         Thêm nhân viên

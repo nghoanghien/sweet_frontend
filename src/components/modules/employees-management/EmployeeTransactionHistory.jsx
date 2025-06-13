@@ -207,17 +207,7 @@ function EmployeeTransactionHistory({ employee }) {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="space-y-6"
     >
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <FileText size={18} className="text-cyan-600" />
-            Lịch sử giao dịch
-          </h3>
-          <div className="text-sm text-gray-500 flex items-center gap-2">
-            <Clock size={14} />
-            Cập nhật gần nhất: {new Date().toLocaleDateString("vi-VN")}
-          </div>
-        </div>
+      <div className="bg-white rounded-2xl md:border border-gray-200 shadow-sm md:p-6 space-y-6">
 
         {/* Enhanced Search Section */}
         <div className="relative mb-6">

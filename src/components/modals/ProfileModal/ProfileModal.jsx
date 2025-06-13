@@ -228,7 +228,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                 />
 
                 {/* Header Section */}
-                <div className="relative p-8 bg-gradient-to-r from-white/40 via-blue-50/50 to-indigo-50/40 backdrop-blur-xl border-b border-white/20">
+                <div className="relative p-6 md:p-8 bg-gradient-to-r from-white/40 via-blue-50/50 to-indigo-50/40 backdrop-blur-xl border-b border-white/20">
                   {/* Header glass decorations */}
                   <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-gradient-to-br from-white/20 to-blue-200/10 blur-2xl" />
 
@@ -236,7 +236,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                     <div className="flex items-center gap-4">
                       {/* Glass Avatar */}
                       <motion.div className="relative" layoutId="profile-avatar">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/40 to-blue-100/30 backdrop-blur-lg border border-white/40 flex items-center justify-center shadow-lg">
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-white/40 to-blue-100/30 backdrop-blur-lg border border-white/40 flex items-center justify-center shadow-lg">
                           <User size={28} className="text-blue-600" />
                         </div>
                         <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-blue-400/20 to-indigo-500/10 blur opacity-60" />
@@ -244,7 +244,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
 
                       <div>
                         <motion.h2 
-                          className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent"
+                          className="text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent"
                           layoutId="profile-title"
                         >
                           Thông tin cá nhân
@@ -269,7 +269,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
 
                     <button
                       onClick={onClose}
-                      className="w-12 h-12 rounded-2xl bg-white/30 backdrop-blur-lg border border-white/40 hover:bg-white/40 transition-all duration-300 flex items-center justify-center group shadow-lg hover:shadow-xl"
+                      className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-white/30 backdrop-blur-lg border border-white/40 hover:bg-white/40 transition-all duration-300 flex items-center justify-center group shadow-lg hover:shadow-xl"
                     >
                       <X
                         size={20}
@@ -311,7 +311,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                 {/* Content Area */}
                 <div className="p-8 bg-gradient-to-br from-white/10 via-blue-50/20 to-indigo-50/10 backdrop-blur-xl max-h-[60vh] overflow-y-auto">
                   {/* Edit Mode Toggle */}
-                  <div className="flex justify-between items-center mb-8">
+                  <div className="flex flex-col md:flex-row justify-between items-center mb-8">
                     <motion.h3
                       className="text-xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent flex items-center gap-3"
                       key={editMode ? "edit" : "view"}
@@ -334,7 +334,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                           exit={{ opacity: 0, scale: 0.8 }}
                           transition={{ duration: 0.2 }}
                           onClick={handleEditToggle}
-                          className="px-6 py-3 bg-gradient-to-r from-blue-500/20 to-indigo-600/20 backdrop-blur-lg border border-white/30 text-blue-600 rounded-2xl hover:from-blue-500/30 hover:to-indigo-600/30 transition-all duration-300 font-semibold text-sm flex items-center gap-2 shadow-lg hover:shadow-xl group"
+                          className="mt-4 md:mt-0 px-6 py-3 bg-gradient-to-r from-blue-500/20 to-indigo-600/20 backdrop-blur-lg border border-white/30 text-blue-600 rounded-2xl hover:from-blue-500/30 hover:to-indigo-600/30 transition-all duration-300 font-semibold text-sm flex items-center gap-2 shadow-lg hover:shadow-xl group"
                         >
                           <Edit3
                             size={18}
@@ -345,7 +345,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
                       ) : (
                         <motion.div
                           key="save-cancel-btns"
-                          className="flex gap-3"
+                          className="mt-4 md:mt-0 flex gap-3"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.8 }}

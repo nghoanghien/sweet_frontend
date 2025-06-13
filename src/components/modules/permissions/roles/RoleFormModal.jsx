@@ -396,7 +396,10 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
               <div className="flex items-center gap-3 relative z-10">
                 <div className="p-2 sm:p-3 bg-white/20 rounded-xl backdrop-blur-sm">
                   <Crown size={20} className="sm:hidden text-yellow-200" />
-                  <Crown size={28} className="hidden sm:block text-yellow-200" />
+                  <Crown
+                    size={28}
+                    className="hidden sm:block text-yellow-200"
+                  />
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-2xl font-bold">
@@ -414,11 +417,11 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
             </div>
 
             {/* Scrollable Content */}
-            <div 
+            <div
               className="flex-1 overflow-y-auto"
-              style={{ 
-                scrollBehavior: 'auto',
-                WebkitOverflowScrolling: 'touch'
+              style={{
+                scrollBehavior: "auto",
+                WebkitOverflowScrolling: "touch",
               }}
             >
               <div className="p-4 sm:p-8 space-y-6 sm:space-y-8">
@@ -452,24 +455,33 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
 
                         <div className="text-left">
                           <div className="flex items-center gap-3 mb-3">
-                            <div className={`p-3 rounded-xl ${
-                              formData.type === "staff"
-                                ? "bg-violet-100 text-violet-600"
-                                : "bg-gray-100 text-gray-600"
-                            }`}>
+                            <div
+                              className={`p-3 rounded-xl ${
+                                formData.type === "staff"
+                                  ? "bg-violet-100 text-violet-600"
+                                  : "bg-gray-100 text-gray-600"
+                              }`}
+                            >
                               <Settings size={24} />
                             </div>
                             <div>
-                              <h5 className={`font-bold text-lg ${
-                                formData.type === "staff" ? "text-violet-700" : "text-gray-700"
-                              }`}>
+                              <h5
+                                className={`font-bold text-lg ${
+                                  formData.type === "staff"
+                                    ? "text-violet-700"
+                                    : "text-gray-700"
+                                }`}
+                              >
                                 Nhân viên
                               </h5>
-                              <p className="text-sm text-gray-500">Quản lý & vận hành</p>
+                              <p className="text-sm text-gray-500">
+                                Quản lý & vận hành
+                              </p>
                             </div>
                           </div>
                           <p className="text-sm text-gray-600">
-                            Dành cho các nhân viên với quyền hạn quản lý hệ thống, khách hàng và vận hành doanh nghiệp.
+                            Dành cho các nhân viên với quyền hạn quản lý hệ
+                            thống, khách hàng và vận hành doanh nghiệp.
                           </p>
                         </div>
                       </button>
@@ -482,8 +494,12 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                               <Users size={24} />
                             </div>
                             <div>
-                              <h5 className="font-bold text-lg text-gray-500">Khách hàng</h5>
-                              <p className="text-sm text-gray-400">Người dùng cuối</p>
+                              <h5 className="font-bold text-lg text-gray-500">
+                                Khách hàng
+                              </h5>
+                              <p className="text-sm text-gray-400">
+                                Người dùng cuối
+                              </p>
                             </div>
                           </div>
                           <p className="text-sm text-gray-500 mb-3">
@@ -516,7 +532,9 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                       <input
                         type="text"
                         value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("name", e.target.value)
+                        }
                         className={`w-full px-6 py-4 text-lg font-medium border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 ${
                           errors.name
                             ? "border-red-300 bg-red-50 focus:border-red-400 focus:ring-red-100 text-red-700"
@@ -547,12 +565,15 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
 
                   <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl border border-emerald-100">
                     <label className="block text-emerald-700 font-semibold mb-3 text-sm uppercase tracking-wide">
-                      Chi tiết về vai trò này <span className="text-red-500">*</span>
+                      Chi tiết về vai trò này{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <textarea
                         value={formData.description}
-                        onChange={(e) => handleInputChange("description", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("description", e.target.value)
+                        }
                         className={`w-full px-6 py-4 text-base leading-relaxed border-2 rounded-xl transition-all duration-200 focus:outline-none focus:ring-4 resize-none ${
                           errors.description
                             ? "border-red-300 bg-red-50 focus:border-red-400 focus:ring-red-100 text-red-700"
@@ -581,50 +602,56 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
 
                 {/* Permissions selection với change tracking */}
                 <div>
-                  <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4 group">
- <div className="relative">
-   <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-sm opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-   <div className="relative p-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full border border-purple-200 shadow-sm">
-     <Shield className="text-purple-600" size={20} />
-   </div>
- </div>
- <div className="flex flex-col">
-   <h4 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent">
-     Phân quyền truy cập
-   </h4>
-   <div className="h-0.5 w-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-60 mt-1"></div>
- </div>
-</div>
-                    
+                  <div className="flex flex-col md:flex-col items-center justify-between mb-6">
+                    <div className="flex mb-4 md:mb-0 items-center gap-4 group">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-sm opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+                        <div className="relative p-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full border border-purple-200 shadow-sm">
+                          <Shield className="text-purple-600" size={20} />
+                        </div>
+                      </div>
+                      <div className="flex flex-col">
+                        <h4 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent">
+                          Phân quyền truy cập
+                        </h4>
+                        <div className="h-0.5 w-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-60 mt-1"></div>
+                      </div>
+                    </div>
+
                     {/* Hiển thị change summary khi đang edit */}
                     {isEditing && changesSummary && (
                       <div className="flex items-center gap-4 text-sm">
-                      {changesSummary.added > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 text-emerald-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200">
-                          <div className="p-1 bg-emerald-100 rounded-full">
-                            <Plus size={10} className="text-emerald-600" />
+                        {changesSummary.added > 0 && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 text-emerald-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200">
+                            <div className="p-1 bg-emerald-100 rounded-full">
+                              <Plus size={10} className="text-emerald-600" />
+                            </div>
+                            <span className="font-semibold">
+                              {changesSummary.added} thêm
+                            </span>
                           </div>
-                          <span className="font-semibold">{changesSummary.added} thêm</span>
-                        </div>
-                      )}
-                      {changesSummary.removed > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 text-red-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200">
-                          <div className="p-1 bg-red-100 rounded-full">
-                            <Minus size={10} className="text-red-600" />
+                        )}
+                        {changesSummary.removed > 0 && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 text-red-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200">
+                            <div className="p-1 bg-red-100 rounded-full">
+                              <Minus size={10} className="text-red-600" />
+                            </div>
+                            <span className="font-semibold">
+                              {changesSummary.removed} bỏ
+                            </span>
                           </div>
-                          <span className="font-semibold">{changesSummary.removed} bỏ</span>
-                        </div>
-                      )}
-                      {changesSummary.unchanged > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-blue-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200">
-                          <div className="p-1 bg-blue-100 rounded-full">
-                            <Check size={10} className="text-blue-600" />
+                        )}
+                        {changesSummary.unchanged > 0 && (
+                          <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-blue-700 rounded-full shadow-sm hover:shadow-md transition-all duration-200">
+                            <div className="p-1 bg-blue-100 rounded-full">
+                              <Check size={10} className="text-blue-600" />
+                            </div>
+                            <span className="font-semibold">
+                              {changesSummary.unchanged} giữ nguyên
+                            </span>
                           </div>
-                          <span className="font-semibold">{changesSummary.unchanged} giữ nguyên</span>
-                        </div>
-                      )}
-                     </div>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -640,9 +667,14 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {filteredPermissions.map((permission) => {
                       const isSelected = isPermissionSelected(permission.id);
-                      const changeStatus = getPermissionChangeStatus(permission.id);
+                      const changeStatus = getPermissionChangeStatus(
+                        permission.id
+                      );
                       const IconComponent = getPermissionIcon(permission.id);
-                      const colors = getCardColors(permission.id, permission.type);
+                      const colors = getCardColors(
+                        permission.id,
+                        permission.type
+                      );
 
                       return (
                         <motion.div
@@ -653,8 +685,12 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                               : "border-gray-200 hover:border-gray-300 bg-white hover:shadow-md"
                           }`}
                           style={{
-                            backgroundColor: isSelected ? colors.light : "white",
-                            borderColor: isSelected ? colors.primary : undefined,
+                            backgroundColor: isSelected
+                              ? colors.light
+                              : "white",
+                            borderColor: isSelected
+                              ? colors.primary
+                              : undefined,
                           }}
                           onClick={() => handleTogglePermission(permission)}
                           whileHover={{ scale: 1.02 }}
@@ -662,7 +698,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                         >
                           {/* Background effect */}
                           {isSelected && (
-                            <div 
+                            <div
                               className="absolute inset-0 rounded-2xl opacity-5"
                               style={{
                                 background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
@@ -671,144 +707,163 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                           )}
 
                           {/* Change Status Indicator */}
-                          {isEditing && changeStatus !== 'none' && (
+                          {isEditing && changeStatus !== "none" && (
                             <div className="absolute -top-2 -left-2 z-20">
-                              {changeStatus === 'added' && (
+                              {changeStatus === "added" && (
                                 <motion.div
                                   className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg"
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  transition={{ type: "spring", stiffness: 300 }}
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 300,
+                                  }}
                                 >
-                                  <Plus size={12} className="text-white" strokeWidth={3} />
+                                  <Plus
+                                    size={12}
+                                    className="text-white"
+                                    strokeWidth={3}
+                                  />
                                 </motion.div>
                               )}
-                              {changeStatus === 'removed' && (
+                              {changeStatus === "removed" && (
                                 <motion.div
                                   className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
                                   initial={{ scale: 0 }}
                                   animate={{ scale: 1 }}
-                                  transition={{ type: "spring", stiffness: 300 }}
-                                    >
-                                      <Minus size={12} className="text-white" strokeWidth={3} />
-                                    </motion.div>
-                                  )}
-                                </div>
-                              )}
-    
-                              {/* Background effect */}
-                              {isSelected && (
-                                <div 
-                                  className="absolute inset-0 rounded-2xl opacity-5"
-                                  style={{
-                                    background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                                  transition={{
+                                    type: "spring",
+                                    stiffness: 300,
                                   }}
-                                />
+                                >
+                                  <Minus
+                                    size={12}
+                                    className="text-white"
+                                    strokeWidth={3}
+                                  />
+                                </motion.div>
                               )}
-    
-                              {/* Icon container */}
-                              <div
-                                className="relative z-10 p-3 rounded-xl mr-4 shadow-md transition-all duration-200"
-                                style={{
-                                  backgroundColor: isSelected ? `${colors.primary}20` : "#f8fafc",
-                                  color: isSelected ? colors.primary : "#64748b",
-                                }}
+                            </div>
+                          )}
+
+                          {/* Background effect */}
+                          {isSelected && (
+                            <div
+                              className="absolute inset-0 rounded-2xl opacity-5"
+                              style={{
+                                background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                              }}
+                            />
+                          )}
+
+                          {/* Icon container */}
+                          <div
+                            className="relative z-10 p-3 rounded-xl mr-4 shadow-md transition-all duration-200"
+                            style={{
+                              backgroundColor: isSelected
+                                ? `${colors.primary}20`
+                                : "#f8fafc",
+                              color: isSelected ? colors.primary : "#64748b",
+                            }}
+                          >
+                            <IconComponent size={20} strokeWidth={2} />
+                          </div>
+
+                          {/* Content */}
+                          <div className="relative z-10 flex-1">
+                            <h5
+                              className="font-bold text-lg mb-2 transition-colors duration-200"
+                              style={{
+                                color: isSelected ? colors.dark : "#374151",
+                              }}
+                            >
+                              {permission.name}
+                            </h5>
+                            <p
+                              className={`text-sm leading-relaxed transition-colors duration-200 ${
+                                isSelected ? "text-gray-700" : "text-gray-500"
+                              }`}
+                            >
+                              {permission.description}
+                            </p>
+                          </div>
+
+                          {/* Selection Indicator */}
+                          {isSelected && (
+                            <div
+                              className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+                              style={{
+                                backgroundColor: colors.primary,
+                                color: "white",
+                              }}
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               >
-                                <IconComponent size={20} strokeWidth={2} />
-                              </div>
-    
-                              {/* Content */}
-                              <div className="relative z-10 flex-1">
-                                <h5
-                                  className="font-bold text-lg mb-2 transition-colors duration-200"
-                                  style={{
-                                    color: isSelected ? colors.dark : "#374151",
-                                  }}
-                                >
-                                  {permission.name}
-                                </h5>
-                                <p className={`text-sm leading-relaxed transition-colors duration-200 ${
-                                  isSelected ? "text-gray-700" : "text-gray-500"
-                                }`}>
-                                  {permission.description}
-                                </p>
-                              </div>
-    
-                              {/* Selection Indicator */}
-                              {isSelected && (
-                                <div
-                                  className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
-                                  style={{
-                                    backgroundColor: colors.primary,
-                                    color: "white",
-                                  }}
-                                >
-                                  <svg
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="3"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <path d="M20 6L9 17l-5-5" />
-                                  </svg>
-                                </div>
-                              )}
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-                    </div>
+                                <path d="M20 6L9 17l-5-5" />
+                              </svg>
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </div>
-    
-                {/* Footer - Fixed position */}
-                <div className="px-4 sm:px-8 py-4 sm:py-6 bg-gradient-to-r from-slate-50 via-blue-50 to-indigo-50 border-t border-slate-200 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center">
-                  <div className="flex items-center gap-4 order-2 sm:order-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <div className="w-2 h-2 rounded-full bg-violet-400"></div>
-                      <span className="font-medium">
-                        {formData.permissions.length} quyền hạn đã chọn</span>
-                    </div>
-                  </div>
-    
-                  {/* Action buttons */}
-                  <div className="flex gap-3 sm:gap-4 w-full sm:w-auto order-1 sm:order-2">
-                    <button
-                      onClick={onClose}
-                      className="flex-1 sm:flex-none px-6 sm:px-8 py-2.5 sm:py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold shadow-md hover:bg-gray-50 hover:border-gray-300 transition-all"
-                    >
-                      Hủy bỏ
-                    </button>
-                    <button
-                      onClick={handleSubmit}
-                      className="flex-1 sm:flex-none px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 hover:from-blue-600 hover:to-indigo-700 transition-all"
-                    >
-                      {isEditing ? <Save size={18} /> : <PlusCircle size={18} />}
-                      <span>{isEditing ? "Cập nhật" : "Thêm mới"}</span>
-                    </button>
-                  </div>
+              </div>
+            </div>
+
+            {/* Footer - Fixed position */}
+            <div className="px-4 sm:px-8 py-4 sm:py-6 bg-gradient-to-r from-slate-50 via-blue-50 to-indigo-50 border-t border-slate-200 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-center">
+              <div className="flex items-center gap-4 order-2 sm:order-1">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="w-2 h-2 rounded-full bg-violet-400"></div>
+                  <span className="font-medium">
+                    {formData.permissions.length} quyền hạn đã chọn
+                  </span>
                 </div>
-    
-                {/* SwipeConfirmationModal */}
-                <SwipeConfirmationModal
-                  isOpen={confirmModal.isOpen}
-                  onClose={closeConfirmModal}
-                  onConfirm={confirmModal.onConfirm}
-                  title={confirmModal.title}
-                  description={confirmModal.description}
-                  type={confirmModal.type}
-                  confirmDetails={confirmModal.confirmDetails}
-                  isProcessing={confirmModal.isProcessing}
-                />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      );
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 sm:gap-4 w-full sm:w-auto order-1 sm:order-2">
+                <button
+                  onClick={onClose}
+                  className="flex-1 sm:flex-none px-6 sm:px-8 py-2.5 sm:py-3 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold shadow-md hover:bg-gray-50 hover:border-gray-300 transition-all"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 sm:flex-none px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 hover:from-blue-600 hover:to-indigo-700 transition-all"
+                >
+                  {isEditing ? <Save size={18} /> : <PlusCircle size={18} />}
+                  <span>{isEditing ? "Cập nhật" : "Thêm mới"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* SwipeConfirmationModal */}
+            <SwipeConfirmationModal
+              isOpen={confirmModal.isOpen}
+              onClose={closeConfirmModal}
+              onConfirm={confirmModal.onConfirm}
+              title={confirmModal.title}
+              description={confirmModal.description}
+              type={confirmModal.type}
+              confirmDetails={confirmModal.confirmDetails}
+              isProcessing={confirmModal.isProcessing}
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
     };
     
     export default RoleFormModal;

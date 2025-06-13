@@ -87,7 +87,7 @@ const ReportDetail = ({ report, formatCurrency }) => {
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-        className="bg-gradient-to-br from-indigo-50/80 to-white rounded-3xl shadow-[0_4px_30px_rgba(99,102,241,0.10)] p-8 border border-indigo-100"
+        className="bg-gradient-to-br from-indigo-50/80 to-white rounded-3xl shadow-[0_4px_30px_rgba(99,102,241,0.10)] p-4 sm:p-8 border border-indigo-100"
       >
         <h2 className="text-2xl font-bold text-gray-800 mb-7 flex items-center">
           <TrendingUp size={22} className="text-indigo-500 mr-2" />

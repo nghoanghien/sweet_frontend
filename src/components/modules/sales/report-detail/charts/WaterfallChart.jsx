@@ -97,7 +97,7 @@ const WaterfallChart = ({ data, formatCurrency }) => {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <div className="mt-4 grid grid-cols-3 gap-3">
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="bg-green-50 rounded-xl p-3">
           <p className="text-xs text-gray-500">Tổng thu</p>
           <p className="text-sm font-medium text-green-700">{formatCurrency(data?.totalIncome || 0)}</p>

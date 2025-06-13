@@ -2141,7 +2141,7 @@ export default function CustomerManagement() {
                       className="relative group mt-6"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-cyan-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                      <div className="relative bg-white/90 border border-cyan-200/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500">
+                      <div className="relative bg-white/90 border border-cyan-200/50 rounded-3xl px-4 py-6 md:p-8 shadow-lg hover:shadow-xl transition-all duration-500">
                         {/* Nhóm: Thông tin có thể chỉnh sửa */}
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
@@ -2212,7 +2212,7 @@ export default function CustomerManagement() {
                         >
                           <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-200/20 to-cyan-200/20 rounded-2xl blur-sm"></div>
-                            <div className="relative bg-white/70 border border-blue-200/40 rounded-2xl p-6">
+                            <div className="relative bg-white/70 border border-blue-200/40 rounded-2xl p-4 md:p-6">
                               <div className="flex flex-col md:flex-row justify-between items-center mb-6">
                                 <div className="flex text-left items-center gap-3">
                                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-md">
@@ -2322,7 +2322,7 @@ export default function CustomerManagement() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={saveCustomerChanges}
-                              className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
+                              className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
                             >
                               <Save size={16} className="mr-2" />
                               Lưu thay đổi
@@ -2633,7 +2633,7 @@ export default function CustomerManagement() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={toggleAddCustomerModal}
-                      className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-all duration-300"
+                      className="px-4 md:px-6 py-3 bg-gray-300 font-semibold text-gray-600 rounded-xl hover:bg-gray-400 transition-all duration-300"
                     >
                       Hủy bỏ
                     </motion.button>
@@ -2642,7 +2642,7 @@ export default function CustomerManagement() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={addNewCustomer}
-                      className="px-6 py-3 font-medium bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
+                      className="px-4 md:px-6 py-3 font-medium bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
                     >
                       <Plus size={16} className="mr-2 font-medium" />
                       Thêm khách hàng

@@ -143,7 +143,7 @@ const PermissionManagement = () => {
   };
 
   return (
-    <div className="container mx-auto md:pl-2 p-3 md:p-6 max-w-7xl">
+    <div className="container mx-auto md:pl-2 p-0 md:p-6 max-w-7xl">
       {/* Header */}
       <PermissionHeader 
         currentUser={currentUser}
@@ -164,7 +164,7 @@ const PermissionManagement = () => {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeTab}
-          className="bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-2 sm:p-8 border border-gray-100"
+          className="bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] p-6 sm:p-8 border border-gray-100"
           initial={{ opacity: 0, y: 30, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -30, scale: 0.98 }}

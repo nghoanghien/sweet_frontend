@@ -23,7 +23,7 @@ const SavingsTypeToggle = ({
               key={type.id}
               onClick={() => onToggle(type.id)}
               className={`
-                relative px-7 py-3 rounded-xl text-base font-semibold tracking-wide
+                relative px-3 md:px-7 py-3 rounded-xl text-base font-semibold tracking-wide
                 transition-all duration-200
                 ${isActive 
                   ? 'text-white z-10' 
@@ -47,7 +47,7 @@ const SavingsTypeToggle = ({
                     animate={isActive ? { x: -2, scale: 1.15 } : { x: 0, scale: 1 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <ArrowLeft size={18} />
+                    <ArrowLeft class="hidden sm:flex" size={18} />
                   </motion.span>
                 )}
                 {type.name}
@@ -56,7 +56,7 @@ const SavingsTypeToggle = ({
                     animate={isActive ? { x: 2, scale: 1.15 } : { x: 0, scale: 1 }}
                     transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <ArrowRight size={18} />
+                    <ArrowRight class="hidden sm:flex" size={18} />
                   </motion.span>
                 )}
               </span>

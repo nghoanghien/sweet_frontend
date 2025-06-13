@@ -308,7 +308,7 @@ const SystemSettings = () => {
               whileHover={{ scale: 1.06, boxShadow: '0 0 12px rgba(0,0,0,0.08)' }}
               whileTap={{ scale: 0.96 }}
               onClick={handleCancel}
-              className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl shadow-sm hover:bg-gray-200 font-semibold tracking-wide"
+              className="px-4 md:px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl shadow-sm hover:bg-gray-200 font-semibold tracking-wide"
             >
               Hủy
             </motion.button>
@@ -316,7 +316,7 @@ const SystemSettings = () => {
               whileHover={{ scale: 1.08, boxShadow: '0 0 16px rgba(0,170,255,0.18)' }}
               whileTap={{ scale: 0.96 }}
               onClick={handleSave}
-              className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
+              className="px-4 md:px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
             >
               <motion.span
                 whileHover={{ rotate: -10 }}
