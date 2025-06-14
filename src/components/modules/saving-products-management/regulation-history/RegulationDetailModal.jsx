@@ -129,7 +129,7 @@ const RegulationDetailModal = ({
                       e.stopPropagation();
                       onCancel();
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl shadow-[0_4px_20px_rgba(239,68,68,0.13)] font-semibold tracking-wide flex items-center gap-2"
+                    className="px-4 py-2 bg-white/50 text-gray-600 rounded-xl shadow-[0_4px_20px_rgba(239,68,68,0.13)] font-semibold tracking-wide flex items-center gap-2"
                   >
                     <Ban size={18} />
                     <span className='hidden sm:flex'>Hủy quy định</span>

@@ -565,7 +565,7 @@ const AccountManagement = () => {
         <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-100">
                 <tr>
                   <th
                     scope="col"
