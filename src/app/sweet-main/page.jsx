@@ -1801,7 +1801,7 @@ export default function Dashboard() {
   }, [savingsData]);
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
       {/* Inject custom scrollbar styles */}
       <style jsx global>
         {scrollbarStyles}
@@ -1861,14 +1861,15 @@ export default function Dashboard() {
         />
       )}
 
-      <div className="fixed top-0 left-0 right-0">
-        {/* Header */}
-        <ModernHeader activeSection={activeSection} />
-      </div>
+<div className="flex w-full justify-center">
+  {/* Header */}
+  <ModernHeader activeSection={activeSection} />
+</div>
+
 
       {/* Main content area */}
       <div
-        className={`flex-1 transition-all duration-300 ease-in-out mt-14 ${
+        className={`flex-1 transition-all duration-300 ease-in-out mt-0 ${
           !isMobile && navHovered ? "ml-28" : !isMobile ? "ml-28" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
