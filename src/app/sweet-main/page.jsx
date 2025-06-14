@@ -949,15 +949,12 @@ export default function Dashboard() {
     // Đóng thẻ chi tiết trước, sau đó mới đóng drawer
     setCardDetailVisible(false);
 
-    setTimeout(() => {
       setDrawerVisible(false);
 
-      // Reset các state sau khi animation hoàn tất
-      setTimeout(() => {
+    
         setSelectedAccountId(null);
         setSelectedCardDetail(null);
-      }, 300);
-    }, 200);
+  
   };
 
   // Simplified version
@@ -1906,10 +1903,22 @@ export default function Dashboard() {
 
               {/* Payment accounts grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
+                <AnimatePresence>
                 {paymentAccounts.map((account) => (
-                  <div
+                  <motion.div
                     key={account.id}
-                    className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
+                    layoutId={`payment-account-card-${account.id}`}
+                    className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg overflow-hidden account-card group"
+                    onClick={() => openTransactionDrawer(account.id)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    transition={{ 
+                      layout: { 
+                        type: "spring", 
+                        damping: 17, 
+                        stiffness: 100, 
+                      } 
+                    }}
                   >
                     <div
                       className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
@@ -1942,7 +1951,10 @@ export default function Dashboard() {
                         <div className="flex items-center space-x-1">
                           {/* Eye toggle button */}
                           <button
-                            onClick={() => toggleAccountVisibility(account.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleAccountVisibility(account.id);
+                            }}
                             className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
                             aria-label={
                               hiddenAccountInfo[account.id]
@@ -1961,12 +1973,10 @@ export default function Dashboard() {
                           {account.status !== "permanent_locked" && (
                             <div className="relative">
                               <button
-                                onClick={() =>
-                                  toggleAccountStatus(
-                                    account.id,
-                                    account.status
-                                  )
-                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleAccountStatus(account.id, account.status)                                
+                                }}
                                 className="relative rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110 lock-button"
                                 aria-label={
                                   account.status === "active"
@@ -2047,8 +2057,9 @@ export default function Dashboard() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
+                </AnimatePresence>
               </div>
               </motion.div>
             ) : activeSection === "deposits" ? (
@@ -2187,19 +2198,24 @@ export default function Dashboard() {
                     <motion.div
                       key={account.id}
                       layoutId={`savings-card-${account.id}`}
-                      className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group cursor-pointer"
+                      className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg overflow-hidden account-card group cursor-pointer"
                       onClick={() => openSavingsDetailDrawer(account.id)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{
                         type: "spring",
                         stiffness: 100,
-                        damping: 15,
+                        damping: 17,
                       }}
                     >
                       <motion.div
                         layoutId={`savings-header-${account.id}`}
                         className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                        transition={{
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 17,
+                      }}
                       >
                         {/* Hiệu ứng hover */}
                         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -2952,9 +2968,6 @@ export default function Dashboard() {
         }
 
         /* Account card hover effects */
-        .account-card {
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
 
         .account-card:hover {
           transform: translateY(-5px);
@@ -3278,23 +3291,27 @@ export default function Dashboard() {
 
       {/* Chi tiết thẻ tài khoản ở giữa màn hình */}
       <div
-        className={`fixed inset-0 z-[60] pointer-events-none hidden md:flex items-center justify-center transition-opacity duration-300 ${
-          cardDetailVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`fixed inset-0 z-[60] pointer-events-none hidden md:flex items-center justify-center`}
       >
         <div
-          className={`w-full max-w-3xl transition-all duration-500 transform ${
-            cardDetailVisible
-              ? "translate-y-0 scale-100"
-              : "translate-y-8 scale-95"
-          } ${drawerVisible ? "mr-[500px] sm:mr-96" : "mr-0"}`}
+          className={`w-full max-w-3xl mr-[400px]`}
           style={{
-            transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
             pointerEvents: cardDetailVisible ? "auto" : "none",
           }}
         >
+          <AnimatePresence>
           {selectedCardDetail && (
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden card-detail-animate mx-4">
+            <motion.div 
+              layoutId={`payment-account-card-${selectedCardDetail.id}`}
+              className="bg-white rounded-3xl shadow-2xl overflow-hidden mx-4"
+              transition={{ 
+                layout: { 
+                  type: "spring", 
+                  damping: 20, 
+                  stiffness: 200, 
+                } 
+              }}
+            >
               {/* Header với màu gradient của tài khoản */}
               <div
                 className={`p-6 ${selectedCardDetail.color} relative overflow-hidden`}
@@ -3431,8 +3448,9 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
 
