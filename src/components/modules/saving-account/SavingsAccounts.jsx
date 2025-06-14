@@ -803,9 +803,11 @@ const SavingsAccounts = ({ customerId }) => {
           }`}
         >
           {filteredAccounts.map((account) => (
-            <div
+            <motion.div
               key={account.id}
-              className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
+              layoutId={`savings-account-card-${account.id}`}
+              transition={{ duration: 0.2, type: "spring", stiffness: 100, damping: 15 }}
+              className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg overflow-hidden account-card group"
             >
               <div
                 className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
@@ -923,7 +925,7 @@ const SavingsAccounts = ({ customerId }) => {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -1013,13 +1015,12 @@ const SavingsAccounts = ({ customerId }) => {
         </div>
       </div>
 
-      
-            <NewSavingsAccountModal
-              isOpen={isNewAccountModalOpen}
-              onClose={() => setIsNewAccountModalOpen(false)}
-              onCreateAccount={prepareNewAccount}
-              isAdmin={true}
-            />
+      <NewSavingsAccountModal
+        isOpen={isNewAccountModalOpen}
+        onClose={() => setIsNewAccountModalOpen(false)}
+        onCreateAccount={prepareNewAccount}
+        isAdmin={true}
+      />
 
       {/* Drawer chi tiết tài khoản */}
       <SavingsAccountDetailDrawer

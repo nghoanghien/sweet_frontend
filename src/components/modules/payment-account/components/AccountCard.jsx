@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, EyeOff, Lock as LockIcon, Unlock as UnlockIcon, Calendar, ChevronRight, CreditCard } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { getStatusInfo, maskAccountNumber, formatCurrency } from '@/utils/accountUtils';
 
 const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDetail }) => {
@@ -21,9 +22,12 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
   };
 
   return (
-    <div 
+    <AnimatePresence mode='wait'>
+      <motion.div 
       ref={cardRef} 
+      layoutId={`payment-account-card-${account.id}`}
       className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
+      transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
     >
       <div className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}>
         {/* Hiệu ứng hover */}
@@ -148,7 +152,8 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
           transform: translateY(0);
         }
       `}</style>
-    </div>
+    </motion.div>
+    </AnimatePresence>
   );
 };
 

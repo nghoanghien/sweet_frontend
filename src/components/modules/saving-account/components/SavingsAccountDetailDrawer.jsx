@@ -535,7 +535,7 @@ const SavingsAccountDetailDrawer = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] flex items-center justify-center"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60] flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -605,24 +605,19 @@ const SavingsAccountDetailDrawer = ({
 
           {/* Account Detail Card */}
           <div
-            className={`hidden sm:flex fixed inset-0 z-[60] pointer-events-none flex items-center justify-center transition-opacity duration-300 ${
-              cardDetailVisible ? "opacity-100" : "opacity-0"
-            }`}
+            className={`hidden sm:flex fixed inset-0 z-[60] pointer-events-none flex items-center justify-center`}
           >
             <div
-              className={`w-full max-w-3xl transition-all duration-500 transform ${
-                cardDetailVisible
-                  ? "translate-y-0 scale-100"
-                  : "translate-y-8 scale-95"
-              } ${drawerVisible ? "mr-[500px] sm:mr-96" : "mr-0"}`}
+              className={`w-full max-w-3xl mr-[400px]`}
               style={{
-                transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
                 pointerEvents: cardDetailVisible ? "auto" : "none",
               }}
             >
-              <div
-                className="bg-white rounded-3xl shadow-2xl overflow-hidden card-detail-animate mx-4"
+              <motion.div
+                layoutId={`savings-account-card-${account.id}`}
+                className="bg-white rounded-3xl shadow-2xl overflow-hidden mx-4"
                 onClick={(e) => e.stopPropagation()}
+                transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
               >
                 {/* Header */}
                 <div
@@ -751,7 +746,7 @@ const SavingsAccountDetailDrawer = ({
                     </motion.button>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
 

@@ -296,25 +296,26 @@ const AccountDetailDrawer = ({
         >
           {/* Account Detail Card */}
           <div
-            className={`fixed inset-0 z-[60] pointer-events-none flex items-center justify-center transition-opacity duration-300 delay-500 ${
-              cardDetailVisible ? "opacity-100" : "opacity-0"
-            }`}
+            className={`fixed inset-0 z-[60] pointer-events-none flex items-center justify-center`}
           >
             <div
-              className={`hidden md:block w-full max-w-3xl transition-all duration-500 transform ${
-                cardDetailVisible
-                  ? "translate-y-0 scale-100"
-                  : "translate-y-8 scale-95"
-              } ${drawerVisible ? "mr-[500px] sm:mr-96" : "mr-0"}`}
+              className={`hidden md:block w-full max-w-3xl transition-all duration-500 transform mr-[400px]`}
               style={{
-                transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
                 pointerEvents: cardDetailVisible ? "auto" : "none",
               }}
             >
               {account && (
-                <div
-                  className="bg-white rounded-3xl shadow-2xl overflow-hidden card-detail-animate mx-4"
+                <motion.div
+                  layoutId={`payment-account-card-${account.id}`}
+                  className="bg-white rounded-3xl shadow-2xl overflow-hidden mx-4"
                   onClick={(e) => e.stopPropagation()}
+                  transition={{ 
+                    layout: { 
+                      type: "spring", 
+                      damping: 16, 
+                      stiffness: 100, 
+                    } 
+                  }}
                 >
                   {/* Header với màu gradient của tài khoản */}
                   <div
@@ -551,7 +552,7 @@ const AccountDetailDrawer = ({
                       </motion.button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
