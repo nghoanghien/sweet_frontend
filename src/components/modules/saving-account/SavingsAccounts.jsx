@@ -806,7 +806,15 @@ const SavingsAccounts = ({ customerId }) => {
             <motion.div
               key={account.id}
               layoutId={`savings-account-card-${account.id}`}
-              transition={{ duration: 0.2, type: "spring", stiffness: 100, damping: 15 }}
+              transition={{
+                duration: 0.2,
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => openSavingsDetailDrawer(account.id)}
               className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg overflow-hidden account-card group"
             >
               <div
@@ -834,7 +842,10 @@ const SavingsAccounts = ({ customerId }) => {
                   <div className="flex items-center space-x-1">
                     {/* Eye toggle button */}
                     <button
-                      onClick={() => toggleHideAccountInfo(account.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleHideAccountInfo(account.id);
+                      }}
                       className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
                       aria-label={
                         hiddenAccounts[account.id]
@@ -930,89 +941,110 @@ const SavingsAccounts = ({ customerId }) => {
         </div>
 
         {/* List view */}
-        <div
-          className={`space-y-4 mb-6 ${viewMode !== "list" ? "hidden" : ""}`}
-        >
-          {filteredAccounts.map((account) => (
-            <div
-              key={account.id}
-              className="bg-sky-50 border border-sky-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                {/* Left colored section */}
-                <div
-                  className={`${account.color} p-4 sm:w-64 flex items-center space-x-3 relative overflow-hidden`}
+        <AnimatePresence>
+          {viewMode === "list" && (
+            <div className={`space-y-4 mb-6`}>
+              {filteredAccounts.map((account) => (
+                <motion.div
+                  key={account.id}
+                  layoutId={`savings-account-card-${account.id}`}
+                  transition={{
+                    duration: 0.2,
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 15,
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => openSavingsDetailDrawer(account.id)}
+                  className="bg-sky-50 border border-sky-100 rounded-xl shadow-sm hover:shadow-md overflow-hidden group"
                 >
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
+                  <div className="flex flex-col sm:flex-row sm:items-center">
+                    {/* Left colored section */}
+                    <div
+                      className={`${account.color} p-4 sm:w-64 flex items-center space-x-3 relative overflow-hidden`}
+                    >
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
 
-                  <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                    <PiggyBank size={24} className="text-white" />
-                  </div>
-                  <div className="text-white">
-                    <h3 className="font-medium text-sm">{account.nickname}</h3>
-                    <p className="text-xs text-white/80 font-mono tracking-wide">
-                      {account.depositNumber}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Right content section */}
-                <div className="p-4 flex-grow">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    {/* Account details */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">Kỳ hạn</p>
-                        <p className="text-sm font-medium text-slate-800">
-                          {account.term}
-                        </p>
+                      <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                        <PiggyBank size={24} className="text-white" />
                       </div>
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">
-                          Số tiền gửi
-                        </p>
-                        <p className="text-sm font-medium text-slate-800">
-                          {hiddenAccounts[account.id] ? (
-                            <span className="text-slate-400">••••••••</span>
-                          ) : (
-                            formatCurrency(account.amount)
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-500 mb-1">Đáo hạn</p>
-                        <p className="text-sm font-medium text-slate-800">
-                          {account.endDate}
+                      <div className="text-white">
+                        <h3 className="font-medium text-sm">
+                          {account.nickname}
+                        </h3>
+                        <p className="text-xs text-white/80 font-mono tracking-wide">
+                          {account.depositNumber}
                         </p>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => toggleHideAccountInfo(account.id)}
-                        className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-all"
-                      >
-                        {hiddenAccounts[account.id] ? (
-                          <Eye size={16} className="text-slate-600" />
-                        ) : (
-                          <EyeOff size={16} className="text-slate-600" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => openSavingsDetailDrawer(account.id)}
-                        className={`${account.color} text-white text-xs font-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300`}
-                      >
-                        Chi tiết
-                      </button>
+                    {/* Right content section */}
+                    <div className="p-4 flex-grow">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        {/* Account details */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Kỳ hạn
+                            </p>
+                            <p className="text-sm font-medium text-slate-800">
+                              {account.term}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Số tiền gửi
+                            </p>
+                            <p className="text-sm font-medium text-slate-800">
+                              {hiddenAccounts[account.id] ? (
+                                <span className="text-slate-400">••••••••</span>
+                              ) : (
+                                formatCurrency(account.amount)
+                              )}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Đáo hạn
+                            </p>
+                            <p className="text-sm font-medium text-slate-800">
+                              {account.endDate}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleHideAccountInfo(account.id);
+                            }}
+                            className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-all"
+                          >
+                            {hiddenAccounts[account.id] ? (
+                              <Eye size={16} className="text-slate-600" />
+                            ) : (
+                              <EyeOff size={16} className="text-slate-600" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => openSavingsDetailDrawer(account.id)}
+                            className={`${account.color} text-white text-xs font-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300`}
+                          >
+                            Chi tiết
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </AnimatePresence>
       </div>
 
       <NewSavingsAccountModal

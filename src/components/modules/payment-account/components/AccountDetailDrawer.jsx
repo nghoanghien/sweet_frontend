@@ -299,7 +299,7 @@ const AccountDetailDrawer = ({
             className={`fixed inset-0 z-[60] pointer-events-none flex items-center justify-center`}
           >
             <div
-              className={`hidden md:block w-full max-w-3xl transition-all duration-500 transform mr-[400px]`}
+              className={`hidden md:block w-full max-w-3xl transform mr-[400px]`}
               style={{
                 pointerEvents: cardDetailVisible ? "auto" : "none",
               }}
@@ -312,8 +312,8 @@ const AccountDetailDrawer = ({
                   transition={{ 
                     layout: { 
                       type: "spring", 
-                      damping: 16, 
-                      stiffness: 100, 
+                      damping: 20, 
+                      stiffness: 200, 
                     } 
                   }}
                 >

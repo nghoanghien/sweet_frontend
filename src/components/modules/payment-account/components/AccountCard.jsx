@@ -26,8 +26,11 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
       <motion.div 
       ref={cardRef} 
       layoutId={`payment-account-card-${account.id}`}
-      className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden account-card group"
+      className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg overflow-hidden account-card group"
       transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onViewDetail}
     >
       <div className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}>
         {/* Hiệu ứng hover */}
@@ -52,7 +55,10 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
           <div className="flex items-center space-x-1">
             {/* Eye toggle button */}
             <button 
-              onClick={() => onToggleHide(account.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleHide(account.id);
+              }}
               className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
               aria-label={isHidden ? "Hiển thị thông tin" : "Ẩn thông tin"}
             >
@@ -66,7 +72,10 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
             {account.status !== "permanent_locked" && (
               <div className="relative">
                 <button 
-                  onClick={handleLockToggle}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLockToggle();
+                  }}
                   className="relative rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110 lock-button"
                   aria-label={account.status === "active" ? "Tạm khóa tài khoản" : "Mở khóa tài khoản"}
                 >
