@@ -174,7 +174,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
             
             {/* Content */}
             <motion.div 
-              className="p-8 overflow-y-auto"
+              className="p-6 md:p-8 overflow-y-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
@@ -188,7 +188,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
               >
                 <div className="flex items-start gap-6">
                   <motion.div
-                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account.id)} flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
+                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account.id)} hidden md:flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -199,12 +199,12 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                       animate={{ x: '100%' }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     />
-                    <span className="relative z-10">{getInitials(account.name)}</span>
+                    <span className="relative  z-10">{getInitials(account.name)}</span>
                   </motion.div>
                   
                   <div className="flex-1">
                     <motion.h4 
-                      className="text-2xl font-bold text-gray-800 mb-2"
+                      className="text-xl text-center md:text-left md:text-2xl font-bold text-gray-800 mb-2"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4, duration: 0.3 }}
@@ -252,7 +252,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                     
                     <div className="flex items-center gap-3">
                       <motion.span 
-                        className={`px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-md ${
+                        className={`px-4 py-2 rounded-2xl text-sm font-semibold md:font-bold flex items-center gap-2 shadow-md ${
                           account.type === 'customer' 
                             ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
                             : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
@@ -274,7 +274,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                       </motion.span>
                       
                       <motion.span 
-                        className={`px-4 py-2 rounded-2xl text-sm font-bold flex items-center gap-2 shadow-md ${
+                        className={`px-4 py-2 rounded-2xl text-sm font-semibold md:font-bold flex items-center gap-2 shadow-md ${
                           account.disabled
                             ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
                             : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
@@ -311,7 +311,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                   Vai trò
                 </h5>
                 <motion.div 
-                  className={`p-6 rounded-2xl font-bold text-lg shadow-lg border-2 relative overflow-hidden ${
+                  className={`p-4 md:p-6 rounded-2xl font-bold text-lg shadow-lg border-2 relative overflow-hidden ${
                     account.type === 'customer' 
                       ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 text-blue-700' 
                       : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200 text-indigo-700'
