@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone, Crown, Star, Eye } from 'lucide-react';
+import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone, Crown, Star, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 
 const AccountDetailModal = ({ isOpen, onClose, account }) => {
+  const [expandedPermissions, setExpandedPermissions] = useState({});
+
   if (!isOpen || !account) return null;
 
   // Mock data cho chi tiết quyền hạn của vai trò
@@ -50,8 +52,11 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
       .substring(0, 2);
   };
 
-  // Hàm chọn màu nền cho avatar dựa trên ID
-  const getAvatarColor = (id) => {
+  // Hàm chọn màu nền cho avatar dựa trên ID và trạng thái
+  const getAvatarColor = (id, disabled) => {
+    if (disabled) {
+      return 'from-gray-400 to-gray-600';
+    }
     const colors = [
       'from-blue-500 to-indigo-600',
       'from-indigo-500 to-purple-600',
@@ -64,6 +69,14 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
     ];
     const index = parseInt(id.replace(/[^0-9]/g, '')) % colors.length;
     return colors[index];
+  };
+
+  // Toggle expanded state for permissions
+  const togglePermission = (permissionId) => {
+    setExpandedPermissions(prev => ({
+      ...prev,
+      [permissionId]: !prev[permissionId]
+    }));
   };
 
   return (
@@ -113,6 +126,42 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
               border: '1px solid rgba(255,255,255,0.2)'
             }}
           >
+            {/* Role Badge - Top Right Corner */}
+            <motion.div 
+              className="absolute top-6 right-6 z-20"
+              initial={{ opacity: 0, scale: 0.8, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.4, type: "spring" }}
+            >
+              <motion.div 
+                className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 text-white px-5 py-3 rounded-2xl font-bold text-lg shadow-xl border-2 border-yellow-300 relative overflow-hidden"
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -2,
+                  boxShadow: '0 12px 40px rgba(251, 191, 36, 0.4)'
+                }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Shimmer effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '100%' }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                />
+                
+                <div className="flex items-center gap-2 relative z-10">
+                  <motion.div
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <Crown size={22} className="text-white drop-shadow-lg" />
+                  </motion.div>
+                  <span className="drop-shadow-lg">{account.role.name}</span>
+                </div>
+              </motion.div>
+            </motion.div>
+
             {/* Decorative corner elements */}
             <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
               <div className="absolute top-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full"></div>
@@ -188,7 +237,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
               >
                 <div className="flex items-start gap-6">
                   <motion.div
-                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account.id)} hidden md:flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
+                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account.id, account.disabled)} hidden md:flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -199,7 +248,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                       animate={{ x: '100%' }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     />
-                    <span className="relative  z-10">{getInitials(account.name)}</span>
+                    <span className="relative z-10">{getInitials(account.name)}</span>
                   </motion.div>
                   
                   <div className="flex-1">
@@ -299,42 +348,6 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                 </div>
               </motion.div>
               
-              {/* Role info */}
-              <motion.div 
-                className="mb-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.3 }}
-              >
-                <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Crown size={20} className="text-blue-600" />
-                  Vai trò
-                </h5>
-                <motion.div 
-                  className={`p-4 md:p-6 rounded-2xl font-bold text-lg shadow-lg border-2 relative overflow-hidden ${
-                    account.type === 'customer' 
-                      ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200 text-blue-700' 
-                      : 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200 text-indigo-700'
-                  }`}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {/* Decorative background */}
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-white/30 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
-                  
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className={`p-3 rounded-xl shadow-md ${
-                      account.type === 'customer'
-                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                    }`}>
-                      <UserCheck size={20} />
-                    </div>
-                    <span>{account.role.name}</span>
-                  </div>
-                </motion.div>
-              </motion.div>
-              
               {/* Permissions */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -342,7 +355,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                 transition={{ delay: 0.5, duration: 0.3 }}
               >
                 <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Shield size={20} className="text-blue-600" />
+                  <Shield size={20} className={account.disabled ? "text-gray-400" : "text-blue-600"} />
                   Quyền hạn ({permissions.length})
                 </h5>
                 
@@ -351,69 +364,123 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                     {permissions.map((permission, idx) => (
                       <motion.div
                         key={permission.id}
-                        className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 rounded-2xl p-6 border border-blue-100 shadow-lg relative overflow-hidden group"
+                        className={`rounded-2xl p-6 border shadow-lg relative overflow-hidden group cursor-pointer ${
+                          account.disabled 
+                            ? 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border-gray-200'
+                            : 'bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 border-blue-100'
+                        }`}
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ delay: 0.6 + idx * 0.1, duration: 0.4 }}
                         whileHover={{ 
                           scale: 1.02, 
                           y: -4,
-                          boxShadow: '0 12px 40px rgba(59, 130, 246, 0.15)'
+                          boxShadow: account.disabled 
+                            ? '0 12px 40px rgba(156, 163, 175, 0.15)'
+                            : '0 12px 40px rgba(59, 130, 246, 0.15)'
                         }}
+                        onClick={() => togglePermission(permission.id)}
                       >
                         {/* Animated background gradient */}
                         <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                            account.disabled
+                              ? 'bg-gradient-to-r from-gray-500/5 via-gray-400/5 to-gray-500/5'
+                              : 'bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5'
+                          }`}
                           initial={{ x: '-100%' }}
                           whileHover={{ x: '100%' }}
                           transition={{ duration: 1.5 }}
                         />
                         
                         <div className="relative z-10">
-                          <div className="flex items-center mb-4">
-                            <motion.div 
-                              className={`p-3 rounded-xl shadow-md mr-4 ${
-                                account.type === 'customer' 
-                                  ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
-                                  : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                              }`}
-                              whileHover={{ rotate: 360 }}
-                              transition={{ duration: 0.6 }}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center">
+                              <motion.div 
+                                className={`p-3 rounded-xl shadow-md mr-4 ${
+                                  account.disabled
+                                    ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
+                                    : account.type === 'customer' 
+                                      ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                                      : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                                }`}
+                                whileHover={{ rotate: 360 }}
+                                transition={{ duration: 0.6 }}
+                              >
+                                <Shield size={18} />
+                              </motion.div>
+                              <h6 className={`font-bold text-lg ${account.disabled ? 'text-gray-500' : 'text-gray-800'}`}>
+                                {permission.name}
+                              </h6>
+                            </div>
+                            
+                            <motion.div
+                              animate={{ rotate: expandedPermissions[permission.id] ? 180 : 0 }}
+                              transition={{ duration: 0.3 }}
+                              className={account.disabled ? 'text-gray-400' : 'text-blue-500'}
                             >
-                              <Shield size={18} />
+                              <ChevronDown size={20} />
                             </motion.div>
-                            <h6 className="font-bold text-lg text-gray-800">{permission.name}</h6>
                           </div>
                           
-                          <div className="space-y-3">
-                            <p className="text-sm font-semibold text-gray-600 flex items-center gap-2">
-                              <Star size={14} className="text-yellow-500" />
-                              Chức năng được phép:
-                            </p>
-                            <div className="grid grid-cols-1 gap-2">
-                              {permission.functions.map((func, index) => (
-                                <motion.div 
-                                  key={index} 
-                                  className="text-sm text-gray-700 flex items-start bg-white/60 p-3 rounded-xl border border-gray-100"
-                                  initial={{ opacity: 0, x: -10 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: 0.7 + idx * 0.1 + index * 0.05, duration: 0.3 }}
-                                >
-                                  <motion.div 
-                                    className={`p-1 rounded-full mr-3 flex-shrink-0 ${
-                                      account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'
-                                    }`}
-                                    whileHover={{ scale: 1.2 }}
-                                  >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                  </motion.div>
-                                  <span className="font-medium">{func}</span>
-                                </motion.div>
-                              ))}
-                            </div>
-                          </div>
+                          <AnimatePresence>
+                            {expandedPermissions[permission.id] && (
+                              <motion.div 
+                                className="space-y-3"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                              >
+                                <p className={`text-sm font-semibold flex items-center gap-2 ${
+                                  account.disabled ? 'text-gray-500' : 'text-gray-600'
+                                }`}>
+                                  <Star size={14} className={account.disabled ? "text-gray-400" : "text-yellow-500"} />
+                                  Chức năng được phép:
+                                </p>
+                                <div className="grid grid-cols-1 gap-2">
+                                  {permission.functions.map((func, index) => (
+                                    <motion.div 
+                                      key={index} 
+                                      className={`text-sm flex items-start p-3 rounded-xl border ${
+                                        account.disabled 
+                                          ? 'text-gray-500 bg-gray-50 border-gray-200'
+                                          : 'text-gray-700 bg-white/60 border-gray-100'
+                                      }`}
+                                      initial={{ opacity: 0, x: -10 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                                    >
+                                      <motion.div 
+                                        className={`p-1 rounded-full mr-3 flex-shrink-0 ${
+                                          account.disabled 
+                                            ? 'text-gray-400' 
+                                            : account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'
+                                        }`}
+                                        whileHover={{ scale: 1.2 }}
+                                      >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                          <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                      </motion.div>
+                                      <span className="font-medium">{func}</span>
+                                    </motion.div>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                          
+                          {!expandedPermissions[permission.id] && (
+                            <motion.p 
+                              className={`text-sm ${account.disabled ? 'text-gray-400' : 'text-gray-500'}`}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.2 }}
+                            >
+                              Nhấn để xem {permission.functions.length} chức năng...
+                            </motion.p>
+                          )}
                         </div>
                       </motion.div>
                     ))}

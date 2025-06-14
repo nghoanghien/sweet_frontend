@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { User, UserCheck, Shield, Edit2, Lock, Eye, XCircle, Users } from 'lucide-react';
+import { User, UserCheck, Shield, Edit2, Lock, Eye, XCircle, Users, Unlock } from 'lucide-react';
 
 const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) => {
   // Hàm tạo avatar từ tên người dùng
@@ -14,7 +14,11 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
   };
 
   // Hàm chọn màu nền cho avatar dựa trên ID và loại tài khoản
-  const getAvatarColor = (id, type) => {
+  const getAvatarColor = (id, type, disabled = false) => {
+    if (disabled) {
+      return 'bg-gray-400';
+    }
+    
     if (type === 'customer') {
       const customerColors = [
         'bg-emerald-500',
@@ -37,19 +41,34 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
   };
 
   // Hàm chọn icon dựa trên loại tài khoản
-  const getAccountIcon = (accountType) => {
+  const getAccountIcon = (accountType, disabled = false) => {
+    const iconColor = disabled ? "text-gray-500" : 
+      accountType === 'customer' ? "text-emerald-600" : "text-violet-600";
+    
     switch (accountType) {
       case 'customer':
-        return <Users className="text-emerald-600" size={24} />;
+        return <Users className={iconColor} size={24} />;
       case 'staff':
-        return <UserCheck className="text-violet-600" size={24} />;
+        return <UserCheck className={iconColor} size={24} />;
       default:
         return <User className="text-gray-500" size={24} />;
     }
   };
 
-  // Hàm lấy style cho card dựa trên loại tài khoản
-  const getCardStyle = (accountType) => {
+  // Hàm lấy style cho card dựa trên loại tài khoản và trạng thái
+  const getCardStyle = (accountType, disabled = false) => {
+    if (disabled) {
+      return {
+        gradient: "from-gray-100 via-gray-50 to-white",
+        border: "border-gray-300",
+        iconBg: "bg-gray-200",
+        shadow: "shadow-[0_4px_25px_rgba(0,0,0,0.08)]",
+        hoverShadow: "0 8px 35px rgba(0,0,0,0.12)",
+        roleBg: "bg-gray-100",
+        roleText: "text-gray-600"
+      };
+    }
+    
     if (accountType === 'customer') {
       return {
         gradient: "from-emerald-50/90 via-teal-50/50 to-white",
@@ -73,15 +92,15 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
     }
   };
 
-  const cardStyle = getCardStyle(account.type);
+  const cardStyle = getCardStyle(account.type, account.disabled);
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        className={`bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} px-4 p-6 border-2 ${cardStyle.border} relative`}
+        className={`relative bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} px-4 p-6 border-2 ${cardStyle.border} overflow-hidden`}
         whileHover={{
-          scale: 1.02,
-          boxShadow: cardStyle.hoverShadow,
+          scale: account.disabled ? 1 : 1.02,
+          boxShadow: account.disabled ? cardStyle.shadow : cardStyle.hoverShadow,
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -95,7 +114,7 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
         {/* Disabled badge */}
         {account.disabled && (
           <motion.span
-            className="absolute top-3 right-3 px-3 py-1.5 bg-red-100 text-red-700 rounded-2xl text-xs font-semibold flex items-center shadow-sm border border-red-200"
+            className="absolute top-3 right-3 px-3 py-1.5 bg-red-100 text-red-700 rounded-2xl text-xs font-semibold flex items-center shadow-sm border border-red-200 z-20"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
@@ -105,108 +124,187 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
           </motion.span>
         )}
 
-        <div className="flex items-center mb-4">
-          <motion.div
-            className={`mr-5 w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg ${getAvatarColor(
-              account.id,
-              account.type
-            )}`}
-            whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
-            transition={{ duration: 0.3 }}
-          >
-            {getInitials(account.name)}
-          </motion.div>
-          <div>
-            <h3 className="font-bold text-gray-800 text-lg mb-1 truncate max-w-[180px]">
-              {account.name}
-            </h3>
-            <p className="text-sm text-gray-500 italic max-w-[220px] line-clamp-2">
-              {account.email}
-            </p>
-          </div>
-        </div>
-
-        {/* Role info */}
-        <div className="mb-4">
-          <div
-            className={`flex items-center px-3 py-2 rounded-xl ${
-              cardStyle.roleBg
-            } border border-opacity-30 ${
-              account.type === "customer"
-                ? "border-emerald-200"
-                : "border-violet-200"
-            }`}
-          >
-            <div className={`mr-3 p-1.5 rounded-lg ${cardStyle.iconBg}`}>
-              {getAccountIcon(account.type)}
-            </div>
+        {/* Main content */}
+        <motion.div
+          animate={{
+            opacity: account.disabled ? 0.4 : 1,
+            filter: account.disabled ? "grayscale(0.8)" : "grayscale(0)"
+          }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
+          <div className="flex items-center mb-4">
+            <motion.div
+              className={`mr-5 w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg ${getAvatarColor(
+                account.id,
+                account.type,
+                account.disabled
+              )}`}
+              whileHover={{ scale: account.disabled ? 1 : 1.05, rotate: account.disabled ? 0 : [0, -5, 5, 0] }}
+              transition={{ duration: 0.3 }}
+              animate={{
+                scale: account.disabled ? 0.95 : 1,
+              }}
+            >
+              {getInitials(account.name)}
+            </motion.div>
             <div>
-              <p className={`text-sm font-semibold ${cardStyle.roleText}`}>
-                {account.role.name}
-              </p>
-              <p className="text-xs text-gray-500 italic">
-                {account.type === "customer" ? "Khách hàng" : "Nhân viên"}
-              </p>
+              <motion.h3 
+                className="font-bold text-lg mb-1 truncate max-w-[180px]"
+                animate={{
+                  color: account.disabled ? "#6b7280" : "#1f2937"
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                {account.name}
+              </motion.h3>
+              <motion.p 
+                className="text-sm italic max-w-[220px] line-clamp-2"
+                animate={{
+                  color: account.disabled ? "#9ca3af" : "#6b7280"
+                }}
+                transition={{ duration: 0.5 }}
+              >
+                {account.email}
+              </motion.p>
             </div>
           </div>
-        </div>
 
-        {/* Action buttons */}
-        <div className="flex flex-wrap gap-2">
-          <motion.button
-            onClick={() => onView(account.id)}
-            className="flex items-center px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm shadow-sm transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-          >
-            <Eye size={14} className="mr-1" />
-            <span className="font-semibold">Xem</span>
-          </motion.button>
+          {/* Role info */}
+          <div className="mb-4">
+            <div
+              className={`flex items-center px-3 py-2 rounded-xl ${
+                cardStyle.roleBg
+              } border border-opacity-30 ${
+                account.disabled ? "border-gray-200" :
+                account.type === "customer"
+                  ? "border-emerald-200"
+                  : "border-violet-200"
+              }`}
+            >
+              <div className={`mr-3 p-1.5 rounded-lg ${cardStyle.iconBg}`}>
+                {getAccountIcon(account.type, account.disabled)}
+              </div>
+              <div>
+                <p className={`text-sm font-semibold ${cardStyle.roleText}`}>
+                  {account.role.name}
+                </p>
+                <p className="text-xs text-gray-500 italic">
+                  {account.type === "customer" ? "Khách hàng" : "Nhân viên"}
+                </p>
+              </div>
+            </div>
+          </div>
 
-          <motion.button
-            onClick={() => onEdit(account.id)}
-            className={`flex items-center px-3 py-1.5 rounded-xl text-sm shadow-sm transition-colors duration-200 ${
-              account.type === "customer"
-                ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                : "bg-violet-100 text-violet-700 hover:bg-violet-200"
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-            layoutId={`edit-account-${account.id}`}
-            transition={{ duration: 0.2, type: "spring", stiffness: 100, damping: 16 }}
-          >
-            <Edit2 size={14} className="mr-1" />
-            <span className="font-semibold">Sửa</span>
-          </motion.button>
+          {/* Action buttons - only visible when not disabled */}
+          {!account.disabled && (
+            <motion.div 
+              className="flex flex-wrap gap-2"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.button
+                onClick={() => onView(account.id)}
+                className="flex items-center px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm shadow-sm transition-colors duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <Eye size={14} className="mr-1" />
+                <span className="font-semibold">Xem</span>
+              </motion.button>
 
-          <motion.button
-            onClick={() => onResetPassword(account.id)}
-            className="flex items-center px-3 py-1.5 rounded-xl bg-amber-100 text-amber-700 hover:bg-amber-200 text-sm shadow-sm transition-colors duration-200"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-            layoutId={`resetPassword-account-${account.id}`}
-            transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
-          >
-            <Lock size={14} className="mr-1" />
-            <span className="font-semibold">Đổi MK</span>
-          </motion.button>
+              <motion.button
+                onClick={() => onEdit(account.id)}
+                className={`flex items-center px-3 py-1.5 rounded-xl text-sm shadow-sm transition-colors duration-200 ${
+                  account.type === "customer"
+                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                    : "bg-violet-100 text-violet-700 hover:bg-violet-200"
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.92 }}
+                layoutId={`edit-account-${account.id}`}
+                transition={{ duration: 0.2, type: "spring", stiffness: 100, damping: 16 }}
+              >
+                <Edit2 size={14} className="mr-1" />
+                <span className="font-semibold">Sửa</span>
+              </motion.button>
 
-          <motion.button
-            onClick={() => onDisable(account.id)}
-            className={`flex items-center px-3 py-1.5 rounded-xl text-sm shadow-sm transition-colors duration-200 ${
-              account.disabled
-                ? "bg-green-100 text-green-700 hover:bg-green-200"
-                : "bg-red-100 text-red-700 hover:bg-red-200"
-            }`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-          >
-            <XCircle size={14} className="mr-1" />
-            <span className="font-semibold">
-              {account.disabled ? "Mở" : "Khóa"}
-            </span>
-          </motion.button>
-        </div>
+              <motion.button
+                onClick={() => onResetPassword(account.id)}
+                className="flex items-center px-3 py-1.5 rounded-xl bg-amber-100 text-amber-700 hover:bg-amber-200 text-sm shadow-sm transition-colors duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.92 }}
+                layoutId={`resetPassword-account-${account.id}`}
+                transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 20 }}
+              >
+                <Lock size={14} className="mr-1" />
+                <span className="font-semibold">Đổi MK</span>
+              </motion.button>
+
+              <motion.button
+                onClick={() => onDisable(account.id)}
+                className="flex items-center px-3 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 text-sm shadow-sm transition-colors duration-200"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.92 }}
+              >
+                <XCircle size={14} className="mr-1" />
+                <span className="font-semibold">Khóa</span>
+              </motion.button>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Glass overlay for disabled state */}
+        <AnimatePresence>
+          {account.disabled && (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center bg-white/0 rounded-2xl z-10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
+              <div className="flex gap-4">
+                {/* View button with glass effect */}
+                <motion.button
+                  onClick={() => onView(account.id)}
+                  className="flex items-center px-6 py-3 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 hover:bg-white/30 shadow-lg transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ delay: 0.2, duration: 0.3 }}
+                >
+                  <Eye size={18} className="mr-2" />
+                  <span className="font-semibold">Xem</span>
+                </motion.button>
+
+                {/* Unlock button with glass effect */}
+                <motion.button
+                  onClick={() => onDisable(account.id)}
+                  className="flex items-center px-6 py-3 rounded-2xl bg-green-400/20 backdrop-blur-sm text-emerald-700 hover:bg-emerald-500/30 shadow-lg transition-all duration-300"
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: "0 8px 32px rgba(16,185,129,0.2)"
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ delay: 0.3, duration: 0.3 }}
+                >
+                  <Unlock size={18} className="mr-2" />
+                  <span className="font-semibold">Mở khóa</span>
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );
