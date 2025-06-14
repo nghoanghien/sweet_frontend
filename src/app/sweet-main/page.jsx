@@ -2462,6 +2462,8 @@ export default function Dashboard() {
                 overflow: "visible",
               }}
               exit={{ width: 0, opacity: 0, padding: 0, overflow: "hidden" }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               transition={{
                 duration: 0.4,
                 ease: "easeInOut",
