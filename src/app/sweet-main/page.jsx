@@ -35,6 +35,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { SwipeConfirmationModal } from "@/components/ui";
 import ExportNotification from "@/components/common/ExportNotification";
+import LoadingOverlay from "@/components/common/LoadingOverlay";
 import CustomerManagement from "../admin/customers-management/CustomerManagement";
 import EmployeeManagement from "../admin/employees-management/EmployeeManagement";
 import SavingsProductManagement from "../admin/saving-products-management/SavingsProductManagement";
@@ -204,11 +205,63 @@ export default function Dashboard() {
   const [navHovered, setNavHovered] = useState(false);
   const [rightPanelVisible, setRightPanelVisible] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [rightPanelContent, setRightPanelContent] = useState("notifications");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileModalAnimating, setProfileModalAnimating] = useState(false);
+  
+  // Hàm xử lý chuyển đổi section với hiệu ứng loading
+  const handleSectionChange = (newSection) => {
+    // Hiển thị loading overlay
+    setIsLoading(true);
+    
+    // Thiết lập thông báo loading dựa trên section
+    switch(newSection) {
+      case "overview":
+        setLoadingMessage("Đang tải trang chủ...");
+        break;
+      case "deposits":
+        setLoadingMessage("Đang tải quản lý tiền gửi...");
+        break;
+      case "customers":
+        setLoadingMessage("Đang tải quản lý khách hàng...");
+        break;
+      case "employees":
+        setLoadingMessage("Đang tải quản lý nhân viên...");
+        break;
+      case "deposit-slips":
+        setLoadingMessage("Đang tải quản lý phiếu gửi tiền...");
+        break;
+      case "savings-products":
+        setLoadingMessage("Đang tải sản phẩm tiết kiệm...");
+        break;
+      case "sales-reports":
+        setLoadingMessage("Đang tải báo cáo doanh số...");
+        break;
+      case "settings":
+        setLoadingMessage("Đang tải cài đặt hệ thống...");
+        break;
+      case "permissions":
+        setLoadingMessage("Đang tải quản lý phân quyền...");
+        break;
+      default:
+        setLoadingMessage("Đang tải...");
+    }
+    
+    // Đặt timeout để tạo hiệu ứng loading
+    setTimeout(() => {
+      // Cập nhật section
+      setActiveSection(newSection);
+      
+      // Ẩn loading overlay sau khi chuyển section
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000); // Thời gian hiển thị loading sau khi đã chuyển section
+    }, 2000); // Thời gian hiển thị loading trước khi chuyển section
+  };
 
   // State for notifications
   const [notificationVisible, setNotificationVisible] = useState(false);
@@ -1812,9 +1865,9 @@ export default function Dashboard() {
         <LiquidGlassNavigation
           profileData={profileData}
           activeSection={activeSection}
-          onSectionChange={setActiveSection}
+          onSectionChange={handleSectionChange}
           onProfileClick={toggleProfileModal}
-          onLogout={() => setActiveSection("logout")}
+          onLogout={() => handleSectionChange("logout")}
           customerMenuItems={[
             { id: "overview", icon: Home, text: "Trang chủ" },
             { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" },
@@ -1848,10 +1901,10 @@ export default function Dashboard() {
         <LiquidGlassMobileNavigation
           profileData={profileData}
           activeSection={activeSection}
-          onSectionChange={setActiveSection}
+          onSectionChange={handleSectionChange}
           onProfileClick={toggleProfileModal}
           onLogout={() => {
-            setActiveSection("logout");
+            handleSectionChange("logout");
             // Thêm logic logout của bạn ở đây
           }}
           customerSectionTitle="Dành cho khách hàng"
@@ -1873,6 +1926,9 @@ export default function Dashboard() {
           !isMobile && navHovered ? "ml-28" : !isMobile ? "ml-28" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
+        {/* Loading Overlay */}
+        <LoadingOverlay isLoading={isLoading} message={loadingMessage} color="blue" type="spinner" />
+        
         {/* Main content */}
         <main
           className={`main-content-scrollbar overflow-auto max-h-[calc(100vh-60px)] p-6 md:p-6 transition-all duration-500 ${
