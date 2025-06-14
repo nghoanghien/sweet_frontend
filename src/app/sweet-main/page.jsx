@@ -3307,7 +3307,7 @@ export default function Dashboard() {
               transition={{ 
                 layout: { 
                   type: "spring", 
-                  damping: 20, 
+                  damping: 22, 
                   stiffness: 200, 
                 } 
               }}
