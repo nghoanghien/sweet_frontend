@@ -558,10 +558,7 @@ export default function SavingsAccountManagement() {
       {/* Modal chi tiết phiếu gửi tiền */}
       <AnimatePresence>
         {isDetailDrawerOpen && selectedAccount && (
-          <motion.div
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div>
             <SavingsAccountDetailDrawer
             isOpen={isDetailDrawerOpen}
             onClose={() => setIsDetailDrawerOpen(false)}

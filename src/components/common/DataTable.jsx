@@ -370,7 +370,7 @@ const DataTable = ({
                       exit="exit"
                       className="hover:bg-blue-50/60 transition-colors cursor-pointer"
                       onClick={() => onRowClick && onRowClick(item)}
-                      layoutId={`row-${item[keyField]}`}
+                      layoutId={!statusFilters.status.includes('inTerm') ? `row-${item[keyField]}` : `savings-account-card-${item[keyField]}`}
                       layout
                       transition={{
                         layout: { type: "spring", damping: 15, stiffness: 100 },
