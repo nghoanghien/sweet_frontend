@@ -378,7 +378,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
           onClick={onClose}
         >
           <motion.div
-            className="bg-white rounded-xl sm:rounded-3xl shadow-2xl w-full max-w-4xl max-h-[98vh] sm:max-h-[95vh] flex flex-col overflow-hidden relative"
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[98vh] sm:max-h-[95vh] flex flex-col overflow-hidden relative"
             
             transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
             layoutId={isEditing ? `role-card-${role.id}` : 'add-role-modal'}

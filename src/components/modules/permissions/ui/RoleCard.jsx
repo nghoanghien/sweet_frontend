@@ -98,7 +98,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       whileHover={{
         scale: 1.02,
         boxShadow: cardStyle.hoverShadow,
-      }}
+      }}     
       layoutId={`role-card-${role.id}`}
       transition={{ duration: 0.4, type: "spring", stiffness: 100, damping: 15 }}
     >
