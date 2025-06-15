@@ -209,7 +209,6 @@ export default function Dashboard() {
   const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [rightPanelContent, setRightPanelContent] = useState("notifications");
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileModalAnimating, setProfileModalAnimating] = useState(false);
   
@@ -227,13 +226,13 @@ export default function Dashboard() {
         setLoadingMessage("Đang tải quản lý tiền gửi...");
         break;
       case "customers":
-        setLoadingMessage("Đang tải quản lý khách hàng...");
+        setLoadingMessage("Đang tải quản lý khách hàng & tiền gửi...");
         break;
       case "employees":
         setLoadingMessage("Đang tải quản lý nhân viên...");
         break;
       case "deposit-slips":
-        setLoadingMessage("Đang tải quản lý phiếu gửi tiền...");
+        setLoadingMessage("Đang tải tra cứu phiếu gửi tiền...");
         break;
       case "savings-products":
         setLoadingMessage("Đang tải sản phẩm tiết kiệm...");
@@ -687,70 +686,6 @@ export default function Dashboard() {
     setNotificationVisible(false);
   };
 
-  // Toggle account status between active and locked
-  const toggleAccountStatus = (accountId, accountStatus) => {
-    openConfirmationModal({
-      title: `${
-        accountStatus === "active"
-          ? "Xác nhận khóa tài khoản"
-          : "Xác nhận mở khóa tài khoản"
-      }`,
-      description: `${
-        accountStatus === "active"
-          ? "Khi khóa tài khoản, mọi giao dịch sẽ bị tạm dừng cho đến khi tài khoản được mở khóa."
-          : "Khi mở khóa tài khoản, tài khoản sẽ hoạt động bình thường trở lại."
-      }`,
-      confirmText: `${
-        accountStatus === "active"
-          ? "Quẹt để khóa tài khoản"
-          : "Quẹt để mở khóa tài khoản"
-      }`,
-      type: `${accountStatus === "active" ? "warning" : "unlock"}`,
-      onConfirm: () => {
-        // Set processing state
-        setConfirmationProcessing(true);
-
-        // Process the account creation after a short delay
-        setTimeout(() => {
-          setPaymentAccounts((accounts) =>
-            accounts.map((account) => {
-              if (account.id === accountId) {
-                // Toggle between active and locked, but don't touch permanent_locked
-                if (account.status === "permanent_locked") return account;
-
-                return {
-                  ...account,
-                  status: account.status === "active" ? "locked" : "active",
-                };
-              }
-              return account;
-            })
-          );
-
-          // Close any open action menu
-          setAccountActionMenuOpen(null);
-
-          // Close modals and reset form
-          closeConfirmationModal();
-
-          // Show success notification
-          setNotificationMessage(
-            accountStatus === "active"
-              ? "Tài khoản đã được khóa thành công!"
-              : "Tài khoản đã được mở khóa thành công!"
-          );
-          setNotificationFormat(
-            accountStatus === "active"
-              ? "Khóa thành công"
-              : "Mở khóa thành công"
-          );
-          setNotificationType("success");
-          setNotificationVisible(true);
-        }, 2000);
-      },
-    });
-  };
-
   // Toggle visibility for an account's sensitive information
   const toggleAccountVisibility = (accountId) => {
     setHiddenAccountInfo((prev) => ({
@@ -765,40 +700,6 @@ export default function Dashboard() {
       style: "currency",
       currency: "VND",
     }).format(amount);
-  };
-
-  // Get status information (text and icon) based on status code
-  const getStatusInfo = (status) => {
-    switch (status) {
-      case "active":
-        return {
-          icon: <CheckCircle size={14} className="text-green-500 mr-1" />,
-          text: "Hoạt động",
-          textColor: "text-green-600",
-          bgColor: "bg-green-100",
-        };
-      case "locked":
-        return {
-          icon: <AlertCircle size={14} className="text-amber-500 mr-1" />,
-          text: "Tạm khóa",
-          textColor: "text-amber-600",
-          bgColor: "bg-amber-100",
-        };
-      case "permanent_locked":
-        return {
-          icon: <XCircle size={14} className="text-red-500 mr-1" />,
-          text: "Khóa vĩnh viễn",
-          textColor: "text-red-600",
-          bgColor: "bg-red-100",
-        };
-      default:
-        return {
-          icon: <AlertCircle size={14} className="text-gray-500 mr-1" />,
-          text: "Không xác định",
-          textColor: "text-gray-600",
-          bgColor: "bg-gray-100",
-        };
-    }
   };
 
   // Mask account number except last 4 digits
@@ -1873,12 +1774,12 @@ export default function Dashboard() {
             { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" },
           ]}
           adminMenuItems={[
-            { id: "customers", icon: Users, text: "Quản lý khách hàng" },
+            { id: "customers", icon: Users, text: "Quản lý khách hàng & tiền gửi" },
             { id: "employees", icon: User, text: "Quản lý nhân viên" },
             {
               id: "deposit-slips",
               icon: Receipt,
-              text: "Quản lý phiếu gửi tiền",
+              text: "Tra cứu phiếu gửi tiền",
             },
             {
               id: "savings-products",
@@ -1914,11 +1815,10 @@ export default function Dashboard() {
         />
       )}
 
-<div className="flex w-full justify-center">
-  {/* Header */}
-  <ModernHeader activeSection={activeSection} />
-</div>
-
+      <div className="flex w-full justify-center">
+        {/* Header */}
+        <ModernHeader activeSection={activeSection} />
+      </div>
 
       {/* Main content area */}
       <div
@@ -1927,8 +1827,13 @@ export default function Dashboard() {
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
         {/* Loading Overlay */}
-        <LoadingOverlay isLoading={isLoading} message={loadingMessage} color="blue" type="spinner" />
-        
+        <LoadingOverlay
+          isLoading={isLoading}
+          message={loadingMessage}
+          color="blue"
+          type="spinner"
+        />
+
         {/* Main content */}
         <main
           className={`main-content-scrollbar overflow-auto max-h-[calc(100vh-60px)] p-6 md:p-6 transition-all duration-500 ${
@@ -1945,179 +1850,137 @@ export default function Dashboard() {
                 transition={{ duration: 0.3 }}
                 className="w-full"
               >
-              <div className="mb-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-800 mb-1">
-                      Tài khoản thanh toán
-                    </h2>
-                    <p className="text-gray-500 text-sm">
-                      Quản lý tài khoản thanh toán của bạn
-                    </p>
+                <div className="mb-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-800 mb-1">
+                        Tài khoản thanh toán
+                      </h2>
+                      <p className="text-gray-500 text-sm">
+                        Quản lý tài khoản thanh toán của bạn
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Payment accounts grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
-                <AnimatePresence>
-                {paymentAccounts.map((account) => (
-                  <motion.div
-                    key={account.id}
-                    layoutId={`payment-account-card-${account.id}`}
-                    className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg overflow-hidden account-card group"
-                    onClick={() => openTransactionDrawer(account.id)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    transition={{ 
-                      layout: { 
-                        type: "spring", 
-                        damping: 17, 
-                        stiffness: 100, 
-                      } 
-                    }}
-                  >
-                    <div
-                      className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
-                    >
-                      {/* Hiệu ứng hover */}
-                      <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
+                {/* Payment accounts grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
+                  <AnimatePresence>
+                    {paymentAccounts.map((account) => (
+                      <motion.div
+                        key={account.id}
+                        layoutId={`payment-account-card-${account.id}`}
+                        className="bg-white backdrop-blur-md rounded-2xl shadow-md hover:shadow-lg overflow-hidden account-card group"
+                        onClick={() => openTransactionDrawer(account.id)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{
+                          layout: {
+                            type: "spring",
+                            damping: 17,
+                            stiffness: 100,
+                          },
+                        }}
+                      >
+                        <div
+                          className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                        >
+                          {/* Hiệu ứng hover */}
+                          <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
 
-                      <div className="flex justify-between items-start relative z-10">
-                        <div className="flex items-center space-x-3">
-                          <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-                            {account.icon}
-                          </div>
-                          <div className="text-white">
-                            <h3 className="font-medium text-sm group-hover:text-white/95">
-                              Tài khoản {account.id}
-                            </h3>
-                            <p className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white">
-                              {hiddenAccountInfo[account.id] ? (
-                                maskAccountNumber(account.accountNumber)
-                              ) : (
-                                <span className="animate-fadeIn">
-                                  {account.accountNumber}
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                        </div>
+                          <div className="flex justify-between items-start relative z-10">
+                            <div className="flex items-center space-x-3">
+                              <div className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                                {account.icon}
+                              </div>
+                              <div className="text-white">
+                                <h3 className="font-medium text-sm group-hover:text-white/95">
+                                  Tài khoản {account.id}
+                                </h3>
+                                <p className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white">
+                                  {hiddenAccountInfo[account.id] ? (
+                                    maskAccountNumber(account.accountNumber)
+                                  ) : (
+                                    <span className="animate-fadeIn">
+                                      {account.accountNumber}
+                                    </span>
+                                  )}
+                                </p>
+                              </div>
+                            </div>
 
-                        <div className="flex items-center space-x-1">
-                          {/* Eye toggle button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleAccountVisibility(account.id);
-                            }}
-                            className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
-                            aria-label={
-                              hiddenAccountInfo[account.id]
-                                ? "Hiển thị thông tin"
-                                : "Ẩn thông tin"
-                            }
-                          >
-                            {hiddenAccountInfo[account.id] ? (
-                              <EyeOff size={16} className="text-white" />
-                            ) : (
-                              <Eye size={16} className="text-white" />
-                            )}
-                          </button>
-
-                          {/* Thay thế nút 3 chấm bằng nút khóa/mở khóa trực tiếp */}
-                          {account.status !== "permanent_locked" && (
-                            <div className="relative">
+                            <div className="flex items-center space-x-1">
+                              {/* Eye toggle button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  toggleAccountStatus(account.id, account.status)                                
+                                  toggleAccountVisibility(account.id);
                                 }}
-                                className="relative rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110 lock-button"
+                                className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
                                 aria-label={
-                                  account.status === "active"
-                                    ? "Tạm khóa tài khoản"
-                                    : "Mở khóa tài khoản"
+                                  hiddenAccountInfo[account.id]
+                                    ? "Hiển thị thông tin"
+                                    : "Ẩn thông tin"
                                 }
                               >
-                                {account.status === "active" ? (
-                                  <LockIcon size={16} className="text-white" />
+                                {hiddenAccountInfo[account.id] ? (
+                                  <EyeOff size={16} className="text-white" />
                                 ) : (
-                                  <UnlockIcon
-                                    size={16}
-                                    className="text-white"
-                                  />
+                                  <Eye size={16} className="text-white" />
                                 )}
                               </button>
-                              {/* Tooltip hiển thị khi hover */}
-                              <div className="tooltip-lock absolute top-full right-0 mt-2 px-2 py-1 bg-white rounded-lg shadow-lg text-xs font-medium text-gray-800 whitespace-nowrap opacity-0 invisible transition-all duration-300 transform translate-y-2 pointer-events-none z-20">
-                                {account.status === "active"
-                                  ? "Tạm khóa"
-                                  : "Mở khóa"}
-                              </div>
                             </div>
-                          )}
+                          </div>
                         </div>
-                      </div>
-                    </div>
 
-                    <div className="p-4 relative overflow-hidden group-hover:bg-gradient-to-b from-white to-gray-50 transition-all duration-500">
-                      {/* Shimmer effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer-effect opacity-0 group-hover:opacity-100"></div>
+                        <div className="p-4 relative overflow-hidden group-hover:bg-gradient-to-b from-white to-gray-50 transition-all duration-500">
+                          {/* Shimmer effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer-effect opacity-0 group-hover:opacity-100"></div>
 
-                      {/* Key information in the footer */}
-                      <div className="flex items-center justify-between mb-3 relative z-10">
-                        <div className="flex flex-col">
-                          <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
-                            Số dư
-                          </p>
-                          <p className="text-base font-semibold text-slate-800 transition-all duration-300 font-mono">
-                            {hiddenAccountInfo[account.id] ? (
-                              <span className="text-slate-400">••••••••</span>
-                            ) : (
-                              <span className="animate-fadeIn">
-                                {formatCurrency(account.balance)}
+                          {/* Key information in the footer */}
+                          <div className="flex items-center justify-between mb-3 relative z-10">
+                            <div className="flex flex-col">
+                              <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
+                                Số dư
+                              </p>
+                              <p className="text-base font-semibold text-slate-800 transition-all duration-300 font-mono">
+                                {hiddenAccountInfo[account.id] ? (
+                                  <span className="text-slate-400">
+                                    ••••••••
+                                  </span>
+                                ) : (
+                                  <span className="animate-fadeIn">
+                                    {formatCurrency(account.balance)}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Bottom date info */}
+                          <div className="border-t border-slate-100 pt-3 flex justify-between items-center relative z-10">
+                            <div className="flex items-center space-x-1 text-xs text-slate-500">
+                              <Calendar
+                                size={12}
+                                className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
+                              />
+                              <span className="group-hover:text-slate-600 transition-colors duration-300">
+                                {account.creationDate}
                               </span>
-                            )}
-                          </p>
+                            </div>
+                            <button
+                              onClick={() => openTransactionDrawer(account.id)}
+                              className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300 transform group-hover:scale-105 hover:translate-y-[-2px]`}
+                            >
+                              Chi tiết
+                            </button>
+                          </div>
                         </div>
-
-                        <div
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                            getStatusInfo(account.status).bgColor
-                          } ${
-                            getStatusInfo(account.status).textColor
-                          } transform transition-transform duration-300 group-hover:scale-105`}
-                        >
-                          {getStatusInfo(account.status).icon}
-                          {getStatusInfo(account.status).text}
-                        </div>
-                      </div>
-
-                      {/* Bottom date info */}
-                      <div className="border-t border-slate-100 pt-3 flex justify-between items-center relative z-10">
-                        <div className="flex items-center space-x-1 text-xs text-slate-500">
-                          <Calendar
-                            size={12}
-                            className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
-                          />
-                          <span className="group-hover:text-slate-600 transition-colors duration-300">
-                            {account.creationDate}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => openTransactionDrawer(account.id)}
-                          className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300 transform group-hover:scale-105 hover:translate-y-[-2px]`}
-                        >
-                          Chi tiết
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-                </AnimatePresence>
-              </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </motion.div>
             ) : activeSection === "deposits" ? (
               <motion.div
@@ -2128,288 +1991,290 @@ export default function Dashboard() {
                 transition={{ duration: 0.3 }}
                 className="w-full"
               >
-              <div className="mb-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-800 mb-1">
-                      Tài khoản tiền gửi tiết kiệm
-                    </h2>
-                    <p className="text-gray-500 text-sm">
-                      Quản lý các tài khoản tiền gửi của bạn
-                    </p>
-                  </div>
-
-                  {/* Thông tin tổng hợp và nút hiển thị */}
-                  <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                    <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                      {/* Tổng số tài khoản */}
-                      <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-indigo-200/50 flex items-center space-x-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg">
-                          <PiggyBank size={20} className="text-white" />
-                        </div>
-                        <div className="relative">
-                          <p className="text-xs text-slate-500 font-medium mb-1">
-                            Tổng số tài khoản
-                          </p>
-                          <p className="text-base font-bold text-gray-800">
-                            {savingsAccounts.length} tài khoản
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Tổng tiền gửi */}
-                      <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-green-200/50 flex items-center space-x-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-green-200/30 to-emerald-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
-                          <DollarSign size={20} className="text-white" />
-                        </div>
-                        <div className="relative">
-                          <p className="text-xs text-slate-500 font-medium mb-1">
-                            Tổng tiền gửi
-                          </p>
-                          <p className="text-base font-bold text-gray-800">
-                            {Object.values(hiddenAccountInfo).every(Boolean)
-                              ? "••••••••"
-                              : formatCurrency(
-                                  savingsAccounts.reduce(
-                                    (sum, account) =>
-                                      sum +
-                                      (hiddenAccountInfo[account.id]
-                                        ? 0
-                                        : account.amount),
-                                    0
-                                  )
-                                )}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Tổng tiền lãi dự kiến */}
-                      <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-blue-200/50 flex items-center space-x-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                        <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
-                          <TrendingUp size={20} className="text-white" />
-                        </div>
-                        <div className="relative">
-                          <p className="text-xs text-slate-500 font-medium mb-1">
-                            Tổng tiền lãi dự kiến
-                          </p>
-                          <p className="text-base font-bold text-gray-800">
-                            {Object.values(hiddenAccountInfo).every(Boolean)
-                              ? "••••••••"
-                              : formatCurrency(
-                                  savingsAccounts.reduce(
-                                    (sum, account) =>
-                                      sum +
-                                      (hiddenAccountInfo[account.id]
-                                        ? 0
-                                        : account.totalReceivable -
-                                          account.amount),
-                                    0
-                                  )
-                                )}
-                          </p>
-                        </div>
-                      </div>
+                <div className="mb-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-800 mb-1">
+                        Tài khoản tiền gửi tiết kiệm
+                      </h2>
+                      <p className="text-gray-500 text-sm">
+                        Quản lý các tài khoản tiền gửi của bạn
+                      </p>
                     </div>
 
-                    <div className="flex space-x-2">
-                      {/* Nút ẩn/hiện tất cả */}
-                      <button
-                        onClick={() => {
-                          const allHidden = savingsAccounts.every(
+                    {/* Thông tin tổng hợp và nút hiển thị */}
+                    <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                        {/* Tổng số tài khoản */}
+                        <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-indigo-200/50 flex items-center space-x-4">
+                          <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg">
+                            <PiggyBank size={20} className="text-white" />
+                          </div>
+                          <div className="relative">
+                            <p className="text-xs text-slate-500 font-medium mb-1">
+                              Tổng số tài khoản
+                            </p>
+                            <p className="text-base font-bold text-gray-800">
+                              {savingsAccounts.length} tài khoản
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Tổng tiền gửi */}
+                        <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-green-200/50 flex items-center space-x-4">
+                          <div className="absolute inset-0 bg-gradient-to-r from-green-200/30 to-emerald-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+                            <DollarSign size={20} className="text-white" />
+                          </div>
+                          <div className="relative">
+                            <p className="text-xs text-slate-500 font-medium mb-1">
+                              Tổng tiền gửi
+                            </p>
+                            <p className="text-base font-bold text-gray-800">
+                              {Object.values(hiddenAccountInfo).every(Boolean)
+                                ? "••••••••"
+                                : formatCurrency(
+                                    savingsAccounts.reduce(
+                                      (sum, account) =>
+                                        sum +
+                                        (hiddenAccountInfo[account.id]
+                                          ? 0
+                                          : account.amount),
+                                      0
+                                    )
+                                  )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Tổng tiền lãi dự kiến */}
+                        <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-blue-200/50 flex items-center space-x-4">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                            <TrendingUp size={20} className="text-white" />
+                          </div>
+                          <div className="relative">
+                            <p className="text-xs text-slate-500 font-medium mb-1">
+                              Tổng tiền lãi dự kiến
+                            </p>
+                            <p className="text-base font-bold text-gray-800">
+                              {Object.values(hiddenAccountInfo).every(Boolean)
+                                ? "••••••••"
+                                : formatCurrency(
+                                    savingsAccounts.reduce(
+                                      (sum, account) =>
+                                        sum +
+                                        (hiddenAccountInfo[account.id]
+                                          ? 0
+                                          : account.totalReceivable -
+                                            account.amount),
+                                      0
+                                    )
+                                  )}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        {/* Nút ẩn/hiện tất cả */}
+                        <button
+                          onClick={() => {
+                            const allHidden = savingsAccounts.every(
+                              (acc) => hiddenAccountInfo[acc.id]
+                            );
+                            const newState = {};
+                            savingsAccounts.forEach((acc) => {
+                              newState[acc.id] = !allHidden;
+                            });
+                            setHiddenAccountInfo(newState);
+                          }}
+                          className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
+                        >
+                          {savingsAccounts.every(
                             (acc) => hiddenAccountInfo[acc.id]
-                          );
-                          const newState = {};
-                          savingsAccounts.forEach((acc) => {
-                            newState[acc.id] = !allHidden;
-                          });
-                          setHiddenAccountInfo(newState);
-                        }}
-                        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-2 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
-                      >
-                        {savingsAccounts.every(
-                          (acc) => hiddenAccountInfo[acc.id]
-                        ) ? (
-                          <>
-                            <Eye size={16} />
-                            <span>Hiện tất cả</span>
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff size={16} />
-                            <span>Ẩn tất cả</span>
-                          </>
-                        )}
-                      </button>
+                          ) ? (
+                            <>
+                              <Eye size={16} />
+                              <span>Hiện tất cả</span>
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff size={16} />
+                              <span>Ẩn tất cả</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Savings accounts grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
-                <AnimatePresence>
-                  {savingsAccounts.map((account) => (
-                    <motion.div
-                      key={account.id}
-                      layoutId={`savings-card-${account.id}`}
-                      className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg overflow-hidden account-card group cursor-pointer"
-                      onClick={() => openSavingsDetailDrawer(account.id)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 17,
-                      }}
-                    >
+                {/* Savings accounts grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
+                  <AnimatePresence>
+                    {savingsAccounts.map((account) => (
                       <motion.div
-                        layoutId={`savings-header-${account.id}`}
-                        className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                        key={account.id}
+                        layoutId={`savings-card-${account.id}`}
+                        className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg overflow-hidden account-card group cursor-pointer"
+                        onClick={() => openSavingsDetailDrawer(account.id)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         transition={{
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 17,
-                      }}
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 17,
+                        }}
                       >
-                        {/* Hiệu ứng hover */}
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
+                        <motion.div
+                          layoutId={`savings-header-${account.id}`}
+                          className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                          transition={{
+                            type: "spring",
+                            stiffness: 100,
+                            damping: 17,
+                          }}
+                        >
+                          {/* Hiệu ứng hover */}
+                          <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                          <div className="absolute -inset-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
 
-                        <div className="flex justify-between items-start relative z-10">
-                          <div className="flex items-center space-x-3">
-                            <motion.div
-                              layoutId={`savings-icon-${account.id}`}
-                              className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center"
-                            >
-                              {account.icon}
-                            </motion.div>
-                            <div className="text-white">
-                              <motion.h3
-                                layoutId={`savings-title-${account.id}`}
-                                className="font-medium text-sm group-hover:text-white/95"
+                          <div className="flex justify-between items-start relative z-10">
+                            <div className="flex items-center space-x-3">
+                              <motion.div
+                                layoutId={`savings-icon-${account.id}`}
+                                className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center"
                               >
-                                {account.nickname}
-                              </motion.h3>
-                              <motion.p
-                                layoutId={`savings-number-${account.id}`}
-                                className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white"
+                                {account.icon}
+                              </motion.div>
+                              <div className="text-white">
+                                <motion.h3
+                                  layoutId={`savings-title-${account.id}`}
+                                  className="font-medium text-sm group-hover:text-white/95"
+                                >
+                                  {account.nickname}
+                                </motion.h3>
+                                <motion.p
+                                  layoutId={`savings-number-${account.id}`}
+                                  className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white"
+                                >
+                                  {account.depositNumber}
+                                </motion.p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center space-x-1">
+                              {/* Eye toggle button */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleAccountVisibility(account.id);
+                                }}
+                                className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
+                                aria-label={
+                                  hiddenAccountInfo[account.id]
+                                    ? "Hiển thị thông tin"
+                                    : "Ẩn thông tin"
+                                }
                               >
-                                {account.depositNumber}
+                                {hiddenAccountInfo[account.id] ? (
+                                  <EyeOff size={16} className="text-white" />
+                                ) : (
+                                  <Eye size={16} className="text-white" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+
+                        <motion.div
+                          layoutId={`savings-content-${account.id}`}
+                          className="p-4 relative overflow-hidden group-hover:bg-gradient-to-b from-white to-gray-50"
+                        >
+                          {/* Shimmer effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer-effect opacity-0 group-hover:opacity-100"></div>
+
+                          {/* Key information */}
+                          <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
+                            <div className="flex flex-col">
+                              <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
+                                Kỳ hạn
+                              </p>
+                              <p className="text-sm font-medium text-slate-800">
+                                {account.term}
+                              </p>
+                            </div>
+
+                            <div className="flex flex-col">
+                              <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
+                                Số tiền gửi
+                              </p>
+                              <motion.p className="text-sm font-medium text-slate-800">
+                                {hiddenAccountInfo[account.id] ? (
+                                  <span className="text-slate-400">
+                                    ••••••••
+                                  </span>
+                                ) : (
+                                  <span className="animate-fadeIn">
+                                    {formatCurrency(
+                                      typeof account.remainingAmount !==
+                                        "undefined"
+                                        ? account.remainingAmount
+                                        : account.amount
+                                    )}
+                                  </span>
+                                )}
                               </motion.p>
                             </div>
                           </div>
 
-                          <div className="flex items-center space-x-1">
-                            {/* Eye toggle button */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleAccountVisibility(account.id);
-                              }}
-                              className="rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110"
-                              aria-label={
-                                hiddenAccountInfo[account.id]
-                                  ? "Hiển thị thông tin"
-                                  : "Ẩn thông tin"
-                              }
+                          {/* Tiến trình kỳ hạn */}
+                          <div className="mb-3 relative z-10">
+                            <div className="flex justify-between text-xs mb-1.5">
+                              <span className="text-slate-600">
+                                Ngày đáo hạn: {account.endDate}
+                              </span>
+                              <span className="text-indigo-600 font-medium">
+                                {account.daysRemaining} ngày nữa
+                              </span>
+                            </div>
+                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${account.color}`}
+                                style={{
+                                  width: `${calculateTermProgress(
+                                    account.daysRemaining,
+                                    account.termDays
+                                  )}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          {/* Bottom info */}
+                          <div className="border-t border-slate-100 pt-3 flex justify-between items-center relative z-10">
+                            <div className="flex items-center space-x-1 text-xs text-slate-500">
+                              <Calendar
+                                size={12}
+                                className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
+                              />
+                              <span className="group-hover:text-slate-600 transition-colors duration-300">
+                                {account.startDate}
+                              </span>
+                            </div>
+                            <span
+                              className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300`}
                             >
-                              {hiddenAccountInfo[account.id] ? (
-                                <EyeOff size={16} className="text-white" />
-                              ) : (
-                                <Eye size={16} className="text-white" />
-                              )}
-                            </button>
+                              Chi tiết
+                            </span>
                           </div>
-                        </div>
+                        </motion.div>
                       </motion.div>
-
-                      <motion.div
-                        layoutId={`savings-content-${account.id}`}
-                        className="p-4 relative overflow-hidden group-hover:bg-gradient-to-b from-white to-gray-50"
-                      >
-                        {/* Shimmer effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent shimmer-effect opacity-0 group-hover:opacity-100"></div>
-
-                        {/* Key information */}
-                        <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
-                          <div className="flex flex-col">
-                            <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
-                              Kỳ hạn
-                            </p>
-                            <p className="text-sm font-medium text-slate-800">
-                              {account.term}
-                            </p>
-                          </div>
-
-                          <div className="flex flex-col">
-                            <p className="text-xs text-slate-500 mb-1 group-hover:text-indigo-500 transition-colors duration-300">
-                              Số tiền gửi
-                            </p>
-                            <motion.p className="text-sm font-medium text-slate-800">
-                              {hiddenAccountInfo[account.id] ? (
-                                <span className="text-slate-400">••••••••</span>
-                              ) : (
-                                <span className="animate-fadeIn">
-                                  {formatCurrency(
-                                    typeof account.remainingAmount !==
-                                      "undefined"
-                                      ? account.remainingAmount
-                                      : account.amount
-                                  )}
-                                </span>
-                              )}
-                            </motion.p>
-                          </div>
-                        </div>
-
-                        {/* Tiến trình kỳ hạn */}
-                        <div className="mb-3 relative z-10">
-                          <div className="flex justify-between text-xs mb-1.5">
-                            <span className="text-slate-600">
-                              Ngày đáo hạn: {account.endDate}
-                            </span>
-                            <span className="text-indigo-600 font-medium">
-                              {account.daysRemaining} ngày nữa
-                            </span>
-                          </div>
-                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${account.color}`}
-                              style={{
-                                width: `${calculateTermProgress(
-                                  account.daysRemaining,
-                                  account.termDays
-                                )}%`,
-                              }}
-                            ></div>
-                          </div>
-                        </div>
-
-                        {/* Bottom info */}
-                        <div className="border-t border-slate-100 pt-3 flex justify-between items-center relative z-10">
-                          <div className="flex items-center space-x-1 text-xs text-slate-500">
-                            <Calendar
-                              size={12}
-                              className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
-                            />
-                            <span className="group-hover:text-slate-600 transition-colors duration-300">
-                              {account.startDate}
-                            </span>
-                          </div>
-                          <span
-                            className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300`}
-                          >
-                            Chi tiết
-                          </span>
-                        </div>
-                      </motion.div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
+                    ))}
+                  </AnimatePresence>
+                </div>
               </motion.div>
             ) : activeSection === "customers" ? (
               <motion.div
@@ -3359,156 +3224,123 @@ export default function Dashboard() {
           }}
         >
           <AnimatePresence>
-          {selectedCardDetail && (
-            <motion.div 
-              layoutId={`payment-account-card-${selectedCardDetail.id}`}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden mx-4"
-              transition={{ 
-                layout: { 
-                  type: "spring", 
-                  damping: 22, 
-                  stiffness: 200, 
-                } 
-              }}
-            >
-              {/* Header với màu gradient của tài khoản */}
-              <div
-                className={`p-6 ${selectedCardDetail.color} relative overflow-hidden`}
+            {selectedCardDetail && (
+              <motion.div
+                layoutId={`payment-account-card-${selectedCardDetail.id}`}
+                className="bg-white rounded-3xl shadow-2xl overflow-hidden mx-4"
+                transition={{
+                  layout: {
+                    type: "spring",
+                    damping: 22,
+                    stiffness: 200,
+                  },
+                }}
               >
-                {/* Background effects */}
-                <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-br from-white/5 to-transparent"></div>
-                <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 backdrop-blur-md"></div>
-                <div className="absolute -left-4 -bottom-4 w-16 h-16 rounded-full bg-white/10 backdrop-blur-md"></div>
+                {/* Header với màu gradient của tài khoản */}
+                <div
+                  className={`p-6 ${selectedCardDetail.color} relative overflow-hidden`}
+                >
+                  {/* Background effects */}
+                  <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+                  <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 backdrop-blur-md"></div>
+                  <div className="absolute -left-4 -bottom-4 w-16 h-16 rounded-full bg-white/10 backdrop-blur-md"></div>
 
-                <div className="relative flex items-start justify-between z-10">
-                  <div className="flex items-center">
-                    <div className="h-16 w-16 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                      <CreditCard size={30} className="text-white" />
-                    </div>
-                    <div className="ml-4 text-white">
-                      <h2 className="text-xl font-semibold">
-                        Tài khoản {selectedCardDetail.id}
-                      </h2>
-                      <p className="text-white/80 font-mono mt-1">
-                        {hiddenAccountInfo[selectedCardDetail.id]
-                          ? maskAccountNumber(selectedCardDetail.accountNumber)
-                          : selectedCardDetail.accountNumber}
-                      </p>
-                      <div
-                        className={`inline-flex items-center px-2.5 py-1 mt-2 rounded-full text-xs font-medium ${getStatusInfo(
-                          selectedCardDetail.status
-                        ).bgColor.replace(
-                          "bg-",
-                          "bg-opacity-20 bg-"
-                        )} text-white`}
-                      >
-                        {getStatusInfo(selectedCardDetail.status).icon}
-                        {getStatusInfo(selectedCardDetail.status).text}
+                  <div className="relative flex items-start justify-between z-10">
+                    <div className="flex items-center">
+                      <div className="h-16 w-16 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                        <CreditCard size={30} className="text-white" />
+                      </div>
+                      <div className="ml-4 text-white">
+                        <h2 className="text-xl font-semibold">
+                          Tài khoản {selectedCardDetail.id}
+                        </h2>
+                        <p className="text-white/80 font-mono mt-1">
+                          {hiddenAccountInfo[selectedCardDetail.id]
+                            ? maskAccountNumber(
+                                selectedCardDetail.accountNumber
+                              )
+                            : selectedCardDetail.accountNumber}
+                        </p>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() =>
-                        toggleAccountVisibility(selectedCardDetail.id)
-                      }
-                      className="rounded-full p-2 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300"
-                    >
-                      {hiddenAccountInfo[selectedCardDetail.id] ? (
-                        <EyeOff size={18} className="text-white" />
-                      ) : (
-                        <Eye size={18} className="text-white" />
-                      )}
-                    </button>
-
-                    {selectedCardDetail.status !== "permanent_locked" && (
+                    <div className="flex space-x-2">
                       <button
                         onClick={() =>
-                          toggleAccountStatus(selectedCardDetail.id)
+                          toggleAccountVisibility(selectedCardDetail.id)
                         }
                         className="rounded-full p-2 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300"
                       >
-                        {selectedCardDetail.status === "active" ? (
-                          <LockIcon size={18} className="text-white" />
+                        {hiddenAccountInfo[selectedCardDetail.id] ? (
+                          <EyeOff size={18} className="text-white" />
                         ) : (
-                          <UnlockIcon size={18} className="text-white" />
+                          <Eye size={18} className="text-white" />
                         )}
                       </button>
-                    )}
+                    </div>
+                  </div>
+
+                  {/* Thông tin số dư */}
+                  <div className="mt-6 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
+                    <p className="text-white/80 text-sm">Số dư hiện tại</p>
+                    <h3 className="text-2xl font-bold text-white mt-1">
+                      {hiddenAccountInfo[selectedCardDetail.id] ? (
+                        <span className="text-white/60">••••••••</span>
+                      ) : (
+                        formatCurrency(selectedCardDetail.balance)
+                      )}
+                    </h3>
                   </div>
                 </div>
 
-                {/* Thông tin số dư */}
-                <div className="mt-6 bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/20">
-                  <p className="text-white/80 text-sm">Số dư hiện tại</p>
-                  <h3 className="text-2xl font-bold text-white mt-1">
-                    {hiddenAccountInfo[selectedCardDetail.id] ? (
-                      <span className="text-white/60">••••••••</span>
-                    ) : (
-                      formatCurrency(selectedCardDetail.balance)
-                    )}
+                {/* Thông tin chi tiết */}
+                <div className="p-6">
+                  <h3 className="text-gray-800 font-medium mb-4">
+                    Thông tin tài khoản
                   </h3>
-                </div>
-              </div>
 
-              {/* Thông tin chi tiết */}
-              <div className="p-6">
-                <h3 className="text-gray-800 font-medium mb-4">
-                  Thông tin tài khoản
-                </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-50 p-3 rounded-xl">
+                      <p className="text-gray-500 text-xs mb-1">
+                        Ngày mở tài khoản
+                      </p>
+                      <p className="text-gray-800 flex items-center text-sm">
+                        <Calendar size={14} className="mr-2 text-indigo-500" />
+                        {selectedCardDetail.creationDate}
+                      </p>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-50 p-3 rounded-xl">
-                    <p className="text-gray-500 text-xs mb-1">
-                      Ngày mở tài khoản
-                    </p>
-                    <p className="text-gray-800 flex items-center text-sm">
-                      <Calendar size={14} className="mr-2 text-indigo-500" />
-                      {selectedCardDetail.creationDate}
-                    </p>
+                    <div className="bg-gray-50 p-3 rounded-xl">
+                      <p className="text-gray-500 text-xs mb-1">
+                        Loại tài khoản
+                      </p>
+                      <p className="text-gray-800 flex items-center text-sm">
+                        <CreditCard
+                          size={14}
+                          className="mr-2 text-indigo-500"
+                        />
+                        Thanh toán
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="bg-gray-50 p-3 rounded-xl">
-                    <p className="text-gray-500 text-xs mb-1">Loại tài khoản</p>
-                    <p className="text-gray-800 flex items-center text-sm">
-                      <CreditCard size={14} className="mr-2 text-indigo-500" />
-                      Thanh toán
-                    </p>
-                  </div>
-
-                  <div className="bg-gray-50 p-3 rounded-xl">
-                    <p className="text-gray-500 text-xs mb-1">Trạng thái</p>
-                    <p className="flex items-center text-sm">
-                      {getStatusInfo(selectedCardDetail.status).icon}
-                      <span
-                        className={
-                          getStatusInfo(selectedCardDetail.status).textColor
-                        }
-                      >
-                        {getStatusInfo(selectedCardDetail.status).text}
-                      </span>
-                    </p>
+                  {/* Các hành động khác */}
+                  <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                    <button className="bg-amber-50 text-amber-600 px-4 py-2 rounded-xl flex items-center text-sm hover:bg-amber-100 transition-colors">
+                      <FileIcon size={16} className="mr-2" />
+                      Sao kê
+                    </button>
+                    <button
+                      className="bg-gray-50 text-gray-600 px-4 py-2 rounded-xl flex items-center text-sm hover:bg-gray-100 transition-colors"
+                      onClick={closeTransactionDrawer}
+                    >
+                      <X size={16} className="mr-2" />
+                      Đóng
+                    </button>
                   </div>
                 </div>
-
-                {/* Các hành động khác */}
-                <div className="mt-6 flex flex-wrap gap-3 justify-center">
-                  <button className="bg-amber-50 text-amber-600 px-4 py-2 rounded-xl flex items-center text-sm hover:bg-amber-100 transition-colors">
-                    <FileIcon size={16} className="mr-2" />
-                    Sao kê
-                  </button>
-                  <button
-                    className="bg-gray-50 text-gray-600 px-4 py-2 rounded-xl flex items-center text-sm hover:bg-gray-100 transition-colors"
-                    onClick={closeTransactionDrawer}
-                  >
-                    <X size={16} className="mr-2" />
-                    Đóng
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>

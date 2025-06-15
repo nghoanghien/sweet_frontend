@@ -19,9 +19,9 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
     ],
     'role4': [
       { id: 'perm3', name: 'Xem tổng quan ngân hàng', functions: ['Xem báo cáo tổng quan', 'Xem biểu đồ hoạt động', 'Xem thống kê giao dịch'] },
-      { id: 'perm4', name: 'Quản lý khách hàng', functions: ['Xem danh sách khách hàng', 'Thêm khách hàng mới', 'Cập nhật thông tin khách hàng', 'Xem lịch sử giao dịch'] },
+      { id: 'perm4', name: 'Quản lý khách hàng & tiền gửi', functions: ['Xem danh sách khách hàng', 'Thêm khách hàng mới', 'Cập nhật thông tin khách hàng', 'Xem lịch sử giao dịch'] },
       { id: 'perm5', name: 'Quản lý nhân viên', functions: ['Xem danh sách nhân viên', 'Thêm nhân viên mới', 'Cập nhật thông tin nhân viên', 'Phân công công việc'] },
-      { id: 'perm6', name: 'Quản lý phiếu gửi tiền', functions: ['Xem danh sách phiếu gửi', 'Tạo phiếu gửi mới', 'Duyệt phiếu gửi', 'In phiếu gửi'] },
+      { id: 'perm6', name: 'Tra cứu phiếu gửi tiền', functions: ['Xem danh sách phiếu gửi', 'Tạo phiếu gửi mới', 'Duyệt phiếu gửi', 'In phiếu gửi'] },
       { id: 'perm7', name: 'Quản lý sản phẩm tiết kiệm', functions: ['Xem danh sách sản phẩm', 'Thêm sản phẩm mới', 'Cập nhật thông tin sản phẩm', 'Quản lý lãi suất'] },
       { id: 'perm8', name: 'Báo cáo doanh số', functions: ['Xem báo cáo doanh số', 'Xuất báo cáo Excel', 'Xuất báo cáo PDF', 'Gửi báo cáo qua email'] },
       { id: 'perm9', name: 'Cài đặt hệ thống', functions: ['Cấu hình thông số hệ thống', 'Quản lý thông báo', 'Cấu hình email', 'Sao lưu dữ liệu'] },
@@ -29,7 +29,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
     ],
     'role5': [
       { id: 'perm3', name: 'Xem tổng quan ngân hàng', functions: ['Xem báo cáo tổng quan', 'Xem biểu đồ hoạt động', 'Xem thống kê giao dịch'] },
-      { id: 'perm4', name: 'Quản lý khách hàng', functions: ['Xem danh sách khách hàng', 'Thêm khách hàng mới', 'Cập nhật thông tin khách hàng', 'Xem lịch sử giao dịch'] },
+      { id: 'perm4', name: 'Quản lý khách hàng & tiền gửi', functions: ['Xem danh sách khách hàng', 'Thêm khách hàng mới', 'Cập nhật thông tin khách hàng', 'Xem lịch sử giao dịch'] },
       { id: 'perm6', name: 'Quản lý phiếu gửi tiền', functions: ['Xem danh sách phiếu gửi', 'Tạo phiếu gửi mới', 'Duyệt phiếu gửi', 'In phiếu gửi'] }
     ],
     'role6': [

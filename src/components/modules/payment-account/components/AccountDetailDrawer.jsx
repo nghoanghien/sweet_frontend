@@ -9,8 +9,6 @@ import {
   EyeOff, 
   CreditCard, 
   Calendar, 
-  LockIcon, 
-  UnlockIcon,
   History,
   DollarSign
 } from 'lucide-react';
@@ -156,15 +154,6 @@ const AccountDetailDrawer = ({
     
     if (onToggleHide && account) {
       onToggleHide(account.id);
-    }
-  };
-
-  // Handle account status toggle
-  const toggleAccountStatus = (e) => {
-    e.stopPropagation();
-    if (onLockToggle && account.status !== "permanent_locked") {
-      const isLocking = account.status === "active";
-      onLockToggle(account.id, isLocking);
     }
   };
   
@@ -340,17 +329,6 @@ const AccountDetailDrawer = ({
                               ? maskAccountNumber(account.accountNumber)
                               : account.accountNumber}
                           </p>
-                          <div
-                            className={`inline-flex items-center px-2.5 py-1 mt-2 rounded-full text-xs font-medium ${getStatusInfo(
-                              account.status
-                            ).bgColor.replace(
-                              "bg-",
-                              "bg-opacity-20 bg-"
-                            )} text-white`}
-                          >
-                            {getStatusInfo(account.status).icon}
-                            {getStatusInfo(account.status).text}
-                          </div>
                         </div>
                       </div>
 
@@ -365,19 +343,6 @@ const AccountDetailDrawer = ({
                             <EyeOff size={18} className="text-white" />
                           )}
                         </button>
-
-                        {account.status !== "permanent_locked" && (
-                          <button
-                            onClick={toggleAccountStatus}
-                            className="rounded-full p-2 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300"
-                          >
-                            {account.status === "active" ? (
-                              <LockIcon size={18} className="text-white" />
-                            ) : (
-                              <UnlockIcon size={18} className="text-white" />
-                            )}
-                          </button>
-                        )}
                       </div>
                     </div>
 
@@ -426,22 +391,8 @@ const AccountDetailDrawer = ({
                           Thanh toán
                         </p>
                       </div>
-
-                      <div className="bg-gray-50 p-3 rounded-xl">
-                        <p className="text-gray-500 text-xs mb-1">Trạng thái</p>
-                        <p className="flex items-center text-sm">
-                          {getStatusInfo(account.status).icon}
-                          <span
-                            className={getStatusInfo(account.status).textColor}
-                          >
-                            {getStatusInfo(account.status).text}
-                          </span>
-                        </p>
-                      </div>
                     </div>
 
-                    {/* Các hành động khác - Hidden on mobile */}
-                    {/* Các hành động khác - Hidden on mobile */}
                     {/* Các hành động khác - Hidden on mobile */}
                     <div className="mt-6 flex flex-wrap gap-4 justify-center md:flex hidden">
                       <motion.button

@@ -433,19 +433,6 @@ import React, { useState, useEffect } from 'react';
         >
           <Edit size={16} />
         </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleEmployeeStatus(employee.id);
-          }}
-          className={`${
-            employee.status === 'active' 
-              ? 'text-orange-600 hover:text-orange-900 hover:bg-orange-50' 
-              : 'text-green-600 hover:text-green-900 hover:bg-green-50'
-          } p-1 rounded-full`}
-        >
-          {employee.status === 'active' ? <Lock size={16} /> : <Unlock size={16} />}
-        </button>
       </div>
     );
     

@@ -25,9 +25,9 @@ const AssistiveTouchNavigation = ({
     { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" }
   ],
   adminMenuItems = [
-    { id: "customers", icon: Users, text: "Quản lý khách hàng" },
+    { id: "customers", icon: Users, text: "Quản lý khách hàng & tiền gửi" },
     { id: "employees", icon: User, text: "Quản lý nhân viên" },
-    { id: "deposit-slips", icon: Receipt, text: "Quản lý phiếu gửi tiền" },
+    { id: "deposit-slips", icon: Receipt, text: "Tra cứu phiếu gửi tiền" },
     { id: "savings-products", icon: PiggyBank, text: "Quản lý sản phẩm tiết kiệm" },
     { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số" },
     { id: "settings", icon: Settings, text: "Cài đặt hệ thống" },
@@ -368,7 +368,7 @@ const renderMenuItem = (item, index) => {
   
   const className = `bg-white/50 backdrop-blur-sm border border-white shadow-[0_0_20px_rgba(0,0,0,0.1)] menu-item w-24 h-24 rounded-[3rem] cursor-pointer flex flex-col items-center justify-center ${
     item.isLogout ? 'logout' : ''
-  } ${isActive ? 'ring-2 ring-blue-400 bg-sky-500/20 border-0' : ''}`;
+  } ${isActive ? 'ring-2 ring-blue-400 bg-sky-400/30 border-0' : ''}`;
   
   const content = (
     <>

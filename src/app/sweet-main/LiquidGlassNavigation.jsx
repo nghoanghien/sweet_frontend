@@ -25,9 +25,9 @@ const LiquidGlassNavigation = ({
     { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" }
   ],
   adminMenuItems = [
-    { id: "customers", icon: Users, text: "Quản lý khách hàng" },
+    { id: "customers", icon: Users, text: "Quản lý khách hàng & tiền gửi" },
     { id: "employees", icon: User, text: "Quản lý nhân viên" },
-    { id: "deposit-slips", icon: Receipt, text: "Quản lý phiếu gửi tiền" },
+    { id: "deposit-slips", icon: Receipt, text: "Tra cứu phiếu gửi tiền" },
     { id: "savings-products", icon: PiggyBank, text: "Quản lý sản phẩm tiết kiệm" },
     { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số" },
     { id: "settings", icon: Settings, text: "Cài đặt hệ thống" },

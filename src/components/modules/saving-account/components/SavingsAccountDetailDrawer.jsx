@@ -53,7 +53,8 @@ const SavingsAccountDetailDrawer = ({
   isHidden = true,
   onToggleHide,
   customerInfo = null,
-  showCustomerInfo = false
+  showCustomerInfo = false,
+  canWithdraw = true
 }) => {
   // State cho việc hiển thị chi tiết
   const [cardDetailVisible, setCardDetailVisible] = useState(false);
@@ -690,7 +691,7 @@ const SavingsAccountDetailDrawer = ({
 
                   {/* Các hành động */}
                   <div className="mt-6 flex flex-wrap gap-4 justify-center md:flex hidden">
-                    {account.status !== "closed" && (
+                    {canWithdraw && (
                       <motion.button
                         className="relative group bg-gradient-to-br from-amber-50/80 via-white/90 to-orange-100/60 backdrop-blur-2xl px-5 py-3 rounded-2xl shadow-md border border-amber-200/50 flex items-center text-sm font-semibold text-amber-600 overflow-hidden min-w-[110px] justify-center"
                         onClick={toggleWithdrawalPanel}

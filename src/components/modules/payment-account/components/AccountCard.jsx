@@ -67,29 +67,6 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
                 <EyeOff size={16} className="text-white" />
               }
             </button>
-            
-            {/* Thay thế nút 3 chấm bằng nút khóa/mở khóa trực tiếp */}
-            {account.status !== "permanent_locked" && (
-              <div className="relative">
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleLockToggle();
-                  }}
-                  className="relative rounded-full p-1.5 bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all duration-300 hover:rotate-12 hover:scale-110 lock-button"
-                  aria-label={account.status === "active" ? "Tạm khóa tài khoản" : "Mở khóa tài khoản"}
-                >
-                  {account.status === "active" ? 
-                    <LockIcon size={16} className="text-white" /> : 
-                    <UnlockIcon size={16} className="text-white" />
-                  }
-                </button>
-                {/* Tooltip hiển thị khi hover */}
-                <div className="tooltip-lock absolute top-full right-0 mt-2 px-2 py-1 bg-white rounded-lg shadow-lg text-xs font-medium text-gray-800 whitespace-nowrap opacity-0 invisible transition-all duration-300 transform translate-y-2 pointer-events-none z-20">
-                  {account.status === "active" ? "Tạm khóa" : "Mở khóa"}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -108,11 +85,6 @@ const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDeta
                 <span className="animate-fadeIn">{formatCurrency(account.balance)}</span>
               }
             </p>
-          </div>
-          
-          <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusInfo.bgColor} ${statusInfo.textColor} transform transition-transform duration-300 group-hover:scale-105`}>
-            {statusInfo.icon}
-            {statusInfo.text}
           </div>
         </div>
         

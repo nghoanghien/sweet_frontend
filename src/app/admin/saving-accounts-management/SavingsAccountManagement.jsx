@@ -116,7 +116,7 @@ export default function SavingsAccountManagement() {
       receivedInterest: 0,
       totalReceivable: 10720000,
       nickname: 'Sổ tiết kiệm A',
-      status: 'matured',
+      status: 'closed',
       customer: {
         fullName: 'Nguyễn Văn A',
         birthDate: '12/05/1985',
@@ -511,8 +511,8 @@ export default function SavingsAccountManagement() {
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-1">Quản lý phiếu gửi tiền</h2>
-            <p className="text-gray-500 text-sm">Quản lý thông tin và trạng thái các phiếu gửi tiền (tài khoản tiết kiệm)</p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-1">Tra cứu phiếu gửi tiền</h2>
+            <p className="text-gray-500 text-sm">Tra cứu và xem thông tin chi tiết các phiếu gửi tiền (tài khoản tiết kiệm)</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button 
@@ -547,7 +547,7 @@ export default function SavingsAccountManagement() {
         renderActions={renderActions}
         // Bộ lọc trạng thái
         statusFilters={{
-          status: ['inTerm', 'matured', 'closed']
+          status: ['inTerm', 'closed']
         }}
         // Bộ lọc khoảng thời gian
         dateRangeFilters={{
@@ -570,6 +570,7 @@ export default function SavingsAccountManagement() {
             customerInfo={selectedAccount.customer}
             showCustomerInfo={true}
             onToggleHide={() => toggleHideAccountInfo(selectedAccount.id)}
+            canWithdraw={false}
           />
           </motion.div>
         )}

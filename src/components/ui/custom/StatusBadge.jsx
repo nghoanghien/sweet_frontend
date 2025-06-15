@@ -29,14 +29,6 @@ const StatusBadge = ({ status, active = false }) => {
         : 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200',
       iconColor: active ? 'text-white' : 'text-blue-500'
     },
-    matured: {
-      icon: <AlertTriangle className="w-3.5 h-3.5 mr-1" />,
-      text: 'Hết kỳ hạn',
-      className: active 
-        ? 'bg-gradient-to-r from-orange-500 to-amber-600 text-white border-2 border-orange-400 shadow-lg shadow-orange-500/30' 
-        : 'bg-gradient-to-r from-orange-100 to-amber-100 text-orange-800 border border-orange-200',
-      iconColor: active ? 'text-white' : 'text-orange-500'
-    },
     disabled: {
       icon: <XCircle className="w-3.5 h-3.5 mr-1" />,
       text: 'Vô hiệu hóa',

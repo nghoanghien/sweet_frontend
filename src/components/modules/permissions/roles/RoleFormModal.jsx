@@ -46,9 +46,9 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
     },
     {
       id: 'perm4',
-      name: 'Quản lý khách hàng',
+      name: 'Quản lý khách hàng & tiền gửi',
       type: 'staff',
-      description: 'Quyền quản lý thông tin khách hàng'
+      description: 'Quyền quản lý thông tin khách hàng và tiền gửi'
     },
     {
       id: 'perm5',

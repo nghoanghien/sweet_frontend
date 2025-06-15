@@ -56,7 +56,7 @@ const ModernHeader = ({ activeSection }) => {
       decorations: ['💳', '💎', '💳']
     },
     customers: {
-      title: 'Quản lý khách hàng',
+      title: 'Quản lý khách hàng & tiền gửi',
       icon: Users,
       gradient: 'from-cyan-400 via-sky-500 to-blue-600',
       bgPattern: 'bg-gradient-to-br from-cyan-50/50 to-sky-50/50',
@@ -70,7 +70,7 @@ const ModernHeader = ({ activeSection }) => {
       decorations: ['🧿', '🧊', '⭐']
     },
     'deposit-slips': {
-      title: 'Quản lý phiếu gửi tiền',
+      title: 'Tra cứu phiếu gửi tiền',
       icon: Receipt,
       gradient: 'from-cyan-400 via-sky-500 to-blue-600',
       bgPattern: 'bg-gradient-to-br from-cyan-50/50 to-sky-50/50',

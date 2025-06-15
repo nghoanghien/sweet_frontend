@@ -1674,10 +1674,10 @@ export default function CustomerManagement() {
             transition={{ duration: 0.5 }}
           >
             <h2 className="text-xl font-semibold mb-1 bg-gradient-to-r from-indigo-700 to-blue-500 bg-clip-text text-transparent">
-              Quản lý khách hàng
+              Quản lý khách hàng & tiền gửi
             </h2>
             <p className="text-gray-500 text-sm">
-              Quản lý thông tin và trạng thái của khách hàng
+              Quản lý thông tin, trạng thái và tiền gửi của khách hàng
             </p>
           </motion.div>
 
@@ -1832,6 +1832,32 @@ export default function CustomerManagement() {
                 onClose={closeModal}
                 variant={isEditMode ? "teal" : "cyan"}
               />
+
+              {/* Disabled Customer Warning */}
+              <AnimatePresence>
+                {selectedCustomer && selectedCustomer.status === 'disabled' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.5, type: "spring" }}
+                    className="fixed top-0 left-2 md:left-44 right-2 z-50 mx-auto max-w-lg mt-4 px-6 py-4 rounded-3xl backdrop-blur-md bg-amber-500/50 shadow-lg"
+                    style={{
+                      boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)",
+                      backdropFilter: "blur(8px)"
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 bg-amber-600/30 rounded-full flex items-center justify-center">
+                        <XCircle size={20} className="text-amber-100" />
+                      </div>
+                      <div className="flex-1 text-amber-50 font-medium">
+                        Khách hàng này đang trong diện bị "Vô hiệu hóa", các thao tác nạp/rút tiền đều không thể thực hiện
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Tab Navigation */}
               {!isEditMode && (
