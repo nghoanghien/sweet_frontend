@@ -288,7 +288,7 @@ const PaymentAccountsNew = ({ customerId }) => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="transition-all duration-300"
       >
-        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10 ${viewMode !== 'grid' ? 'hidden' : ''}`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10 ${viewMode !== 'grid' ? 'hidden' : ''}`}>
           {filteredAccounts.map((account, index) => (
             <motion.div
               key={account.id}

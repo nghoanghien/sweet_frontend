@@ -39,13 +39,25 @@ const availableMaturityOptionsByInterestPaymentType = {
   'yearly': ['receive_all', 'rollover_principal']
 };
 
+const paymentAccounts = [
+  {
+  id: 1,
+  accountNumber: "1234567890123456",
+  status: "active",
+  balance: 15000000,
+  creationDate: "20/04/2022",
+  color: "bg-gradient-to-r from-blue-400 to-indigo-500",
+  icon: <CreditCard size={24} className="text-white" />
+}
+];
+
 const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=false }) => {
   const [step, setStep] = useState(1); // 1: Loại tiền gửi, 2: Tài khoản & số tiền, 3: Kỳ hạn & lãi suất, 4: Xác nhận
   const [formData, setFormData] = useState({
     nickname: '',
     amount: '',
-    sourceAccount: '',
-    targetAccount: '',
+    sourceAccount: paymentAccounts[0].id.toString(),
+    targetAccount: paymentAccounts[0].id.toString(),
     term: '12_months', // Sử dụng định dạng giống như trong sweet-main
     interestRate: '6.8',
     depositType: 'standard', // standard hoặc flexible
@@ -60,18 +72,6 @@ const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=fals
     interestAmount: 0,
     totalAmount: 0
   });
-
-  const paymentAccounts = [
-      {
-      id: 1,
-      accountNumber: "1234567890123456",
-      status: "active",
-      balance: 15000000,
-      creationDate: "20/04/2022",
-      color: "bg-gradient-to-r from-blue-400 to-indigo-500",
-      icon: <CreditCard size={24} className="text-white" />
-    }
-  ];
 
   // Định nghĩa các kỳ hạn có sẵn theo loại trả lãi
 const availableTermsByInterestType = {
@@ -185,7 +185,7 @@ const interestRateData = {
         nickname: '',
         amount: '',
         sourceAccount: '',
-        targetAccount: '',
+        targetAccount: paymentAccounts[0].id.toString(),
         term: '12_months',
         interestRate: '6.8',
         depositType: 'standard',
@@ -252,6 +252,7 @@ const interestRateData = {
 
   // Hàm xử lý thay đổi form data
   const handleFormDataChange = (name, value) => {
+
     // Cập nhật giá trị được thay đổi
     setFormData(prev => {
       const newFormData = { ...prev, [name]: value };
@@ -269,6 +270,7 @@ const interestRateData = {
       }
       
       return newFormData;
+      
     });
     
     // Clear error when field is edited
@@ -499,10 +501,16 @@ const interestRateData = {
 
               <div className="flex justify-between items-center relative z-10">
                 <div className="flex items-center gap-2">
-                  <motion.div layoutId="savings-icon" className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30">
+                  <motion.div
+                    layoutId="savings-icon"
+                    className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30"
+                  >
                     <PiggyBank size={18} className="text-white" />
                   </motion.div>
-                  <motion.h2 layoutId="savings-title" className="text-lg font-semibold tracking-wide">
+                  <motion.h2
+                    layoutId="savings-title"
+                    className="text-lg font-semibold tracking-wide"
+                  >
                     Mở tài khoản tiền gửi
                   </motion.h2>
                 </div>
@@ -763,500 +771,625 @@ const interestRateData = {
               {/* Step 2: Select Accounts and Amount - Modern Style */}
               {step === 2 && (
                 <motion.div
-                className="relative z-10"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                {/* Glass Header with Liquid Effect */}
-                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-                  <div className="relative">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-pink-400/20 to-rose-500/30 backdrop-blur-xl rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-2xl border border-white/20">
-                      <div className="absolute inset-0 bg-gradient-to-br from-pink-300/10 to-rose-400/20 rounded-2xl sm:rounded-3xl animate-pulse"></div>
-                      <Wallet size={18} className="text-pink-100 relative z-10 sm:w-5 sm:h-5" />
+                  className="relative z-10"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {/* Glass Header with Liquid Effect */}
+                  <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className="relative">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-pink-400/20 to-rose-500/30 backdrop-blur-xl rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-2xl border border-white/20">
+                        <div className="absolute inset-0 bg-gradient-to-br from-pink-300/10 to-rose-400/20 rounded-2xl sm:rounded-3xl animate-pulse"></div>
+                        <Wallet
+                          size={18}
+                          className="text-pink-100 relative z-10 sm:w-5 sm:h-5"
+                        />
+                      </div>
+                      {/* Liquid drops effect */}
+                      <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-60 animate-bounce [animation-delay:0.5s]"></div>
+                      <div className="absolute -bottom-0.5 -left-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-br from-rose-300 to-pink-400 rounded-full opacity-40 animate-bounce [animation-delay:1s]"></div>
                     </div>
-                    {/* Liquid drops effect */}
-                    <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-60 animate-bounce [animation-delay:0.5s]"></div>
-                    <div className="absolute -bottom-0.5 -left-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-br from-rose-300 to-pink-400 rounded-full opacity-40 animate-bounce [animation-delay:1s]"></div>
+                    <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                      Thông tin tài khoản và số tiền
+                    </h3>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                    Thông tin tài khoản và số tiền
-                  </h3>
-                </div>
-              
-                <div className="space-y-6 sm:space-y-8 mb-6">
-                  {/* Source Account - Liquid Glass Style */}
-                  <motion.div variants={itemVariants}>
-                    <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
-                        <CreditCard size={8} className="text-white sm:w-2.5 sm:h-2.5" />
-                      </div>
-                      Tài khoản nguồn
-                      <span className="text-pink-500">*</span>
-                    </label>
-                    
-                    <div className="overflow-x-auto pb-3 sm:pb-4 -mx-1 sm:-mx-2 px-1 sm:px-2">
-                      <div className="flex gap-3 sm:gap-4">
-                        {/* Cash at counter - Mobile Optimized */}
-                        {isAdmin && (
-                          <motion.div
-                            whileHover={{ 
-                              scale: 1.02,
-                              rotateY: 2,
-                              transition: { type: "spring", stiffness: 300, damping: 20 }
-                            }}
-                            whileTap={{ scale: 0.98 }}
-                            className={`flex-shrink-0 w-52 sm:w-64 relative group cursor-pointer transition-all duration-500 ${
-                              formData.sourceAccount === "cash_at_counter" ? "z-10" : ""
-                            }`}
-                            onClick={() =>
-                              handleFormDataChange("sourceAccount", "cash_at_counter")
-                            }
-                          >
-                            {/* Glass container */}
-                            <div className={`
+
+                  <div className="space-y-6 sm:space-y-8 mb-6">
+                    {/* Source Account - Liquid Glass Style */}
+                    {isAdmin && (
+                      <motion.div variants={itemVariants}>
+                        <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
+                          <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
+                            <CreditCard
+                              size={8}
+                              className="text-white sm:w-2.5 sm:h-2.5"
+                            />
+                          </div>
+                          Tài khoản nguồn
+                          <span className="text-pink-500">*</span>
+                        </label>
+
+                        <div className="overflow-x-auto pb-3 sm:pb-4 -mx-1 sm:-mx-2 px-1 sm:px-2">
+                          <div className="flex gap-3 sm:gap-4">
+                            {/* Cash at counter - Mobile Optimized */}
+                            <motion.div
+                              whileHover={{
+                                scale: 1.02,
+                                rotateY: 2,
+                                transition: {
+                                  type: "spring",
+                                  stiffness: 300,
+                                  damping: 20,
+                                },
+                              }}
+                              whileTap={{ scale: 0.98 }}
+                              className={`flex-shrink-0 w-52 sm:w-64 relative group cursor-pointer transition-all duration-500 ${
+                                formData.sourceAccount === "cash_at_counter"
+                                  ? "z-10"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                handleFormDataChange(
+                                  "sourceAccount",
+                                  "cash_at_counter"
+                                )
+                              }
+                            >
+                              {/* Glass container */}
+                              <div
+                                className={`
                               relative backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 transition-all duration-500
-                              ${formData.sourceAccount === "cash_at_counter" 
-                                ? "bg-gradient-to-br from-amber-100/40 to-orange-200/30 border-2 border-amber-300/50 shadow-2xl shadow-amber-200/30" 
-                                : "bg-white/20 border border-white/30 hover:bg-amber-50/20 hover:border-amber-200/40"
+                              ${
+                                formData.sourceAccount === "cash_at_counter"
+                                  ? "bg-gradient-to-br from-amber-100/40 to-orange-200/30 border-2 border-amber-300/50 shadow-2xl shadow-amber-200/30"
+                                  : "bg-white/20 border border-white/30 hover:bg-amber-50/20 hover:border-amber-200/40"
                               }
-                            `}>
-                              {/* Liquid effect background */}
-                              <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden">
-                                <div className={`
+                            `}
+                              >
+                                {/* Liquid effect background */}
+                                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden">
+                                  <div
+                                    className={`
                                   absolute inset-0 opacity-30 transition-all duration-700
-                                  ${formData.sourceAccount === "cash_at_counter"
-                                    ? "bg-gradient-to-br from-amber-200/60 via-orange-200/40 to-amber-300/50 animate-pulse"
-                                    : "bg-gradient-to-br from-white/10 to-pink-100/10"
+                                  ${
+                                    formData.sourceAccount === "cash_at_counter"
+                                      ? "bg-gradient-to-br from-amber-200/60 via-orange-200/40 to-amber-300/50 animate-pulse"
+                                      : "bg-gradient-to-br from-white/10 to-pink-100/10"
                                   }
-                                `}></div>
-                                {/* Floating liquid bubbles */}
-                                {formData.sourceAccount === "cash_at_counter" && (
-                                  <>
-                                    <div className="absolute top-3 right-4 sm:top-4 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-300/60 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                                    <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-orange-300/60 rounded-full animate-bounce [animation-delay:0.8s]"></div>
-                                  </>
-                                )}
-                              </div>
-              
-                              <div className="relative z-10 flex items-center justify-between">
-                                <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                                  <div className={`
+                                `}
+                                  ></div>
+                                  {/* Floating liquid bubbles */}
+                                  {formData.sourceAccount ===
+                                    "cash_at_counter" && (
+                                    <>
+                                      <div className="absolute top-3 right-4 sm:top-4 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-amber-300/60 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                                      <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-orange-300/60 rounded-full animate-bounce [animation-delay:0.8s]"></div>
+                                    </>
+                                  )}
+                                </div>
+
+                                <div className="relative z-10 flex items-center justify-between">
+                                  <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                                    <div
+                                      className={`
                                     w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex-shrink-0 transition-all duration-500 flex items-center justify-center
-                                    ${formData.sourceAccount === "cash_at_counter"
-                                      ? "bg-gradient-to-br from-amber-400/80 to-orange-500/80 shadow-lg backdrop-blur-sm"
-                                      : "bg-amber-100/60 backdrop-blur-sm"
+                                    ${
+                                      formData.sourceAccount ===
+                                      "cash_at_counter"
+                                        ? "bg-gradient-to-br from-amber-400/80 to-orange-500/80 shadow-lg backdrop-blur-sm"
+                                        : "bg-amber-100/60 backdrop-blur-sm"
                                     }
-                                  `}>
-                                    <DollarSign
-                                      size={18}
-                                      className={
-                                        formData.sourceAccount === "cash_at_counter"
-                                          ? "text-white"
-                                          : "text-amber-600"
-                                      }
-                                    />
-                                  </div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="text-sm sm:text-base font-semibold text-slate-800 mb-0.5 sm:mb-1 truncate">
-                                      Tiền mặt tại quầy
+                                  `}
+                                    >
+                                      <DollarSign
+                                        size={18}
+                                        className={
+                                          formData.sourceAccount ===
+                                          "cash_at_counter"
+                                            ? "text-white"
+                                            : "text-amber-600"
+                                        }
+                                      />
                                     </div>
-                                    <div className="text-xs sm:text-sm text-slate-600/80 truncate">
-                                      Gửi tiền mặt trực tiếp
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-sm sm:text-base font-semibold text-slate-800 mb-0.5 sm:mb-1 truncate">
+                                        Tiền mặt tại quầy
+                                      </div>
+                                      <div className="text-xs sm:text-sm text-slate-600/80 truncate">
+                                        Gửi tiền mặt trực tiếp
+                                      </div>
                                     </div>
                                   </div>
+                                  {formData.sourceAccount ===
+                                    "cash_at_counter" && (
+                                    <motion.div
+                                      initial={{ scale: 0, rotate: -180 }}
+                                      animate={{ scale: 1, rotate: 0 }}
+                                      transition={{
+                                        type: "spring",
+                                        stiffness: 500,
+                                        damping: 15,
+                                      }}
+                                      className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0"
+                                    >
+                                      <Check
+                                        size={12}
+                                        className="text-white sm:w-4 sm:h-4"
+                                      />
+                                    </motion.div>
+                                  )}
                                 </div>
-                                {formData.sourceAccount === "cash_at_counter" && (
-                                  <motion.div
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                                    className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0"
+                              </div>
+
+                              {/* Glass reflection effect */}
+                              <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 to-transparent opacity-60 pointer-events-none"></div>
+                            </motion.div>
+
+                            {/* Payment accounts - Mobile Optimized with Pink Theme */}
+                            {paymentAccounts
+                              .filter((account) => account.status === "active")
+                              .map((account) => (
+                                <motion.div
+                                  key={account.id}
+                                  whileHover={{
+                                    scale: 1.02,
+                                    rotateY: 2,
+                                    transition: {
+                                      type: "spring",
+                                      stiffness: 300,
+                                      damping: 20,
+                                    },
+                                  }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className={`flex-shrink-0 w-52 sm:w-64 relative group cursor-pointer transition-all duration-500 ${
+                                    formData.sourceAccount ===
+                                    account.id.toString()
+                                      ? "z-10"
+                                      : ""
+                                  }`}
+                                  onClick={() =>
+                                    handleFormDataChange(
+                                      "sourceAccount",
+                                      account.id.toString()
+                                    )
+                                  }
+                                >
+                                  {/* Glass container */}
+                                  <div
+                                    className={`
+                                relative backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 transition-all duration-500
+                                ${
+                                  formData.sourceAccount ===
+                                  account.id.toString()
+                                    ? "bg-gradient-to-br from-pink-100/40 to-rose-200/30 border-2 border-pink-300/50 shadow-2xl shadow-pink-200/30"
+                                    : "bg-white/20 border border-white/30 hover:bg-pink-50/20 hover:border-pink-200/40"
+                                }
+                              `}
                                   >
-                                    <Check size={12} className="text-white sm:w-4 sm:h-4" />
-                                  </motion.div>
-                                )}
-                              </div>
-                            </div>
-              
-                            {/* Glass reflection effect */}
-                            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 to-transparent opacity-60 pointer-events-none"></div>
-                          </motion.div>
-                        )}
-              
-                        {/* Payment accounts - Mobile Optimized with Pink Theme */}
-                        {paymentAccounts
-                          .filter((account) => account.status === "active")
-                          .map((account) => (
-                            <motion.div
-                              key={account.id}
-                              whileHover={{ 
-                                scale: 1.02,
-                                rotateY: 2,
-                                transition: { type: "spring", stiffness: 300, damping: 20 }
-                              }}
-                              whileTap={{ scale: 0.98 }}
-                              className={`flex-shrink-0 w-52 sm:w-64 relative group cursor-pointer transition-all duration-500 ${
-                                formData.sourceAccount === account.id.toString() ? "z-10" : ""
-                              }`}
-                              onClick={() =>
-                                handleFormDataChange("sourceAccount", account.id.toString())
-                              }
-                            >
-                              {/* Glass container */}
-                              <div className={`
-                                relative backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 transition-all duration-500
-                                ${formData.sourceAccount === account.id.toString()
-                                  ? "bg-gradient-to-br from-pink-100/40 to-rose-200/30 border-2 border-pink-300/50 shadow-2xl shadow-pink-200/30" 
-                                  : "bg-white/20 border border-white/30 hover:bg-pink-50/20 hover:border-pink-200/40"
-                                }
-                              `}>
-                                {/* Liquid effect background */}
-                                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden">
-                                  <div className={`
+                                    {/* Liquid effect background */}
+                                    <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden">
+                                      <div
+                                        className={`
                                     absolute inset-0 opacity-30 transition-all duration-700
-                                    ${formData.sourceAccount === account.id.toString()
-                                      ? "bg-gradient-to-br from-pink-200/60 via-rose-200/40 to-pink-300/50 animate-pulse"
-                                      : "bg-gradient-to-br from-white/10 to-slate-100/10"
+                                    ${
+                                      formData.sourceAccount ===
+                                      account.id.toString()
+                                        ? "bg-gradient-to-br from-pink-200/60 via-rose-200/40 to-pink-300/50 animate-pulse"
+                                        : "bg-gradient-to-br from-white/10 to-slate-100/10"
                                     }
-                                  `}></div>
-                                  {/* Floating liquid bubbles */}
-                                  {formData.sourceAccount === account.id.toString() && (
-                                    <>
-                                      <div className="absolute top-3 right-4 sm:top-4 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-300/60 rounded-full animate-bounce [animation-delay:0.3s]"></div>
-                                      <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-300/60 rounded-full animate-bounce [animation-delay:0.9s]"></div>
-                                    </>
-                                  )}
-                                </div>
-              
-                                <div className="relative z-10">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div className="text-sm sm:text-base font-semibold text-slate-800 truncate pr-2">
-                                      {account.nickname}
+                                  `}
+                                      ></div>
+                                      {/* Floating liquid bubbles */}
+                                      {formData.sourceAccount ===
+                                        account.id.toString() && (
+                                        <>
+                                          <div className="absolute top-3 right-4 sm:top-4 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-300/60 rounded-full animate-bounce [animation-delay:0.3s]"></div>
+                                          <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-300/60 rounded-full animate-bounce [animation-delay:0.9s]"></div>
+                                        </>
+                                      )}
                                     </div>
-                                    {formData.sourceAccount === account.id.toString() && (
-                                      <motion.div
-                                        initial={{ scale: 0, rotate: -180 }}
-                                        animate={{ scale: 1, rotate: 0 }}
-                                        transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                                        className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0"
-                                      >
-                                        <Check size={12} className="text-white sm:w-4 sm:h-4" />
-                                      </motion.div>
-                                    )}
-                                  </div>
-                                  <div className="text-xs sm:text-sm text-slate-600/80 mb-2 truncate">
-                                    {maskAccountNumber(account.accountNumber)}
-                                  </div>
-                                  <div className="text-base sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                                    {formatCurrency(account.balance)}
-                                  </div>
-                                </div>
-                              </div>
-              
-                              {/* Glass reflection effect */}
-                              <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 to-transparent opacity-60 pointer-events-none"></div>
-                            </motion.div>
-                          ))}
-                      </div>
-                    </div>
-                    
-                    {formErrors.sourceAccount && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
-                      >
-                        <AlertCircle size={14} className="flex-shrink-0" />
-                        <span className="break-words">{formErrors.sourceAccount}</span>
-                      </motion.p>
-                    )}
-                  </motion.div>
-              
-                  {/* Target Account - Pink Theme Mobile Optimized */}
-                  <motion.div variants={itemVariants}>
-                    <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-rose-400 to-pink-500 rounded-md sm:rounded-lg flex items-center justify-center">
-                        <CreditCard size={8} className="text-white sm:w-2.5 sm:h-2.5" />
-                      </div>
-                      Tài khoản nhận tiền
-                      <span className="text-rose-500">*</span>
-                    </label>
-                    
-                    <div className="overflow-x-auto pb-3 sm:pb-4 -mx-1 sm:-mx-2 px-1 sm:px-2">
-                      <div className="flex gap-3 sm:gap-4">
-                        {paymentAccounts
-                          .filter((account) => account.status === "active")
-                          .map((account) => (
-                            <motion.div
-                              key={account.id}
-                              whileHover={{ 
-                                scale: 1.02,
-                                rotateY: 2,
-                                transition: { type: "spring", stiffness: 300, damping: 20 }
-                              }}
-                              whileTap={{ scale: 0.98 }}
-                              className={`flex-shrink-0 w-52 sm:w-64 relative group cursor-pointer transition-all duration-500 ${
-                                formData.targetAccount === account.id.toString() ? "z-10" : ""
-                              }`}
-                              onClick={() =>
-                                handleFormDataChange("targetAccount", account.id.toString())
-                              }
-                            >
-                              {/* Glass container */}
-                              <div className={`
-                                relative backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 transition-all duration-500
-                                ${formData.targetAccount === account.id.toString()
-                                  ? "bg-gradient-to-br from-rose-100/40 to-pink-200/30 border-2 border-rose-300/50 shadow-2xl shadow-rose-200/30" 
-                                  : "bg-white/20 border border-white/30 hover:bg-rose-50/20 hover:border-rose-200/40"
-                                }
-                              `}>
-                                {/* Liquid effect background */}
-                                <div className="absolute inset-0 rounded-2xl sm:rounded-3xl overflow-hidden">
-                                  <div className={`
-                                    absolute inset-0 opacity-30 transition-all duration-700
-                                    ${formData.targetAccount === account.id.toString()
-                                      ? "bg-gradient-to-br from-rose-200/60 via-pink-200/40 to-rose-300/50 animate-pulse"
-                                      : "bg-gradient-to-br from-white/10 to-slate-100/10"
-                                    }
-                                  `}></div>
-                                  {/* Floating liquid bubbles */}
-                                  {formData.targetAccount === account.id.toString() && (
-                                    <>
-                                      <div className="absolute top-3 right-4 sm:top-4 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-300/60 rounded-full animate-bounce [animation-delay:0.4s]"></div>
-                                      <div className="absolute bottom-6 left-6 sm:bottom-8 sm:left-8 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-pink-300/60 rounded-full animate-bounce [animation-delay:1.2s]"></div>
-                                    </>
-                                  )}
-                                </div>
-              
-                                <div className="relative z-10">
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div className="text-sm sm:text-base font-semibold text-slate-800 truncate pr-2">
-                                      {account.nickname}
+
+                                    <div className="relative z-10">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <div className="text-sm sm:text-base font-semibold text-slate-800 truncate pr-2">
+                                          {account.nickname}
+                                        </div>
+                                        {formData.sourceAccount ===
+                                          account.id.toString() && (
+                                          <motion.div
+                                            initial={{ scale: 0, rotate: -180 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            transition={{
+                                              type: "spring",
+                                              stiffness: 500,
+                                              damping: 15,
+                                            }}
+                                            className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0"
+                                          >
+                                            <Check
+                                              size={12}
+                                              className="text-white sm:w-4 sm:h-4"
+                                            />
+                                          </motion.div>
+                                        )}
+                                      </div>
+                                      <div className="text-xs sm:text-sm text-slate-600/80 mb-2 truncate">
+                                        {maskAccountNumber(
+                                          account.accountNumber
+                                        )}
+                                      </div>
+                                      <div className="text-base sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+                                        {formatCurrency(account.balance)}
+                                      </div>
                                     </div>
-                                    {formData.targetAccount === account.id.toString() && (
-                                      <motion.div
-                                        initial={{ scale: 0, rotate: -180 }}
-                                        animate={{ scale: 1, rotate: 0 }}
-                                        transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                                        className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm flex-shrink-0"
-                                      >
-                                        <Check size={12} className="text-white sm:w-4 sm:h-4" />
-                                      </motion.div>
-                                    )}
                                   </div>
-                                  <div className="text-xs sm:text-sm text-slate-600/80 truncate">
-                                    {maskAccountNumber(account.accountNumber)}
-                                  </div>
-                                </div>
-                              </div>
-              
-                              {/* Glass reflection effect */}
-                              <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 to-transparent opacity-60 pointer-events-none"></div>
-                            </motion.div>
-                          ))}
-                      </div>
-                    </div>
-                    
-                    {formErrors.targetAccount && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
-                      >
-                        <AlertCircle size={14} className="flex-shrink-0" />
-                        <span className="break-words">{formErrors.targetAccount}</span>
-                      </motion.p>
-                    )}
-                  </motion.div>
-              
-                  {/* Amount Input - Pink Theme Mobile Optimized */}
-                  <motion.div variants={itemVariants}>
-                    <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
-                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
-                        <Banknote size={8} className="text-white sm:w-2.5 sm:h-2.5" />
-                      </div>
-                      Số tiền gửi
-                      <span className="text-pink-500">*</span>
-                      <span className="text-slate-500 text-xs block sm:hidden">
-                        (Tối thiểu 100.000đ)
-                      </span>
-                      <span className="text-slate-500 text-xs hidden sm:inline">
-                        (Tối thiểu 100.000đ)
-                      </span>
-                    </label>
-                    
-                    <div className="relative group">
-                      {/* Glass container for input */}
-                      <div className="relative backdrop-blur-2xl bg-white/30 border-2 border-white/40 rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/40 hover:border-pink-200/60 focus-within:bg-white/50 focus-within:border-pink-300/80 focus-within:shadow-2xl focus-within:shadow-pink-200/30">
-                        {/* Liquid background effect */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 via-rose-100/10 to-pink-100/20 opacity-50"></div>
-                        
-                        {/* Icon container */}
-                        <div className="absolute inset-y-0 left-4 sm:left-6 flex items-center pointer-events-none">
-                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-pink-400/80 to-rose-500/80 backdrop-blur-sm border-2 border-pink-300/60 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-                            <PiggyBankIcon size={16} className="text-white sm:w-5 sm:h-5" />
+
+                                  {/* Glass reflection effect */}
+                                  <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 to-transparent opacity-60 pointer-events-none"></div>
+                                </motion.div>
+                              ))}
                           </div>
                         </div>
-                        
-                        <input
-                          type="text"
-                          value={formData.amount}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/[^\d]/g, "");
-                            handleFormDataChange("amount", value);
-                          }}
-                          placeholder="Nhập số tiền"
-                          className={`
+
+                        {formErrors.sourceAccount && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
+                          >
+                            <AlertCircle size={14} className="flex-shrink-0" />
+                            <span className="break-words">
+                              {formErrors.sourceAccount}
+                            </span>
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Amount Input - Pink Theme Mobile Optimized */}
+                    <motion.div variants={itemVariants}>
+                      <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
+                        <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
+                          <Banknote
+                            size={8}
+                            className="text-white sm:w-2.5 sm:h-2.5"
+                          />
+                        </div>
+                        Số tiền gửi
+                        <span className="text-pink-500">*</span>
+                        <span className="text-slate-500 text-xs block sm:hidden">
+                          (Tối thiểu 100.000đ)
+                        </span>
+                        <span className="text-slate-500 text-xs hidden sm:inline">
+                          (Tối thiểu 100.000đ)
+                        </span>
+                      </label>
+
+                      <div className="relative group">
+                        {/* Glass container for input */}
+                        <div className="relative backdrop-blur-2xl bg-white/30 border-2 border-white/40 rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/40 hover:border-pink-200/60 focus-within:bg-white/50 focus-within:border-pink-300/80 focus-within:shadow-2xl focus-within:shadow-pink-200/30">
+                          {/* Liquid background effect */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 via-rose-100/10 to-pink-100/20 opacity-50"></div>
+
+                          {/* Icon container */}
+                          <div className="absolute inset-y-0 left-4 sm:left-6 flex items-center pointer-events-none">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-pink-400/80 to-rose-500/80 backdrop-blur-sm border-2 border-pink-300/60 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                              <PiggyBankIcon
+                                size={16}
+                                className="text-white sm:w-5 sm:h-5"
+                              />
+                            </div>
+                          </div>
+
+                          <input
+                            type="text"
+                            value={formData.amount}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(
+                                /[^\d]/g,
+                                ""
+                              );
+                              handleFormDataChange("amount", value);
+                            }}
+                            placeholder="Nhập số tiền"
+                            className={`
                             relative z-10 block w-full pl-16 sm:pl-24 pr-16 sm:pr-20 py-4 sm:py-6 text-lg sm:text-xl font-semibold
                             bg-transparent border-0 outline-none transition-all duration-300
                             placeholder:text-slate-500/60 text-slate-800
                             ${formErrors.amount ? "text-red-600" : ""}
                           `}
-                        />
-                        
-                        {/* Currency label */}
-                        <div className="absolute inset-y-0 right-3 sm:right-6 flex items-center pointer-events-none">
-                          <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent px-2 sm:px-4 py-1 sm:py-2 bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl">
-                            VND
-                          </span>
-                        </div>
-              
-                        {/* Floating liquid particles */}
-                        <div className="absolute top-3 right-16 sm:top-4 sm:right-20 w-1 h-1 sm:w-1 sm:h-1 bg-pink-400/60 rounded-full animate-bounce [animation-delay:0.5s]"></div>
-                        <div className="absolute bottom-3 left-16 sm:bottom-4 sm:left-20 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-400/60 rounded-full animate-bounce [animation-delay:1.5s]"></div>
-                      </div>
-                    </div>
-              
-                    <AnimatePresence>
-                      {formErrors.amount ? (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
-                        >
-                          <AlertCircle size={14} className="flex-shrink-0" />
-                          <span className="break-words">{formErrors.amount}</span>
-                        </motion.p>
-                      ) : (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="mt-3 text-xs sm:text-sm text-slate-600 flex items-center gap-1.5 sm:gap-2 bg-slate-50/60 backdrop-blur-sm border border-slate-200/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
-                        >
-                          {formData.sourceAccount &&
-                            formData.sourceAccount !== "cash_at_counter" && (
-                              <>
-                                <Wallet size={14} className="text-slate-500 flex-shrink-0" />
-                                <span className="truncate">
-                                  Số dư khả dụng:{" "}
-                                  <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
-                                    {formatCurrency(
-                                      paymentAccounts.find(
-                                        (acc) => acc.id === parseInt(formData.sourceAccount)
-                                      )?.balance || 0
-                                    )}
-                                  </span>
-                                </span>
-                              </>
-                            )}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
-              
-                    {/* Amount Display - Pink Theme Mobile Optimized */}
-                    <AnimatePresence>
-                      {formData.amount && parseInt(formData.amount) > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8, y: -20 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                          className="mt-4 relative group"
-                        >
-                          <div className="relative backdrop-blur-2xl bg-gradient-to-br from-pink-100/40 to-rose-200/30 border-2 border-pink-300/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl shadow-pink-200/30 overflow-hidden">
-                            {/* Liquid background animation */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-pink-200/30 via-rose-200/20 to-pink-300/30 animate-pulse opacity-60"></div>
-                            
-                            {/* Floating particles */}
-                            <div className="absolute top-2 right-4 sm:top-3 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-400/60 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                            <div className="absolute bottom-2 left-4 sm:bottom-3 sm:left-6 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-400/60 rounded-full animate-bounce [animation-delay:0.8s]"></div>
-                            
-                            <div className="relative z-10 flex flex-row   justify-between gap-0">
-                              <span className="text-sm sm:text-lg font-semibold text-slate-700">Số tiền gửi:</span>
-                              <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-pink-600 via-rose-600 to-pink-600 bg-clip-text text-transparent break-all">
-                                {formatCurrency(parseInt(formData.amount))}
-                              </span>
-                            </div>
-                            
-                            {/* Glass reflection */}
-                            <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/30 to-transparent opacity-70 pointer-events-none"></div>
+                          />
+
+                          {/* Currency label */}
+                          <div className="absolute inset-y-0 right-3 sm:right-6 flex items-center pointer-events-none">
+                            <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent px-2 sm:px-4 py-1 sm:py-2 bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl">
+                              VND
+                            </span>
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                </div>
-              </motion.div>
+
+                          {/* Floating liquid particles */}
+                          <div className="absolute top-3 right-16 sm:top-4 sm:right-20 w-1 h-1 sm:w-1 sm:h-1 bg-pink-400/60 rounded-full animate-bounce [animation-delay:0.5s]"></div>
+                          <div className="absolute bottom-3 left-16 sm:bottom-4 sm:left-20 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-400/60 rounded-full animate-bounce [animation-delay:1.5s]"></div>
+                        </div>
+                      </div>
+
+                      <AnimatePresence>
+                        {formErrors.amount ? (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
+                          >
+                            <AlertCircle size={14} className="flex-shrink-0" />
+                            <span className="break-words">
+                              {formErrors.amount}
+                            </span>
+                          </motion.p>
+                        ) : (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="mt-3 text-xs sm:text-sm text-slate-600 flex items-center gap-1.5 sm:gap-2 bg-slate-50/60 backdrop-blur-sm border border-slate-200/40 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
+                          >
+                            {!isAdmin && (
+                              <>
+                              <Wallet
+                                size={14}
+                                className="text-slate-500 flex-shrink-0"
+                              />
+                              <span className="truncate">
+                                Số dư khả dụng:{" "}
+                                <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
+                                  {formatCurrency(
+                                    paymentAccounts.find(
+                                      (acc) =>
+                                        acc.id ===
+                                        parseInt(formData.sourceAccount)
+                                    )?.balance || 0
+                                  )}
+                                </span>
+                              </span>
+                            </>
+                            )}
+                            {isAdmin && formData.sourceAccount &&
+                              formData.sourceAccount !== "cash_at_counter" && (
+                                <>
+                                  <Wallet
+                                    size={14}
+                                    className="text-slate-500 flex-shrink-0"
+                                  />
+                                  <span className="truncate">
+                                    Số dư khả dụng:{" "}
+                                    <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
+                                      {formatCurrency(
+                                        paymentAccounts.find(
+                                          (acc) =>
+                                            acc.id ===
+                                            parseInt(formData.sourceAccount)
+                                        )?.balance || 0
+                                      )}
+                                    </span>
+                                  </span>
+                                </>
+                              )}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Amount Display - Pink Theme Mobile Optimized */}
+                      <AnimatePresence>
+                        {formData.amount && parseInt(formData.amount) > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 20,
+                            }}
+                            className="mt-4 relative group"
+                          >
+                            <div className="relative backdrop-blur-2xl bg-gradient-to-br from-pink-100/40 to-rose-200/30 border-2 border-pink-300/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl shadow-pink-200/30 overflow-hidden">
+                              {/* Liquid background animation */}
+                              <div className="absolute inset-0 bg-gradient-to-br from-pink-200/30 via-rose-200/20 to-pink-300/30 animate-pulse opacity-60"></div>
+
+                              {/* Floating particles */}
+                              <div className="absolute top-2 right-4 sm:top-3 sm:right-6 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-400/60 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                              <div className="absolute bottom-2 left-4 sm:bottom-3 sm:left-6 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-400/60 rounded-full animate-bounce [animation-delay:0.8s]"></div>
+
+                              <div className="relative z-10 flex flex-row   justify-between gap-0">
+                                <span className="text-sm sm:text-lg font-semibold text-slate-700">
+                                  Số tiền gửi:
+                                </span>
+                                <span className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-pink-600 via-rose-600 to-pink-600 bg-clip-text text-transparent break-all">
+                                  {formatCurrency(parseInt(formData.amount))}
+                                </span>
+                              </div>
+
+                              {/* Glass reflection */}
+                              <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/30 to-transparent opacity-70 pointer-events-none"></div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
+                </motion.div>
               )}
 
               {/* Step 3: Interest and Term Options */}
               {step === 3 && (
                 <div className="animate-fadeInSlideUp pb-24 md:pb-0">
-                {/* Header với liquid glass effect */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="relative w-8 h-8 rounded-xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20">
-                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500/60 to-rose-400/60" />
-                    <div className="relative flex items-center justify-center h-full">
-                      <Clock size={16} className="text-white drop-shadow-sm" />
+                  {/* Header với liquid glass effect */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="relative w-8 h-8 rounded-xl overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20">
+                      <div className="absolute inset-0 bg-gradient-to-br from-pink-500/60 to-rose-400/60" />
+                      <div className="relative flex items-center justify-center h-full">
+                        <Clock
+                          size={16}
+                          className="text-white drop-shadow-sm"
+                        />
+                      </div>
+                      {/* Liquid highlight */}
+                      <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-xl" />
                     </div>
-                    {/* Liquid highlight */}
-                    <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-xl" />
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Kỳ hạn và lãi suất
+                    </h3>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Kỳ hạn và lãi suất
-                  </h3>
-                </div>
-              
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Left Column */}
-                  <div className="space-y-6">
-                    {/* Interest Payment Type */}
-                    <motion.div variants={itemVariants}>
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
-                        <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20">
-                          <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
-                          <div className="relative flex items-center justify-center h-full">
-                            <Sparkles size={12} className="text-white drop-shadow-sm" />
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Left Column */}
+                    <div className="space-y-6">
+                      {/* Interest Payment Type */}
+                      <motion.div variants={itemVariants}>
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
+                          <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20">
+                            <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
+                            <div className="relative flex items-center justify-center h-full">
+                              <Sparkles
+                                size={12}
+                                className="text-white drop-shadow-sm"
+                              />
+                            </div>
+                            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
                           </div>
-                          <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
+                          Thời điểm nhận lãi
+                        </label>
+                        <div className="space-y-3">
+                          {Object.entries(interestPaymentTypeDisplayNames).map(
+                            ([key, displayName], index) => (
+                              <motion.div
+                                key={key}
+                                className={`group relative overflow-hidden rounded-2xl backdrop-blur-xl border transition-all duration-500 cursor-pointer ${
+                                  formData.interestPaymentType === key
+                                    ? "bg-gradient-to-br from-pink-200/40 via-pink-600/30 to-pink-200/20 border-white/30 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] shadow-pink-500/50"
+                                    : "bg-gradient-to-br from-white/20 via-white/15 to-white/10 border-white/20 hover:border-white/30 hover:bg-gradient-to-br hover:from-white/30 hover:via-white/25 hover:to-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
+                                }`}
+                                onClick={() => {
+                                  handleFormDataChange(
+                                    "interestPaymentType",
+                                    key
+                                  );
+                                  if (
+                                    !availableTermsByInterestType[key].includes(
+                                      formData.term
+                                    )
+                                  ) {
+                                    handleFormDataChange(
+                                      "term",
+                                      availableTermsByInterestType[key][0]
+                                    );
+                                  }
+                                }}
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                              >
+                                {/* Liquid glass reflections */}
+                                <div className="absolute inset-0 rounded-2xl">
+                                  <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
+                                  <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
+                                </div>
+
+                                <div className="flex items-start gap-4 relative z-10 p-4">
+                                  <div
+                                    className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)] ${
+                                      formData.interestPaymentType === key
+                                        ? "bg-gradient-to-br from-pink-400/80 to-rose-500/80"
+                                        : "bg-gradient-to-br from-white/30 to-white/10 group-hover:from-pink-100/50 group-hover:to-pink-200/30"
+                                    }`}
+                                  >
+                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
+                                    {formData.interestPaymentType === key && (
+                                      <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="relative z-10"
+                                      >
+                                        <Check
+                                          size={14}
+                                          className="text-white drop-shadow-sm"
+                                        />
+                                      </motion.div>
+                                    )}
+                                  </div>
+
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className="font-semibold text-gray-800 drop-shadow-sm">
+                                        {displayName}
+                                      </span>
+                                      {key === "yearly" && (
+                                        <span className="px-2 py-0.5 backdrop-blur-md bg-gradient-to-r from-orange-400/80 to-orange-500/80 border border-white/20 text-white text-xs rounded-full font-medium shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]">
+                                          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/20 to-transparent" />
+                                          <span className="relative">Mới</span>
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-sm text-gray-600 leading-relaxed drop-shadow-sm">
+                                      {key === "end_of_term" &&
+                                        "Nhận lãi vào cuối kỳ hạn - Tối ưu cho tích lũy dài hạn"}
+                                      {key === "monthly" &&
+                                        "Nhận lãi hàng tháng - Phù hợp với chi tiêu thường xuyên"}
+                                      {key === "quarterly" &&
+                                        "Nhận lãi hàng quý - Cân bằng giữa thanh khoản và lợi nhuận"}
+                                      {key === "yearly" &&
+                                        "Nhận lãi ngay sau khi gửi - Linh hoạt tối đa"}
+                                    </p>
+                                    {(key === "monthly" ||
+                                      key === "quarterly" ||
+                                      key === "yearly") && (
+                                      <div className="mt-2 p-2 backdrop-blur-md bg-gradient-to-br from-pink-50/80 to-rose-50/80 border border-pink-200/30 rounded-lg">
+                                        <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent" />
+                                        <p className="text-xs text-pink-700 flex items-center gap-1 relative">
+                                          <AlertCircle size={12} />
+                                          Rút tiền trước hạn cần trả lại số lãi
+                                          đã nhận
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )
+                          )}
                         </div>
-                        Thời điểm nhận lãi
-                      </label>
-                      <div className="space-y-3">
-                        {Object.entries(interestPaymentTypeDisplayNames).map(
-                          ([key, displayName], index) => (
+                      </motion.div>
+
+                      {/* Maturity Options */}
+                      <motion.div variants={itemVariants} className="lg:block">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
+                          <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]">
+                            <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
+                            <div className="relative flex items-center justify-center h-full">
+                              <RotateCcw
+                                size={12}
+                                className="text-white drop-shadow-sm"
+                              />
+                            </div>
+                            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
+                          </div>
+                          Phương thức đáo hạn
+                        </label>
+                        <div className="space-y-3">
+                          {availableMaturityOptionsByInterestPaymentType[
+                            formData.interestPaymentType
+                          ].map((option) => (
                             <motion.div
-                              key={key}
+                              key={option}
                               className={`group relative overflow-hidden rounded-2xl backdrop-blur-xl border transition-all duration-500 cursor-pointer ${
-                                formData.interestPaymentType === key
+                                formData.maturityOption === option
                                   ? "bg-gradient-to-br from-pink-200/40 via-pink-600/30 to-pink-200/20 border-white/30 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] shadow-pink-500/50"
                                   : "bg-gradient-to-br from-white/20 via-white/15 to-white/10 border-white/20 hover:border-white/30 hover:bg-gradient-to-br hover:from-white/30 hover:via-white/25 hover:to-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
                               }`}
-                              onClick={() => {
-                                handleFormDataChange("interestPaymentType", key);
-                                if (
-                                  !availableTermsByInterestType[key].includes(formData.term)
-                                ) {
-                                  handleFormDataChange(
-                                    "term",
-                                    availableTermsByInterestType[key][0]
-                                  );
-                                }
-                              }}
-                              variants={itemVariants}
+                              onClick={() =>
+                                handleFormDataChange("maturityOption", option)
+                              }
                               whileHover={{ scale: 1.02, y: -2 }}
                               whileTap={{ scale: 0.98 }}
                             >
@@ -1265,319 +1398,247 @@ const interestRateData = {
                                 <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
                                 <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
                               </div>
-              
-                             
-              
-                              <div className="flex items-start gap-4 relative z-10 p-4">
+
+                              <div className="flex items-center gap-4 relative z-10 p-4">
                                 <div
-                                  className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)] ${
-                                    formData.interestPaymentType === key
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] ${
+                                    formData.maturityOption === option
                                       ? "bg-gradient-to-br from-pink-400/80 to-rose-500/80"
                                       : "bg-gradient-to-br from-white/30 to-white/10 group-hover:from-pink-100/50 group-hover:to-pink-200/30"
                                   }`}
                                 >
                                   <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
-                                  {formData.interestPaymentType === key && (
+                                  {formData.maturityOption === option && (
                                     <motion.div
                                       initial={{ scale: 0 }}
                                       animate={{ scale: 1 }}
                                       className="relative z-10"
                                     >
-                                      <Check size={14} className="text-white drop-shadow-sm" />
+                                      <Check
+                                        size={14}
+                                        className="text-white drop-shadow-sm"
+                                      />
                                     </motion.div>
                                   )}
                                 </div>
-              
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
+                                <div>
+                                  <div className="flex items-center gap-2">
                                     <span className="font-semibold text-gray-800 drop-shadow-sm">
-                                      {displayName}
+                                      {maturityOptionDisplayNames[option]}
                                     </span>
-                                    {key === "yearly" && (
-                                      <span className="px-2 py-0.5 backdrop-blur-md bg-gradient-to-r from-orange-400/80 to-orange-500/80 border border-white/20 text-white text-xs rounded-full font-medium shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]">
-                                        <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/20 to-transparent" />
-                                        <span className="relative">Mới</span>
-                                      </span>
+                                    {option === "receive_all" && (
+                                      <Wallet
+                                        size={14}
+                                        className="text-pink-500 drop-shadow-sm"
+                                      />
+                                    )}
+                                    {option === "rollover_principal" && (
+                                      <RefreshCw
+                                        size={14}
+                                        className="text-pink-500 drop-shadow-sm"
+                                      />
+                                    )}
+                                    {option === "rollover_all" && (
+                                      <RefreshCcw
+                                        size={14}
+                                        className="text-pink-500 drop-shadow-sm"
+                                      />
                                     )}
                                   </div>
-                                  <p className="text-sm text-gray-600 leading-relaxed drop-shadow-sm">
-                                    {key === "end_of_term" &&
-                                      "Nhận lãi vào cuối kỳ hạn - Tối ưu cho tích lũy dài hạn"}
-                                    {key === "monthly" &&
-                                      "Nhận lãi hàng tháng - Phù hợp với chi tiêu thường xuyên"}
-                                    {key === "quarterly" &&
-                                      "Nhận lãi hàng quý - Cân bằng giữa thanh khoản và lợi nhuận"}
-                                    {key === "yearly" &&
-                                      "Nhận lãi ngay sau khi gửi - Linh hoạt tối đa"}
+                                  <p className="text-sm text-gray-600 drop-shadow-sm">
+                                    {option === "receive_all" &&
+                                      "Nhận toàn bộ tiền gốc và lãi khi đáo hạn"}
+                                    {option === "rollover_principal" &&
+                                      "Nhận lãi và tự động gửi lại tiền gốc"}
+                                    {option === "rollover_all" &&
+                                      "Tự động gửi lại cả gốc và lãi khi đáo hạn"}
                                   </p>
-                                  {(key === "monthly" ||
-                                    key === "quarterly" ||
-                                    key === "yearly") && (
-                                    <div className="mt-2 p-2 backdrop-blur-md bg-gradient-to-br from-pink-50/80 to-rose-50/80 border border-pink-200/30 rounded-lg">
-                                      <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/20 to-transparent" />
-                                      <p className="text-xs text-pink-700 flex items-center gap-1 relative">
-                                        <AlertCircle size={12} />
-                                        Rút tiền trước hạn cần trả lại số lãi đã nhận
-                                      </p>
-                                    </div>
-                                  )}
                                 </div>
                               </div>
                             </motion.div>
-                          )
-                        )}
-                      </div>
-                    </motion.div>
-              
-                    {/* Maturity Options */}
-                    <motion.div variants={itemVariants} className="lg:block">
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
-                        <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)]">
-                          <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
-                          <div className="relative flex items-center justify-center h-full">
-                            <RotateCcw size={12} className="text-white drop-shadow-sm" />
-                          </div>
-                          <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
+                          ))}
                         </div>
-                        Phương thức đáo hạn
-                      </label>
-                      <div className="space-y-3">
-                        {availableMaturityOptionsByInterestPaymentType[
-                          formData.interestPaymentType
-                        ].map((option) => (
-                          <motion.div
-                            key={option}
-                            className={`group relative overflow-hidden rounded-2xl backdrop-blur-xl border transition-all duration-500 cursor-pointer ${
-                              formData.maturityOption === option
-                                ? "bg-gradient-to-br from-pink-200/40 via-pink-600/30 to-pink-200/20 border-white/30 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] shadow-pink-500/50"
-                                : "bg-gradient-to-br from-white/20 via-white/15 to-white/10 border-white/20 hover:border-white/30 hover:bg-gradient-to-br hover:from-white/30 hover:via-white/25 hover:to-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
-                            }`}
-                            onClick={() => handleFormDataChange("maturityOption", option)}
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            {/* Liquid glass reflections */}
-                            <div className="absolute inset-0 rounded-2xl">
-                              <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
-                              <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
+                      </motion.div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="space-y-5">
+                      {/* Term & Interest Rate */}
+                      <motion.div variants={itemVariants}>
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
+                          <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)]">
+                            <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
+                            <div className="relative flex items-center justify-center h-full">
+                              <Percent
+                                size={12}
+                                className="text-white drop-shadow-sm"
+                              />
                             </div>
-              
-                            <div className="flex items-center gap-4 relative z-10 p-4">
-                              <div
-                                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] ${
-                                  formData.maturityOption === option
-                                    ? "bg-gradient-to-br from-pink-400/80 to-rose-500/80"
-                                    : "bg-gradient-to-br from-white/30 to-white/10 group-hover:from-pink-100/50 group-hover:to-pink-200/30"
-                                }`}
-                              >
-                                <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
-                                {formData.maturityOption === option && (
-                                  <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    className="relative z-10"
-                                  >
-                                    <Check size={14} className="text-white drop-shadow-sm" />
-                                  </motion.div>
-                                )}
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-gray-800 drop-shadow-sm">
-                                    {maturityOptionDisplayNames[option]}
-                                  </span>
-                                  {option === "receive_all" && (
-                                    <Wallet size={14} className="text-pink-500 drop-shadow-sm" />
-                                  )}
-                                  {option === "rollover_principal" && (
-                                    <RefreshCw size={14} className="text-pink-500 drop-shadow-sm" />
-                                  )}
-                                  {option === "rollover_all" && (
-                                    <RefreshCcw size={14} className="text-pink-500 drop-shadow-sm" />
-                                  )}
-                                </div>
-                                <p className="text-sm text-gray-600 drop-shadow-sm">
-                                  {option === "receive_all" &&
-                                    "Nhận toàn bộ tiền gốc và lãi khi đáo hạn"}
-                                  {option === "rollover_principal" &&
-                                    "Nhận lãi và tự động gửi lại tiền gốc"}
-                                  {option === "rollover_all" &&
-                                    "Tự động gửi lại cả gốc và lãi khi đáo hạn"}
-                                </p>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </div>
-              
-                  {/* Right Column */}
-                  <div className="space-y-5">
-                    {/* Term & Interest Rate */}
-                    <motion.div variants={itemVariants}>
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
-                        <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)]">
-                          <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
-                          <div className="relative flex items-center justify-center h-full">
-                            <Percent size={12} className="text-white drop-shadow-sm" />
+                            <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
                           </div>
-                          <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
-                        </div>
-                        Kỳ hạn & lãi suất theo năm
-                      </label>
-              
-                      <div className="grid grid-cols-2 gap-3">
-                        {(() => {
-                          const availableTerms =
-                            availableTermsByInterestType[formData.interestPaymentType];
-                          const termRates = availableTerms.map((term) => {
-                            const interestRate =
-                              interestRateData[formData.depositType][
+                          Kỳ hạn & lãi suất theo năm
+                        </label>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          {(() => {
+                            const availableTerms =
+                              availableTermsByInterestType[
                                 formData.interestPaymentType
-                              ][term] || 0;
-                            return { term, interestRate };
-                          });
-              
-                          const sortedByRate = [...termRates].sort(
-                            (a, b) => b.interestRate - a.interestRate
-                          );
-                          const highestRates = sortedByRate
-                            .slice(0, 2)
-                            .map((item) => item.interestRate);
-              
-                          const sortedTerms = [...termRates];
-                          sortedTerms.sort((a, b) => {
-                            if (
-                              highestRates.includes(a.interestRate) &&
-                              !highestRates.includes(b.interestRate)
-                            ) {
-                              return -1;
-                            }
-                            if (
-                              highestRates.includes(b.interestRate) &&
-                              !highestRates.includes(a.interestRate)
-                            ) {
-                              return 1;
-                            }
-                            return (
-                              availableTerms.indexOf(a.term) -
-                              availableTerms.indexOf(b.term)
+                              ];
+                            const termRates = availableTerms.map((term) => {
+                              const interestRate =
+                                interestRateData[formData.depositType][
+                                  formData.interestPaymentType
+                                ][term] || 0;
+                              return { term, interestRate };
+                            });
+
+                            const sortedByRate = [...termRates].sort(
+                              (a, b) => b.interestRate - a.interestRate
                             );
-                          });
-              
-                          return sortedTerms.map((item, index) => {
-                            const { term, interestRate } = item;
-                            const isHighestRate = highestRates.includes(interestRate);
-              
-                            return (
-                              <motion.div
-                                key={term}
-                                className={`group relative overflow-hidden rounded-2xl backdrop-blur-xl border transition-all duration-500 cursor-pointer ${
-                                  formData.term === term
-                                    ? "bg-gradient-to-br from-pink-200/40 via-pink-600/30 to-pink-200/20 border-white/30 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] shadow-pink-500/50"
-                                    : "bg-gradient-to-br from-white/20 via-white/15 to-white/10 border-white/20 hover:border-white/30 hover:bg-gradient-to-br hover:from-white/30 hover:via-white/25 hover:to-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
-                                }`}
-                                onClick={() => handleFormDataChange("term", term)}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{
-                                  duration: 0.3,
-                                  delay: index * 0.08,
-                                }}
-                                whileHover={{ scale: 1.03, y: -3 }}
-                                whileTap={{ scale: 0.97 }}
-                              >
-                                {/* Liquid glass reflections */}
-                                <div className="absolute inset-0 rounded-2xl">
-                                  <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
-                                  <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
-                                </div>
-              
-                                
-              
-                                {/* Liquid glass star badge */}
-                                {isHighestRate && (
-                                  <motion.div
-                                    className="absolute -top-2 -right-2 w-10 h-10 rounded-full backdrop-blur-md bg-gradient-to-br from-amber-400/80 to-orange-500/80 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] flex items-center justify-center"
-                                    animate={{
-                                      scale: 1,
-                                      rotate: [0, 360],
-                                      boxShadow: [
-                                        "0 0 0px 0px rgba(255, 193, 7, 0.0)",
-                                        "0 0 30px 15px rgba(255, 193, 7, 0.6)", 
-                                        "0 0 0px 0px rgba(255, 193, 7, 0.0)",
-                                      ],
-                                    }}
-                                    transition={{
-                                      duration: 1.5,
-                                      repeat: Infinity,
-                                      ease: "easeInOut",
-                                      rotate: { duration: 4, repeat: Infinity }
-                                    }}
-                                  >
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
-                                    <Star
-                                      size={24}
-                                      className="text-white drop-shadow-sm relative z-10"
-                                      fill="currentColor"
-                                    />
-                                  </motion.div>
-                                )}
-              
-                                <div className="relative z-10 text-center p-4">
-                                  <div
-                                    className={`w-6 h-6 rounded-full mx-auto mb-3 transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_4px_16px_0_rgba(31,38,135,0.37)] ${
-                                      formData.term === term
-                                        ? "bg-gradient-to-br from-pink-400/80 to-rose-500/80"
-                                        : "bg-gradient-to-br from-white/30 to-white/10 group-hover:from-pink-100/50 group-hover:to-pink-200/30"
-                                    } flex items-center justify-center`}
-                                  >
-                                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
-                                    {formData.term === term && (
+                            const highestRates = sortedByRate
+                              .slice(0, 2)
+                              .map((item) => item.interestRate);
+
+                            const sortedTerms = [...termRates];
+                            sortedTerms.sort((a, b) => {
+                              if (
+                                highestRates.includes(a.interestRate) &&
+                                !highestRates.includes(b.interestRate)
+                              ) {
+                                return -1;
+                              }
+                              if (
+                                highestRates.includes(b.interestRate) &&
+                                !highestRates.includes(a.interestRate)
+                              ) {
+                                return 1;
+                              }
+                              return (
+                                availableTerms.indexOf(a.term) -
+                                availableTerms.indexOf(b.term)
+                              );
+                            });
+
+                            return sortedTerms.map((item, index) => {
+                              const { term, interestRate } = item;
+                              const isHighestRate =
+                                highestRates.includes(interestRate);
+
+                              return (
+                                <motion.div
+                                  key={term}
+                                  className={`group relative overflow-hidden rounded-2xl backdrop-blur-xl border transition-all duration-500 cursor-pointer ${
+                                    formData.term === term
+                                      ? "bg-gradient-to-br from-pink-200/40 via-pink-600/30 to-pink-200/20 border-white/30 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] shadow-pink-500/50"
+                                      : "bg-gradient-to-br from-white/20 via-white/15 to-white/10 border-white/20 hover:border-white/30 hover:bg-gradient-to-br hover:from-white/30 hover:via-white/25 hover:to-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)]"
+                                  }`}
+                                  onClick={() =>
+                                    handleFormDataChange("term", term)
+                                  }
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{
+                                    duration: 0.3,
+                                    delay: index * 0.08,
+                                  }}
+                                  whileHover={{ scale: 1.03, y: -3 }}
+                                  whileTap={{ scale: 0.97 }}
+                                >
+                                  {/* Liquid glass reflections */}
+                                  <div className="absolute inset-0 rounded-2xl">
+                                    <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
+                                    <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
+                                  </div>
+
+                                  {/* Liquid glass star badge */}
+                                  {isHighestRate && (
+                                    <motion.div
+                                      className="absolute -top-2 -right-2 w-10 h-10 rounded-full backdrop-blur-md bg-gradient-to-br from-amber-400/80 to-orange-500/80 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] flex items-center justify-center"
+                                      animate={{
+                                        scale: 1,
+                                        rotate: [0, 360],
+                                        boxShadow: [
+                                          "0 0 0px 0px rgba(255, 193, 7, 0.0)",
+                                          "0 0 30px 15px rgba(255, 193, 7, 0.6)",
+                                          "0 0 0px 0px rgba(255, 193, 7, 0.0)",
+                                        ],
+                                      }}
+                                      transition={{
+                                        duration: 1.5,
+                                        repeat: Infinity,
+                                        ease: "easeInOut",
+                                        rotate: {
+                                          duration: 4,
+                                          repeat: Infinity,
+                                        },
+                                      }}
+                                    >
+                                      <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
+                                      <Star
+                                        size={24}
+                                        className="text-white drop-shadow-sm relative z-10"
+                                        fill="currentColor"
+                                      />
+                                    </motion.div>
+                                  )}
+
+                                  <div className="relative z-10 text-center p-4">
+                                    <div
+                                      className={`w-6 h-6 rounded-full mx-auto mb-3 transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_4px_16px_0_rgba(31,38,135,0.37)] ${
+                                        formData.term === term
+                                          ? "bg-gradient-to-br from-pink-400/80 to-rose-500/80"
+                                          : "bg-gradient-to-br from-white/30 to-white/10 group-hover:from-pink-100/50 group-hover:to-pink-200/30"
+                                      } flex items-center justify-center`}
+                                    >
+                                      <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
+                                      {formData.term === term && (
+                                        <motion.div
+                                          initial={{ scale: 0 }}
+                                          animate={{ scale: 1 }}
+                                          className="relative z-10"
+                                        >
+                                          <Check
+                                            size={12}
+                                            className="text-white drop-shadow-sm"
+                                          />
+                                        </motion.div>
+                                      )}
+                                    </div>
+
+                                    <div className="font-semibold text-gray-800 text-sm mb-1 drop-shadow-sm">
+                                      {termDisplayNames[term]}
+                                    </div>
+
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="text-lg font-bold bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent drop-shadow-sm">
+                                        {interestRate}%
+                                      </span>
+                                      <span className="text-xs text-gray-500 drop-shadow-sm">
+                                        /năm
+                                      </span>
+                                    </div>
+
+                                    {isHighestRate && (
                                       <motion.div
-                                        initial={{ scale: 0 }}
-                                        animate={{ scale: 1 }}
-                                        className="relative z-10"
+                                        className="mt-1 text-sm text-amber-600 font-bold drop-shadow-sm"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
                                       >
-                                        <Check size={12} className="text-white drop-shadow-sm" />
+                                        Lãi suất cao nhất
                                       </motion.div>
                                     )}
                                   </div>
-              
-                                  <div className="font-semibold text-gray-800 text-sm mb-1 drop-shadow-sm">
-                                    {termDisplayNames[term]}
-                                  </div>
-              
-                                  <div className="flex items-center justify-center gap-1">
-                                    <span className="text-lg font-bold bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent drop-shadow-sm">
-                                      {interestRate}%
-                                    </span>
-                                    <span className="text-xs text-gray-500 drop-shadow-sm">
-                                      /năm
-                                    </span>
-                                  </div>
-              
-                                  {isHighestRate && (
-                                    <motion.div
-                                      className="mt-1 text-sm text-amber-600 font-bold drop-shadow-sm"
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      transition={{ delay: 0.5 }}
-                                    >
-                                      Lãi suất cao nhất
-                                    </motion.div>
-                                  )}
-                                </div>
-                              </motion.div>
-                            );
-                          });
-                        })()}
-                      </div>
-                    </motion.div>
+                                </motion.div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      </motion.div>
+                    </div>
                   </div>
                 </div>
-              </div>
               )}
 
               {formData.amount && parseInt(formData.amount) >= 100000 && (
@@ -1865,20 +1926,20 @@ const interestRateData = {
                               </span>
                             </div>
                             <div className="text-sm text-gray-700 font-medium flex items-center space-x-1">
-                              <span className='italic'>Ngày</span>
+                              <span className="italic">Ngày</span>
                               <span className="border-b border-dashed border-gray-400 px-2 py-1 min-w-[30px] text-center font-mono">
                                 {new Date()
                                   .getDate()
                                   .toString()
                                   .padStart(2, "0")}
                               </span>
-                              <span className='italic'>tháng</span>
+                              <span className="italic">tháng</span>
                               <span className="border-b border-dashed border-gray-400 px-2 py-1 min-w-[30px] text-center font-mono">
                                 {(new Date().getMonth() + 1)
                                   .toString()
                                   .padStart(2, "0")}
                               </span>
-                              <span className='italic'>năm</span>
+                              <span className="italic">năm</span>
                               <span className="border-b border-dashed border-gray-400 px-2 py-1 min-w-[40px] text-center font-mono">
                                 {new Date().getFullYear()}
                               </span>
@@ -1984,11 +2045,7 @@ const interestRateData = {
                               <span className="ml-3 text-sm sm:text-base font-semibold text-gray-800">
                                 {formData.sourceAccount === "cash_at_counter"
                                   ? "Tiền mặt tại quầy"
-                                  : paymentAccounts.find(
-                                      (acc) =>
-                                        acc.id ===
-                                        parseInt(formData.sourceAccount)
-                                    )?.nickname || "Chưa chọn"}
+                                  : 'Tài khoản thanh toán'}
                               </span>
                             </div>
                             <div className="flex-1 text-right">

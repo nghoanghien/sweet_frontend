@@ -1833,6 +1833,16 @@ export default function CustomerManagement() {
                 variant={isEditMode ? "teal" : "cyan"}
               />
 
+              {/* Tab Navigation */}
+              {!isEditMode && (
+                <div className="bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20">
+                  <AnimatedTabNavigation
+                    activeTab={activeDetailTab}
+                    onTabChange={setActiveDetailTab}
+                  />
+                </div>
+              )}
+
               {/* Disabled Customer Warning */}
               <AnimatePresence>
                 {selectedCustomer && selectedCustomer.status === 'disabled' && (
@@ -1841,7 +1851,7 @@ export default function CustomerManagement() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.5, type: "spring" }}
-                    className="fixed top-0 left-2 md:left-44 right-2 z-50 mx-auto max-w-lg mt-4 px-6 py-4 rounded-3xl backdrop-blur-md bg-amber-500/50 shadow-lg"
+                    className="mx-auto max-w-4xl w-full text-sm md:text-base mt-0 px-4 md:px-6 py-4 rounded-3xl backdrop-blur-md bg-amber-500/50 shadow-lg"
                     style={{
                       boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)",
                       backdropFilter: "blur(8px)"
@@ -1852,22 +1862,12 @@ export default function CustomerManagement() {
                         <XCircle size={20} className="text-amber-100" />
                       </div>
                       <div className="flex-1 text-amber-50 font-medium">
-                        Khách hàng này đang trong diện bị "Vô hiệu hóa", các thao tác nạp/rút tiền đều không thể thực hiện
+                        Khách hàng này đang trong diện bị "Vô hiệu hóa", các thao tác nạp/rút tiền đều không thể thực hiện.
                       </div>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              {/* Tab Navigation */}
-              {!isEditMode && (
-                <div className="bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20">
-                  <AnimatedTabNavigation
-                    activeTab={activeDetailTab}
-                    onTabChange={setActiveDetailTab}
-                  />
-                </div>
-              )}
 
               {/* Scrollable Content */}
               <div

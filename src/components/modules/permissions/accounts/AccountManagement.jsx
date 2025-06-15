@@ -410,23 +410,6 @@ const AccountManagement = () => {
             Tạo và quản lý các tài khoản trong hệ thống
           </motion.p>
         </div>
-
-        {/* Add account button */}
-        <motion.button
-          onClick={handleAddAccount}
-          className="px-4 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
-          whileHover={{
-            scale: 1.08,
-            boxShadow: "0 0 16px rgba(0,170,255,0.18)",
-          }}
-          whileTap={{ scale: 0.96 }}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          <Plus size={20} className="mr-0" />
-          Thêm tài khoản
-        </motion.button>
       </div>
 
       {/* Search and filter */}

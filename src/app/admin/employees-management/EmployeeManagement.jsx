@@ -1918,7 +1918,7 @@ import React, { useState, useEffect } from 'react';
                     )}
 
                     {/* Edit Mode Content */}
-                    {isEditMode && (
+                    {isEditMode && activeDetailTab === "information" && (
                       <motion.div
                       key="edit-mode"
                       initial={{ opacity: 0, y: 20 }}

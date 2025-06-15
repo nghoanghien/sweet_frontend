@@ -299,15 +299,37 @@ const InterestRateRegulations = () => {
   
   // Toggle savings type active state
   const handleToggleSavingsType = (typeId) => {
+    // Check if this is the last active savings type
+    const activeTypes = editedRegulation.savingsTypes.filter(
+      type => !disabledSavingsTypes.includes(type.id)
+    );
+    
     if (disabledSavingsTypes.includes(typeId)) {
       // Re-enable savings type
       setDisabledSavingsTypes(disabledSavingsTypes.filter(id => id !== typeId));
+      
+      // Clear savings type error if we're enabling a type
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.savingsTypes;
+        return newErrors;
+      });
       
       // If no active savings type is selected, select this one
       if (!activeSavingsType || disabledSavingsTypes.includes(activeSavingsType)) {
         setActiveSavingsType(typeId);
       }
     } else {
+      // Check if we're about to disable the last active type
+      if (activeTypes.length === 1 && activeTypes[0].id === typeId) {
+        // Don't allow disabling the last active savings type, but show error
+        setValidationErrors(prev => ({
+          ...prev,
+          savingsTypes: 'Vui lòng chọn ít nhất một loại sản phẩm tiết kiệm'
+        }));
+        return;
+      }
+      
       // Disable savings type
       setDisabledSavingsTypes([...disabledSavingsTypes, typeId]);
       
@@ -388,8 +410,23 @@ const InterestRateRegulations = () => {
   };
   
   // Change interest rate
-  const handleRateChange = (termId, frequencyId, rate) => {
+  const handleRateChange = (termId, frequencyId, rate, errorMessage = null) => {
     if (!activeSavingsType) return;
+    
+    // Xử lý thông báo lỗi nếu có
+    if (errorMessage !== undefined) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        if (errorMessage === null) {
+          // Xóa lỗi nếu errorMessage là null
+          delete newErrors.interestRates;
+        } else {
+          // Cập nhật lỗi
+          newErrors.interestRates = errorMessage;
+        }
+        return newErrors;
+      });
+    }
     
     const updatedRegulation = { ...editedRegulation };
     const savingsTypeIndex = updatedRegulation.savingsTypes.findIndex(
@@ -521,7 +558,7 @@ const InterestRateRegulations = () => {
     });
   };
   
-  // Update minimum deposit
+  // Update minimum deposit with continuous validation
   const handleMinimumDepositChange = (value) => {
     setEditedRegulation({
       ...editedRegulation,
@@ -533,9 +570,12 @@ const InterestRateRegulations = () => {
       ...prev,
       minimumDeposit: true
     }));
+
+    // Validate immediately
+    validateField('minimumDeposit', value);
   };
   
-  // Update no term rate
+  // Update no term rate with continuous validation
   const handleNoTermRateChange = (value) => {
     setEditedRegulation({
       ...editedRegulation,
@@ -547,6 +587,35 @@ const InterestRateRegulations = () => {
       ...prev,
       noTermRate: true
     }));
+
+    // Validate immediately
+    validateField('noTermRate', value);
+  };
+
+  // Validate individual field
+  const validateField = (fieldName, value) => {
+    setValidationErrors(prev => {
+      const newErrors = { ...prev };
+      
+      // Check specific field
+      if (fieldName === 'minimumDeposit') {
+        if (value === null || value === undefined || value === '') {
+          newErrors.minimumDeposit = 'Vui lòng nhập số tiền gửi tối thiểu';
+        } else {
+          delete newErrors.minimumDeposit;
+        }
+      }
+      
+      if (fieldName === 'noTermRate') {
+        if (value === null || value === undefined || value === '') {
+          newErrors.noTermRate = 'Vui lòng nhập lãi suất không kỳ hạn';
+        } else {
+          delete newErrors.noTermRate;
+        }
+      }
+      
+      return newErrors;
+    });
   };
   
   // Update application type and date
@@ -1039,4 +1108,4 @@ const InterestRateRegulations = () => {
   );
 };
 
-export default InterestRateRegulations; 
+export default InterestRateRegulations;

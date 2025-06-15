@@ -37,6 +37,7 @@ const InterestRateTable = ({
   useEffect(() => {
     if (isEditing && !readOnly) {
       const newInvalidCells = {};
+      let emptyCount = 0;
       
       // Kiểm tra tất cả các ô
       terms.forEach(term => {
@@ -54,10 +55,11 @@ const InterestRateTable = ({
                 r => r.termId === term.id && r.frequencyId === frequency.id
               )?.rate;
               
-              const isEmpty = isNewTerm || (rate === null || rate === undefined || rate === '');
+              const isEmpty = (rate === null || rate === undefined || rate === '');
               
               if (isEmpty) {
                 newInvalidCells[`${term.id}-${frequency.id}`] = true;
+                emptyCount++;
               }
             }
           });
@@ -66,8 +68,18 @@ const InterestRateTable = ({
       
       // Cập nhật trạng thái
       setInvalidCells(newInvalidCells);
+      
+      // Báo lỗi ngay nếu có ô trống và onRateChange được cung cấp
+      if (emptyCount > 0 && typeof onRateChange === 'function') {
+        // Gọi onRateChange với tham số thứ 4 là error message
+        onRateChange(null, null, null, 
+          `Vui lòng nhập đầy đủ các mức lãi suất (còn ${emptyCount} ô trống)`);
+      } else if (emptyCount === 0 && typeof onRateChange === 'function') {
+        // Xóa lỗi nếu không còn ô trống
+        onRateChange(null, null, null, null);
+      }
     }
-  }, [terms, interestRates, paymentFrequencies, disabledFrequencies, isEditing, readOnly, newTermIds, deletedTerms]);
+  }, [terms, interestRates, paymentFrequencies, disabledFrequencies, isEditing, readOnly, newTermIds, deletedTerms, onRateChange]);
 
   // Format interest rate for display (e.g., 4.5 -> "4.5%")
   const formatInterestRate = (rate) => {
@@ -147,8 +159,21 @@ const InterestRateTable = ({
     // Thêm ID của kỳ hạn mới vào trạng thái
     setNewTermIds(prevIds => [...prevIds, months]);
     
-    // Đánh dấu các ô lãi suất của kỳ hạn mới là không hợp lệ
-    // Sẽ được xử lý tự động trong quá trình render
+    // Đánh dấu các ô lãi suất của kỳ hạn mới là không hợp lệ và báo lỗi ngay lập tức
+    // Tính số ô trống mới sẽ được thêm vào
+    const newEmptyCells = paymentFrequencies.filter(freq => {
+      const isFrequencyDisabled = disabledFrequencies.includes(freq.id);
+      const isQuarterlyDisabled = freq.id === 'quarterly' && !isDivisibleByThree(months);
+      return !isFrequencyDisabled && !isQuarterlyDisabled;
+    }).length;
+    
+    // Cập nhật số ô trống và báo lỗi
+    if (newEmptyCells > 0 && typeof onRateChange === 'function') {
+      // Tính tổng số ô trống (hiện tại + mới)
+      const totalEmptyCells = Object.keys(invalidCells).length + newEmptyCells;
+      onRateChange(null, null, null, 
+        `Vui lòng nhập đầy đủ các mức lãi suất (còn ${totalEmptyCells} ô trống)`);
+    }
   };
 
   // Handle keypress in the new term input
@@ -177,16 +202,41 @@ const InterestRateTable = ({
         ...prev,
         [`${termId}-${frequencyId}`]: true
       }));
+      
+      // Report error to parent component immediately
+      if (error === null && Object.keys(invalidCells).length > 0) {
+        // Tính số ô trống hiện tại
+        const emptyCount = Object.keys(invalidCells).length + 1; // +1 cho ô hiện tại
+        if (typeof onRateChange === 'function') {
+          // Gọi onRateChange với tham số thứ 4 là error message
+          onRateChange(termId, frequencyId, value, 
+            `Vui lòng nhập đầy đủ các mức lãi suất (còn ${emptyCount} ô trống)`);
+        }
+      }
     } else {
+      // Xóa ô này khỏi danh sách ô không hợp lệ
       setInvalidCells(prev => {
         const updated = { ...prev };
         delete updated[`${termId}-${frequencyId}`];
+        
+        // Nếu không còn ô nào không hợp lệ, xóa thông báo lỗi
+        if (Object.keys(updated).length === 0 && typeof onRateChange === 'function') {
+          onRateChange(termId, frequencyId, value, null); // Xóa lỗi
+        } else if (typeof onRateChange === 'function') {
+          // Vẫn còn ô trống, cập nhật thông báo lỗi
+          const emptyCount = Object.keys(updated).length;
+          onRateChange(termId, frequencyId, value, 
+            `Vui lòng nhập đầy đủ các mức lãi suất (còn ${emptyCount} ô trống)`);
+        }
+        
         return updated;
       });
     }
     
-    // Pass to parent handler
-    onRateChange(termId, frequencyId, value);
+    // Pass to parent handler (nếu không có tham số error)
+    if (typeof onRateChange === 'function' && arguments.length <= 3) {
+      onRateChange(termId, frequencyId, value);
+    }
   };
 
   // Mobile view for the table
@@ -262,7 +312,7 @@ const InterestRateTable = ({
                   const isDisabled = isFrequencyDisabled || isDeleted || isQuarterlyDisabled;
                   
                   // Kiểm tra ô trống
-                  const isEmpty = isNewTerm || (rate === null || rate === undefined || rate === '');
+                  const isEmpty = (rate === null || rate === undefined || rate === '');
                   const shouldShowInvalid = isEditing && !isDisabled && isEmpty;
                   
                   // Cập nhật trạng thái ô không hợp lệ
@@ -469,7 +519,7 @@ const InterestRateTable = ({
             )}
           </div>
           
-          {error && (
+          {isEditing && error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
               <div className="flex items-center">
                 <AlertCircle size={18} className="text-red-500 mr-2" />
@@ -542,7 +592,7 @@ const InterestRateTable = ({
                         const isDisabled = isFrequencyDisabled || isDeleted || isQuarterlyDisabled;
                         
                         // Kiểm tra ô trống
-                        const isEmpty = isNewTerm || (rate === null || rate === undefined || rate === '');
+                        const isEmpty = (rate === null || rate === undefined || rate === '');
                         const shouldShowInvalid = isEditing && !isDisabled && isEmpty;
                         
                         // Cập nhật trạng thái ô không hợp lệ

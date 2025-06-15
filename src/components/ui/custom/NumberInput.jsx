@@ -56,7 +56,7 @@ const NumberInput = ({
         }
       }
     }
-  }, [value, allowDecimal, decimalPlaces, autoFormat, isFocused]);
+  }, [value, allowDecimal, decimalPlaces, autoFormat, isFocused, displayValue]);
 
   // Handle input change
   const handleChange = (e) => {
@@ -87,7 +87,10 @@ const NumberInput = ({
     const numValue = allowDecimal ? parseFloat(inputValue) : parseInt(inputValue);
     
     if (!isNaN(numValue)) {
-      onChange(numValue);
+      // Đảm bảo giá trị được cập nhật và không bị mất
+      setTimeout(() => {
+        onChange(numValue);
+      }, 0);
     } else if (inputValue === '' || inputValue === '-' || (allowDecimal && (inputValue === '.' || inputValue.endsWith('.')))) {
       // Keep partial input in display but send empty to parent
       onChange('');
@@ -131,7 +134,10 @@ const NumberInput = ({
         }
       }
       
-      onChange(finalValue);
+      // Đảm bảo giá trị được cập nhật và không bị xóa
+      setTimeout(() => {
+        onChange(finalValue);
+      }, 0);
     } else {
       // Invalid input - clear it
       setDisplayValue('');

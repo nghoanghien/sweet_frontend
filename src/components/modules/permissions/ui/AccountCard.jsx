@@ -111,18 +111,6 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
           stiffness: 100,
         }}
       >
-        {/* Disabled badge */}
-        {account.disabled && (
-          <motion.span
-            className="absolute top-3 right-3 px-3 py-1.5 bg-red-100 text-red-700 rounded-2xl text-xs font-semibold flex items-center shadow-sm border border-red-200 z-20"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <XCircle size={14} className="mr-1" />
-            Vô hiệu hóa
-          </motion.span>
-        )}
 
         {/* Main content */}
         <motion.div
