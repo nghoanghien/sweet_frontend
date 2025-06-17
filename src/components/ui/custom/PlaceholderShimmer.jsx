@@ -4,7 +4,6 @@ import TextShimmer from './shimmer-types/TextShimmer';
 import GridCardShimmer from './shimmer-types/GridCardShimmer';
 import PaymentAccountShimmer from './shimmer-types/PaymentAccountShimmer';
 // Import các loại shimmer mới
-import ListHistoryShimmer from './shimmer-types/ListHistoryShimmer';
 import FilterableAccountTransactionListShimmer from './shimmer-types/FilterableAccountTransactionListShimmer';
 
 const PlaceholderShimmer = ({
@@ -56,8 +55,6 @@ const PlaceholderShimmer = ({
         return <GridCardShimmer {...commonProps} cardCount={count} />;
       case 'payment-account':
         return <PaymentAccountShimmer {...commonProps} cardCount={count} />;
-      case 'list-history':
-        return <ListHistoryShimmer {...commonProps} count={count} />;
       case 'filterable-account-transaction-list':
         return <FilterableAccountTransactionListShimmer {...commonProps} itemCount={count} />;
       default:
