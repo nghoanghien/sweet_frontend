@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, TrendingUp, Clock, CheckCircle2, AlertCircle, Wallet } from 'lucide-react';
 import { formatCurrency, getChannelInfo } from '../../../../utils/accountUtils';
 import SearchBar, { highlightText } from '../../ui/SearchBar'
@@ -15,6 +15,12 @@ const FilterableAccountTransactionList = ({
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
   const [isSearching, setIsSearching] = useState(false);
   const [internalIsLoading, setInternalIsLoading] = useState(true);
+  const [displayedTransactions, setDisplayedTransactions] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const observerRef = useRef();
+  const ITEMS_PER_PAGE = 10;
 
   // Auto-hide loading after a delay
   useEffect(() => {
@@ -24,6 +30,51 @@ const FilterableAccountTransactionList = ({
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Initialize displayed transactions when filteredTransactions change
+  useEffect(() => {
+    const initialTransactions = filteredTransactions.slice(0, ITEMS_PER_PAGE);
+    setDisplayedTransactions(initialTransactions);
+    setCurrentPage(1);
+    setHasMoreData(filteredTransactions.length > ITEMS_PER_PAGE);
+  }, [filteredTransactions]);
+
+  // Load more transactions
+  const loadMoreTransactions = useCallback(() => {
+    if (isLoadingMore || !hasMoreData) return;
+    
+    setIsLoadingMore(true);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      const nextPage = currentPage + 1;
+      const startIndex = (nextPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const newTransactions = filteredTransactions.slice(startIndex, endIndex);
+      
+      if (newTransactions.length > 0) {
+        setDisplayedTransactions(prev => [...prev, ...newTransactions]);
+        setCurrentPage(nextPage);
+        setHasMoreData(endIndex < filteredTransactions.length);
+      } else {
+        setHasMoreData(false);
+      }
+      
+      setIsLoadingMore(false);
+    }, 1000); // 1 second delay as requested
+  }, [currentPage, filteredTransactions, isLoadingMore, hasMoreData]);
+
+  // Intersection Observer for infinite scroll
+  const lastTransactionElementRef = useCallback(node => {
+    if (isLoadingMore) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMoreData) {
+        loadMoreTransactions();
+      }
+    });
+    if (node) observerRef.current.observe(node);
+  }, [isLoadingMore, hasMoreData, loadMoreTransactions]);
 
   // Filter transactions với animation effect
   useEffect(() => {
@@ -122,16 +173,19 @@ const FilterableAccountTransactionList = ({
       </div>
 
       {/* Enhanced Transaction List */}
-      {filteredTransactions.length > 0 ? (
+      {displayedTransactions.length > 0 ? (
         <div className="space-y-4">
-          {filteredTransactions.map((transaction, index) => {
+          {displayedTransactions.map((transaction, index) => {
             const channelInfo = getChannelInfo(transaction.channel);
             const statusConfig = transaction.status ? getStatusConfig(transaction.status) : null;
             const StatusIcon = statusConfig?.icon;
             
+            const isLastTransaction = index === displayedTransactions.length - 1;
+            
             return (
               <div 
                 key={transaction.id} 
+                ref={isLastTransaction ? lastTransactionElementRef : null}
                 className="group relative bg-sky-50 bg-gradient-to-r from-slate-50 to-purple-50/30 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-purple-100/50 transition-all duration-300 overflow-hidden"
                 style={{
                   animationDelay: `${index * 50}ms`
@@ -248,6 +302,26 @@ const FilterableAccountTransactionList = ({
               </div>
             );
           })}
+          
+          {/* Loading more shimmer */}
+          {isLoadingMore && (
+            <div className="mt-4">
+              <FilterableAccountTransactionListShimmer 
+                itemCount={3}
+                showSearchBar={false}
+              />
+            </div>
+          )}
+          
+          {/* End of list indicator */}
+          {!hasMoreData && displayedTransactions.length > 0 && (
+            <div className="text-center py-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">
+                <CheckCircle2 size={16} />
+                <span>Đã hiển thị tất cả giao dịch</span>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         /* Enhanced empty state */
@@ -272,7 +346,7 @@ const FilterableAccountTransactionList = ({
               <p className="text-gray-500 text-center max-w-sm">
                 {searchTerm ? 
                   <>Không tìm thấy kết quả nào cho "<em className="font-medium">{searchTerm}</em>"</> : 
-                  emptyMessage
+                  (filteredTransactions.length === 0 ? emptyMessage : "Đang tải dữ liệu...")
                 }
               </p>
               {searchTerm && (

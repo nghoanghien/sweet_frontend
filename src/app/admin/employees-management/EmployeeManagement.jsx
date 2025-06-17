@@ -237,7 +237,683 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         },
         registrationDate: '25/04/2023',
         status: 'disabled'
-      }
+      },
+      {
+        id: 14,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 15,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 6,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 7,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 8,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 9,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 10,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 11,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 12,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 13,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 21,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 20,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 22,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 23,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 24,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 25,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 27,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 26,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 29,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 28,
+        code: 'NV000005',
+        fullName: 'Hoàng Văn E',
+        birthDate: '30/09/1982',
+        age: 41,
+        idNumber: '026082456789',
+        email: 'hoangvane@email.com',
+        phone: '0945678901',
+        permanentAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        contactAddress: {
+          province: 'Hà Nội',
+          district: 'Đống Đa',
+          ward: 'Quang Trung',
+          street: 'Nguyễn Lương Bằng',
+          houseNumber: '56'
+        },
+        registrationDate: '25/04/2023',
+        status: 'disabled'
+      },
+      {
+        id: 30,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 31,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 32,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 33,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 34,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
+      {
+        id: 35,
+        code: 'NV000004',
+        fullName: 'Phạm Thị D',
+        birthDate: '18/07/1995',
+        age: 28,
+        idNumber: '038095345678',
+        email: 'phamthid@email.com',
+        phone: '0934567890',
+        permanentAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        contactAddress: {
+          province: 'Hải Phòng',
+          district: 'Hồng Bàng',
+          ward: 'Hoàng Văn Thụ',
+          street: 'Lê Lợi',
+          houseNumber: '102'
+        },
+        registrationDate: '12/02/2023',
+        status: 'active'
+      },
     ]);
   
     // State for employee detail modal

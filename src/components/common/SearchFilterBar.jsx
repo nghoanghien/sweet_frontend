@@ -6,6 +6,7 @@ const SearchFilterBar = ({
   searchFields,
   handleSearchChange,
   clearSearchFields,
+  onSearch,
   sortField,
   sortDirection,
   handleSort,
@@ -20,6 +21,7 @@ const SearchFilterBar = ({
   subtitle = 'Tìm kiếm'
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [localSearchFields, setLocalSearchFields] = useState({});
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -27,7 +29,26 @@ const SearchFilterBar = ({
 
   const handleClearAndCollapse = () => {
     clearSearchFields();
+    setLocalSearchFields({});
     setIsExpanded(false);
+  };
+
+  const handleLocalSearchChange = (key, value) => {
+    setLocalSearchFields(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  const handleSearchSubmit = () => {
+    // Cập nhật searchFields với localSearchFields
+    Object.keys(localSearchFields).forEach(key => {
+      handleSearchChange(key, localSearchFields[key]);
+    });
+    // Gọi hàm tìm kiếm nếu được cung cấp
+    if (onSearch) {
+      onSearch(localSearchFields);
+    }
   };
 
   return (
@@ -70,7 +91,7 @@ const SearchFilterBar = ({
             >
               <Search size={20} className="text-white" />
             </motion.div>
-            <div>
+            <div className={`${isExpanded ? 'hidden md:block' : ''}`}>
               <h3 className="text-base font-semibold text-blue-800">
                 {isExpanded ? title : "Nhấp để tìm kiếm"}
               </h3>
@@ -90,22 +111,40 @@ const SearchFilterBar = ({
 
           <div className="flex items-center space-x-3">
             {isExpanded && (
-              <motion.button
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClearAndCollapse();
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl flex items-center transition-all duration-200 border border-red-200 shadow-sm"
-              >
-                <X size={16} className="mr-2" />
-                Xóa
-              </motion.button>
+              <>
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSearchSubmit();
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-sm font-medium bg-green-50 text-green-600 hover:bg-green-100 px-4 py-2 rounded-xl flex items-center transition-all duration-200 border border-green-200 shadow-sm"
+                >
+                  <Search size={16} className="mr-2" />
+                  Tìm kiếm
+                </motion.button>
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClearAndCollapse();
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl flex items-center transition-all duration-200 border border-red-200 shadow-sm"
+                >
+                  <X size={16} className="mr-2" />
+                  Xóa
+                </motion.button>
+              </>
             )}
 
             <motion.div
@@ -158,10 +197,15 @@ const SearchFilterBar = ({
                         <input
                           type="text"
                           placeholder={field.placeholder}
-                          value={searchFields[field.key] || ""}
+                          value={localSearchFields[field.key] || ""}
                           onChange={(e) =>
-                            handleSearchChange(field.key, e.target.value)
+                            handleLocalSearchChange(field.key, e.target.value)
                           }
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              handleSearchSubmit();
+                            }
+                          }}
                           className="w-full pl-12 pr-4 py-3.5 text-sm bg-white border border-blue-100 rounded-xl shadow-sm focus:shadow-md focus:border-blue-300 focus:ring-2 focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200"
                         />
                         <motion.div

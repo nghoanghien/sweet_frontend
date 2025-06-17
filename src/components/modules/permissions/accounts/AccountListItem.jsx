@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit2, Eye, Lock, XCircle, CheckCircle, User, Users, Settings, Unlock } from 'lucide-react';
 
-const AccountListItem = ({ account, onView, onEdit, onDisable, onResetPassword, delay = 0 }) => {
+const AccountListItem = React.forwardRef(({ account, onView, onEdit, onDisable, onResetPassword, delay = 0 }, ref) => {
   // Hàm tạo avatar từ tên người dùng
   const getInitials = (name) => {
     return name
@@ -29,6 +29,7 @@ const AccountListItem = ({ account, onView, onEdit, onDisable, onResetPassword, 
 
   return (
     <motion.tr
+      ref={ref}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.3 }}
@@ -204,6 +205,8 @@ const AccountListItem = ({ account, onView, onEdit, onDisable, onResetPassword, 
       </td>
     </motion.tr>
   );
-};
+});
+
+AccountListItem.displayName = 'AccountListItem';
 
 export default AccountListItem;

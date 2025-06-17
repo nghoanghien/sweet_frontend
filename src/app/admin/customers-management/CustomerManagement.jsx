@@ -245,6 +245,266 @@ export default function CustomerManagement() {
       },
       registrationDate: '25/04/2023',
       status: 'disabled'
+    },
+    {
+      id: 6,
+      code: 'KH000006',
+      fullName: 'Trần Thị A',
+      birthDate: '12/05/1990',
+      age: 34,
+      idNumber: '012345678901',
+      email: 'tranthea@email.com',
+      phone: '0912345678',
+      permanentAddress: {
+        province: 'Hà Nội',
+        district: 'Ba Đình',
+        ward: 'Ngọc Hà',
+        street: 'Đội Cấn',
+        houseNumber: '15'
+      },
+      contactAddress: {
+        province: 'Hà Nội',
+        district: 'Ba Đình',
+        ward: 'Ngọc Hà',
+        street: 'Đội Cấn',
+        houseNumber: '15'
+      },
+      registrationDate: '10/01/2024',
+      status: 'active'
+    },
+    {
+      id: 7,
+      code: 'KH000007',
+      fullName: 'Nguyễn Văn B',
+      birthDate: '01/01/1985',
+      age: 40,
+      idNumber: '023456789012',
+      email: 'nguyenvanb@email.com',
+      phone: '0934567890',
+      permanentAddress: {
+        province: 'TP.HCM',
+        district: 'Quận 1',
+        ward: 'Bến Nghé',
+        street: 'Lê Lợi',
+        houseNumber: '21A'
+      },
+      contactAddress: {
+        province: 'TP.HCM',
+        district: 'Quận 1',
+        ward: 'Bến Nghé',
+        street: 'Lê Lợi',
+        houseNumber: '21A'
+      },
+      registrationDate: '12/02/2024',
+      status: 'active'
+    },
+    {
+      id: 8,
+      code: 'KH000008',
+      fullName: 'Lê Thị C',
+      birthDate: '08/08/1995',
+      age: 29,
+      idNumber: '034567890123',
+      email: 'lethic@email.com',
+      phone: '0967890123',
+      permanentAddress: {
+        province: 'Đà Nẵng',
+        district: 'Hải Châu',
+        ward: 'Hòa Thuận Đông',
+        street: 'Nguyễn Văn Linh',
+        houseNumber: '58B'
+      },
+      contactAddress: {
+        province: 'Đà Nẵng',
+        district: 'Hải Châu',
+        ward: 'Hòa Thuận Đông',
+        street: 'Nguyễn Văn Linh',
+        houseNumber: '58B'
+      },
+      registrationDate: '20/03/2024',
+      status: 'disabled'
+    },
+    {
+      id: 9,
+      code: 'KH000009',
+      fullName: 'Phạm Văn D',
+      birthDate: '22/03/1980',
+      age: 44,
+      idNumber: '045678901234',
+      email: 'phamvand@email.com',
+      phone: '0978901234',
+      permanentAddress: {
+        province: 'Cần Thơ',
+        district: 'Ninh Kiều',
+        ward: 'Tân An',
+        street: 'Nguyễn Trãi',
+        houseNumber: '33'
+      },
+      contactAddress: {
+        province: 'Cần Thơ',
+        district: 'Ninh Kiều',
+        ward: 'Tân An',
+        street: 'Nguyễn Trãi',
+        houseNumber: '33'
+      },
+      registrationDate: '05/04/2024',
+      status: 'active'
+    },
+    {
+      id: 10,
+      code: 'KH000010',
+      fullName: 'Đỗ Thị F',
+      birthDate: '30/12/1988',
+      age: 36,
+      idNumber: '056789012345',
+      email: 'dothif@email.com',
+      phone: '0989012345',
+      permanentAddress: {
+        province: 'Hà Nam',
+        district: 'Phủ Lý',
+        ward: 'Lê Hồng Phong',
+        street: 'Trần Hưng Đạo',
+        houseNumber: '12'
+      },
+      contactAddress: {
+        province: 'Hà Nam',
+        district: 'Phủ Lý',
+        ward: 'Lê Hồng Phong',
+        street: 'Trần Hưng Đạo',
+        houseNumber: '12'
+      },
+      registrationDate: '11/05/2024',
+      status: 'disabled'
+    },
+    {
+      id: 11,
+      code: 'KH000011',
+      fullName: 'Bùi Văn G',
+      birthDate: '15/04/1992',
+      age: 33,
+      idNumber: '067890123456',
+      email: 'buivang@email.com',
+      phone: '0911122233',
+      permanentAddress: {
+        province: 'Hải Phòng',
+        district: 'Lê Chân',
+        ward: 'An Dương',
+        street: 'Hoàng Diệu',
+        houseNumber: '44'
+      },
+      contactAddress: {
+        province: 'Hải Phòng',
+        district: 'Lê Chân',
+        ward: 'An Dương',
+        street: 'Hoàng Diệu',
+        houseNumber: '44'
+      },
+      registrationDate: '25/05/2024',
+      status: 'active'
+    },
+    {
+      id: 12,
+      code: 'KH000012',
+      fullName: 'Ngô Thị H',
+      birthDate: '09/06/1998',
+      age: 27,
+      idNumber: '078901234567',
+      email: 'ngothih@email.com',
+      phone: '0933344455',
+      permanentAddress: {
+        province: 'Thanh Hóa',
+        district: 'Thành phố Thanh Hóa',
+        ward: 'Quảng Thắng',
+        street: 'Phan Chu Trinh',
+        houseNumber: '90'
+      },
+      contactAddress: {
+        province: 'Thanh Hóa',
+        district: 'Thành phố Thanh Hóa',
+        ward: 'Quảng Thắng',
+        street: 'Phan Chu Trinh',
+        houseNumber: '90'
+      },
+      registrationDate: '29/05/2024',
+      status: 'active'
+    },
+    {
+      id: 13,
+      code: 'KH000013',
+      fullName: 'Đặng Văn I',
+      birthDate: '14/02/1987',
+      age: 38,
+      idNumber: '089012345678',
+      email: 'dangvani@email.com',
+      phone: '0966667777',
+      permanentAddress: {
+        province: 'Nghệ An',
+        district: 'Vinh',
+        ward: 'Hưng Bình',
+        street: 'Nguyễn Phong Sắc',
+        houseNumber: '11'
+      },
+      contactAddress: {
+        province: 'Nghệ An',
+        district: 'Vinh',
+        ward: 'Hưng Bình',
+        street: 'Nguyễn Phong Sắc',
+        houseNumber: '11'
+      },
+      registrationDate: '01/06/2024',
+      status: 'disabled'
+    },
+    {
+      id: 14,
+      code: 'KH000014',
+      fullName: 'Trịnh Thị J',
+      birthDate: '03/03/1993',
+      age: 32,
+      idNumber: '090123456789',
+      email: 'trinhthij@email.com',
+      phone: '0988889999',
+      permanentAddress: {
+        province: 'Huế',
+        district: 'Thành phố Huế',
+        ward: 'Thuận Hòa',
+        street: 'Hùng Vương',
+        houseNumber: '27'
+      },
+      contactAddress: {
+        province: 'Huế',
+        district: 'Thành phố Huế',
+        ward: 'Thuận Hòa',
+        street: 'Hùng Vương',
+        houseNumber: '27'
+      },
+      registrationDate: '04/06/2024',
+      status: 'active'
+    },
+    {
+      id: 15,
+      code: 'KH000015',
+      fullName: 'Vũ Văn K',
+      birthDate: '19/11/1979',
+      age: 45,
+      idNumber: '091234567890',
+      email: 'vuvank@email.com',
+      phone: '0909090909',
+      permanentAddress: {
+        province: 'Bắc Ninh',
+        district: 'Từ Sơn',
+        ward: 'Đình Bảng',
+        street: 'Lý Thái Tổ',
+        houseNumber: '77'
+      },
+      contactAddress: {
+        province: 'Bắc Ninh',
+        district: 'Từ Sơn',
+        ward: 'Đình Bảng',
+        street: 'Lý Thái Tổ',
+        houseNumber: '77'
+      },
+      registrationDate: '06/06/2024',
+      status: 'disabled'
     }
   ]);
 

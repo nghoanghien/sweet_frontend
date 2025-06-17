@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Calendar, DollarSign, TrendingUp, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { formatCurrency } from '@/utils/accountUtils';
 import SearchBar, { highlightText } from '../../ui/SearchBar';
@@ -15,6 +15,12 @@ const FilterableInterestList = ({
   const [filteredInterest, setFilteredInterest] = useState(interestHistory);
   const [isSearching, setIsSearching] = useState(false);
   const [internalIsLoading, setInternalIsLoading] = useState(true);
+  const [displayedInterest, setDisplayedInterest] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const observerRef = useRef();
+  const ITEMS_PER_PAGE = 10;
 
   // Auto turn off internal loading after 2 seconds
   useEffect(() => {
@@ -24,6 +30,51 @@ const FilterableInterestList = ({
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Initialize displayed interest when filteredInterest change
+  useEffect(() => {
+    const initialInterest = filteredInterest.slice(0, ITEMS_PER_PAGE);
+    setDisplayedInterest(initialInterest);
+    setCurrentPage(1);
+    setHasMoreData(filteredInterest.length > ITEMS_PER_PAGE);
+  }, [filteredInterest]);
+
+  // Load more interest
+  const loadMoreInterest = useCallback(() => {
+    if (isLoadingMore || !hasMoreData) return;
+    
+    setIsLoadingMore(true);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      const nextPage = currentPage + 1;
+      const startIndex = (nextPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const newInterest = filteredInterest.slice(startIndex, endIndex);
+      
+      if (newInterest.length > 0) {
+        setDisplayedInterest(prev => [...prev, ...newInterest]);
+        setCurrentPage(nextPage);
+        setHasMoreData(endIndex < filteredInterest.length);
+      } else {
+        setHasMoreData(false);
+      }
+      
+      setIsLoadingMore(false);
+    }, 1000); // 1 second delay as requested
+  }, [currentPage, filteredInterest, isLoadingMore, hasMoreData]);
+
+  // Intersection Observer for infinite scroll
+  const lastInterestElementRef = useCallback(node => {
+    if (isLoadingMore) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMoreData) {
+        loadMoreInterest();
+      }
+    });
+    if (node) observerRef.current.observe(node);
+  }, [isLoadingMore, hasMoreData, loadMoreInterest]);
 
   // Filter interest history với animation effect
   useEffect(() => {
@@ -107,15 +158,18 @@ const FilterableInterestList = ({
       </div>
 
       {/* Enhanced Interest History List */}
-      {filteredInterest.length > 0 ? (
+      {displayedInterest.length > 0 ? (
         <div className="space-y-4">
-          {filteredInterest.map((item, index) => {
+          {displayedInterest.map((item, index) => {
             const statusConfig = getStatusConfig(item.status);
             const StatusIcon = statusConfig.icon;
+            
+            const isLastInterest = index === displayedInterest.length - 1;
             
             return (
               <div 
                 key={item.id} 
+                ref={isLastInterest ? lastInterestElementRef : null}
                 className="group relative bg-sky-50 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-blue-100/50 transition-all duration-300 overflow-hidden"
                 style={{
                   animationDelay: `${index * 50}ms`
@@ -199,6 +253,26 @@ const FilterableInterestList = ({
               </div>
             );
           })}
+          
+          {/* Loading more shimmer */}
+          {isLoadingMore && (
+            <div className="mt-4">
+              <FilterableInterestListShimmer 
+                itemCount={3}
+                showSearchBar={false}
+              />
+            </div>
+          )}
+          
+          {/* End of list indicator */}
+          {!hasMoreData && displayedInterest.length > 0 && (
+            <div className="text-center py-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">
+                <CheckCircle2 size={16} />
+                <span>Đã hiển thị tất cả lịch sử trả lãi</span>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         /* Enhanced empty state */
@@ -223,7 +297,7 @@ const FilterableInterestList = ({
               <p className="text-gray-500 text-center max-w-sm">
                 {searchTerm ? 
                   <>Không tìm thấy kết quả nào cho "<em className="font-medium">{searchTerm}</em>"</> : 
-                  emptyMessage
+                  (filteredInterest.length === 0 ? emptyMessage : "Đang tải dữ liệu...")
                 }
               </p>
               {searchTerm && (

@@ -1,20 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Calendar, ArrowUpRight, TrendingUp, Clock, CheckCircle2, AlertCircle, Wallet } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Calendar, ArrowUpRight, ArrowDownLeft, CreditCard, TrendingUp, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { formatCurrency } from '@/utils/accountUtils';
 import SearchBar, { highlightText } from '../../ui/SearchBar';
 import FilterableWithdrawalListShimmer from '@/components/ui/custom/shimmer-types/FilterableWithdrawalListShimmer';
 
 const FilterableWithdrawalList = ({ 
-  withdrawalHistory = [], 
+  withdrawals = [], 
   isHidden = false,
   externalIsLoading = false,
-  emptyMessage = "Không có lịch sử rút tiền nào",
-  emptyIcon = <ArrowUpRight size={48} className="text-gray-400" />
+  emptyMessage = "Không có lệnh rút tiền nào",
+  emptyIcon = <Search size={48} className="text-gray-400" />
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredWithdrawals, setFilteredWithdrawals] = useState(withdrawalHistory);
+  const [filteredWithdrawals, setFilteredWithdrawals] = useState(withdrawals);
   const [isSearching, setIsSearching] = useState(false);
   const [internalIsLoading, setInternalIsLoading] = useState(true);
+  const [displayedWithdrawals, setDisplayedWithdrawals] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  const observerRef = useRef();
+  const ITEMS_PER_PAGE = 10;
 
   // Auto turn off internal loading after 2 seconds
   useEffect(() => {
@@ -25,6 +31,51 @@ const FilterableWithdrawalList = ({
     return () => clearTimeout(timer);
   }, []);
 
+  // Initialize displayed withdrawals when filteredWithdrawals change
+  useEffect(() => {
+    const initialWithdrawals = filteredWithdrawals.slice(0, ITEMS_PER_PAGE);
+    setDisplayedWithdrawals(initialWithdrawals);
+    setCurrentPage(1);
+    setHasMoreData(filteredWithdrawals.length > ITEMS_PER_PAGE);
+  }, [filteredWithdrawals]);
+
+  // Load more withdrawals
+  const loadMoreWithdrawals = useCallback(() => {
+    if (isLoadingMore || !hasMoreData) return;
+    
+    setIsLoadingMore(true);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      const nextPage = currentPage + 1;
+      const startIndex = (nextPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      const newWithdrawals = filteredWithdrawals.slice(startIndex, endIndex);
+      
+      if (newWithdrawals.length > 0) {
+        setDisplayedWithdrawals(prev => [...prev, ...newWithdrawals]);
+        setCurrentPage(nextPage);
+        setHasMoreData(endIndex < filteredWithdrawals.length);
+      } else {
+        setHasMoreData(false);
+      }
+      
+      setIsLoadingMore(false);
+    }, 1000); // 1 second delay as requested
+  }, [currentPage, filteredWithdrawals, isLoadingMore, hasMoreData]);
+
+  // Intersection Observer for infinite scroll
+  const lastWithdrawalElementRef = useCallback(node => {
+    if (isLoadingMore) return;
+    if (observerRef.current) observerRef.current.disconnect();
+    observerRef.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMoreData) {
+        loadMoreWithdrawals();
+      }
+    });
+    if (node) observerRef.current.observe(node);
+  }, [isLoadingMore, hasMoreData, loadMoreWithdrawals]);
+
   // Filter withdrawal history với animation effect
   useEffect(() => {
     setIsSearching(true);
@@ -33,7 +84,7 @@ const FilterableWithdrawalList = ({
         setFilteredWithdrawals(withdrawalHistory);
       } else {
         const searchTermLower = searchTerm.toLowerCase();
-        const filtered = withdrawalHistory.filter(item => {
+        const filtered = withdrawals.filter(item => {
           return (
             (item.time && item.time.toLowerCase().includes(searchTermLower)) ||
             (item.channel && item.channel.toLowerCase().includes(searchTermLower)) ||
@@ -47,7 +98,7 @@ const FilterableWithdrawalList = ({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, withdrawalHistory]);
+  }, [searchTerm, withdrawals]);
 
   const getStatusConfig = (status) => {
     switch (status) {
@@ -107,15 +158,17 @@ const FilterableWithdrawalList = ({
       </div>
 
       {/* Enhanced Withdrawal History List */}
-      {filteredWithdrawals.length > 0 ? (
+      {displayedWithdrawals.length > 0 ? (
         <div className="space-y-4">
-          {filteredWithdrawals.map((item, index) => {
+          {displayedWithdrawals.map((item, index) => {
             const statusConfig = getStatusConfig(item.status);
             const StatusIcon = statusConfig.icon;
+            const isLastWithdrawal = index === displayedWithdrawals.length - 1;
             
             return (
               <div 
                 key={item.id} 
+                ref={isLastWithdrawal ? lastWithdrawalElementRef : null}
                 className="group relative bg-sky-50 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:shadow-blue-100/50 transition-all duration-300 overflow-hidden"
                 style={{
                   animationDelay: `${index * 50}ms`
@@ -217,6 +270,26 @@ const FilterableWithdrawalList = ({
               </div>
             );
           })}
+          
+          {/* Loading more shimmer */}
+          {isLoadingMore && (
+            <div className="mt-4">
+              <FilterableWithdrawalListShimmer 
+                itemCount={3}
+                showSearchBar={false}
+              />
+            </div>
+          )}
+          
+          {/* End of list indicator */}
+          {!hasMoreData && displayedWithdrawals.length > 0 && (
+            <div className="text-center py-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600">
+                <CheckCircle2 size={16} />
+                <span>Đã hiển thị tất cả lệnh rút tiền</span>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         /* Enhanced empty state */
@@ -241,7 +314,7 @@ const FilterableWithdrawalList = ({
               <p className="text-gray-500 text-center max-w-sm">
                 {searchTerm ? 
                   <>Không tìm thấy kết quả nào cho "<em className="font-medium">{searchTerm}</em>"</> : 
-                  emptyMessage
+                  (filteredWithdrawals.length === 0 ? emptyMessage : "Đang tải dữ liệu...")
                 }
               </p>
               {searchTerm && (

@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Edit, Trash, RefreshCcw } from 'lucide-react';
 import StatusBadge from '../ui/custom/StatusBadge';
 import DataTableFilter from './DataTableFilter';
+import DataTableRowShimmer from '../ui/custom/shimmer-types/DataTableRowShimmer';
 
 const DataTable = ({
   data = [],
@@ -35,16 +36,59 @@ const DataTable = ({
   // State cho dữ liệu đã được lọc
   const [filteredData, setFilteredData] = useState(data);
   
-  // Ref cho container để tránh thanh cuộn dọc
+  // State cho lazy loading và phân trang
+  const [displayedData, setDisplayedData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showShimmer, setShowShimmer] = useState(false);
+  const [isFilteringData, setIsFilteringData] = useState(false);
+  const itemsPerPage = 10;
+  
+  // Ref cho container để tránh thanh cuộn dọc và theo dõi scroll
   const tableContainerRef = useRef(null);
+  const observerRef = useRef(null);
   
   // Cập nhật dữ liệu đã lọc khi data thay đổi
   useEffect(() => {
     applyFilters();
   }, [data, activeFilters]);
   
+  // Cập nhật dữ liệu hiển thị khi filteredData thay đổi
+  useEffect(() => {
+    if (filteredData.length > 0) {
+      setCurrentPage(1);
+      // Luôn hiển thị shimmer khi filteredData thay đổi
+      setDisplayedData([]);
+      setShowShimmer(true);
+      setIsFilteringData(true);
+      
+      // Sau 1.5s hiển thị dữ liệu thật
+      setTimeout(() => {
+        setDisplayedData(filteredData.slice(0, itemsPerPage));
+        setShowShimmer(false);
+        setIsFilteringData(false);
+      }, 1500);
+    } else {
+      // Hiển thị shimmer ngay cả khi filteredData rỗng
+      setDisplayedData([]);
+      setShowShimmer(true);
+      setIsFilteringData(true);
+      
+      // Sau 1.5s hiển thị thông báo "không tìm thấy dữ liệu"
+      setTimeout(() => {
+        setShowShimmer(false);
+        setIsFilteringData(false);
+      }, 1500);
+    }
+  }, [filteredData]);
+  
+
+  
   // Xử lý khi thay đổi bộ lọc
   const handleFilterChange = (key, value) => {
+    // Đánh dấu đang lọc dữ liệu
+    setIsFilteringData(true);
+    
     setActiveFilters(prev => {
       const newFilters = { ...prev };
       
@@ -63,20 +107,86 @@ const DataTable = ({
   
   // Xử lý xóa tất cả các bộ lọc
   const clearAllFilters = () => {
+    // Đánh dấu đang lọc dữ liệu
+    setIsFilteringData(true);
     setActiveFilters({});
   };
+  
+  // Kiểm tra có còn dữ liệu để load không
+  const hasMoreData = useCallback(() => {
+    return displayedData.length < filteredData.length;
+  }, [displayedData.length, filteredData.length]);
+  
+  // Load thêm dữ liệu
+  const loadMoreData = useCallback(() => {
+    if (isLoadingMore || !hasMoreData()) return;
+    
+    setIsLoadingMore(true);
+    setShowShimmer(true);
+    
+    // Hiển thị shimmer trong 1.5s
+    setTimeout(() => {
+      const nextPage = currentPage + 1;
+      const startIndex = currentPage * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const newData = filteredData.slice(startIndex, endIndex);
+      
+      setDisplayedData(prev => [...prev, ...newData]);
+      setCurrentPage(nextPage);
+      setShowShimmer(false);
+      setIsLoadingMore(false);
+    }, 1500);
+  }, [currentPage, filteredData, isLoadingMore, hasMoreData]);
+  
+  // Intersection Observer để phát hiện khi scroll đến cuối
+  useEffect(() => {
+    // Disconnect observer cũ nếu có
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting && !isLoadingMore && hasMoreData()) {
+          loadMoreData();
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+    
+    observerRef.current = observer;
+    
+    // Delay để đảm bảo DOM đã được render
+    const timeoutId = setTimeout(() => {
+      const targetElement = document.querySelector('[data-scroll-target="true"]');
+      if (targetElement && hasMoreData()) {
+        observer.observe(targetElement);
+      }
+    }, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [isLoadingMore, displayedData, filteredData, hasMoreData, loadMoreData]);
   
   // Áp dụng các bộ lọc vào dữ liệu
   const applyFilters = () => {
     if (!data) {
       setFilteredData([]);
-      changeTableData([]);
+      changeTableData && changeTableData([]);
       return;
     }
     
     if (Object.keys(activeFilters).length === 0) {
       setFilteredData(data);
-      changeTableData(data);
+      changeTableData && changeTableData(data);
       return;
     }
     
@@ -153,7 +263,7 @@ const DataTable = ({
     });
     
     setFilteredData(result);
-    changeTableData(result);
+    changeTableData && changeTableData(result);
   };
   
   // Hàm hỗ trợ lấy giá trị từ nested properties
@@ -268,7 +378,7 @@ const DataTable = ({
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.05,
+        delay: (i % itemsPerPage) * 0.05, // Chỉ delay cho 10 rows đầu tiên của mỗi batch
         duration: 0.4,
         ease: 'easeOut'
       }
@@ -294,11 +404,12 @@ const DataTable = ({
         layout
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: 0.4, layout: { type: "tween", ease: "easeOut" } }}
         ref={tableContainerRef}
         className={`bg-white rounded-2xl border border-blue-100 shadow-[0_4px_24px_rgba(0,170,255,0.08)] overflow-hidden`}
+        style={{ overflowY: 'hidden' }}
       >
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-hidden">
           <table className="min-w-full divide-y divide-blue-100">
             <thead className={headerClassName}>
               <tr>
@@ -334,8 +445,17 @@ const DataTable = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-blue-50">
-              <AnimatePresence>
-                {filteredData.length === 0 ? (
+              <AnimatePresence mode="wait">
+                {/* Hiển thị shimmer khi filteredData thay đổi (chỉ khi filtering, không phải load more) */}
+                {showShimmer && (isFilteringData || displayedData.length === 0) ? (
+                  Array.from({ length: itemsPerPage }, (_, index) => (
+                    <DataTableRowShimmer
+                      key={`filter-shimmer-${index}`}
+                      columnCount={columns.length}
+                      index={index}
+                    />
+                  ))
+                ) : displayedData.length === 0 && !isLoading && !showShimmer ? (
                   <tr>
                     <td colSpan={columns.length + 1} className="px-6 py-10 text-center">
                       <motion.div 
@@ -359,84 +479,133 @@ const DataTable = ({
                       </motion.div>
                     </td>
                   </tr>
-                ) : (
-                  filteredData.map((item, i) => (
-                    <motion.tr 
-                      key={item[keyField]}
-                      custom={i}
-                      variants={tableRowVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className="hover:bg-blue-50/60 transition-colors cursor-pointer"
-                      onClick={() => onRowClick && onRowClick(item)}
-                      layoutId={!statusFilters.status.includes('inTerm') ? `row-${item[keyField]}` : `savings-account-card-${item[keyField]}`}
-                      layout
-                      transition={{
-                        layout: { type: "spring", damping: 15, stiffness: 100 },
-                        opacity: { duration: 0.6 }
-                      }}
-                    >
-                      {columns.map((column) => {
-                        // Render special components based on column type
-                        if (column.type === 'status') {
+                ) : !(showShimmer && (isFilteringData || displayedData.length === 0)) && (
+                  <>
+                    {/* Hiển thị dữ liệu thực */}
+                    {displayedData.map((item, i) => (
+                      <motion.tr 
+                        key={item[keyField]}
+                        custom={i}
+                        variants={tableRowVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="hover:bg-blue-50/60 transition-colors cursor-pointer"
+                        onClick={() => onRowClick && onRowClick(item)}
+                        layoutId={statusFilters.status && !statusFilters.status.includes('inTerm') ? `row-${item[keyField]}` : `savings-account-card-${item[keyField]}`}
+                        layout
+                        transition={{
+                          layout: { type: "spring", damping: 15, stiffness: 100 },
+                          opacity: { duration: 0.6 }
+                        }}
+                      >
+                        {columns.map((column) => {
+                          // Render special components based on column type
+                          if (column.type === 'status') {
+                            return (
+                              <td key={column.key} className={`px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap ${column.className || ''}`}>
+                                <StatusBadge status={item[column.key]} />
+                              </td>
+                            );
+                          }
+                          
+                          // Handle nested properties
+                          let value = item[column.key];
+                          if (column.key.includes('.')) {
+                            const keys = column.key.split('.');
+                            value = keys.reduce((obj, key) => obj && obj[key], item);
+                          }
+                          
+                          // Apply formatter if provided
+                          if (column.formatter) {
+                            value = column.formatter(value, item);
+                          }
+                          
                           return (
                             <td key={column.key} className={`px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap ${column.className || ''}`}>
-                              <StatusBadge status={item[column.key]} />
+                              {column.formatter ? value : (
+                                <div className="text-sm text-gray-800">{value}</div>
+                              )}
                             </td>
                           );
-                        }
-                        
-                        // Handle nested properties
-                        let value = item[column.key];
-                        if (column.key.includes('.')) {
-                          const keys = column.key.split('.');
-                          value = keys.reduce((obj, key) => obj && obj[key], item);
-                        }
-                        
-                        // Apply formatter if provided
-                        if (column.formatter) {
-                          value = column.formatter(value, item);
-                        }
-                        
-                        return (
-                          <td key={column.key} className={`px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap ${column.className || ''}`}>
-                            {column.formatter ? value : (
-                              <div className="text-sm text-gray-800">{value}</div>
+                        })}
+                        <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex justify-end space-x-2" onClick={(e) => e.stopPropagation()}>
+                            {renderActions ? renderActions(item) : (
+                              <>
+                                {onEditClick && (
+                                  <motion.button
+                                    onClick={() => onEditClick(item)}
+                                    whileHover={{ scale: 1.15, rotate: 5 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="text-blue-600 hover:text-blue-800 p-1.5 rounded-full hover:bg-blue-50"
+                                  >
+                                    <Edit size={18} />
+                                  </motion.button>
+                                )}
+                                {onDeleteClick && (
+                                  <motion.button
+                                    onClick={() => onDeleteClick(item)}
+                                    whileHover={{ scale: 1.15, rotate: -5 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="text-red-600 hover:text-red-800 p-1.5 rounded-full hover:bg-red-50"
+                                  >
+                                    <Trash size={18} />
+                                  </motion.button>
+                                )}
+                              </>
                             )}
-                          </td>
-                        );
-                      })}
-                      <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2" onClick={(e) => e.stopPropagation()}>
-                          {renderActions ? renderActions(item) : (
-                            <>
-                              {onEditClick && (
-                                <motion.button
-                                  onClick={() => onEditClick(item)}
-                                  whileHover={{ scale: 1.15, rotate: 5 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  className="text-blue-600 hover:text-blue-800 p-1.5 rounded-full hover:bg-blue-50"
-                                >
-                                  <Edit size={18} />
-                                </motion.button>
-                              )}
-                              {onDeleteClick && (
-                                <motion.button
-                                  onClick={() => onDeleteClick(item)}
-                                  whileHover={{ scale: 1.15, rotate: -5 }}
-                                  whileTap={{ scale: 0.95 }}
-                                  className="text-red-600 hover:text-red-800 p-1.5 rounded-full hover:bg-red-50"
-                                >
-                                  <Trash size={18} />
-                                </motion.button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                    
+                    {/* Hiển thị shimmer rows khi đang load thêm (không phải khi lọc) */}
+                    {showShimmer && hasMoreData() && !isFilteringData && displayedData.length > 0 && (
+                      Array.from({ length: itemsPerPage }, (_, index) => (
+                        <DataTableRowShimmer
+                          key={`shimmer-${displayedData.length + index}`}
+                          columnCount={columns.length}
+                          index={index}
+                        />
+                      ))
+                    )}
+                    
+                    {/* Invisible element để trigger intersection observer */}
+                    {hasMoreData() && !showShimmer && (
+                      <tr 
+                        data-scroll-target="true"
+                        ref={(el) => {
+                          if (el && observerRef.current) {
+                            observerRef.current.observe(el);
+                          }
+                        }}
+                        style={{ height: '1px' }}
+                      >
+                        <td colSpan={columns.length + 1} style={{ height: '1px', padding: 0 }}></td>
+                      </tr>
+                    )}
+                    
+                    {/* Thông báo đã lướt hết dữ liệu */}
+                    {!hasMoreData() && displayedData.length > 0 && !showShimmer && (
+                      <tr>
+                        <td colSpan={columns.length + 1} className="px-6 py-8 text-center">
+                          <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4 }}
+                            className="flex flex-col items-center justify-center text-gray-500"
+                          >
+                            <svg className="w-8 h-8 text-blue-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p className="text-sm font-medium text-gray-600">Đã hiển thị tất cả dữ liệu</p>
+                            <p className="text-xs text-gray-400 mt-1">Tổng cộng {filteredData.length} mục</p>
+                          </motion.div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 )}
               </AnimatePresence>
             </tbody>

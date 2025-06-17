@@ -411,8 +411,7 @@ export default function Dashboard() {
   const [savingsCardDetailVisible, setSavingsCardDetailVisible] =
     useState(false);
   const [selectedSavingsDetail, setSelectedSavingsDetail] = useState(null);
-  const [savingsRightPanelContent, setSavingsRightPanelContent] =
-    useState("transactions");
+  const [savingsRightPanelContent, setSavingsRightPanelContent] = useState("transactions");
 
   // State for savings account transaction history
   const [savingsTransactionHistory, setSavingsTransactionHistory] = useState({
@@ -514,6 +513,72 @@ export default function Dashboard() {
         channel: "Hệ thống",
         amount: 150000000,
         content: "Trả lãi tiền gửi tiết kiệm kỳ 5",
+        isInterest: true,
+        interestAmount: 687500,
+        balanceAfter: 150000000,
+      },
+      {
+        id: 5,
+        time: "09:45 - 10/09/2023",
+        type: "Trả lãi",
+        channel: "Hệ thống",
+        amount: 150000000,
+        content: "Trả lãi tiền gửi tiết kiệm kỳ 3",
+        isInterest: true,
+        interestAmount: 687500,
+        balanceAfter: 150000000,
+      },
+      {
+        id: 6,
+        time: "09:45 - 10/10/2023",
+        type: "Trả lãi",
+        channel: "Hệ thống",
+        amount: 150000000,
+        content: "Trả lãi tiền gửi tiết kiệm kỳ 4",
+        isInterest: true,
+        interestAmount: 687500,
+        balanceAfter: 150000000,
+      },
+      {
+        id: 5,
+        time: "09:45 - 10/09/2023",
+        type: "Trả lãi",
+        channel: "Hệ thống",
+        amount: 150000000,
+        content: "Trả lãi tiền gửi tiết kiệm kỳ 3",
+        isInterest: true,
+        interestAmount: 687500,
+        balanceAfter: 150000000,
+      },
+      {
+        id: 6,
+        time: "09:45 - 10/10/2023",
+        type: "Trả lãi",
+        channel: "Hệ thống",
+        amount: 150000000,
+        content: "Trả lãi tiền gửi tiết kiệm kỳ 4",
+        isInterest: true,
+        interestAmount: 687500,
+        balanceAfter: 150000000,
+      },
+      {
+        id: 5,
+        time: "09:45 - 10/09/2023",
+        type: "Trả lãi",
+        channel: "Hệ thống",
+        amount: 150000000,
+        content: "Trả lãi tiền gửi tiết kiệm kỳ 3",
+        isInterest: true,
+        interestAmount: 687500,
+        balanceAfter: 150000000,
+      },
+      {
+        id: 6,
+        time: "09:45 - 10/10/2023",
+        type: "Trả lãi",
+        channel: "Hệ thống",
+        amount: 150000000,
+        content: "Trả lãi tiền gửi tiết kiệm kỳ 4",
         isInterest: true,
         interestAmount: 687500,
         balanceAfter: 150000000,
@@ -907,6 +972,126 @@ export default function Dashboard() {
         content: "Lương tháng 4/2023",
         isIncoming: true,
       },
+      {
+        id: 1,
+        time: "15:30 - 12/05/2023",
+        type: "Nhận tiền chuyển khoản",
+        channel: "Internet Banking",
+        amount: 5000000,
+        balanceAfter: 20000000,
+        content: "Chuyển tiền thanh toán dự án website",
+        isIncoming: true,
+      },
+      {
+        id: 2,
+        time: "09:15 - 10/05/2023",
+        type: "Chuyển tiền",
+        channel: "ATM",
+        amount: 1500000,
+        balanceAfter: 15000000,
+        content: "Chuyển tiền học phí",
+        isIncoming: false,
+      },
+      {
+        id: 1,
+        time: "15:30 - 12/05/2023",
+        type: "Nhận tiền chuyển khoản",
+        channel: "Internet Banking",
+        amount: 5000000,
+        balanceAfter: 20000000,
+        content: "Chuyển tiền thanh toán dự án website",
+        isIncoming: true,
+      },
+      {
+        id: 2,
+        time: "09:15 - 10/05/2023",
+        type: "Chuyển tiền",
+        channel: "ATM",
+        amount: 1500000,
+        balanceAfter: 15000000,
+        content: "Chuyển tiền học phí",
+        isIncoming: false,
+      },
+      {
+        id: 1,
+        time: "15:30 - 12/05/2023",
+        type: "Nhận tiền chuyển khoản",
+        channel: "Internet Banking",
+        amount: 5000000,
+        balanceAfter: 20000000,
+        content: "Chuyển tiền thanh toán dự án website",
+        isIncoming: true,
+      },
+      {
+        id: 2,
+        time: "09:15 - 10/05/2023",
+        type: "Chuyển tiền",
+        channel: "ATM",
+        amount: 1500000,
+        balanceAfter: 15000000,
+        content: "Chuyển tiền học phí",
+        isIncoming: false,
+      },
+      {
+        id: 1,
+        time: "15:30 - 12/05/2023",
+        type: "Nhận tiền chuyển khoản",
+        channel: "Internet Banking",
+        amount: 5000000,
+        balanceAfter: 20000000,
+        content: "Chuyển tiền thanh toán dự án website",
+        isIncoming: true,
+      },
+      {
+        id: 2,
+        time: "09:15 - 10/05/2023",
+        type: "Chuyển tiền",
+        channel: "ATM",
+        amount: 1500000,
+        balanceAfter: 15000000,
+        content: "Chuyển tiền học phí",
+        isIncoming: false,
+      },
+      {
+        id: 1,
+        time: "15:30 - 12/05/2023",
+        type: "Nhận tiền chuyển khoản",
+        channel: "Internet Banking",
+        amount: 5000000,
+        balanceAfter: 20000000,
+        content: "Chuyển tiền thanh toán dự án website",
+        isIncoming: true,
+      },
+      {
+        id: 2,
+        time: "09:15 - 10/05/2023",
+        type: "Chuyển tiền",
+        channel: "ATM",
+        amount: 1500000,
+        balanceAfter: 15000000,
+        content: "Chuyển tiền học phí",
+        isIncoming: false,
+      },
+      {
+        id: 1,
+        time: "15:30 - 12/05/2023",
+        type: "Nhận tiền chuyển khoản",
+        channel: "Internet Banking",
+        amount: 5000000,
+        balanceAfter: 20000000,
+        content: "Chuyển tiền thanh toán dự án website",
+        isIncoming: true,
+      },
+      {
+        id: 2,
+        time: "09:15 - 10/05/2023",
+        type: "Chuyển tiền",
+        channel: "ATM",
+        amount: 1500000,
+        balanceAfter: 15000000,
+        content: "Chuyển tiền học phí",
+        isIncoming: false,
+      },
     ],
   });
 
@@ -1011,8 +1196,7 @@ export default function Dashboard() {
 
   // Add state for savings account creation modal
   const [savingsAccountModalOpen, setSavingsAccountModalOpen] = useState(false);
-  const [savingsAccountModalAnimating, setSavingsAccountModalAnimating] =
-    useState(false);
+  const [savingsAccountModalAnimating, setSavingsAccountModalAnimating] = useState(false);
   const [savingsData, setSavingsData] = useState({
     depositType: "standard", // standard or flexible
     sourceAccount: "",
@@ -1129,38 +1313,6 @@ export default function Dashboard() {
     monthly: "Hàng tháng",
     quarterly: "Hàng quý",
     yearly: "Đầu kỳ",
-  };
-
-  // Available terms based on interest payment type
-  const availableTermsByInterestType = {
-    end_of_term: [
-      "1_month",
-      "3_months",
-      "6_months",
-      "9_months",
-      "12_months",
-      "18_months",
-      "24_months",
-      "36_months",
-    ],
-    monthly: [
-      "3_months",
-      "6_months",
-      "9_months",
-      "12_months",
-      "18_months",
-      "24_months",
-      "36_months",
-    ],
-    quarterly: [
-      "6_months",
-      "9_months",
-      "12_months",
-      "18_months",
-      "24_months",
-      "36_months",
-    ],
-    yearly: ["12_months", "18_months", "24_months", "36_months"],
   };
 
   // Toggle savings account creation modal
