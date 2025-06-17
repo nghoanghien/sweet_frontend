@@ -25,6 +25,9 @@ import React, { useState, useEffect } from 'react';
   import ModalHeader from '../../../components/ui/custom/ModalHeader';
   import AnimatedTabNavigation from '../../../components/ui/custom/AnimatedTabNavigation';
   import EmployeeTransactionHistory from '../../../components/modules/employees-management/EmployeeTransactionHistory';
+  import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
+import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
+import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer';
 
   export default function EmployeeManagement() {
     // State for employee data
@@ -306,6 +309,11 @@ import React, { useState, useEffect } from 'react';
     const [navHovered, setNavHovered] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    
+    // Loading states
+    const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
+    const [isLoadingSearch, setIsLoadingSearch] = useState(true);
+    const [isLoadingForm, setIsLoadingForm] = useState(true);
   
     const employeeColumns = [
       {
@@ -444,6 +452,24 @@ import React, { useState, useEffect } from 'react';
       checkIfMobile();
       window.addEventListener('resize', checkIfMobile);
       return () => window.removeEventListener('resize', checkIfMobile);
+    }, []);
+    
+    // Simulate loading states
+    useEffect(() => {
+      // Simulate search filter loading
+      setTimeout(() => {
+        setIsLoadingSearch(false);
+      }, 2000);
+      
+      // Simulate employees data loading
+      setTimeout(() => {
+        setIsLoadingEmployees(false);
+      }, 2000);
+      
+      // Simulate form loading
+      setTimeout(() => {
+        setIsLoadingForm(false);
+      }, 3000);
     }, []);
   
     // useEffect to filter and sort employees
@@ -811,6 +837,10 @@ import React, { useState, useEffect } from 'react';
         // Immediately clear errors
         setErrors({});
       } else {
+        setIsLoadingForm(true);
+        setTimeout(() => {
+          setIsLoadingForm(false);
+        }, 1500)
         // If opening, reset the form first then open the modal
         setNewEmployee({
           fullName: '',
@@ -1530,14 +1560,18 @@ import React, { useState, useEffect } from 'react';
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <SearchFilterBar
-              searchFields={searchFields}
-              handleSearchChange={handleSearchChange}
-              clearSearchFields={clearSearchFields}
-              sortField={sortField}
-              sortDirection={sortDirection}
-              handleSort={handleSort}
-            />
+            {isLoadingSearch ? (
+              <SearchFilterBarShimmer />
+            ) : (
+              <SearchFilterBar
+                searchFields={searchFields}
+                handleSearchChange={handleSearchChange}
+                clearSearchFields={clearSearchFields}
+                sortField={sortField}
+                sortDirection={sortDirection}
+                handleSort={handleSort}
+              />
+            )}
           </motion.div>
         </div>
 
@@ -1547,32 +1581,38 @@ import React, { useState, useEffect } from 'react';
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <DataTable
-            data={filteredEmployees}
-            columns={employeeColumns}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            handleSort={handleSort}
-            onRowClick={openEmployeeDetail}
-            onEditClick={enableEditMode}
-            onDeleteClick={null} // Không sử dụng delete, dùng custom actions
-            keyField="id"
-            className="mb-6"
-            // Custom header styling
-            headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
-            // Custom actions
-            renderActions={renderActions}
-            // Bộ lọc trạng thái
-            statusFilters={{
-              status: ['active', 'disabled']
-            }}
-            // Bộ lọc khoảng thời gian
-            dateRangeFilters={{
-              registrationDate: { label: 'Ngày đăng ký' },
-              birthDate: { label: 'Ngày sinh' }
-            }}
-            changeTableData={setExporData}
-          />
+          {isLoadingEmployees ? (
+            <DataTableShimmer
+              showFilter={true}
+            />
+          ) : (
+            <DataTable
+              data={filteredEmployees}
+              columns={employeeColumns}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+              onRowClick={openEmployeeDetail}
+              onEditClick={enableEditMode}
+              onDeleteClick={null} // Không sử dụng delete, dùng custom actions
+              keyField="id"
+              className="mb-6"
+              // Custom header styling
+              headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
+              // Custom actions
+              renderActions={renderActions}
+              // Bộ lọc trạng thái
+              statusFilters={{
+                status: ['active', 'disabled']
+              }}
+              // Bộ lọc khoảng thời gian
+              dateRangeFilters={{
+                 registrationDate: { label: 'Ngày đăng ký' },
+                 birthDate: { label: 'Ngày sinh' }
+               }}
+               changeTableData={setExporData}
+             />
+           )}
         </motion.div>
 
         {/* "Add Employee" fixed button */}
@@ -2242,11 +2282,14 @@ import React, { useState, useEffect } from 'react';
                 </div>
 
                 {/* Scrollable Content */}
-                <div
-                  className="overflow-y-auto flex-1 py-8 px-4 md:px-12"
-                  style={{ scrollbarWidth: "thin" }}
-                >
-                  <form className="space-y-8">
+                {isLoadingForm ? (
+                  <FormShimmer />
+                ) : (
+                  <div
+                    className="overflow-y-auto flex-1 py-8 px-4 md:px-12"
+                    style={{ scrollbarWidth: "thin" }}
+                  >
+                    <form className="space-y-8">
                     {/* Thông tin cá nhân */}
                     <motion.div
                       layout
@@ -2419,6 +2462,7 @@ import React, { useState, useEffect } from 'react';
                     </motion.div>
                   </form>
                 </div>
+                )}
 
                 {/* Fixed Footer */}
                 <div className="p-6 border-t-2 border-gray-100 flex justify-end space-x-4 sticky bottom-0 bg-white rounded-b-2xl z-10">
@@ -2442,13 +2486,18 @@ import React, { useState, useEffect } from 'react';
                       </motion.button>
                       <motion.button
                         type="button"
-                        whileHover={{
+                        whileHover={!isLoadingForm ? {
                           scale: 1.05,
                           boxShadow: "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
-                        }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={addNewEmployee}
-                        className="px-4 md:px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                        } : {}}
+                        whileTap={!isLoadingForm ? { scale: 0.95 } : {}}
+                        onClick={!isLoadingForm ? addNewEmployee : undefined}
+                        disabled={isLoadingForm}
+                        className={`px-4 md:px-6 py-3 font-semibold rounded-xl shadow-md transition-all duration-500 flex items-center ${
+                          isLoadingForm
+                            ? 'bg-gray-400 text-gray-300 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white'
+                        }`}
                       >
                         <Plus size={16} className="mr-2 font-medium" />
                         Thêm nhân viên

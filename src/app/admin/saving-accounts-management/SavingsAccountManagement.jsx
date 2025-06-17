@@ -14,6 +14,8 @@ import ExportDataModal from '../../../components/common/ExportDataModal';
 import ExportNotification from '../../../components/common/ExportNotification';
 import SwipeConfirmationModal from '../../../components/modals/ConfirmationModal/SwipeConfirmationModal';
 import { formatCurrency } from '../../../utils/accountUtils';
+import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
+import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
 // Các component phụ trợ sẽ bổ sung sau: InputField, SearchFilterBar, DataTable, ...
 
 // Dữ liệu mẫu cho giao dịch tiết kiệm
@@ -189,6 +191,10 @@ export default function SavingsAccountManagement() {
   // State cho modal thêm mới
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  // Loading states
+  const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
+  const [isLoadingSearch, setIsLoadingSearch] = useState(true);
+
   // State cho filter, sort, search (sẽ bổ sung sau)
   const [filteredAccounts, setFilteredAccounts] = useState([]);
   const [sortField, setSortField] = useState('accountNumber');
@@ -250,6 +256,19 @@ export default function SavingsAccountManagement() {
     }
   });
   const [errors, setErrors] = useState({});
+
+  // useEffect to simulate loading states
+  useEffect(() => {
+    // Simulate loading for search filtering
+    setTimeout(() => {
+      setIsLoadingSearch(false);
+    }, 2000);
+
+    // Simulate loading for accounts data
+    setTimeout(() => {
+      setIsLoadingAccounts(false);
+    }, 2000);
+  }, []);
 
   // useEffect filter + sort (sẽ bổ sung logic sau)
   useEffect(() => {
@@ -524,37 +543,47 @@ export default function SavingsAccountManagement() {
             </button>
           </div>
         </div>
-        <SearchFilterBar
-          searchFields={searchFields}
-          handleSearchChange={handleSearchChange}
-          clearSearchFields={clearSearchFields}
+        {isLoadingSearch ? (
+          <SearchFilterBarShimmer />
+        ) : (
+          <SearchFilterBar
+            searchFields={searchFields}
+            handleSearchChange={handleSearchChange}
+            clearSearchFields={clearSearchFields}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            handleSort={handleSort}
+            searchFieldsConfig={searchFieldsConfig}
+          />
+        )}
+      </div>
+      {isLoadingAccounts ? (
+        <DataTableShimmer
+          showFilter={true}
+        />
+      ) : (
+        <DataTable
+          data={filteredAccounts}
+          columns={accountColumns}
           sortField={sortField}
           sortDirection={sortDirection}
           handleSort={handleSort}
-          searchFieldsConfig={searchFieldsConfig}
+          onRowClick={(acc) => { setSelectedAccount(acc); setIsDetailDrawerOpen(true); }}
+          keyField="id"
+          className="mb-6"
+          headerClassName="bg-sky-600"
+          renderActions={renderActions}
+          // Bộ lọc trạng thái
+          statusFilters={{
+            status: ['inTerm', 'closed']
+          }}
+          // Bộ lọc khoảng thời gian
+          dateRangeFilters={{
+            depositDate: { label: 'Ngày gửi tiền' }
+          }}
+          changeTableData={setExporData}
         />
-      </div>
-      <DataTable
-        data={filteredAccounts}
-        columns={accountColumns}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        handleSort={handleSort}
-        onRowClick={(acc) => { setSelectedAccount(acc); setIsDetailDrawerOpen(true); }}
-        keyField="id"
-        className="mb-6"
-        headerClassName="bg-sky-600"
-        renderActions={renderActions}
-        // Bộ lọc trạng thái
-        statusFilters={{
-          status: ['inTerm', 'closed']
-        }}
-        // Bộ lọc khoảng thời gian
-        dateRangeFilters={{
-          depositDate: { label: 'Ngày gửi tiền' }
-        }}
-        changeTableData={setExporData}
-      />
+      )}
       {/* Modal chi tiết phiếu gửi tiền */}
       <AnimatePresence>
         {isDetailDrawerOpen && selectedAccount && (

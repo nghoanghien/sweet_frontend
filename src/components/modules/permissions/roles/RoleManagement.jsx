@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserCheck, Plus, Search, Filter, Users, Settings } from 'lucide-react';
 import RoleCard from '../ui/RoleCard';
 import RoleFormModal from './RoleFormModal';
 import DeleteRoleModal from './DeleteRoleModal';
 import ExportNotification from '../../../common/ExportNotification';
+import RoleCardShimmer from '../../../ui/custom/shimmer-types/RoleCardShimmer';
 
 const RoleManagement = () => {
+  // State cho loading
+  const [isLoading, setIsLoading] = useState(true);
+  
   // State cho modal
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -16,6 +20,15 @@ const RoleManagement = () => {
   // State cho filter
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // useEffect để xử lý loading state 3 giây
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // State cho modal xác nhận
   const [confirmModal, setConfirmModal] = useState({
@@ -220,6 +233,39 @@ const RoleManagement = () => {
     }
   };
 
+  // Hiển thị shimmer khi đang loading
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <motion.h3
+              className="text-2xl font-bold text-indigo-700 flex items-center gap-2 drop-shadow"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <UserCheck
+                size={28}
+                className="text-indigo-500 mr-2 drop-shadow-lg"
+              />
+              Quản lý vai trò
+            </motion.h3>
+            <motion.p
+              className="text-sm text-gray-500 mt-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              Đang tải danh sách vai trò...
+            </motion.p>
+          </div>
+        </div>
+        <RoleCardShimmer cardCount={9} />
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -404,4 +450,4 @@ const RoleManagement = () => {
   );
 };
 
-export default RoleManagement; 
+export default RoleManagement;

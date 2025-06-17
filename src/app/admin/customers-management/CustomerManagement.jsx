@@ -28,6 +28,9 @@ import {
 import SearchFilterBar from '@/components/common/SearchFilterBar';
 import DataTable from '../../../components/common/DataTable';
 import SwipeConfirmationModal from '../../../components/modals/ConfirmationModal/SwipeConfirmationModal';
+import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
+import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
+import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer';
 import PaymentAccountsNew from '../../../components/modules/payment-account/PaymentAccountsNew';
 import SavingsAccounts from '../../../components/modules/saving-account/SavingsAccounts';
 import CalendarDatePicker from '../../../components/ui/CalendarDatePicker';
@@ -535,6 +538,11 @@ export default function CustomerManagement() {
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
+  // Loading states
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  const [isLoadingSearch, setIsLoadingSearch] = useState(true);
+  const [isLoadingForm, setIsLoadingForm] = useState(true);
+  
   // Check if viewing on mobile device
   useEffect(() => {
     const checkIfMobile = () => {
@@ -543,6 +551,24 @@ export default function CustomerManagement() {
     checkIfMobile();
     window.addEventListener('resize', checkIfMobile);
     return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+  
+  // Simulate loading states
+  useEffect(() => {
+    // Simulate search filter loading
+    setTimeout(() => {
+      setIsLoadingSearch(false);
+    }, 2000);
+    
+    // Simulate customers data loading
+    setTimeout(() => {
+      setIsLoadingCustomers(false);
+    }, 2000);
+    
+    // Simulate form loading
+    setTimeout(() => {
+      setIsLoadingForm(false);
+    }, 8000);
   }, []);
 
   // useEffect to filter and sort customers
@@ -884,6 +910,10 @@ export default function CustomerManagement() {
       // Immediately clear errors
       setErrors({});
     } else {
+      setIsLoadingForm(true);
+      setTimeout(() => {
+        setIsLoadingForm(false);
+      }, 1500)
       // If opening, reset the form first then open the modal
       setNewCustomer({
         fullName: '',
@@ -1710,16 +1740,20 @@ export default function CustomerManagement() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <SearchFilterBar
-            searchFields={searchFields}
-            handleSearchChange={handleSearchChange}
-            clearSearchFields={clearSearchFields}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            handleSort={handleSort}
-            title="Tìm kiếm khách hàng"
-            subtitle="Lọc theo thông tin cá nhân"
-          />
+          {isLoadingSearch ? (
+            <SearchFilterBarShimmer />
+          ) : (
+            <SearchFilterBar
+              searchFields={searchFields}
+              handleSearchChange={handleSearchChange}
+              clearSearchFields={clearSearchFields}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              handleSort={handleSort}
+              title="Tìm kiếm khách hàng"
+              subtitle="Lọc theo thông tin cá nhân"
+            />
+          )}
         </motion.div>
       </div>
 
@@ -1730,30 +1764,39 @@ export default function CustomerManagement() {
         transition={{ duration: 0.6, delay: 0.4 }}
         className="mb-6"
       >
-        <DataTable
-          data={filteredCustomers}
-          columns={customerColumns}
-          sortField={sortField}
-          sortDirection={sortDirection}
-          handleSort={handleSort}
-          onRowClick={openCustomerDetail}
-          onEditClick={enableEditMode}
-          keyField="id"
-          className="bg-white rounded-xl shadow-sm overflow-hidden"
-          headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
-          renderActions={renderActions}
-          emptyMessage="Không tìm thấy khách hàng nào phù hợp với điều kiện tìm kiếm"
-          // Bộ lọc trạng thái
-          statusFilters={{
-            status: ['active', 'disabled']
-          }}
-          changeTableData={setExporData}
-          // Bộ lọc khoảng thời gian
-          dateRangeFilters={{
-            registrationDate: { label: 'Ngày đăng ký' },
-            birthDate: { label: 'Ngày sinh' }
-          }}
-        />
+        {isLoadingCustomers ? (
+          <DataTableShimmer 
+            rowCount={10}
+            columnCount={6}
+            showFilter={true}
+            headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500"
+          />
+        ) : (
+          <DataTable
+            data={filteredCustomers}
+            columns={customerColumns}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            handleSort={handleSort}
+            onRowClick={openCustomerDetail}
+            onEditClick={enableEditMode}
+            keyField="id"
+            className="bg-white rounded-xl shadow-sm overflow-hidden"
+            headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
+            renderActions={renderActions}
+            emptyMessage="Không tìm thấy khách hàng nào phù hợp với điều kiện tìm kiếm"
+            // Bộ lọc trạng thái
+            statusFilters={{
+              status: ['active', 'disabled']
+            }}
+            changeTableData={setExporData}
+            // Bộ lọc khoảng thời gian
+            dateRangeFilters={{
+              registrationDate: { label: 'Ngày đăng ký' },
+              birthDate: { label: 'Ngày sinh' }
+            }}
+          />
+        )}
       </motion.div>
 
       {/* "Add Customer" fixed button */}
@@ -1845,7 +1888,7 @@ export default function CustomerManagement() {
 
               {/* Disabled Customer Warning */}
               <AnimatePresence>
-                {selectedCustomer && selectedCustomer.status === 'disabled' && (
+                {selectedCustomer && selectedCustomer.status === 'disabled' && !isEditMode && (activeDetailTab !== "information") && (
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -2465,11 +2508,14 @@ export default function CustomerManagement() {
               </div>
 
               {/* Scrollable Content */}
-              <div
-                className="overflow-y-auto flex-1 py-8 px-4 md:px-12"
-                style={{ scrollbarWidth: "thin" }}
-              >
-                <form className="space-y-8">
+              {isLoadingForm ? (
+                <FormShimmer />
+              ) : (
+                <div
+                  className="overflow-y-auto flex-1 py-8 px-4 md:px-12"
+                  style={{ scrollbarWidth: "thin" }}
+                >
+                  <form className="space-y-8">
                   {/* Thông tin cá nhân */}
                   <motion.div
                     layout
@@ -2642,6 +2688,7 @@ export default function CustomerManagement() {
                   </motion.div>
                 </form>
               </div>
+              )}
 
               {/* Fixed Footer */}
               <div className="p-6 border-t-2 border-gray-100 flex justify-end space-x-4 sticky bottom-0 bg-white rounded-b-2xl z-10">
@@ -2665,10 +2712,15 @@ export default function CustomerManagement() {
                     </motion.button>
                     <motion.button
                       type="button"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={addNewCustomer}
-                      className="px-4 md:px-6 py-3 font-medium bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
+                      whileHover={!isLoadingForm ? { scale: 1.05 } : {}}
+                      whileTap={!isLoadingForm ? { scale: 0.95 } : {}}
+                      onClick={!isLoadingForm ? addNewCustomer : undefined}
+                      disabled={isLoadingForm}
+                      className={`px-4 md:px-6 py-3 font-medium rounded-xl transition-all duration-500 flex items-center ${
+                        isLoadingForm
+                          ? 'bg-gray-400 text-gray-300 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:shadow-lg'
+                      }`}
                     >
                       <Plus size={16} className="mr-2 font-medium" />
                       Thêm khách hàng

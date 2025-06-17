@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone, Crown, Star, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import PermissionsShimmer from '../../../ui/custom/shimmer-types/PermissionsShimmer';
 
 const AccountDetailModal = ({ isOpen, onClose, account }) => {
   const [expandedPermissions, setExpandedPermissions] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading for 3 seconds when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   if (!isOpen || !account) return null;
 
@@ -349,159 +362,164 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
               </motion.div>
               
               {/* Permissions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.3 }}
-              >
-                <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Shield size={20} className={account.disabled ? "text-gray-400" : "text-blue-600"} />
-                  Quyền hạn ({permissions.length})
-                </h5>
-                
-                {permissions.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {permissions.map((permission, idx) => (
-                      <motion.div
-                        key={permission.id}
-                        className={`rounded-2xl p-6 border shadow-lg relative overflow-hidden group cursor-pointer ${
-                          account.disabled 
-                            ? 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border-gray-200'
-                            : 'bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 border-blue-100'
-                        }`}
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ delay: 0.6 + idx * 0.1, duration: 0.4 }}
-                        whileHover={{ 
-                          scale: 1.02, 
-                          y: -4,
-                          boxShadow: account.disabled 
-                            ? '0 12px 40px rgba(156, 163, 175, 0.15)'
-                            : '0 12px 40px rgba(59, 130, 246, 0.15)'
-                        }}
-                        onClick={() => togglePermission(permission.id)}
-                      >
-                        {/* Animated background gradient */}
+              {/* Permissions */}
+              {isLoading ? (
+                <PermissionsShimmer permissionCount={4} />
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.3 }}
+                >
+                  <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Shield size={20} className={account.disabled ? "text-gray-400" : "text-blue-600"} />
+                    Quyền hạn ({permissions.length})
+                  </h5>
+                  
+                  {permissions.length > 0 ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {permissions.map((permission, idx) => (
                         <motion.div
-                          className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                            account.disabled
-                              ? 'bg-gradient-to-r from-gray-500/5 via-gray-400/5 to-gray-500/5'
-                              : 'bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5'
+                          key={permission.id}
+                          className={`rounded-2xl p-6 border shadow-lg relative overflow-hidden group cursor-pointer ${
+                            account.disabled 
+                              ? 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border-gray-200'
+                              : 'bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 border-blue-100'
                           }`}
-                          initial={{ x: '-100%' }}
-                          whileHover={{ x: '100%' }}
-                          transition={{ duration: 1.5 }}
-                        />
-                        
-                        <div className="relative z-10">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center">
-                              <motion.div 
-                                className={`p-3 rounded-xl shadow-md mr-4 ${
-                                  account.disabled
-                                    ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
-                                    : account.type === 'customer' 
-                                      ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
-                                      : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                                }`}
-                                whileHover={{ rotate: 360 }}
-                                transition={{ duration: 0.6 }}
+                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ delay: 0.6 + idx * 0.1, duration: 0.4 }}
+                          whileHover={{ 
+                            scale: 1.02, 
+                            y: -4,
+                            boxShadow: account.disabled 
+                              ? '0 12px 40px rgba(156, 163, 175, 0.15)'
+                              : '0 12px 40px rgba(59, 130, 246, 0.15)'
+                          }}
+                          onClick={() => togglePermission(permission.id)}
+                        >
+                          {/* Animated background gradient */}
+                          <motion.div
+                            className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                              account.disabled
+                                ? 'bg-gradient-to-r from-gray-500/5 via-gray-400/5 to-gray-500/5'
+                                : 'bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5'
+                            }`}
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: '100%' }}
+                            transition={{ duration: 1.5 }}
+                          />
+                          
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center">
+                                <motion.div 
+                                  className={`p-3 rounded-xl shadow-md mr-4 ${
+                                    account.disabled
+                                      ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
+                                      : account.type === 'customer' 
+                                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                                  }`}
+                                  whileHover={{ rotate: 360 }}
+                                  transition={{ duration: 0.6 }}
+                                >
+                                  <Shield size={18} />
+                                </motion.div>
+                                <h6 className={`font-bold text-lg ${account.disabled ? 'text-gray-500' : 'text-gray-800'}`}>
+                                  {permission.name}
+                                </h6>
+                              </div>
+                              
+                              <motion.div
+                                animate={{ rotate: expandedPermissions[permission.id] ? 180 : 0 }}
+                                transition={{ duration: 0.3 }}
+                                className={account.disabled ? 'text-gray-400' : 'text-blue-500'}
                               >
-                                <Shield size={18} />
+                                <ChevronDown size={20} />
                               </motion.div>
-                              <h6 className={`font-bold text-lg ${account.disabled ? 'text-gray-500' : 'text-gray-800'}`}>
-                                {permission.name}
-                              </h6>
                             </div>
                             
-                            <motion.div
-                              animate={{ rotate: expandedPermissions[permission.id] ? 180 : 0 }}
-                              transition={{ duration: 0.3 }}
-                              className={account.disabled ? 'text-gray-400' : 'text-blue-500'}
-                            >
-                              <ChevronDown size={20} />
-                            </motion.div>
-                          </div>
-                          
-                          <AnimatePresence>
-                            {expandedPermissions[permission.id] && (
-                              <motion.div 
-                                className="space-y-3"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.3, ease: "easeInOut" }}
-                              >
-                                <p className={`text-sm font-semibold flex items-center gap-2 ${
-                                  account.disabled ? 'text-gray-500' : 'text-gray-600'
-                                }`}>
-                                  <Star size={14} className={account.disabled ? "text-gray-400" : "text-yellow-500"} />
-                                  Chức năng được phép:
-                                </p>
-                                <div className="grid grid-cols-1 gap-2">
-                                  {permission.functions.map((func, index) => (
-                                    <motion.div 
-                                      key={index} 
-                                      className={`text-sm flex items-start p-3 rounded-xl border ${
-                                        account.disabled 
-                                          ? 'text-gray-500 bg-gray-50 border-gray-200'
-                                          : 'text-gray-700 bg-white/60 border-gray-100'
-                                      }`}
-                                      initial={{ opacity: 0, x: -10 }}
-                                      animate={{ opacity: 1, x: 0 }}
-                                      transition={{ delay: index * 0.05, duration: 0.3 }}
-                                    >
+                            <AnimatePresence>
+                              {expandedPermissions[permission.id] && (
+                                <motion.div 
+                                  className="space-y-3"
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                                >
+                                  <p className={`text-sm font-semibold flex items-center gap-2 ${
+                                    account.disabled ? 'text-gray-500' : 'text-gray-600'
+                                  }`}>
+                                    <Star size={14} className={account.disabled ? "text-gray-400" : "text-yellow-500"} />
+                                    Chức năng được phép:
+                                  </p>
+                                  <div className="grid grid-cols-1 gap-2">
+                                    {permission.functions.map((func, index) => (
                                       <motion.div 
-                                        className={`p-1 rounded-full mr-3 flex-shrink-0 ${
+                                        key={index} 
+                                        className={`text-sm flex items-start p-3 rounded-xl border ${
                                           account.disabled 
-                                            ? 'text-gray-400' 
-                                            : account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'
+                                            ? 'text-gray-500 bg-gray-50 border-gray-200'
+                                            : 'text-gray-700 bg-white/60 border-gray-100'
                                         }`}
-                                        whileHover={{ scale: 1.2 }}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: index * 0.05, duration: 0.3 }}
                                       >
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                          <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
+                                        <motion.div 
+                                          className={`p-1 rounded-full mr-3 flex-shrink-0 ${
+                                            account.disabled 
+                                              ? 'text-gray-400' 
+                                              : account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'
+                                          }`}
+                                          whileHover={{ scale: 1.2 }}
+                                        >
+                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                          </svg>
+                                        </motion.div>
+                                        <span className="font-medium">{func}</span>
                                       </motion.div>
-                                      <span className="font-medium">{func}</span>
-                                    </motion.div>
-                                  ))}
-                                </div>
-                              </motion.div>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                            
+                            {!expandedPermissions[permission.id] && (
+                              <motion.p 
+                                className={`text-sm ${account.disabled ? 'text-gray-400' : 'text-gray-500'}`}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.2 }}
+                              >
+                                Nhấn để xem {permission.functions.length} chức năng...
+                              </motion.p>
                             )}
-                          </AnimatePresence>
-                          
-                          {!expandedPermissions[permission.id] && (
-                            <motion.p 
-                              className={`text-sm ${account.disabled ? 'text-gray-400' : 'text-gray-500'}`}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 0.2 }}
-                            >
-                              Nhấn để xem {permission.functions.length} chức năng...
-                            </motion.p>
-                          )}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <motion.div 
-                    className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-8 border border-gray-200 text-center shadow-lg"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.6, duration: 0.4 }}
-                  >
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="p-4 bg-gray-200 rounded-full">
-                        <Shield size={32} className="text-gray-400" />
-                      </div>
-                      <p className="text-gray-500 font-semibold text-lg">Tài khoản không có quyền hạn nào</p>
-                      <p className="text-gray-400 text-sm">Liên hệ quản trị viên để cấp quyền</p>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
-                  </motion.div>
-                )}
-              </motion.div>
+                  ) : (
+                    <motion.div 
+                      className="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-8 border border-gray-200 text-center shadow-lg"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.6, duration: 0.4 }}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="p-4 bg-gray-200 rounded-full">
+                          <Shield size={32} className="text-gray-400" />
+                        </div>
+                        <p className="text-gray-500 font-semibold text-lg">Tài khoản không có quyền hạn nào</p>
+                        <p className="text-gray-400 text-sm">Liên hệ quản trị viên để cấp quyền</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              )}
             </motion.div>
             
             {/* Footer */}

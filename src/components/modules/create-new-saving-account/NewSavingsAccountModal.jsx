@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, PiggyBank, Info, Calendar, DollarSign, TrendingUp, ChevronRight, ArrowRight, Check, CreditCard, Calculator, Shield, Sparkles, Wallet, Banknote, Percent, Clock, ClipboardCheck, AlertCircle, RefreshCcw, RotateCcw, RefreshCw, Star, PiggyBankIcon } from 'lucide-react';
+import { X, PiggyBank, DollarSign, ChevronRight, Check, CreditCard, Shield, Sparkles, Wallet, Banknote, Percent, Clock, ClipboardCheck, AlertCircle, RefreshCcw, RotateCcw, RefreshCw, Star, PiggyBankIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '@/utils/accountUtils';
 import MobileBottomCard from './MobileBottomCard';
+import { DepositTypeShimmer, SourceAccountShimmer, AmountInputShimmer } from '@/components/ui/custom/shimmer-types/NewSavingsAccountModalShimmer';
+import TextShimmer from '@/components/ui/custom/shimmer-types/TextShimmer';
 
 // Định nghĩa các loại tiết kiệm có sẵn
 const depositTypes = [
@@ -71,6 +73,15 @@ const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=fals
     rate: 0,
     interestAmount: 0,
     totalAmount: 0
+  });
+
+  // Loading states for different sections
+  const [loadingStates, setLoadingStates] = useState({
+    depositType: true,
+    sourceAccount: false,
+    amountInfo: false,
+    amountInput: false,
+    balanceInfo: false
   });
 
   // Định nghĩa các kỳ hạn có sẵn theo loại trả lãi
@@ -179,6 +190,18 @@ const interestRateData = {
 
   // Reset form khi đóng modal
   useEffect(() => {
+    setTimeout(() => {
+      console.log("loadingStates: ", loadingStates);
+      if (isOpen) {
+        setLoadingStates({
+          depositType: false,
+          sourceAccount: false,
+          amountInfo: false,
+          amountInput: false,
+          balanceInfo: false
+        });
+      }
+    }, 1500)
     if (!isOpen) {
       setStep(1);
       setFormData({
@@ -194,11 +217,54 @@ const interestRateData = {
       });
       setFormErrors({});
       setPreviewData(null);
+      // Reset loading states
     }
+  }, [isOpen]);
+
+  // Handle loading when step changes
+  useEffect(() => {
+    if (isOpen && step > 1) {
+      if (step === 2) {
+        setLoadingStates(prev => ({ 
+          ...prev, 
+          sourceAccount: true, 
+          amountInfo: true,
+          amountInput: true,
+          balanceInfo: true 
+        }));
+        setTimeout(() => {
+          setLoadingStates(prev => ({ 
+            ...prev, 
+            sourceAccount: false, 
+            amountInfo: false,
+            amountInput: false,
+            balanceInfo: false 
+          }));
+        }, 1200);
+      }
+    }
+  }, [step, isOpen]);
+
+  // Handle loading when source account changes (only for balance info, not minimum amount)
+  useEffect(() => {
+    if (isOpen && step === 2 && formData.sourceAccount) {
+      // Only show loading for balance info, not for minimum amount text
+      setLoadingStates(prev => ({ ...prev, balanceInfo: true }));
+      setTimeout(() => {
+        setLoadingStates(prev => ({ ...prev, balanceInfo: false }));
+      }, 800);
+    }
+  }, [formData.sourceAccount, isOpen, step]);
+
+  useEffect(() => {
+    console.log('isOpen: ', isOpen);
+    console.log('sloadingStates: ', loadingStates);
   }, [isOpen]);
 
   // Cập nhật lãi suất dựa trên kỳ hạn và loại tiền gửi
   useEffect(() => {
+    if (!isOpen) return;
+    
     // Lãi suất mặc định theo kỳ hạn
     let rate = '5.0';
     
@@ -222,14 +288,14 @@ const interestRateData = {
     }
     
     setFormData(prev => ({ ...prev, interestRate: rate }));
-  }, [formData.term, formData.depositType]);
+  }, [formData.term, formData.depositType, isOpen]);
 
   // Cập nhật useEffect để tính toán lãi suất khi thay đổi các thông số liên quan
   useEffect(() => {
-    if (step >= 3 && formData.amount && parseInt(formData.amount) >= 100000) {
+    if (isOpen && step >= 3 && formData.amount && parseInt(formData.amount) >= 100000) {
       calculateInterest();
     }
-  }, [formData.term, formData.depositType, formData.interestPaymentType, formData.amount, step]);
+  }, [formData.term, formData.depositType, formData.interestPaymentType, formData.amount, step, isOpen]);
 
   // Hàm xử lý thay đổi input
   const handleChange = (e) => {
@@ -457,6 +523,9 @@ const interestRateData = {
 
   if (!isOpen) return null;
 
+  // Check if any loading state is true
+  const isAnyLoading = Object.values(loadingStates).some(state => state === true);
+
   // Animation variants for staggered children animations
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -610,162 +679,167 @@ const interestRateData = {
               <div className="absolute bottom-20 left-10 w-[150px] h-[150px] bg-gradient-to-r from-indigo-100/20 to-purple-100/20 rounded-full blur-3xl pointer-events-none opacity-70"></div>
               {/* Step 1: Select Deposit Type - Modern Style */}
               {step === 1 && (
-                <motion.div
-                  className="relative z-10"
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  <div className="flex items-center gap-3 mb-5">
-                    <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-400 rounded-xl flex items-center justify-center shadow-md">
-                      <PiggyBank size={16} className="text-white" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Chọn loại tiền gửi tiết kiệm
-                    </h3>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-                    {/* Standard Deposit - Modern Style */}
+                <div className="relative z-10">
+                  {loadingStates.depositType ? (
+                    <DepositTypeShimmer />
+                  ) : (
                     <motion.div
-                      variants={itemVariants}
-                      className={`relative group p-5 rounded-3xl border-2 transition-all duration-500 ${
-                        formData.depositType === "standard"
-                          ? "border-pink-300 bg-gradient-to-br from-pink-50 to-rose-50 shadow-lg shadow-pink-200/30"
-                          : "border-gray-200 bg-white/80 hover:border-pink-200 hover:bg-pink-50/30"
-                      }`}
-                      onClick={() =>
-                        handleFormDataChange("depositType", "standard")
-                      }
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
                     >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <div
-                            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                              formData.depositType === "standard"
-                                ? "bg-gradient-to-br from-pink-400 to-rose-500 shadow-lg"
-                                : "bg-gray-100 group-hover:bg-pink-100"
-                            }`}
-                          >
-                            <Shield
-                              size={20}
-                              className={
-                                formData.depositType === "standard"
-                                  ? "text-white"
-                                  : "text-gray-600"
-                              }
-                            />
-                          </div>
-                          <div className="text-left">
-                            <h4 className="font-bold text-gray-800 text-base">
-                              Tiền gửi tiêu chuẩn
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Lãi suất cao nhất, cam kết dài hạn
-                            </p>
-                          </div>
+                      <div className="flex items-center gap-3 mb-5">
+                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-rose-400 rounded-xl flex items-center justify-center shadow-md">
+                          <PiggyBank size={16} className="text-white" />
                         </div>
-                        {formData.depositType === "standard" && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-6 h-6 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center"
-                          >
-                            <Check size={14} className="text-white" />
-                          </motion.div>
-                        )}
+                        <h3 className="text-lg font-semibold text-gray-800">
+                          Chọn loại tiền gửi tiết kiệm
+                        </h3>
                       </div>
-                      <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100 text-xs text-gray-600 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Percent size={14} className="text-pink-500" />
-                          <p>Lãi suất cao nhất tới 7.2%/năm</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock size={14} className="text-pink-500" />
-                          <p>Rút tiền trước hạn: lãi suất không kỳ hạn</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Shield size={14} className="text-pink-500" />
-                          <p>Phù hợp với kế hoạch dài hạn, ổn định</p>
-                        </div>
-                      </div>
-                    </motion.div>
 
-                    {/* Flexible Deposit - Modern Style */}
-                    <motion.div
-                      variants={itemVariants}
-                      className={`relative group p-5 rounded-3xl border-2 transition-all duration-500 ${
-                        formData.depositType === "flexible"
-                          ? "border-pink-300 bg-gradient-to-br from-pink-50 to-rose-50 shadow-lg shadow-pink-200/30"
-                          : "border-gray-200 bg-white/80 hover:border-pink-200 hover:bg-pink-50/30"
-                      }`}
-                      onClick={() =>
-                        handleFormDataChange("depositType", "flexible")
-                      }
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <div
-                            className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                              formData.depositType === "flexible"
-                                ? "bg-gradient-to-br from-pink-400 to-rose-500 shadow-lg"
-                                : "bg-gray-100 group-hover:bg-pink-100"
-                            }`}
-                          >
-                            <Sparkles
-                              size={20}
-                              className={
-                                formData.depositType === "flexible"
-                                  ? "text-white"
-                                  : "text-gray-600"
-                              }
-                            />
-                          </div>
-                          <div className="text-left">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-gray-800 text-base">
-                                Tiền gửi linh hoạt
-                              </h4>
-                              <span className="px-2 py-0.5 bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs rounded-full font-medium shadow-sm">
-                                Phổ biến
-                              </span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                        {/* Standard Deposit - Modern Style */}
+                        <motion.div
+                          variants={itemVariants}
+                          className={`relative group p-5 rounded-3xl border-2 transition-all duration-500 ${
+                            formData.depositType === "standard"
+                              ? "border-pink-300 bg-gradient-to-br from-pink-50 to-rose-50 shadow-lg shadow-pink-200/30"
+                              : "border-gray-200 bg-white/80 hover:border-pink-200 hover:bg-pink-50/30"
+                          }`}
+                          onClick={() =>
+                            handleFormDataChange("depositType", "standard")
+                          }
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                                  formData.depositType === "standard"
+                                    ? "bg-gradient-to-br from-pink-400 to-rose-500 shadow-lg"
+                                    : "bg-gray-100 group-hover:bg-pink-100"
+                                }`}
+                              >
+                                <Shield
+                                  size={20}
+                                  className={
+                                    formData.depositType === "standard"
+                                      ? "text-white"
+                                      : "text-gray-600"
+                                  }
+                                />
+                              </div>
+                              <div className="text-left">
+                                <h4 className="font-bold text-gray-800 text-base">
+                                  Tiền gửi tiêu chuẩn
+                                </h4>
+                                <p className="text-sm text-gray-600">
+                                  Lãi suất cao nhất, cam kết dài hạn
+                                </p>
+                              </div>
                             </div>
-                            <p className="text-sm text-gray-600">
-                              Rút tiền linh hoạt khi cần
-                            </p>
+                            {formData.depositType === "standard" && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-6 h-6 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center"
+                              >
+                                <Check size={14} className="text-white" />
+                              </motion.div>
+                            )}
                           </div>
-                        </div>
-                        {formData.depositType === "flexible" && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-6 h-6 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center"
-                          >
-                            <Check size={14} className="text-white" />
-                          </motion.div>
-                        )}
-                      </div>
-                      <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100 text-xs text-gray-600 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Wallet size={14} className="text-pink-500" />
-                          <p>Rút tiền linh hoạt không mất lãi</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Percent size={14} className="text-pink-500" />
-                          <p>Lãi suất hấp dẫn tới 6.8%/năm</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Sparkles size={14} className="text-pink-500" />
-                          <p>Phù hợp khi cần tiền đột xuất</p>
-                        </div>
+                          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100 text-xs text-gray-600 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Percent size={14} className="text-pink-500" />
+                              <p>Lãi suất cao nhất tới 7.2%/năm</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Clock size={14} className="text-pink-500" />
+                              <p>Rút tiền trước hạn: lãi suất không kỳ hạn</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Shield size={14} className="text-pink-500" />
+                              <p>Phù hợp với kế hoạch dài hạn, ổn định</p>
+                            </div>
+                          </div>
+                        </motion.div>
+
+                        {/* Flexible Deposit - Modern Style */}
+                        <motion.div
+                          variants={itemVariants}
+                          className={`relative group p-5 rounded-3xl border-2 transition-all duration-500 ${
+                            formData.depositType === "flexible"
+                              ? "border-pink-300 bg-gradient-to-br from-pink-50 to-rose-50 shadow-lg shadow-pink-200/30"
+                              : "border-gray-200 bg-white/80 hover:border-pink-200 hover:bg-pink-50/30"
+                          }`}
+                          onClick={() =>
+                            handleFormDataChange("depositType", "flexible")
+                          }
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div
+                                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                                  formData.depositType === "flexible"
+                                    ? "bg-gradient-to-br from-pink-400 to-rose-500 shadow-lg"
+                                    : "bg-gray-100 group-hover:bg-pink-100"
+                                }`}
+                              >
+                                <Sparkles
+                                  size={20}
+                                  className={
+                                    formData.depositType === "flexible"
+                                      ? "text-white"
+                                      : "text-gray-600"
+                                  }
+                                />
+                              </div>
+                              <div className="text-left">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="font-bold text-gray-800 text-base">
+                                    Tiền gửi linh hoạt
+                                  </h4>
+                                  <span className="px-2 py-0.5 bg-gradient-to-r from-pink-400 to-rose-400 text-white text-xs rounded-full font-medium shadow-sm">
+                                    Phổ biến
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                  Rút tiền linh hoạt khi cần
+                                </p>
+                              </div>
+                            </div>
+                            {formData.depositType === "flexible" && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-6 h-6 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full flex items-center justify-center"
+                              >
+                                <Check size={14} className="text-white" />
+                              </motion.div>
+                            )}
+                          </div>
+                          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100 text-xs text-gray-600 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Wallet size={14} className="text-pink-500" />
+                              <p>Rút tiền linh hoạt không mất lãi</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Percent size={14} className="text-pink-500" />
+                              <p>Lãi suất hấp dẫn tới 6.8%/năm</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Sparkles size={14} className="text-pink-500" />
+                              <p>Phù hợp khi cần tiền đột xuất</p>
+                            </div>
+                          </div>
+                        </motion.div>
                       </div>
                     </motion.div>
-                  </div>
-                </motion.div>
+                  )}
+                </div>
               )}
 
               {/* Step 2: Select Accounts and Amount - Modern Style */}
@@ -799,16 +873,20 @@ const interestRateData = {
                     {/* Source Account - Liquid Glass Style */}
                     {isAdmin && (
                       <motion.div variants={itemVariants}>
-                        <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
-                          <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
-                            <CreditCard
-                              size={8}
-                              className="text-white sm:w-2.5 sm:h-2.5"
-                            />
-                          </div>
-                          Tài khoản nguồn
-                          <span className="text-pink-500">*</span>
-                        </label>
+                        {loadingStates.sourceAccount ? (
+                          <SourceAccountShimmer />
+                        ) : (
+                          <>
+                            <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
+                              <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
+                                <CreditCard
+                                  size={8}
+                                  className="text-white sm:w-2.5 sm:h-2.5"
+                                />
+                              </div>
+                              Tài khoản nguồn
+                              <span className="text-pink-500">*</span>
+                            </label>
 
                         <div className="overflow-x-auto pb-3 sm:pb-4 -mx-1 sm:-mx-2 px-1 sm:px-2">
                           <div className="flex gap-3 sm:gap-4">
@@ -1032,87 +1110,98 @@ const interestRateData = {
                           </div>
                         </div>
 
-                        {formErrors.sourceAccount && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
-                          >
-                            <AlertCircle size={14} className="flex-shrink-0" />
-                            <span className="break-words">
-                              {formErrors.sourceAccount}
-                            </span>
-                          </motion.p>
+                            {formErrors.sourceAccount && (
+                              <motion.p
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-3 text-xs sm:text-sm text-red-500 flex items-center gap-1.5 sm:gap-2 bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-xl sm:rounded-2xl p-2.5 sm:p-3"
+                              >
+                                <AlertCircle size={14} className="flex-shrink-0" />
+                                <span className="break-words">
+                                  {formErrors.sourceAccount}
+                                </span>
+                              </motion.p>
+                            )}
+                          </>
                         )}
                       </motion.div>
                     )}
 
                     {/* Amount Input - Pink Theme Mobile Optimized */}
                     <motion.div variants={itemVariants}>
-                      <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
-                        <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
-                          <Banknote
-                            size={8}
-                            className="text-white sm:w-2.5 sm:h-2.5"
-                          />
-                        </div>
-                        Số tiền gửi
-                        <span className="text-pink-500">*</span>
-                        <span className="text-slate-500 text-xs block sm:hidden">
-                          (Tối thiểu 100.000đ)
-                        </span>
-                        <span className="text-slate-500 text-xs hidden sm:inline">
-                          (Tối thiểu 100.000đ)
-                        </span>
-                      </label>
-
-                      <div className="relative group">
-                        {/* Glass container for input */}
-                        <div className="relative backdrop-blur-2xl bg-white/30 border-2 border-white/40 rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/40 hover:border-pink-200/60 focus-within:bg-white/50 focus-within:border-pink-300/80 focus-within:shadow-2xl focus-within:shadow-pink-200/30">
-                          {/* Liquid background effect */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 via-rose-100/10 to-pink-100/20 opacity-50"></div>
-
-                          {/* Icon container */}
-                          <div className="absolute inset-y-0 left-4 sm:left-6 flex items-center pointer-events-none">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-pink-400/80 to-rose-500/80 backdrop-blur-sm border-2 border-pink-300/60 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-                              <PiggyBankIcon
-                                size={16}
-                                className="text-white sm:w-5 sm:h-5"
-                              />
-                            </div>
+                      {loadingStates.amountInput ? (
+                        <></>
+                      ) : (
+                        <label className="flex items-center gap-1.5 sm:gap-2 text-sm font-semibold text-slate-700 mb-3 sm:mb-4">
+                          <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-md sm:rounded-lg flex items-center justify-center">
+                            <Banknote
+                              size={8}
+                              className="text-white sm:w-2.5 sm:h-2.5"
+                            />
                           </div>
-
-                          <input
-                            type="text"
-                            value={formData.amount}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(
-                                /[^\d]/g,
-                                ""
-                              );
-                              handleFormDataChange("amount", value);
-                            }}
-                            placeholder="Nhập số tiền"
-                            className={`
-                            relative z-10 block w-full pl-16 sm:pl-24 pr-16 sm:pr-20 py-4 sm:py-6 text-lg sm:text-xl font-semibold
-                            bg-transparent border-0 outline-none transition-all duration-300
-                            placeholder:text-slate-500/60 text-slate-800
-                            ${formErrors.amount ? "text-red-600" : ""}
-                          `}
-                          />
-
-                          {/* Currency label */}
-                          <div className="absolute inset-y-0 right-3 sm:right-6 flex items-center pointer-events-none">
-                            <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent px-2 sm:px-4 py-1 sm:py-2 bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl">
-                              VND
+                          Số tiền gửi
+                          <span className="text-pink-500">*</span>
+                          {loadingStates.amountInfo ? (
+                            <TextShimmer width={15} height={12} />
+                          ) : (
+                            <span className="text-slate-500 text-xs hidden sm:inline">
+                              (Tối thiểu 100.000đ)
                             </span>
-                          </div>
+                          )}
+                        </label>
+                      )}
 
-                          {/* Floating liquid particles */}
-                          <div className="absolute top-3 right-16 sm:top-4 sm:right-20 w-1 h-1 sm:w-1 sm:h-1 bg-pink-400/60 rounded-full animate-bounce [animation-delay:0.5s]"></div>
-                          <div className="absolute bottom-3 left-16 sm:bottom-4 sm:left-20 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-400/60 rounded-full animate-bounce [animation-delay:1.5s]"></div>
+                      {loadingStates.amountInput ? (
+                        <AmountInputShimmer />
+                      ) : (
+                        <div className="relative group">
+                          {/* Glass container for input */}
+                          <div className="relative backdrop-blur-2xl bg-white/30 border-2 border-white/40 rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500 hover:bg-white/40 hover:border-pink-200/60 focus-within:bg-white/50 focus-within:border-pink-300/80 focus-within:shadow-2xl focus-within:shadow-pink-200/30">
+                            {/* Liquid background effect */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 via-rose-100/10 to-pink-100/20 opacity-50"></div>
+
+                            {/* Icon container */}
+                            <div className="absolute inset-y-0 left-4 sm:left-6 flex items-center pointer-events-none">
+                              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-pink-400/80 to-rose-500/80 backdrop-blur-sm border-2 border-pink-300/60 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                                <PiggyBankIcon
+                                  size={16}
+                                  className="text-white sm:w-5 sm:h-5"
+                                />
+                              </div>
+                            </div>
+
+                            <input
+                              type="text"
+                              value={formData.amount}
+                              onChange={(e) => {
+                                const value = e.target.value.replace(
+                                  /[^\d]/g,
+                                  ""
+                                );
+                                handleFormDataChange("amount", value);
+                              }}
+                              placeholder="Nhập số tiền"
+                              className={`
+                              relative z-10 block w-full pl-16 sm:pl-24 pr-16 sm:pr-20 py-4 sm:py-6 text-lg sm:text-xl font-semibold
+                              bg-transparent border-0 outline-none transition-all duration-300
+                              placeholder:text-slate-500/60 text-slate-800
+                              ${formErrors.amount ? "text-red-600" : ""}
+                            `}
+                            />
+
+                            {/* Currency label */}
+                            <div className="absolute inset-y-0 right-3 sm:right-6 flex items-center pointer-events-none">
+                              <span className="text-sm sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent px-2 sm:px-4 py-1 sm:py-2 bg-white/40 backdrop-blur-sm rounded-xl sm:rounded-2xl">
+                                VND
+                              </span>
+                            </div>
+
+                            {/* Floating liquid particles */}
+                            <div className="absolute top-3 right-16 sm:top-4 sm:right-20 w-1 h-1 sm:w-1 sm:h-1 bg-pink-400/60 rounded-full animate-bounce [animation-delay:0.5s]"></div>
+                            <div className="absolute bottom-3 left-16 sm:bottom-4 sm:left-20 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-rose-400/60 rounded-full animate-bounce [animation-delay:1.5s]"></div>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <AnimatePresence>
                         {formErrors.amount ? (
@@ -1140,18 +1229,22 @@ const interestRateData = {
                                 size={14}
                                 className="text-slate-500 flex-shrink-0"
                               />
-                              <span className="truncate">
-                                Số dư khả dụng:{" "}
-                                <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
-                                  {formatCurrency(
-                                    paymentAccounts.find(
-                                      (acc) =>
-                                        acc.id ===
-                                        parseInt(formData.sourceAccount)
-                                    )?.balance || 0
-                                  )}
-                                </span>
-                              </span>
+                              {loadingStates.balanceInfo ? (
+                                 <TextShimmer width={120} height={14} />
+                               ) : (
+                                 <span className="truncate">
+                                   Số dư khả dụng:{" "}
+                                   <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
+                                     {formatCurrency(
+                                       paymentAccounts.find(
+                                         (acc) =>
+                                           acc.id ===
+                                           parseInt(formData.sourceAccount)
+                                       )?.balance || 0
+                                     )}
+                                   </span>
+                                 </span>
+                               )}
                             </>
                             )}
                             {isAdmin && formData.sourceAccount &&
@@ -1161,18 +1254,22 @@ const interestRateData = {
                                     size={14}
                                     className="text-slate-500 flex-shrink-0"
                                   />
-                                  <span className="truncate">
-                                    Số dư khả dụng:{" "}
-                                    <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
-                                      {formatCurrency(
-                                        paymentAccounts.find(
-                                          (acc) =>
-                                            acc.id ===
-                                            parseInt(formData.sourceAccount)
-                                        )?.balance || 0
-                                      )}
-                                    </span>
-                                  </span>
+                                  {loadingStates.balanceInfo ? (
+                                     <TextShimmer width={120} height={14} />
+                                   ) : (
+                                     <span className="truncate">
+                                       Số dư khả dụng:{" "}
+                                       <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
+                                         {formatCurrency(
+                                           paymentAccounts.find(
+                                             (acc) =>
+                                               acc.id ===
+                                               parseInt(formData.sourceAccount)
+                                           )?.balance || 0
+                                         )}
+                                       </span>
+                                     </span>
+                                   )}
                                 </>
                               )}
                           </motion.p>
@@ -2308,18 +2405,32 @@ const interestRateData = {
 
                 {step < 4 ? (
                   <motion.button
-                    className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-xl hover:shadow-md transition-all duration-200 font-medium text-sm flex items-center relative overflow-hidden group"
-                    onClick={handleNextStep}
-                    whileHover={{ x: 2 }}
-                    whileTap={{ scale: 0.98 }}
+                    className={`px-6 py-2.5 rounded-xl font-medium text-sm flex items-center relative overflow-hidden group transition-all duration-300 ${
+                      isAnyLoading 
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-pink-500 to-rose-400 text-white hover:shadow-md'
+                    }`}
+                    onClick={isAnyLoading ? undefined : handleNextStep}
+                    disabled={isAnyLoading}
+                    whileHover={isAnyLoading ? {} : { x: 2 }}
+                    whileTap={isAnyLoading ? {} : { scale: 0.98 }}
+                    animate={{
+                      opacity: isAnyLoading ? 0.6 : 1,
+                      scale: isAnyLoading ? 0.98 : 1
+                    }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-600/20 to-rose-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className={`absolute inset-0 w-full h-full opacity-0 transition-opacity duration-300 ${
+                      isAnyLoading 
+                        ? 'bg-gray-400/20' 
+                        : 'bg-gradient-to-r from-pink-600/20 to-rose-500/20 group-hover:opacity-100'
+                    }`}></span>
                     <span className="relative z-10">Tiếp tục</span>
                     <motion.span
                       className="relative z-10 ml-2"
                       initial={{ x: 0 }}
-                      whileHover={{ x: 2 }}
-                      transition={{
+                      whileHover={isAnyLoading ? {} : { x: 2 }}
+                      transition={isAnyLoading ? {} : {
                         repeat: Infinity,
                         repeatType: "reverse",
                         duration: 0.6,
@@ -2330,17 +2441,31 @@ const interestRateData = {
                   </motion.button>
                 ) : (
                   <motion.button
-                    className="px-4 md:px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:shadow-md transition-all duration-200 font-medium text-sm flex items-center relative overflow-hidden group"
-                    onClick={handleConfirm}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className={`px-4 md:px-6 py-2.5 rounded-xl font-medium text-sm flex items-center relative overflow-hidden group transition-all duration-300 ${
+                      isAnyLoading 
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:shadow-md'
+                    }`}
+                    onClick={isAnyLoading ? undefined : handleConfirm}
+                    disabled={isAnyLoading}
+                    whileHover={isAnyLoading ? {} : { scale: 1.02 }}
+                    whileTap={isAnyLoading ? {} : { scale: 0.98 }}
+                    animate={{
+                      opacity: isAnyLoading ? 0.6 : 1,
+                      scale: isAnyLoading ? 0.98 : 1
+                    }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-pink-600/20 to-rose-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className={`absolute inset-0 w-full h-full opacity-0 transition-opacity duration-300 ${
+                      isAnyLoading 
+                        ? 'bg-gray-400/20' 
+                        : 'bg-gradient-to-r from-pink-600/20 to-rose-600/20 group-hover:opacity-100'
+                    }`}></span>
                     <motion.span
                       className="relative z-10 mr-2"
                       initial={{ scale: 1 }}
-                      whileHover={{ scale: 1.1 }}
-                      transition={{
+                      whileHover={isAnyLoading ? {} : { scale: 1.1 }}
+                      transition={isAnyLoading ? {} : {
                         repeat: 1,
                         repeatType: "reverse",
                         duration: 0.3,

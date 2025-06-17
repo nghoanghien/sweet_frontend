@@ -35,7 +35,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { SwipeConfirmationModal } from "@/components/ui";
 import ExportNotification from "@/components/common/ExportNotification";
-import LoadingOverlay from "@/components/common/LoadingOverlay";
+import PlaceholderShimmer from "@/components/ui/custom/PlaceholderShimmer";
+import Skeleton, { SkeletonGroup, SkeletonText, SkeletonCard } from "@/components/ui/custom/Skeleton";
 import CustomerManagement from "../admin/customers-management/CustomerManagement";
 import EmployeeManagement from "../admin/employees-management/EmployeeManagement";
 import SavingsProductManagement from "../admin/saving-products-management/SavingsProductManagement";
@@ -205,62 +206,95 @@ export default function Dashboard() {
   const [navHovered, setNavHovered] = useState(false);
   const [rightPanelVisible, setRightPanelVisible] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("Đang tải...");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileModalAnimating, setProfileModalAnimating] = useState(false);
   
-  // Hàm xử lý chuyển đổi section với hiệu ứng loading
+  // Loading states for different sections
+  const [isLoadingPaymentAccounts, setIsLoadingPaymentAccounts] = useState(true);
+  const [isLoadingSavingsAccounts, setIsLoadingSavingsAccounts] = useState(true);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [isLoadingContent, setIsLoadingContent] = useState(false);
+  
+  // Hàm xử lý chuyển đổi section
   const handleSectionChange = (newSection) => {
-    // Hiển thị loading overlay
-    setIsLoading(true);
-    
-    // Thiết lập thông báo loading dựa trên section
-    switch(newSection) {
-      case "overview":
-        setLoadingMessage("Đang tải trang chủ...");
-        break;
-      case "deposits":
-        setLoadingMessage("Đang tải quản lý tiền gửi...");
-        break;
-      case "customers":
-        setLoadingMessage("Đang tải quản lý khách hàng & tiền gửi...");
-        break;
-      case "employees":
-        setLoadingMessage("Đang tải quản lý nhân viên...");
-        break;
-      case "deposit-slips":
-        setLoadingMessage("Đang tải tra cứu phiếu gửi tiền...");
-        break;
-      case "savings-products":
-        setLoadingMessage("Đang tải sản phẩm tiết kiệm...");
-        break;
-      case "sales-reports":
-        setLoadingMessage("Đang tải báo cáo doanh số...");
-        break;
-      case "settings":
-        setLoadingMessage("Đang tải cài đặt hệ thống...");
-        break;
-      case "permissions":
-        setLoadingMessage("Đang tải quản lý phân quyền...");
-        break;
-      default:
-        setLoadingMessage("Đang tải...");
+    if (newSection !== activeSection) {
+      // Reset loading states when switching to overview section
+      if (newSection === "overview") {
+        setIsLoadingContent(true);
+        setIsLoadingPaymentAccounts(true);
+        setIsLoadingSavingsAccounts(true);
+        setIsLoadingStats(true);
+        
+        // Simulate content loading with different delays
+        setTimeout(() => {
+          setIsLoadingStats(false);
+        }, 800);
+        
+        setTimeout(() => {
+          setIsLoadingPaymentAccounts(false);
+        }, 2000);
+        
+        setTimeout(() => {
+          setIsLoadingSavingsAccounts(false);
+        }, 1600);
+        
+        setTimeout(() => {
+          setIsLoadingContent(false);
+        }, 2000);
+      } else if (newSection === "deposits") {
+        // Reset loading states when switching to deposits section
+        setIsLoadingContent(true);
+        setIsLoadingSavingsAccounts(true);
+        setIsLoadingStats(true);
+        
+        // Simulate deposits content loading with different delays
+        setTimeout(() => {
+          setIsLoadingStats(false);
+        }, 2000);
+        
+        setTimeout(() => {
+          setIsLoadingSavingsAccounts(false);
+        }, 2000);
+        
+        setTimeout(() => {
+          setIsLoadingContent(false);
+        }, 1400);
+      } else {
+        // For other sections, show brief loading
+        setIsLoadingContent(true);
+        setTimeout(() => {
+          setIsLoadingContent(false);
+        }, 500);
+      }
     }
-    
-    // Đặt timeout để tạo hiệu ứng loading
-    setTimeout(() => {
-      // Cập nhật section
-      setActiveSection(newSection);
-      
-      // Ẩn loading overlay sau khi chuyển section
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 1000); // Thời gian hiển thị loading sau khi đã chuyển section
-    }, 2000); // Thời gian hiển thị loading trước khi chuyển section
+    setActiveSection(newSection);
   };
+  
+  // Initial data loading
+  useEffect(() => {
+    // Simulate payment accounts loading
+    const paymentAccountsTimer = setTimeout(() => {
+      setIsLoadingPaymentAccounts(false);
+    }, 1500);
+    
+    // Simulate savings accounts loading
+    const savingsAccountsTimer = setTimeout(() => {
+      setIsLoadingSavingsAccounts(false);
+    }, 2000);
+    
+    // Simulate stats loading
+    const statsTimer = setTimeout(() => {
+      setIsLoadingStats(false);
+    }, 1000);
+    
+    return () => {
+      clearTimeout(paymentAccountsTimer);
+      clearTimeout(savingsAccountsTimer);
+      clearTimeout(statsTimer);
+    };
+  }, []);
 
   // State for notifications
   const [notificationVisible, setNotificationVisible] = useState(false);
@@ -1826,13 +1860,6 @@ export default function Dashboard() {
           !isMobile && navHovered ? "ml-28" : !isMobile ? "ml-28" : "ml-0"
         } ${rightPanelVisible && !isMobile ? "mr-80" : "mr-0"}`}
       >
-        {/* Loading Overlay */}
-        <LoadingOverlay
-          isLoading={isLoading}
-          message={loadingMessage}
-          color="blue"
-          type="spinner"
-        />
 
         {/* Main content */}
         <main
@@ -1865,8 +1892,16 @@ export default function Dashboard() {
 
                 {/* Payment accounts grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
-                  <AnimatePresence>
-                    {paymentAccounts.map((account) => (
+                  {isLoadingPaymentAccounts ? (
+                    <PlaceholderShimmer 
+                      type="payment-account" 
+                      count={1}
+                      className="col-span-1"
+                      animate={false}
+                    />
+                  ) : (
+                    <AnimatePresence>
+                      {paymentAccounts.map((account) => (
                       <motion.div
                         key={account.id}
                         layoutId={`payment-account-card-${account.id}`}
@@ -1978,9 +2013,10 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
+                        ))}
+                      </AnimatePresence>
+                    )}
+                  </div>
               </motion.div>
             ) : activeSection === "deposits" ? (
               <motion.div
@@ -2004,78 +2040,86 @@ export default function Dashboard() {
 
                     {/* Thông tin tổng hợp và nút hiển thị */}
                     <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                      <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                        {/* Tổng số tài khoản */}
-                        <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-indigo-200/50 flex items-center space-x-4">
-                          <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg">
-                            <PiggyBank size={20} className="text-white" />
-                          </div>
-                          <div className="relative">
-                            <p className="text-xs text-slate-500 font-medium mb-1">
-                              Tổng số tài khoản
-                            </p>
-                            <p className="text-base font-bold text-gray-800">
-                              {savingsAccounts.length} tài khoản
-                            </p>
-                          </div>
+                      {isLoadingStats ? (
+                        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                          <SkeletonCard width="w-64" height="h-20" />
+                          <SkeletonCard width="w-64" height="h-20" />
+                          <SkeletonCard width="w-64" height="h-20" />
                         </div>
+                      ) : (
+                        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                          {/* Tổng số tài khoản */}
+                          <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-indigo-200/50 flex items-center space-x-4">
+                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg">
+                              <PiggyBank size={20} className="text-white" />
+                            </div>
+                            <div className="relative">
+                              <p className="text-xs text-slate-500 font-medium mb-1">
+                                Tổng số tài khoản
+                              </p>
+                              <p className="text-base font-bold text-gray-800">
+                                {savingsAccounts.length} tài khoản
+                              </p>
+                            </div>
+                          </div>
 
-                        {/* Tổng tiền gửi */}
-                        <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-green-200/50 flex items-center space-x-4">
-                          <div className="absolute inset-0 bg-gradient-to-r from-green-200/30 to-emerald-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
-                            <DollarSign size={20} className="text-white" />
+                          {/* Tổng tiền gửi */}
+                          <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-green-200/50 flex items-center space-x-4">
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-200/30 to-emerald-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+                              <DollarSign size={20} className="text-white" />
+                            </div>
+                            <div className="relative">
+                              <p className="text-xs text-slate-500 font-medium mb-1">
+                                Tổng tiền gửi
+                              </p>
+                              <p className="text-base font-bold text-gray-800">
+                                {Object.values(hiddenAccountInfo).every(Boolean)
+                                  ? "••••••••"
+                                  : formatCurrency(
+                                      savingsAccounts.reduce(
+                                        (sum, account) =>
+                                          sum +
+                                          (hiddenAccountInfo[account.id]
+                                            ? 0
+                                            : account.amount),
+                                        0
+                                      )
+                                    )}
+                              </p>
+                            </div>
                           </div>
-                          <div className="relative">
-                            <p className="text-xs text-slate-500 font-medium mb-1">
-                              Tổng tiền gửi
-                            </p>
-                            <p className="text-base font-bold text-gray-800">
-                              {Object.values(hiddenAccountInfo).every(Boolean)
-                                ? "••••••••"
-                                : formatCurrency(
-                                    savingsAccounts.reduce(
-                                      (sum, account) =>
-                                        sum +
-                                        (hiddenAccountInfo[account.id]
-                                          ? 0
-                                          : account.amount),
-                                      0
-                                    )
-                                  )}
-                            </p>
-                          </div>
-                        </div>
 
-                        {/* Tổng tiền lãi dự kiến */}
-                        <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-blue-200/50 flex items-center space-x-4">
-                          <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-                          <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
-                            <TrendingUp size={20} className="text-white" />
-                          </div>
-                          <div className="relative">
-                            <p className="text-xs text-slate-500 font-medium mb-1">
-                              Tổng tiền lãi dự kiến
-                            </p>
-                            <p className="text-base font-bold text-gray-800">
-                              {Object.values(hiddenAccountInfo).every(Boolean)
-                                ? "••••••••"
-                                : formatCurrency(
-                                    savingsAccounts.reduce(
-                                      (sum, account) =>
-                                        sum +
-                                        (hiddenAccountInfo[account.id]
-                                          ? 0
-                                          : account.totalReceivable -
-                                            account.amount),
-                                      0
-                                    )
-                                  )}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                          {/* Tổng tiền lãi dự kiến */}
+                          <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-blue-200/50 flex items-center space-x-4">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                            <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
+                              <TrendingUp size={20} className="text-white" />
+                            </div>
+                            <div className="relative">
+                               <p className="text-xs text-slate-500 font-medium mb-1">
+                                 Tổng tiền lãi dự kiến
+                               </p>
+                               <p className="text-base font-bold text-gray-800">
+                                 {Object.values(hiddenAccountInfo).every(Boolean)
+                                   ? "••••••••"
+                                   : formatCurrency(
+                                       savingsAccounts.reduce(
+                                         (sum, account) =>
+                                           sum +
+                                           (hiddenAccountInfo[account.id]
+                                             ? 0
+                                             : account.totalReceivable -
+                                               account.amount),
+                                         0
+                                       )
+                                     )}
+                               </p>
+                             </div>
+                           </div>
+                         </div>
+                       )}
 
                       <div className="flex space-x-2">
                         {/* Nút ẩn/hiện tất cả */}
@@ -2113,8 +2157,16 @@ export default function Dashboard() {
 
                 {/* Savings accounts grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-10">
-                  <AnimatePresence>
-                    {savingsAccounts.map((account) => (
+                  {isLoadingSavingsAccounts ? (
+                    <PlaceholderShimmer 
+                      type="grid-card" 
+                      count={4}
+                      className="col-span-full"
+                      animate={false}
+                    />
+                  ) : (
+                    <AnimatePresence>
+                      {savingsAccounts.map((account) => (
                       <motion.div
                         key={account.id}
                         layoutId={`savings-card-${account.id}`}
@@ -2272,9 +2324,10 @@ export default function Dashboard() {
                           </div>
                         </motion.div>
                       </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
+                        ))}
+                      </AnimatePresence>
+                    )}
+                  </div>
               </motion.div>
             ) : activeSection === "customers" ? (
               <motion.div
@@ -2283,7 +2336,7 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full relative"
               >
                 <CustomerManagement />
               </motion.div>
@@ -2294,7 +2347,7 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full relative"
               >
                 <EmployeeManagement />
               </motion.div>
@@ -2305,7 +2358,7 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full relative"
               >
                 <SavingsProductManagement />
               </motion.div>
@@ -2316,7 +2369,7 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full relative"
               >
                 <SalesReportPage />
               </motion.div>
@@ -2327,7 +2380,7 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full relative"
               >
                 <PermissionManagement />
               </motion.div>
@@ -2338,9 +2391,18 @@ export default function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full"
+                className="w-full relative"
               >
-                <SystemSettings />
+                {isLoadingContent ? (
+                  <div className="flex items-center justify-center h-96">
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                      <p className="text-gray-600">Đang tải cài đặt hệ thống...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <SystemSettings />
+                )}
               </motion.div>
             ) : activeSection === "deposit-slips" ? (
               <motion.div

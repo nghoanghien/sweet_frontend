@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, TrendingUp, Clock, CheckCircle2, AlertCircle, Wallet } from 'lucide-react';
 import { formatCurrency, getChannelInfo } from '../../../../utils/accountUtils';
-import SearchBar, { highlightText } from '../../ui/SearchBar';
+import SearchBar, { highlightText } from '../../ui/SearchBar'
+import  FilterableAccountTransactionListShimmer  from '@/components/ui/custom/shimmer-types/FilterableAccountTransactionListShimmer';
 
 const FilterableAccountTransactionList = ({ 
   transactions = [], 
   isHidden = false,
+  isLoading: externalIsLoading = false,
   emptyMessage = "Không có giao dịch nào",
   emptyIcon = <Wallet size={48} className="text-gray-400" />
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
   const [isSearching, setIsSearching] = useState(false);
+  const [internalIsLoading, setInternalIsLoading] = useState(true);
+
+  // Auto-hide loading after a delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInternalIsLoading(false);
+    }, 2000); // Loading sẽ tắt sau 2 giây
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter transactions với animation effect
   useEffect(() => {
@@ -68,6 +80,16 @@ const FilterableAccountTransactionList = ({
         };
     }
   };
+
+  // Show shimmer when loading (either external or internal)
+  if (externalIsLoading || internalIsLoading) {
+    return (
+      <FilterableAccountTransactionListShimmer 
+        itemCount={5}
+        showSearchBar={true}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6 mb-56">

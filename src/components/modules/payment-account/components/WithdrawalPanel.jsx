@@ -3,12 +3,14 @@ import { AlertTriangle, Check, ArrowUpRight, CreditCard, Wallet, Banknote, Bankn
 import { formatCurrency } from '../../../../utils/accountUtils';
 import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import WithdrawalPanelShimmer from '../../../ui/custom/shimmer-types/WithdrawalPanelShimmer';
 
 const WithdrawalPanel = ({
   account,
   onCancel,
   onConfirm
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [inputError, setInputError] = useState(null);
@@ -95,6 +97,19 @@ const WithdrawalPanel = ({
 
     return () => clearTimeout(timer);
   }, [withdrawalAmount, isFullAmount, account.balance]);
+
+  // Loading state effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Show shimmer while loading
+  if (isLoading) {
+    return <WithdrawalPanelShimmer />;
+  }
 
   // Mở modal xác nhận
   const openConfirmModal = () => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, Info, ArrowRight, Search, DollarSign, TrendingUp, ChevronDown, User } from 'lucide-react';
 import RegulationTooltip from './RegulationTooltip';
+import ApplicationScheduleShimmer from '@/components/ui/custom/shimmer-types/ApplicationScheduleShimmer';
 
 const ApplicationSchedule = () => {
   // State for current date and view month/year
@@ -15,7 +16,16 @@ const ApplicationSchedule = () => {
   const [highlightedRegulation, setHighlightedRegulation] = useState(null);
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [showYearDropdown, setShowYearDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const monthDropdownRef = useRef(null);
+
+  // Turn off loading after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
   const yearDropdownRef = useRef(null);
   // Animation state for sliding calendar
   const [slideDirection, setSlideDirection] = useState(null); // 'left' | 'right' | null
@@ -591,6 +601,10 @@ const ApplicationSchedule = () => {
         reg.id.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
+
+  if (isLoading) {
+    return <ApplicationScheduleShimmer />;
+  }
 
   return (
     <div className="space-y-6">

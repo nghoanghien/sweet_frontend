@@ -2,16 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Search, Calendar, DollarSign, TrendingUp, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { formatCurrency } from '@/utils/accountUtils';
 import SearchBar, { highlightText } from '../../ui/SearchBar';
+import FilterableInterestListShimmer from '@/components/ui/custom/shimmer-types/FilterableInterestListShimmer';
 
 const FilterableInterestList = ({ 
   interestHistory = [], 
   isHidden = false,
+  externalIsLoading = false,
   emptyMessage = "Không có lịch sử trả lãi nào",
   emptyIcon = <DollarSign size={48} className="text-gray-400" />
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredInterest, setFilteredInterest] = useState(interestHistory);
   const [isSearching, setIsSearching] = useState(false);
+  const [internalIsLoading, setInternalIsLoading] = useState(true);
+
+  // Auto turn off internal loading after 2 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInternalIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter interest history với animation effect
   useEffect(() => {
@@ -57,6 +69,11 @@ const FilterableInterestList = ({
         };
     }
   };
+
+  // Show shimmer if either external or internal loading is true
+  if (externalIsLoading || internalIsLoading) {
+    return <FilterableInterestListShimmer />;
+  }
 
   return (
     <div className="space-y-6 pb-44 md:pb-24">

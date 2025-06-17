@@ -16,6 +16,7 @@ import {
   User
 } from 'lucide-react';
 import SearchBar, { highlightText } from '../ui/SearchBar';
+import TransactionHistoryShimmer from '@/components/ui/custom/shimmer-types/TransactionHistoryShimmer';
 
 function EmployeeTransactionHistory({ employee }) {
   // State for expanded transaction items
@@ -24,6 +25,17 @@ function EmployeeTransactionHistory({ employee }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTransactions, setFilteredTransactions] = useState(employee?.transactions || []);
   const [isSearching, setIsSearching] = useState(false);
+  // Loading state - starts as true and turns off after 3 seconds
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Auto turn off loading after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Filter transactions with animation effect
   useEffect(() => {
@@ -197,6 +209,11 @@ function EmployeeTransactionHistory({ employee }) {
     
     return dateB - dateA; // Descending order
   });
+  
+  // Show shimmer loading state
+  if (isLoading) {
+    return <TransactionHistoryShimmer dateCount={3} transactionsPerDate={2} />;
+  }
   
   return (
     <motion.div

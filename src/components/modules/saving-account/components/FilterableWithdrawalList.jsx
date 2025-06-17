@@ -2,16 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { Search, Calendar, ArrowUpRight, TrendingUp, Clock, CheckCircle2, AlertCircle, Wallet } from 'lucide-react';
 import { formatCurrency } from '@/utils/accountUtils';
 import SearchBar, { highlightText } from '../../ui/SearchBar';
+import FilterableWithdrawalListShimmer from '@/components/ui/custom/shimmer-types/FilterableWithdrawalListShimmer';
 
 const FilterableWithdrawalList = ({ 
   withdrawalHistory = [], 
   isHidden = false,
+  externalIsLoading = false,
   emptyMessage = "Không có lịch sử rút tiền nào",
   emptyIcon = <ArrowUpRight size={48} className="text-gray-400" />
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredWithdrawals, setFilteredWithdrawals] = useState(withdrawalHistory);
   const [isSearching, setIsSearching] = useState(false);
+  const [internalIsLoading, setInternalIsLoading] = useState(true);
+
+  // Auto turn off internal loading after 2 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInternalIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter withdrawal history với animation effect
   useEffect(() => {
@@ -57,6 +69,11 @@ const FilterableWithdrawalList = ({
         };
     }
   };
+
+  // Show shimmer if either external or internal loading is true
+  if (externalIsLoading || internalIsLoading) {
+    return <FilterableWithdrawalListShimmer />;
+  }
 
   return (
     <div className="space-y-6 pb-44 md:pb-24">

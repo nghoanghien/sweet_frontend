@@ -15,9 +15,8 @@ import { formatCurrency } from '@/utils/accountUtils';
 import ExportNotification from '../../common/ExportNotification';
 
 // Import các component con từ file index.js
-import {
-  LoadingState
-} from '../../ui';
+import PlaceholderShimmer from '../../ui/custom/PlaceholderShimmer';
+import { SkeletonCard } from '../../ui/custom/Skeleton';
 
 import EmptyAccountState from '../ui/EmptyAccountState';
 import EmptySearchResult from './ui/EmptySearchResult';
@@ -633,77 +632,151 @@ const SavingsAccounts = ({ customerId }) => {
     setNotificationVisible(false);
   };
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
-  // Hiển thị khi không có tài khoản nào
-  if (accounts.length === 0) {
+  // Hiển thị khi không có tài khoản nào và không đang loading
+  if (!isLoading && accounts.length === 0) {
     return <EmptyAccountState />;
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50 py-0 p-4 rounded-lg">
+    <motion.div 
+      className="h-full overflow-y-auto bg-gray-50 py-0 p-4 rounded-lg"
+      initial={{ opacity: 0, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
       {/* Header với thông tin tổng quan */}
-      <div className="mb-6">
+      <motion.div 
+        className="mb-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+      >
         <div className="flex flex-col w-full gap-3 md:flex-row md:items-center md:justify-between pt-4">
           {/* Thẻ thống kê bên trái */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-            {/* Tổng số tài khoản */}
-            <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-indigo-200/50 flex items-center space-x-4">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg">
-                <PiggyBank size={20} className="text-white" />
-              </div>
-              <div className="relative">
-                <p className="text-xs text-slate-500 font-medium mb-1">
-                  Tổng số tài khoản
-                </p>
-                <p className="text-base font-bold text-gray-800">
-                  {activeAccountsCount} tài khoản
-                </p>
-              </div>
-            </div>
+          {isLoading ? (
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-3 sm:items-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <SkeletonCard width="w-64" height="h-20" />
+              <SkeletonCard width="w-64" height="h-20" />
+              <SkeletonCard width="w-64" height="h-20" />
+            </motion.div>
+          ) : (
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-3 sm:items-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4, staggerChildren: 0.1 }}
+            >
+              {/* Tổng số tài khoản */}
+              <motion.div 
+                className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-indigo-200/50 flex items-center space-x-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-200/30 to-blue-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                <motion.div 
+                  className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-500 flex items-center justify-center shadow-lg"
+                  whileHover={{ rotate: 5, scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <PiggyBank size={20} className="text-white" />
+                </motion.div>
+                <div className="relative">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Tổng số tài khoản
+                  </p>
+                  <motion.p 
+                    className="text-base font-bold text-gray-800"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
+                  >
+                    {activeAccountsCount} tài khoản
+                  </motion.p>
+                </div>
+              </motion.div>
 
-            {/* Tổng tiền gửi */}
-            <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-green-200/50 flex items-center space-x-4">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-200/30 to-emerald-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
-                <DollarSign size={20} className="text-white" />
-              </div>
-              <div className="relative">
-                <p className="text-xs text-slate-500 font-medium mb-1">
-                  Tổng tiền gửi
-                </p>
-                <p className="text-base font-bold text-gray-800">
-                  {hideAllSensitiveInfo
-                    ? "••••••••"
-                    : formatCurrency(totalDeposit)}
-                </p>
-              </div>
-            </div>
+              {/* Tổng tiền gửi */}
+              <motion.div 
+                className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-green-200/50 flex items-center space-x-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-green-200/30 to-emerald-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                <motion.div 
+                  className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg"
+                  whileHover={{ rotate: 5, scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <DollarSign size={20} className="text-white" />
+                </motion.div>
+                <div className="relative">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Tổng tiền gửi
+                  </p>
+                  <motion.p 
+                    className="text-base font-bold text-gray-800"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                  >
+                    {hideAllSensitiveInfo
+                      ? "••••••••"
+                      : formatCurrency(totalDeposit)}
+                  </motion.p>
+                </div>
+              </motion.div>
 
-            {/* Tổng tiền lãi dự kiến */}
-            <div className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-blue-200/50 flex items-center space-x-4">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
-              <div className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg">
-                <TrendingUp size={20} className="text-white" />
-              </div>
-              <div className="relative">
-                <p className="text-xs text-slate-500 font-medium mb-1">
-                  Tổng tiền lãi dự kiến
-                </p>
-                <p className="text-base font-bold text-gray-800">
-                  {hideAllSensitiveInfo
-                    ? "••••••••"
-                    : formatCurrency(totalInterest)}
-                </p>
-              </div>
-            </div>
-          </div>
+              {/* Tổng tiền lãi dự kiến */}
+              <motion.div 
+                className="relative group bg-white/90 backdrop-blur-xl p-4 rounded-3xl shadow-lg border border-blue-200/50 flex items-center space-x-4"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500 pointer-events-none"></div>
+                <motion.div 
+                  className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center shadow-lg"
+                  whileHover={{ rotate: 5, scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <TrendingUp size={20} className="text-white" />
+                </motion.div>
+                <div className="relative">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Tổng tiền lãi dự kiến
+                  </p>
+                  <motion.p 
+                    className="text-base font-bold text-gray-800"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.9 }}
+                  >
+                    {hideAllSensitiveInfo
+                      ? "••••••••"
+                      : formatCurrency(totalInterest)}
+                  </motion.p>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
 
           {/* Nút chức năng bên phải */}
-          <div className="flex flex-row gap-3 justify-end">
+          <motion.div 
+            className="flex flex-row gap-3 justify-end"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
             {/* Nút ẩn/hiện */}
             {/* Nút ẩn/hiện */}
             <motion.button
@@ -777,22 +850,37 @@ const SavingsAccounts = ({ customerId }) => {
                 </motion.span>
               </motion.button>
             </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Thanh tìm kiếm và chuyển đổi chế độ xem */}
-      <SearchAndViewToggle
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+      >
+        <SearchAndViewToggle
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+        />
+      </motion.div>
 
       {/* Hiển thị khi không có kết quả tìm kiếm */}
-      {filteredAccounts.length === 0 && (
-        <EmptySearchResult searchQuery={searchQuery} />
-      )}
+      <AnimatePresence>
+        {!isLoading && filteredAccounts.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.4 }}
+          >
+            <EmptySearchResult searchQuery={searchQuery} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Nội dung chính - danh sách tài khoản */}
       <div className="transition-all duration-300">
@@ -802,9 +890,19 @@ const SavingsAccounts = ({ customerId }) => {
             viewMode !== "grid" ? "hidden" : ""
           }`}
         >
-          {filteredAccounts.map((account) => (
+          {isLoading ? (
+            <PlaceholderShimmer 
+              type="grid-card" 
+              count={4}
+              className="col-span-full"
+              animate={false}
+            />
+          ) : 
+            filteredAccounts.map((account) => (
             <motion.div
               key={account.id}
+              initial={{ opacity: 0, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
               layoutId={`savings-account-card-${account.id}`}
               transition={{
                 duration: 0.2,
@@ -1230,7 +1328,7 @@ const SavingsAccounts = ({ customerId }) => {
         position="bottom-center"
         autoHideDuration={3000}
       />
-    </div>
+    </motion.div>
   );
 };
 

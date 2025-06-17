@@ -6,9 +6,8 @@ import { sampleAccounts } from '../../../data/sampleData';
 import { formatCurrency } from '../../../utils/accountUtils';
 
 // Import các component con từ file index.js
-import {
-  LoadingState,
-} from '../../ui';
+import PlaceholderShimmer from "@/components/ui/custom/PlaceholderShimmer";
+import { SkeletonCard } from "@/components/ui/custom/Skeleton";
 
 import AccountCard from './components/AccountCard';
 import AccountHeader from "./components/AccountHeader";
@@ -253,12 +252,8 @@ const PaymentAccountsNew = ({ customerId }) => {
     setIsDetailDrawerOpen(true);
   };
 
-  if (isLoading) {
-    return <LoadingState />;
-  }
-
   // Hiển thị khi không có tài khoản nào
-  if (accounts.length === 0) {
+  if (!isLoading && accounts.length === 0) {
     return <EmptyAccountState />;
   }
 
@@ -271,14 +266,22 @@ const PaymentAccountsNew = ({ customerId }) => {
         transition={{ duration: 0.5 }}
         className="w-full"
       >
-        <AccountHeader 
-          accounts={accounts}
-          totalBalance={totalBalance}
-          hideAllSensitiveInfo={hideAllSensitiveInfo}
-          toggleAllSensitiveInfo={toggleAllSensitiveInfo}
-          formatCurrency={formatCurrency}
-          onCreateAccountClick={() => setIsNewAccountModalOpen(true)}
-        />
+        {isLoading ? (
+          <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-6">
+            <SkeletonCard width="w-64" height="h-20" />
+            <SkeletonCard width="w-64" height="h-20" />
+            <SkeletonCard width="w-64" height="h-20" />
+          </div>
+        ) : (
+          <AccountHeader 
+            accounts={accounts}
+            totalBalance={totalBalance}
+            hideAllSensitiveInfo={hideAllSensitiveInfo}
+            toggleAllSensitiveInfo={toggleAllSensitiveInfo}
+            formatCurrency={formatCurrency}
+            onCreateAccountClick={() => setIsNewAccountModalOpen(true)}
+          />
+        )}
       </motion.div>
 
       {/* Nội dung chính - danh sách tài khoản */}
@@ -289,24 +292,33 @@ const PaymentAccountsNew = ({ customerId }) => {
         className="transition-all duration-300"
       >
         <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-10 ${viewMode !== 'grid' ? 'hidden' : ''}`}>
-          {filteredAccounts.map((account, index) => (
-            <motion.div
-              key={account.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 * index }}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
-              className="h-full"
-            >
-              <AccountCard
-                account={account}
-                isHidden={hiddenAccounts[account.id]}
-                onToggleHide={toggleAccountVisibility}
-                onLockToggle={toggleAccountStatus}
-                onViewDetail={() => openTransactionDrawer(account.id)}
-              />
-            </motion.div>
-          ))}
+          {isLoading ? (
+            <PlaceholderShimmer 
+              type="payment-account" 
+              count={1}
+              className=""
+              animate={false}
+            />
+          ) : (
+            filteredAccounts.map((account, index) => (
+              <motion.div
+                key={account.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 * index }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="h-full"
+              >
+                <AccountCard
+                  account={account}
+                  isHidden={hiddenAccounts[account.id]}
+                  onToggleHide={toggleAccountVisibility}
+                  onLockToggle={toggleAccountStatus}
+                  onViewDetail={() => openTransactionDrawer(account.id)}
+                />
+              </motion.div>
+            ))
+          )}
         </div>
       </motion.div>
       

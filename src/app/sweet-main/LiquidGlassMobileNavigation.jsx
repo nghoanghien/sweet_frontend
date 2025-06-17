@@ -14,6 +14,7 @@ import {
   Circle,
   ChevronLeft
 } from 'lucide-react';
+import LiquidGlassMobileNavigationShimmer from '@/components/ui/custom/shimmer-types/LiquidGlassMobileNavigationShimmer';
 
 const AssistiveTouchNavigation = ({
   profileData = { fullName: "Người dùng", email: "user@example.com" },
@@ -37,6 +38,7 @@ const AssistiveTouchNavigation = ({
   isCustomer = true,
   isAdmin = true
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [buttonPosition, setButtonPosition] = useState({ x: 20, y: 100 });
   const [isDragging, setIsDragging] = useState(false);
@@ -47,6 +49,15 @@ const AssistiveTouchNavigation = ({
   const buttonRef = useRef(null);
   const hideTimeoutRef = useRef(null);
   const showTimeoutRef = useRef(null);
+
+  // Loading effect - automatically turn off after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Auto-hide/show button logic
   useEffect(() => {
@@ -327,9 +338,21 @@ const AssistiveTouchNavigation = ({
     if (itemIndex < menuItems.length) {
       const firstRowItems = menuItems.slice(itemIndex, itemIndex + 3);
       rows.push(
-        <div key="row-0" className="flex justify-center gap-6">
+        <motion.div 
+          key="row-0" 
+          className="flex justify-center gap-6"
+          layout
+          transition={{
+            layout: {
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+              mass: 0.8
+            }
+          }}
+        >
           {firstRowItems.map((item, index) => renderMenuItem(item, itemIndex + index))}
-        </div>
+        </motion.div>
       );
       itemIndex += 3;
     }
@@ -338,9 +361,21 @@ const AssistiveTouchNavigation = ({
     if (itemIndex < menuItems.length) {
       const secondRowItems = menuItems.slice(itemIndex, itemIndex + 2);
       rows.push(
-        <div key="row-1" className="flex justify-center gap-6">
+        <motion.div 
+          key="row-1" 
+          className="flex justify-center gap-6"
+          layout
+          transition={{
+            layout: {
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+              mass: 0.8
+            }
+          }}
+        >
           {secondRowItems.map((item, index) => renderMenuItem(item, itemIndex + index))}
-        </div>
+        </motion.div>
       );
       itemIndex += 2;
     }
@@ -350,14 +385,41 @@ const AssistiveTouchNavigation = ({
       const rowItems = menuItems.slice(itemIndex, itemIndex + 3);
       const rowIndex = Math.floor((itemIndex - 5) / 3) + 2;
       rows.push(
-        <div key={`row-${rowIndex}`} className="flex justify-center gap-6">
+        <motion.div 
+          key={`row-${rowIndex}`} 
+          className="flex justify-center gap-6"
+          layout
+          transition={{
+            layout: {
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
+              mass: 0.8
+            }
+          }}
+        >
           {rowItems.map((item, index) => renderMenuItem(item, itemIndex + index))}
-        </div>
+        </motion.div>
       );
       itemIndex += 3;
     }
     
-    return <div className="flex flex-col gap-6">{rows}</div>;
+    return (
+      <motion.div 
+        className="flex flex-col gap-6"
+        layout
+        transition={{
+          layout: {
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+            mass: 0.8
+          }
+        }}
+      >
+        {rows}
+      </motion.div>
+    );
   };
 
   // Render individual menu item
@@ -385,290 +447,309 @@ const renderMenuItem = (item, index) => {
     </>
   );
   
-  // Sử dụng motion.div cho item có id là "profile"
-  if (item.id === 'profile') {
-    return (
-      <motion.div
-        key={`${currentLevel}-${item.id}-${index}`}
-        layoutId="profile-section"
-        className={className}
-        onClick={() => handleMenuItemClick(item)}
-      >
-        {content}
-      </motion.div>
-    );
-  }
-  
-  // Sử dụng div thông thường cho các item khác
+  // Sử dụng motion.div cho tất cả các item để có hiệu ứng spring
   return (
-    <div
+    <motion.div
       key={`${currentLevel}-${item.id}-${index}`}
+      layoutId={item.id === 'profile' ? "profile-section" : undefined}
+      layout
       className={className}
       onClick={() => handleMenuItemClick(item)}
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.8 }}
+      transition={{
+        layout: {
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          mass: 0.8
+        },
+        opacity: { duration: 0.2 },
+        scale: { duration: 0.2 }
+      }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
       {content}
-    </div>
+    </motion.div>
   );
 };
 
   return (
     <>
-      <style jsx>{`
-        .assistive-touch-button {
-          background: rgba(211, 159, 101, 0.45);
-          backdrop-filter: blur(15px);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.5);
-          transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+      {isMenuOpen && isLoading ? (
+        <LiquidGlassMobileNavigationShimmer />
+      ) : (
+        <>
+          <style jsx global>{`
+            .assistive-touch-button {
+              background: rgba(211, 159, 101, 0.45);
+              backdrop-filter: blur(15px);
+              border: 1px solid rgba(255, 255, 255, 0.8);
+              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+              animation: buttonAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+              opacity: 0.95;
+              transition: opacity 0.3s ease;
+            }
 
-        .assistive-touch-button.visible {
-          opacity: 1;
-          transform: scale(1);
-          animation: buttonAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+            .assistive-touch-button:hover {
+              opacity: 1;
+            }
 
-        .assistive-touch-button.hidden {
-          opacity: 0.25;
-          transform: scale(0.7);
-          animation: buttonDisappear 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
+            .assistive-touch-button.visible {
+              display: flex;
+            }
 
-        .assistive-touch-button.dragging {
-          transform: scale(1.05);
-          box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
-        }
+            .assistive-touch-button.hidden {
+              opacity: 0;
+              pointer-events: none;
+            }
 
-        .assistive-touch-button:active {
-          transform: scale(0.95);
-        }
+            .assistive-touch-button.dragging {
+              transition: none;
+              opacity: 0.7;
+            }
 
-        .menu-overlay {
-          backdrop-filter: blur(20px);
-          background: rgba(0, 0, 0, 0.1);
-        }
+            .menu-container {
+              background: rgba(255, 255, 255, 0.2);
+              backdrop-filter: blur(4px);
+              border: 1px solid rgba(255, 255, 255, 0.3);
+              box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 0 18px 12px rgba(255, 255, 255, 0.7);
+            }
 
-        .menu-container {
-          background: rgba(255, 255, 255, 0.2);
-          backdrop-filter: blur(4px);
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          box-shadow: 
-              0 25px 80px rgba(0, 0, 0, 0.15),
-              inset 0 1px 0 rgba(255, 255, 255, 0.8),
-              inset 0 0 18px 12px rgba(255, 255, 255, 0.7);
-          transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+            .menu-item {
+              background: rgba(255, 255, 255, 0.5);
+              backdrop-filter: blur(4px);
+              border: 1px solid rgba(255, 255, 255, 0.4);
+              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+              transition: all 0.3s ease;
+            }
 
-        .menu-item {
-          background: rgba(255, 255, 255, 0.4);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.7);
-          transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+            .menu-item:hover {
+              background: rgba(255, 255, 255, 0.7);
+              transform: translateY(-3px);
+              box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            }
 
-        .menu-item:hover {
-          background: rgba(255, 255, 255, 0.8);
-          transform: scale(1.05);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12),
-                      inset 0 1px 0 rgba(255, 255, 255, 1);
-        }
+            .menu-item.active {
+              background: rgba(211, 159, 101, 0.3);
+              border: 1px solid rgba(211, 159, 101, 0.5);
+            }
 
-        .menu-item:active {
-          transform: scale(0.95);
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15),
-                      inset 0 1px 0 rgba(255, 255, 255, 0.8);
-        }
+            .back-button {
+              background: rgba(255, 255, 255, 0.5);
+              backdrop-filter: blur(4px);
+              border: 1px solid rgba(255, 255, 255, 0.4);
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+              transition: all 0.3s ease;
+            }
 
-        .menu-item.logout:hover {
-          background: rgba(255, 59, 48, 0.15);
-        }
+            .back-button:hover {
+              background: rgba(255, 255, 255, 0.7);
+              transform: translateY(-2px);
+              box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            }
 
-        .back-button {
-          background: rgba(255, 255, 255, 0.6);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+            .triangle-layout {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 20px;
+            }
 
-        .back-button:hover {
-          background: rgba(255, 255, 255, 0.8);
-          transform: scale(1.05);
-        }
+            .triangle-top {
+              display: flex;
+              justify-content: center;
+            }
 
-        .triangle-layout {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 20px;
-        }
+            .triangle-bottom {
+              display: flex;
+              gap: 20px;
+            }
 
-        .triangle-top {
-          display: flex;
-          justify-content: center;
-        }
+            @keyframes buttonAppear {
+              0% {
+                opacity: 0;
+                transform: scale(0.3);
+              }
+              60% {
+                transform: scale(1.1);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
 
-        .triangle-bottom {
-          display: flex;
-          gap: 40px;
-        }
+            @keyframes buttonDisappear {
+              0% {
+                opacity: 1;
+                transform: scale(1);
+              }
+              100% {
+                opacity: 0;
+                transform: scale(0.7);
+              }
+            }
 
-        @keyframes buttonAppear {
-          0% {
-            opacity: 0;
-            transform: scale(0.3);
-          }
-          60% {
-            transform: scale(1.1);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
+            @keyframes menuAppear {
+              0% {
+                opacity: 0;
+                transform: scale(0.1);
+              }
+              60% {
+                transform: scale(1.08);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
 
-        @keyframes buttonDisappear {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          100% {
-            opacity: 0.25;
-            transform: scale(0.7);
-          }
-        }
+            @keyframes menuDisappear {
+              0% {
+                opacity: 1;
+                transform: scale(1);
+              }
+              100% {
+                opacity: 0;
+                transform: scale(0.1);
+              }
+            }
 
-        @keyframes menuAppear {
-          0% {
-            opacity: 0;
-            transform: scale(0.1);
-          }
-          60% {
-            transform: scale(1.08);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
+            @keyframes levelChange {
+              0% {
+                opacity: 0;
+                transform: translateX(30px);
+              }
+              100% {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
 
-        @keyframes menuDisappear {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(0.1);
-          }
-        }
+            .menu-appear {
+              animation: menuAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
 
-        @keyframes levelChange {
-          0% {
-            opacity: 0;
-            transform: translateX(30px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
+            .menu-disappear {
+              animation: menuDisappear 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
 
-        .menu-appear {
-          animation: menuAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+            .level-change {
+              animation: levelChange 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            }
 
-        .menu-disappear {
-          animation: menuDisappear 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
+            .button-snap {
+              transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            }
+          `}</style>
 
-        .level-change {
-          animation: levelChange 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+          {/* Floating AssistiveTouch Button */}
+          {!isMenuOpen && (
+            <div
+              ref={buttonRef}
+              className={`assistive-touch-button fixed w-15 h-15 rounded-full cursor-pointer select-none z-50 flex items-center justify-center ${
+                isDragging ? 'dragging' : (isButtonVisible ? 'visible' : 'hidden')
+              } ${!isDragging ? 'button-snap' : ''}`}
+              style={{
+                left: `${buttonPosition.x}px`,
+                top: `${buttonPosition.y}px`,
+                width: '60px',
+                height: '60px'
+              }}
+              onClick={handleButtonClick}
+              onMouseDown={handleMouseDown}
+              onTouchStart={handleTouchStart}
+              onMouseEnter={() => setIsButtonVisible(true)}
+            >
+              <div className="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center">
+                <div className="w-3 h-3 rounded-full bg-white/60"></div>
+              </div>
+            </div>
+          )}
 
-        .button-snap {
-          transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-      `}</style>
+          {/* Menu Overlay */}
+          {(isMenuOpen || isMenuClosing) && (
+            <div
+              className="fixed inset-0 z-40 flex items-center justify-center"
+              onClick={handleMenuClose}
+            >
+              {/* Menu Container */}
+              <motion.div
+                layout
+                className={`menu-container rounded-3xl p-6 ${
+                  isMenuClosing ? 'menu-disappear' : 'menu-appear level-change'
+                }`}
+                style={{
+                  width: `${menuWidth + 70}px`,
+                  minHeight: `${menuHeight + 50}px`
+                }}
+                transition={{
+                  layout: {
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                    mass: 0.8
+                  }
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Back Button */}
+                {currentLevel !== 'main' && (
+                  <div className="mb-4">
+                    <button
+                      onClick={handleBackToMain}
+                      className="back-button w-8 h-8 rounded-full flex items-center justify-center"
+                    >
+                      <ChevronLeft size={16} className="text-gray-600" />
+                    </button>
+                  </div>
+                )}
 
-      {/* Floating AssistiveTouch Button */}
-      {!isMenuOpen && (
-        <div
-          ref={buttonRef}
-          className={`assistive-touch-button fixed w-15 h-15 rounded-full cursor-pointer select-none z-50 flex items-center justify-center ${
-            isDragging ? 'dragging' : (isButtonVisible ? 'visible' : 'hidden')
-          } ${!isDragging ? 'button-snap' : ''}`}
-          style={{
-            left: `${buttonPosition.x}px`,
-            top: `${buttonPosition.y}px`,
-            width: '60px',
-            height: '60px'
-          }}
-          onClick={handleButtonClick}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onMouseEnter={() => setIsButtonVisible(true)}
-        >
-          <div className="w-6 h-6 rounded-full bg-white/30 flex items-center justify-center">
-            <div className="w-3 h-3 rounded-full bg-white/60"></div>
-          </div>
-        </div>
-      )}
-
-      {/* Menu Overlay */}
-      {(isMenuOpen || isMenuClosing) && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center"
-          onClick={handleMenuClose}
-        >
-          {/* Menu Container */}
-          <div
-            className={`menu-container rounded-3xl p-6 ${
-              isMenuClosing ? 'menu-disappear' : 'menu-appear level-change'
-            }`}
-            style={{
-              width: `${menuWidth + 70}px`,
-              minHeight: `${menuHeight + 50}px`
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Back Button */}
-            {currentLevel !== 'main' && (
-              <div className="mb-4">
-                <button
-                  onClick={handleBackToMain}
-                  className="back-button w-8 h-8 rounded-full flex items-center justify-center"
+                {/* Menu Layout */}
+                <motion.div
+                  layout
+                  key={currentLevel}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{
+                    layout: {
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 30,
+                      mass: 0.8
+                    },
+                    opacity: { duration: 0.2 },
+                    scale: { duration: 0.2 }
+                  }}
                 >
-                  <ChevronLeft size={16} className="text-gray-600" />
-                </button>
-              </div>
-            )}
-
-            {/* Menu Layout */}
-            {isTriangle ? (
-              <div className="triangle-layout">
-                <div className="triangle-top">
-                  {(() => {
-                    const item = menuItems[0];
-                    return renderMenuItem(item, 0);
-                  })()}
-                </div>
-                <div className="triangle-bottom">
-                  {menuItems.slice(1).map((item, index) => renderMenuItem(item, index + 1))}
-                </div>
-              </div>
-            ) : isStaggered ? (
-              renderStaggeredLayout()
-            ) : (
-              <div className={`grid gap-6 ${gridSize === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                {menuItems.map((item, index) => renderMenuItem(item, index))}
-              </div>
-            )}
-          </div>
-        </div>
+                  {isTriangle ? (
+                    <div className="triangle-layout">
+                      <div className="triangle-top">
+                        {(() => {
+                          const item = menuItems[0];
+                          return renderMenuItem(item, 0);
+                        })()}
+                      </div>
+                      <div className="triangle-bottom">
+                        {menuItems.slice(1).map((item, index) => renderMenuItem(item, index + 1))}
+                      </div>
+                    </div>
+                  ) : isStaggered ? (
+                    renderStaggeredLayout()
+                  ) : (
+                    <div className={`grid gap-6 ${gridSize === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                      {menuItems.map((item, index) => renderMenuItem(item, index))}
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            </div>
+          )}
+        </>
       )}
     </>
   );

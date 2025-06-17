@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, DollarSign, TrendingUp, BookOpen, Check, User, Clock, Ban, Download, ChevronDown, ChevronUp } from 'lucide-react';
 import SavingsTypeToggle from '../interest-rates/SavingsTypeToggle';
 import InterestRateTable from '../interest-rates/InterestRateTable';
+import Skeleton from '@/components/ui/custom/Skeleton';
+import SavingsTypeToggleShimmer from '@/components/ui/custom/shimmer-types/SavingsTypeToggleShimmer';
+import InterestRateTableShimmer from '@/components/ui/custom/shimmer-types/InterestRateTableShimmer';
 
 const RegulationDetailModal = ({
   isOpen,
@@ -11,10 +14,21 @@ const RegulationDetailModal = ({
   onCancel,
   canCancel = true
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [activeSavingsType, setActiveSavingsType] = useState(
     regulation?.savingsTypes?.length > 0 ? regulation.savingsTypes[0].id : null
   );
   const [showAllDetails, setShowAllDetails] = useState(false);
+  
+  // Loading effect
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, [isOpen]);
   
   if (!regulation) return null;
   
@@ -150,19 +164,23 @@ const RegulationDetailModal = ({
               {/* Status indicator */}
               <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
+                  <Skeleton isLoading={isLoading} width="w-28" height="h-8" round='3xl' className="inline-block rounde-3xl">
                   <motion.span 
                     layoutId={`regulation-status-${regulation.id}`}
                     className={`px-4 py-1.5 rounded-full text-base font-bold shadow-sm ${status.color}`}
                   >
                     {status.label}
                   </motion.span>
+                  </Skeleton>
                 </div>
                 <motion.div 
                   layoutId={`regulation-creator-${regulation.id}`}
                   className="flex items-center text-base text-blue-700 font-semibold"
                 >
                   <User size={18} className="mr-2" />
-                  Người tạo: {regulation.creator.name}
+                  Người tạo: <Skeleton isLoading={isLoading} width="w-24" height="h-5" className="inline-block ml-1">
+                    {regulation.creator.name}
+                  </Skeleton>
                 </motion.div>
               </div>
               
@@ -178,7 +196,9 @@ const RegulationDetailModal = ({
                     layoutId={`regulation-date-${regulation.id}`}
                     className="text-lg font-bold text-blue-900"
                   >
-                    {formatDate(regulation.applicationDate)}
+                    <Skeleton isLoading={isLoading} width="w-32" height="h-6">
+                      {formatDate(regulation.applicationDate)}
+                    </Skeleton>
                   </motion.p>
                 </div>
                 {/* Minimum deposit */}
@@ -191,7 +211,9 @@ const RegulationDetailModal = ({
                     layoutId={`regulation-min-deposit-${regulation.id}`}
                     className="text-lg font-bold text-blue-900"
                   >
-                    {formatCurrency(regulation.minimumDeposit)}
+                    <Skeleton isLoading={isLoading} width="w-28" height="h-6">
+                      {formatCurrency(regulation.minimumDeposit)}
+                    </Skeleton>
                   </motion.p>
                 </div>
                 {/* No-term rate */}
@@ -204,7 +226,9 @@ const RegulationDetailModal = ({
                     layoutId={`regulation-no-term-rate-${regulation.id}`}
                     className="text-lg font-bold text-blue-900"
                   >
-                    {regulation.noTermRate}%
+                    <Skeleton isLoading={isLoading} width="w-16" height="h-6">
+                      {regulation.noTermRate}%
+                    </Skeleton>
                   </motion.p>
                 </div>
               </div>
@@ -214,7 +238,9 @@ const RegulationDetailModal = ({
                   layoutId={`regulation-description-${regulation.id}`}
                   className="mb-6 text-base text-blue-700 italic bg-blue-50/60 rounded-2xl p-4 border border-blue-100 shadow-sm"
                 >
-                  {regulation.description}
+                  <Skeleton isLoading={isLoading} width="w-full" height="h-5">
+                    {regulation.description}
+                  </Skeleton>
                 </motion.div>
               )}
               
@@ -222,36 +248,46 @@ const RegulationDetailModal = ({
               <motion.div 
                 className="mb-4 flex justify-center"
               >
-                {regulation.savingsTypes.length > 1 ? (
-                  <SavingsTypeToggle
-                    savingsTypes={regulation.savingsTypes}
-                    activeSavingsType={activeSavingsType}
-                    onToggle={setActiveSavingsType}
-                  />
-                ) : regulation.savingsTypes.map(type => (
-                  <span 
-                    key={type.id} 
-                    className="bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full font-semibold shadow-sm border border-blue-100"
-                  >
-                    {type.name}
-                  </span>
-                ))}
+                {isLoading ? (
+                  <SavingsTypeToggleShimmer />
+                ) : (
+                  regulation.savingsTypes.length > 1 ? (
+                    <SavingsTypeToggle
+                      savingsTypes={regulation.savingsTypes}
+                      activeSavingsType={activeSavingsType}
+                      onToggle={setActiveSavingsType}
+                    />
+                  ) : regulation.savingsTypes.map(type => (
+                    <span 
+                      key={type.id} 
+                      className="bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full font-semibold shadow-sm border border-blue-100"
+                    >
+                      <Skeleton isLoading={isLoading} width="w-32" height="h-5" className="inline-block">
+                        {type.name}
+                      </Skeleton>
+                    </span>
+                  ))
+                )}
               </motion.div>
               
               {/* Interest rate table */}
               {activeSavingsTypeDetails && (
                 <div>
-                  <InterestRateTable
-                    savingsType={activeSavingsTypeDetails.name}
-                    interestRates={activeSavingsTypeDetails.interestRates}
-                    paymentFrequencies={regulation.paymentFrequencies}
-                    terms={activeSavingsTypeDetails.terms}
-                    isEditing={false}
-                    onRateChange={() => {}}
-                    onAddTerm={() => {}}
-                    onRemoveTerm={() => {}}
-                    readOnly={true}
-                  />
+                  {isLoading ? (
+                    <InterestRateTableShimmer />
+                  ) : (
+                    <InterestRateTable
+                      savingsType={activeSavingsTypeDetails.name}
+                      interestRates={activeSavingsTypeDetails.interestRates}
+                      paymentFrequencies={regulation.paymentFrequencies}
+                      terms={activeSavingsTypeDetails.terms}
+                      isEditing={false}
+                      onRateChange={() => {}}
+                      onAddTerm={() => {}}
+                      onRemoveTerm={() => {}}
+                      readOnly={true}
+                    />
+                  )}
                 </div>
               )}
             </div>

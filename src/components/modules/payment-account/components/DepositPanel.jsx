@@ -3,12 +3,14 @@ import { AlertTriangle, Check, ArrowDownLeft, CreditCard, Wallet, Banknote, Spar
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../../../../utils/accountUtils';
 import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
+import DepositPanelShimmer from '../../../ui/custom/shimmer-types/DepositPanelShimmer';
 
 const DepositPanel = ({
   account,
   onCancel,
   onConfirm
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [inputError, setInputError] = useState(null);
@@ -78,6 +80,19 @@ const DepositPanel = ({
 
     return () => clearTimeout(timer);
   }, [depositAmount]);
+
+  // Loading state effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Show shimmer while loading
+  if (isLoading) {
+    return <DepositPanelShimmer />;
+  }
 
   const openConfirmModal = () => {
     if (isValidAmount) {

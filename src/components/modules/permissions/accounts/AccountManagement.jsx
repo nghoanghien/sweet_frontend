@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Plus, Search, Filter, Grid, List, Settings } from 'lucide-react';
 import AccountCard from '../ui/AccountCard';
@@ -8,8 +8,12 @@ import AccountDetailModal from './AccountDetailModal';
 import ResetPasswordModal from './ResetPasswordModal';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
+import AccountCardShimmer from '@/components/ui/custom/shimmer-types/AccountCardShimmer';
 
 const AccountManagement = () => {
+  // State cho loading
+  const [isLoading, setIsLoading] = useState(true);
+  
   // State cho modal
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -202,6 +206,15 @@ const AccountManagement = () => {
       description: 'Quản lý các sản phẩm và báo cáo'
     }
   ];
+
+  // useEffect để quản lý loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Hàm hiển thị modal xác nhận
   const showConfirmModal = (title, description, type, details, onConfirm) => {
@@ -510,7 +523,19 @@ const AccountManagement = () => {
       </div>
 
       {/* Account list */}
-      {viewMode === "grid" ? (
+      {isLoading ? (
+        <div>
+          <motion.div
+            className="text-center mb-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <p className="text-blue-500 font-medium">Đang tải danh sách tài khoản...</p>
+          </motion.div>
+          <AccountCardShimmer cardCount={9} />
+        </div>
+      ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredAccounts.map((account, index) => (
             <motion.div

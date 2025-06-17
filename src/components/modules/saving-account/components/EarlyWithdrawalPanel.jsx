@@ -3,6 +3,8 @@ import { AlertTriangle, Check, ArrowUpRight, CreditCard, Wallet, Banknote, Spark
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../../../../utils/accountUtils';
 import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
+import  Skeleton  from '../../../ui/custom/Skeleton';
+import TextShimmer from '../../../ui/custom/shimmer-types/TextShimmer';
 
 const EarlyWithdrawalPanel = ({
   account = {
@@ -35,6 +37,8 @@ const EarlyWithdrawalPanel = ({
   const [selectedAccount, setSelectedAccount] = useState('main');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [minWithdrawalAmount] = useState(100000);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Enhanced payment accounts data
   const paymentAccounts = [
@@ -58,6 +62,25 @@ const EarlyWithdrawalPanel = ({
     },
   ];
 
+  // Loading state management
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Loading state when withdrawalAmount or withdrawalType changes
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [withdrawalAmount, withdrawalType]);
+
   // Enhanced validation with animations
   useEffect(() => {
     setIsAnimating(true);
@@ -75,8 +98,8 @@ const EarlyWithdrawalPanel = ({
     if (!withdrawalAmount || withdrawalAmount.trim() === '') {
       setInputError('Vui lòng nhập số tiền');
       setIsValidAmount(false);
-    } else if (numValue < 100000) {
-      setInputError('Số tiền tối thiểu là 100.000đ');
+    } else if (numValue < minWithdrawalAmount) {
+      setInputError(`Số tiền tối thiểu là ${formatCurrency(minWithdrawalAmount)}`);
       setIsValidAmount(false);
     } else if (numValue >= currentAmount) {
       setInputError(`Số tiền không được vượt quá ${formatCurrency(currentAmount)}`);
@@ -87,7 +110,7 @@ const EarlyWithdrawalPanel = ({
     }
     
     return () => clearTimeout(timer);
-  }, [withdrawalAmount, withdrawalType, account.amount]);
+  }, [withdrawalAmount, withdrawalType, account.amount, minWithdrawalAmount]);
 
   const openConfirmModal = () => {
     if (!isAdmin) {
@@ -123,7 +146,7 @@ const EarlyWithdrawalPanel = ({
     const numValue = parseFloat(value) || 0;
     const currentAmount = typeof account.remainingAmount !== 'undefined' ? account.remainingAmount : account.amount;
     
-    if (numValue >= 100000 && numValue < currentAmount) {
+    if (numValue >= minWithdrawalAmount && numValue < currentAmount) {
       // Trigger withdrawal calculation
     }
   };
@@ -363,7 +386,7 @@ const EarlyWithdrawalPanel = ({
                 </AnimatePresence>
 
                 <div className="text-sm text-gray-600 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-                  <strong>Lưu ý:</strong> Số tiền rút tối thiểu là 100.000đ
+                  <strong>Lưu ý:</strong> Số tiền rút tối thiểu là <Skeleton isLoading={isLoading} width="w-20" height="h-4" className="inline-block">{formatCurrency(minWithdrawalAmount)}</Skeleton>
                 </div>
               </motion.div>
             )}
@@ -487,9 +510,11 @@ const EarlyWithdrawalPanel = ({
                         <span className="text-gray-600 font-medium whitespace-pre-line">
                           {item.label}
                         </span>
-                        <span className={`font-bold text-lg ${item.color}`}>
-                          {item.value}
-                        </span>
+                        <Skeleton isLoading={isLoading} width="w-24" height="h-6" className="inline-block">
+                          <span className={`font-bold text-lg ${item.color}`}>
+                            {item.value}
+                          </span>
+                        </Skeleton>
                       </motion.div>
                     ))}
                   </div>
@@ -548,7 +573,9 @@ const EarlyWithdrawalPanel = ({
                               </h5>
                               {acc.number && (
                                 <p className="text-sm text-gray-500 mb-1">
-                                  {acc.number}
+                                  <Skeleton isLoading={isLoading} width="w-16" height="h-4" className="inline-block">
+                                    {acc.number}
+                                  </Skeleton>
                                 </p>
                               )}
                               <p className="text-xs text-gray-600">
@@ -566,9 +593,11 @@ const EarlyWithdrawalPanel = ({
                           </div>
                           <div className="flex items-center gap-3">
                             {acc.balance !== null && (
-                              <span className="text-sm text-gray-600 font-medium">
-                                {formatCurrency(acc.balance)}
-                              </span>
+                              <Skeleton isLoading={isLoading} width="w-20" height="h-4" className="inline-block">
+                                <span className="text-sm text-gray-600 font-medium">
+                                  {formatCurrency(acc.balance)}
+                                </span>
+                              </Skeleton>
                             )}
                             {selectedAccount === acc.id && (
                               <motion.div
@@ -664,7 +693,9 @@ const EarlyWithdrawalPanel = ({
                           <p className="text-green-800 leading-relaxed">
                             <strong>Nếu chờ đến cuối kỳ:</strong> Bạn có thể
                             nhận tổng số tiền đáo hạn là{" "}
-                            {formatCurrency(account.totalReceivable)}.
+                            <Skeleton isLoading={isLoading} width="w-24" height="h-4" className="inline-block">
+                              {formatCurrency(account.totalReceivable)}
+                            </Skeleton>.
                           </p>
                         </div>
                       </>

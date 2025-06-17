@@ -3,8 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, UserCheck, Users, Settings, Save, PlusCircle, Check, Phone, IdCard, Info, Shield, Crown } from 'lucide-react';
 import InputField from '@/components/ui/custom/Inputfield';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
+import RoleSelectionShimmer from '@/components/ui/custom/shimmer-types/RoleSelectionShimmer';
 
 const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEditing, rolesList }) => {
+  // State cho loading
+  const [isLoading, setIsLoading] = useState(true);
+  
   // State cho form
   const [formData, setFormData] = useState({
     name: '',
@@ -31,6 +35,17 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
     onConfirm: () => {},
     isProcessing: false,
   });
+  
+  // Effect cho loading state
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
   
   // Cập nhật formData khi account thay đổi
   useEffect(() => {
@@ -531,90 +546,94 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
               )}
               
               {/* Role selection */}
-              <motion.div 
-                className="mb-6"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.3 }}
-              >
-                <label className="block text-gray-700 font-bold mb-4 pl-2 flex items-center gap-2">
-                  <Shield size={18} className="text-blue-600" />
-                  Vai trò:
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                
-                {errors.role && (
-                  <motion.p 
-                    className="text-sm text-red-600 mb-3 p-2 bg-red-50 rounded-lg border border-red-200"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                  >
-                    {errors.role}
-                  </motion.p>
-                )}
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredRoles.map((role, index) => (
-                    <motion.div
-                      key={role.id}
-                      className={`p-5 rounded-2xl border-2 cursor-pointer flex items-start transition-all relative overflow-hidden group
-                        ${formData.role && formData.role.id === role.id
-                          ? formData.type === 'staff'
-                            ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-300 shadow-lg shadow-indigo-200/50'
-                            : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-300 shadow-lg shadow-blue-200/50'
-                          : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-md'}`}
-                      onClick={() => handleRoleSelect(role)}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 * index, duration: 0.3 }}
+              {isLoading ? (
+                <RoleSelectionShimmer />
+              ) : (
+                <motion.div 
+                  className="mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.3 }}
+                >
+                  <label className="block text-gray-700 font-bold mb-4 pl-2 flex items-center gap-2">
+                    <Shield size={18} className="text-blue-600" />
+                    Vai trò:
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  
+                  {errors.role && (
+                    <motion.p 
+                      className="text-sm text-red-600 mb-3 p-2 bg-red-50 rounded-lg border border-red-200"
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
                     >
-                      {/* Animated background for selected role */}
-                      {formData.role && formData.role.id === role.id && (
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
-                          initial={{ x: '-100%' }}
-                          animate={{ x: '100%' }}
-                          transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
-                        />
-                      )}
-                      
-                      <motion.div 
-                        className={`p-2 rounded-xl mr-4 flex-shrink-0
+                      {errors.role}
+                    </motion.p>
+                  )}
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredRoles.map((role, index) => (
+                      <motion.div
+                        key={role.id}
+                        className={`p-5 rounded-2xl border-2 cursor-pointer flex items-start transition-all relative overflow-hidden group
                           ${formData.role && formData.role.id === role.id
                             ? formData.type === 'staff'
-                              ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white'
-                              : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
-                            : 'bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600'}`}
-                        whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.6 }}
+                              ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-300 shadow-lg shadow-indigo-200/50'
+                              : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-300 shadow-lg shadow-blue-200/50'
+                            : 'bg-white border-gray-200 hover:border-blue-300 hover:shadow-md'}`}
+                        onClick={() => handleRoleSelect(role)}
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 * index, duration: 0.3 }}
                       >
-                        {formData.role && formData.role.id === role.id ? (
-                          <Check size={18} />
-                        ) : (
-                          <UserCheck size={18} />
+                        {/* Animated background for selected role */}
+                        {formData.role && formData.role.id === role.id && (
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
+                            initial={{ x: '-100%' }}
+                            animate={{ x: '100%' }}
+                            transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
+                          />
                         )}
-                      </motion.div>
-                      
-                      <div className="flex-1 relative z-10">
-                        <p className={`font-bold text-base mb-1
-                          ${formData.role && formData.role.id === role.id
-                            ? formData.type === 'staff'
-                              ? 'text-indigo-700'
-                              : 'text-blue-700'
-                            : 'text-gray-700 group-hover:text-gray-800'}`}
+                        
+                        <motion.div 
+                          className={`p-2 rounded-xl mr-4 flex-shrink-0
+                            ${formData.role && formData.role.id === role.id
+                              ? formData.type === 'staff'
+                                ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white'
+                                : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
+                              : 'bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600'}`}
+                          whileHover={{ rotate: 360 }}
+                          transition={{ duration: 0.6 }}
                         >
-                          {role.name}
-                        </p>
-                        <p className="text-sm text-gray-500 leading-relaxed">
-                          {role.description}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+                          {formData.role && formData.role.id === role.id ? (
+                            <Check size={18} />
+                          ) : (
+                            <UserCheck size={18} />
+                          )}
+                        </motion.div>
+                        
+                        <div className="flex-1 relative z-10">
+                          <p className={`font-bold text-base mb-1
+                            ${formData.role && formData.role.id === role.id
+                              ? formData.type === 'staff'
+                                ? 'text-indigo-700'
+                                : 'text-blue-700'
+                              : 'text-gray-700 group-hover:text-gray-800'}`}
+                          >
+                            {role.name}
+                          </p>
+                          <p className="text-sm text-gray-500 leading-relaxed">
+                            {role.description}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
             
             {/* Footer */}

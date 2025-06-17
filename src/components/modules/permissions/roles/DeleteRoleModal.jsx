@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, Trash2, UserMinus } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
+import Skeleton from '@/components/ui/custom/Skeleton';
 
 const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
   // State cho modal xác nhận
@@ -14,6 +15,16 @@ const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
     onConfirm: () => {},
     isProcessing: false,
   });
+  
+  // State cho loading
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulate loading state
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000)
+  }, []);
 
   if (!isOpen || !role) return null;
 
@@ -152,7 +163,7 @@ const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
                     <div>
                       <p className="text-amber-700 font-semibold">Cảnh báo quan trọng</p>
                       <p className="text-amber-600 text-sm mt-1">
-                        Hiện có <span className="font-semibold">{role.accountCount} tài khoản</span> đang được gán vai trò này.
+                        Hiện có <Skeleton isLoading={isLoading} width="w-16" height="h-4" className="inline-block"><span className="font-semibold">{role.accountCount} tài khoản</span></Skeleton> đang được gán vai trò này.
                         Khi xóa, tất cả các tài khoản này sẽ được chuyển sang vai trò "Không có quyền" và sẽ không thể thực hiện bất kỳ thao tác nào.
                       </p>
                     </div>

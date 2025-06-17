@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Edit2, Save, User, UserCheck } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
+import Skeleton from '@/components/ui/custom/Skeleton';
 
 const SystemSettings = () => {
   // State cho giá trị hiện tại
@@ -22,6 +23,16 @@ const SystemSettings = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Loading state management
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Xử lý lưu thay đổi
   const handleSave = () => {
@@ -110,7 +121,9 @@ const SystemSettings = () => {
             </motion.span>
             <div>
               <p className="text-sm text-gray-500">Độ tuổi <span className='font-bold text-red-500'>TỐI THIỂU</span> nhân viên</p>
-              <p className="text-xl font-bold text-gray-800">{minEmployeeAge} tuổi</p>
+              <Skeleton isLoading={isLoading} width="w-20" height="h-7" className="inline-block">
+                <p className="text-xl font-bold text-gray-800">{minEmployeeAge} tuổi</p>
+              </Skeleton>
             </div>
           </motion.div>
           {/* Card khách hàng */}
@@ -134,7 +147,9 @@ const SystemSettings = () => {
             </motion.span>
             <div>
               <p className="text-sm text-gray-500">Độ tuổi <span className='font-bold text-red-500'>TỐI THIỂU</span> khách hàng</p>
-              <p className="text-xl font-bold text-gray-800">{minCustomerAge} tuổi</p>
+              <Skeleton isLoading={isLoading} width="w-20" height="h-7" className="inline-block">
+                <p className="text-xl font-bold text-gray-800">{minCustomerAge} tuổi</p>
+              </Skeleton>
             </div>
           </motion.div>
 
@@ -158,7 +173,9 @@ const SystemSettings = () => {
             </motion.span>
             <div>
               <p className="text-sm text-gray-500">Số tiền <span className='font-bold text-red-500'>TỐI THIỂU</span> cho mỗi giao dịch nạp/rút tài khoản thanh toán</p>
-              <p className="text-xl font-bold text-gray-800">{formatVND(minTransactionAmountForPaymentAccount)}</p>
+              <Skeleton isLoading={isLoading} width="w-32" height="h-7" className="inline-block">
+                <p className="text-xl font-bold text-gray-800">{formatVND(minTransactionAmountForPaymentAccount)}</p>
+              </Skeleton>
             </div>
           </motion.div>
 
@@ -182,7 +199,9 @@ const SystemSettings = () => {
             </motion.span>
             <div>
               <p className="text-sm text-gray-500">Số tiền <span className='font-bold text-red-500'>TỐI ĐA</span> cho mỗi giao dịch nạp/rút tài khoản thanh toán</p>
-              <p className="text-xl font-bold text-gray-800">{formatVND(maxTransactionAmountForPaymentAccount)}</p>
+              <Skeleton isLoading={isLoading} width="w-32" height="h-7" className="inline-block">
+                <p className="text-xl font-bold text-gray-800">{formatVND(maxTransactionAmountForPaymentAccount)}</p>
+              </Skeleton>
             </div>
           </motion.div>
 
@@ -206,7 +225,9 @@ const SystemSettings = () => {
             </motion.span>
             <div>
               <p className="text-sm text-gray-500">Số tiền <span className='font-bold text-red-500'>TỐI THIỂU</span> cho giao dịch rút tài khoản tiết kiệm</p>
-              <p className="text-xl font-bold text-gray-800">{formatVND(minWithdrawalAmountForSavingAccount)}</p>
+              <Skeleton isLoading={isLoading} width="w-32" height="h-7" className="inline-block">
+                <p className="text-xl font-bold text-gray-800">{formatVND(minWithdrawalAmountForSavingAccount)}</p>
+              </Skeleton>
             </div>
           </motion.div>
         </div>

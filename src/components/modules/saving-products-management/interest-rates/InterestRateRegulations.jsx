@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Edit2, User, Calendar, ArrowLeftRight, Save, Eye, DollarSign, TrendingUp, Info } from 'lucide-react';
+import { Edit2, User, Save, DollarSign, TrendingUp } from 'lucide-react';
 
 // Import sub-components
 import SavingsTypeToggle from './SavingsTypeToggle';
@@ -10,9 +10,12 @@ import GeneralSettings from './GeneralSettings';
 import ApplicationDateSelector from './ApplicationDateSelector';
 import RegulationComparisonModal from './RegulationComparisonModal';
 import ExportNotification from '@/components/common/ExportNotification';
+import Skeleton from '@/components/ui/custom/Skeleton';
+import SavingsTypeToggleShimmer from '@/components/ui/custom/shimmer-types/SavingsTypeToggleShimmer';
+import InterestRateTableShimmer from '@/components/ui/custom/shimmer-types/InterestRateTableShimmer';
 
 // New component to display current regulations summary
-const CurrentRegulationSummary = ({ regulation }) => {
+const CurrentRegulationSummary = ({ regulation, isLoading }) => {
   // Format currency for display
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -44,7 +47,11 @@ const CurrentRegulationSummary = ({ regulation }) => {
           </motion.span>
           <div>
             <p className="text-sm text-gray-500">Số tiền gửi tối thiểu</p>
-            <p className="text-xl font-bold text-gray-800">{formatCurrency(regulation.minimumDeposit)}</p>
+            <p className="text-xl font-bold text-gray-800">
+            <Skeleton isLoading={isLoading} width="w-32" height="h-7" className="text-xl font-bold text-gray-800">
+              {formatCurrency(regulation.minimumDeposit)}
+            </Skeleton>
+            </p>
           </div>
         </motion.div>
         <motion.div
@@ -61,7 +68,11 @@ const CurrentRegulationSummary = ({ regulation }) => {
           </motion.span>
           <div>
             <p className="text-sm text-gray-500">Lãi suất không kỳ hạn</p>
-            <p className="text-xl font-bold text-gray-800">{regulation.noTermRate}%</p>
+            <p className="text-xl font-bold text-gray-800">
+            <Skeleton isLoading={isLoading} width="w-32" height="h-7" className="text-xl font-bold text-gray-800">
+              {regulation.noTermRate}%
+            </Skeleton>
+            </p>
           </div>
         </motion.div>
       </div>
@@ -72,7 +83,9 @@ const CurrentRegulationSummary = ({ regulation }) => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="mt-6 text-base text-blue-700 italic bg-blue-50/60 rounded-2xl p-4 border border-blue-100 shadow-sm"
         >
-          {regulation.description}
+          <Skeleton isLoading={isLoading} width="w-full" height="h-5" className="text-base text-blue-700 italic">
+            {regulation.description}
+          </Skeleton>
         </motion.div>
       )}
     </motion.div>
@@ -109,6 +122,7 @@ const InterestRateRegulations = () => {
   };
 
   // Component states
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: 'success', message: '', details: null, format: '' });
@@ -196,6 +210,15 @@ const InterestRateRegulations = () => {
   
   // New state to track deleted terms per savings type
   const [deletedTerms, setDeletedTerms] = useState({});
+  
+  // Loading state management
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Reset edited regulation when switching to edit mode
   useEffect(() => {
@@ -854,7 +877,11 @@ const InterestRateRegulations = () => {
               <h2 className="text-xl font-bold text-gray-800">Quy định lãi suất hiện hành</h2>
               <p className="text-sm text-gray-600 flex items-center mt-1">
                 <User size={14} className="mr-1 flex-shrink-0" />
-                Người tạo: {currentRegulation.creator?.name || 'Không xác định'} ({currentRegulation.createdAt || 'Không xác định'})
+                Người tạo: <Skeleton isLoading={isLoading} width="w-24" height="h-4" className="inline-block mx-1">
+                  {currentRegulation.creator?.name || 'Không xác định'}
+                </Skeleton> (<Skeleton isLoading={isLoading} width="w-20" height="h-4" className="inline-block">
+                  {currentRegulation.createdAt || 'Không xác định'}
+                </Skeleton>)
               </p>
             </>
           )}
@@ -863,7 +890,7 @@ const InterestRateRegulations = () => {
           )}
           {/* Display the current regulations summary */}
           {!isEditing && (
-            <CurrentRegulationSummary regulation={currentRegulation} />
+            <CurrentRegulationSummary regulation={currentRegulation} isLoading={isLoading} />
           )}
         </div>
         
@@ -882,7 +909,9 @@ const InterestRateRegulations = () => {
               >
                 <Edit2 size={18} />
               </motion.span>
-              Chỉnh sửa
+              <Skeleton isLoading={isLoading} width="w-16" height="h-5" className="inline-block">
+                Chỉnh sửa
+              </Skeleton>
             </motion.button>
           ) : (
             <div className="flex gap-3">
@@ -988,14 +1017,18 @@ const InterestRateRegulations = () => {
       {((currentRegulation.savingsTypes.length > 1 && !isEditing) || 
         (editedRegulation.savingsTypes.filter(t => !disabledSavingsTypes.includes(t.id)).length > 1 && isEditing)) && (
         <div className="mb-6 flex justify-center">
-          <SavingsTypeToggle
-            savingsTypes={isEditing 
-              ? editedRegulation.savingsTypes.filter(t => !disabledSavingsTypes.includes(t.id))
-              : currentRegulation.savingsTypes
-            }
-            activeSavingsType={activeSavingsType}
-            onToggle={setActiveSavingsType}
-          />
+          {isLoading ? (
+            <SavingsTypeToggleShimmer />
+          ) : (
+            <SavingsTypeToggle
+              savingsTypes={isEditing 
+                ? editedRegulation.savingsTypes.filter(t => !disabledSavingsTypes.includes(t.id))
+                : currentRegulation.savingsTypes
+              }
+              activeSavingsType={activeSavingsType}
+              onToggle={setActiveSavingsType}
+            />
+          )}
         </div>
       )}
       
@@ -1003,27 +1036,31 @@ const InterestRateRegulations = () => {
       {activeSavingsTypeDetails && (
         <div className="relative">
                    
-          <InterestRateTable
-            savingsType={activeSavingsTypeDetails.name}
-            savingsTypeId={activeSavingsType}
-            terms={activeSavingsTypeDetails.terms}
-            interestRates={activeSavingsTypeDetails.interestRates}
-            paymentFrequencies={isEditing 
-              ? editedRegulation.paymentFrequencies
-              : currentRegulation.paymentFrequencies
-            }
-            disabledFrequencies={getDisabledFrequenciesForActiveType()}
-            isEditing={isEditing}
-            onRateChange={handleRateChange}
-            onAddTerm={handleAddTerm}
-            onRemoveTerm={handleRemoveTerm}
-            onToggleFrequency={handleToggleFrequency}
-            highlightChanges={changedFields.interestRates || {}}
-            error={validationErrors.interestRates}
-            deletedTerms={deletedTerms[activeSavingsType] || []}
-            onRestoreTerm={handleRestoreTerm}
-            isFlexibleType={isActiveTypeFlexible()}
-          />
+          {isLoading ? (
+            <InterestRateTableShimmer />
+          ) : (
+            <InterestRateTable
+              savingsType={activeSavingsTypeDetails.name}
+              savingsTypeId={activeSavingsType}
+              terms={activeSavingsTypeDetails.terms}
+              interestRates={activeSavingsTypeDetails.interestRates}
+              paymentFrequencies={isEditing 
+                ? editedRegulation.paymentFrequencies
+                : currentRegulation.paymentFrequencies
+              }
+              disabledFrequencies={getDisabledFrequenciesForActiveType()}
+              isEditing={isEditing}
+              onRateChange={handleRateChange}
+              onAddTerm={handleAddTerm}
+              onRemoveTerm={handleRemoveTerm}
+              onToggleFrequency={handleToggleFrequency}
+              highlightChanges={changedFields.interestRates || {}}
+              error={validationErrors.interestRates}
+              deletedTerms={deletedTerms[activeSavingsType] || []}
+              onRestoreTerm={handleRestoreTerm}
+              isFlexibleType={isActiveTypeFlexible()}
+            />
+          )}
         </div>
       )}
       

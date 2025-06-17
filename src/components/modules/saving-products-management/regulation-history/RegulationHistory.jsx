@@ -9,6 +9,7 @@ import RegulationFilters from './RegulationFilters';
 import RegulationDetailModal from './RegulationDetailModal';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
+import RegulationCardShimmer from '@/components/ui/custom/shimmer-types/RegulationCardShimmer';
 
 const RegulationHistory = () => {
   // Component states
@@ -20,6 +21,7 @@ const RegulationHistory = () => {
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: 'success', message: '', details: null, format: '' });
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   
   // Mock data for regulations history
   const [regulations, setRegulations] = useState([
@@ -544,6 +546,15 @@ const RegulationHistory = () => {
     };
   };
 
+  // useEffect to turn off loading after 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="container mx-auto p-3 max-w-7xl">
       {/* Header */}
@@ -569,7 +580,9 @@ const RegulationHistory = () => {
       />
       
       {/* Regulations list */}
-      {sortedRegulations.length > 0 ? (
+      {isLoading ? (
+        <RegulationCardShimmer cardCount={6} />
+      ) : sortedRegulations.length > 0 ? (
         <div>
           {viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

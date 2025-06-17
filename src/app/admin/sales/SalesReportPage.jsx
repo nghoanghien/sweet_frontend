@@ -4,13 +4,9 @@ import {
   Grid, 
   List, 
   ArrowLeft, 
-  Search, 
-  FileText, 
   Calendar, 
   TrendingUp, 
-  DollarSign,
-  Download,
-  Eye
+  DollarSign
 } from 'lucide-react';
 
 // Import sub-components (we'll create these next)
@@ -19,6 +15,11 @@ import ReportList from '../../../components/modules/sales/report-list/ReportList
 import ReportSearchBar from '../../../components/modules/sales/report-list/ReportSearchBar';
 import ReportDetail from '../../../components/modules/sales/report-detail/ReportDetail';
 import ExportButtons from '../../../components/modules/sales/report-detail/ExportButtons';
+
+// Import shimmer components
+import ReportGridShimmer from '@/components/ui/custom/shimmer-types/ReportGridShimmer';
+import ReportSearchBarShimmer from '../../../components/ui/custom/shimmer-types/ReportSearchBarShimmer';
+import Skeleton from '../../../components/ui/custom/Skeleton';
 
 const SalesReportPage = () => {
   // State for view type (grid or list)
@@ -29,6 +30,18 @@ const SalesReportPage = () => {
   
   // State for search query
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // State for loading
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Loading effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Mock data for reports
   const [reports, setReports] = useState([
@@ -262,22 +275,29 @@ const SalesReportPage = () => {
             </div>
             
             {/* Search Bar */}
-            <ReportSearchBar 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
+            {isLoading ? (
+              <ReportSearchBarShimmer />
+            ) : (
+              <ReportSearchBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            )}
             
             {/* Reports Display (Grid or List) */}
             <div className="mt-6">
-              {viewType === 'grid' ? (
-                <ReportGrid 
-                  reports={filteredReports}
-                  onViewReport={handleViewReport}
-                  formatCurrency={formatCurrency}
-                />
+              {isLoading ? (
+                <ReportGridShimmer itemCount={6} />
               ) : (
-                <ReportList 
-                  reports={filteredReports}
+                viewType === 'grid') ? (
+                  <ReportGrid 
+                    reports={filteredReports}
+                    onViewReport={handleViewReport}
+                    formatCurrency={formatCurrency}
+                  />
+                ) : (
+                  <ReportList 
+                    reports={filteredReports}
                   onViewReport={handleViewReport}
                   formatCurrency={formatCurrency}
                 />
@@ -340,7 +360,9 @@ const SalesReportPage = () => {
                   </motion.span>
                   <div>
                     <p className="text-sm text-gray-500">Tổng số vốn huy động</p>
-                    <p className="text-xl font-bold text-gray-800">{formatCurrency(selectedReport.totalCapital)}</p>
+                    <Skeleton isLoading={isLoading} width="w-32" height="h-6" className="text-xl font-bold text-gray-800">
+                      <p className="text-xl font-bold text-gray-800">{formatCurrency(selectedReport.totalCapital)}</p>
+                    </Skeleton>
                   </div>
                 </motion.div>
                 <motion.div
@@ -357,7 +379,9 @@ const SalesReportPage = () => {
                   </motion.span>
                   <div>
                     <p className="text-sm text-gray-500">Tổng số vốn huy động ròng</p>
-                    <p className="text-xl font-bold text-gray-800">{formatCurrency(selectedReport.netCapital)}</p>
+                    <Skeleton isLoading={isLoading} width="w-32" height="h-6" className="text-xl font-bold text-gray-800">
+                      <p className="text-xl font-bold text-gray-800">{formatCurrency(selectedReport.netCapital)}</p>
+                    </Skeleton>
                   </div>
                 </motion.div>
               </div>
@@ -375,4 +399,4 @@ const SalesReportPage = () => {
   );
 };
 
-export default SalesReportPage; 
+export default SalesReportPage;
