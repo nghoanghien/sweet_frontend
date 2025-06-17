@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CreditCard, Edit2, Save, User, UserCheck } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
@@ -24,6 +24,7 @@ const SystemSettings = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const editFormRef = useRef(null);
 
   // Loading state management
   useEffect(() => {
@@ -234,13 +235,20 @@ const SystemSettings = () => {
       </motion.div>
 
       {/* Form chỉnh sửa */}
-      {isEditing && (
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-gradient-to-br from-blue-50/80 to-white rounded-3xl shadow-[0_4px_30px_rgba(0,170,255,0.12)] p-6 mb-8 border border-blue-100"
-        >
+      <AnimatePresence mode="wait">
+        {isEditing && (
+          <motion.div
+            ref={editFormRef}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ 
+              duration: 0.4, 
+              ease: [0.4, 0.0, 0.2, 1],
+              scale: { duration: 0.3 }
+            }}
+            className="bg-gradient-to-br from-blue-50/80 to-white rounded-3xl shadow-[0_4px_30px_rgba(0,170,255,0.12)] p-6 mb-8 border border-blue-100"
+          >
           <div className="mb-5">
             <label className="block text-base font-semibold text-blue-700 mb-2 flex items-center gap-2">
               <User size={18} className="text-blue-400" /> Độ tuổi tối thiểu nhân viên
@@ -349,26 +357,44 @@ const SystemSettings = () => {
               Lưu thay đổi
             </motion.button>
           </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Nút chỉnh sửa */}
       {!isEditing && (
         <div className="flex justify-end">
           <motion.button
-            whileHover={{ scale: 1.08, boxShadow: '0 0 16px rgba(0,170,255,0.18)' }}
-            whileTap={{ scale: 0.96 }}
-            onClick={() => setIsEditing(true)}
-            className="px-6 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-[0_4px_20px_rgba(0,170,255,0.13)] flex items-center font-semibold tracking-wide gap-2"
+            whileHover={!isLoading ? { scale: 1.08, boxShadow: '0 0 16px rgba(0,170,255,0.18)' } : {}}
+            whileTap={!isLoading ? { scale: 0.96 } : {}}
+            onClick={() => {
+              if (!isLoading) {
+                setIsEditing(true);
+                // Scroll to edit form after a short delay to ensure it's rendered
+                setTimeout(() => {
+                  editFormRef.current?.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                  });
+                }, 100);
+              }
+            }}
+            disabled={isLoading}
+            className={`px-6 py-2.5 rounded-xl flex items-center font-semibold tracking-wide gap-2 transition-all duration-300 ${
+              isLoading 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-sm' 
+                : 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-[0_4px_20px_rgba(0,170,255,0.13)] hover:shadow-[0_6px_25px_rgba(0,170,255,0.18)]'
+            }`}
           >
             <motion.span
-              whileHover={{ rotate: 10 }}
+              whileHover={!isLoading ? { rotate: 10 } : {}}
               transition={{ type: 'spring', stiffness: 300 }}
               className="inline-flex"
             >
               <Edit2 size={18} />
             </motion.span>
-            Chỉnh sửa
+            {isLoading ? 'Đang tải...' : 'Chỉnh sửa'}
           </motion.button>
         </div>
       )}
