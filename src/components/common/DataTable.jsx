@@ -586,25 +586,7 @@ const DataTable = ({
                       </tr>
                     )}
                     
-                    {/* Thông báo đã lướt hết dữ liệu */}
-                    {!hasMoreData() && displayedData.length > 0 && !showShimmer && (
-                      <tr>
-                        <td colSpan={columns.length + 1} className="px-6 py-8 text-center">
-                          <motion.div 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4 }}
-                            className="flex flex-col items-center justify-center text-gray-500"
-                          >
-                            <svg className="w-8 h-8 text-blue-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p className="text-sm font-medium text-gray-600">Đã hiển thị tất cả dữ liệu</p>
-                            <p className="text-xs text-gray-400 mt-1">Tổng cộng {filteredData.length} mục</p>
-                          </motion.div>
-                        </td>
-                      </tr>
-                    )}
+
                   </>
                 )}
               </AnimatePresence>
@@ -612,6 +594,22 @@ const DataTable = ({
           </table>
         </div>
       </motion.div>
+      
+      {/* Thông báo đã hiển thị tất cả dữ liệu - nằm ngoài bảng */}
+      {!hasMoreData() && displayedData.length > 0 && !showShimmer && (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col items-center justify-center text-gray-500 py-6 mt-4"
+        >
+          <svg className="w-8 h-8 text-blue-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-sm font-medium text-gray-600">Đã hiển thị tất cả dữ liệu</p>
+          <p className="text-xs text-gray-400 mt-1">Tổng cộng {filteredData.length} mục</p>
+        </motion.div>
+      )}
     </div>
   );
 };

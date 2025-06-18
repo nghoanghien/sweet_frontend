@@ -1978,6 +1978,20 @@ export default function CustomerManagement() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <motion.button
+              onClick={toggleAddCustomerModal}
+              className="group flex items-center space-x-2 px-4 py-2.5 md:px-5 md:py-3 bg-gradient-to-r from-[#7226FF] to-[#E02F75] bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-500"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Plus
+                size={16}
+                className="text-white group-hover:scale-110 transition-transform duration-200"
+              />
+              <span className="font-medium text-sm md:font-semibold md:text-md">
+                Thêm khách hàng
+              </span>
+            </motion.button>
+            <motion.button
               onClick={() => setIsExportModalOpen(true)}
               className="group flex items-center space-x-2 px-4 py-2.5 md:px-5 md:py-3 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-500"
               whileHover={{ scale: 1.05 }}
@@ -2041,7 +2055,7 @@ export default function CustomerManagement() {
             onRowClick={openCustomerDetail}
             onEditClick={enableEditMode}
             keyField="id"
-            className="bg-white rounded-xl shadow-sm overflow-hidden"
+            className="mb-6"
             headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
             renderActions={renderActions}
             emptyMessage="Không tìm thấy khách hàng nào phù hợp với điều kiện tìm kiếm"
@@ -2059,26 +2073,7 @@ export default function CustomerManagement() {
         )}
       </motion.div>
 
-      {/* "Add Customer" fixed button */}
-      <div className="fixed bottom-6 left-0 right-0 flex justify-center z-10">
-        <motion.button
-          whileHover={{
-            scale: 1.05,
-            boxShadow: "0 10px 25px -5px rgba(79, 70, 229, 0.5)",
-          }}
-          whileTap={{ scale: 0.95 }}
-          className="h-12 sm:h-14 px-4 sm:px-6 rounded-full bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 flex items-center justify-center text-white shadow-lg transition-all duration-500"
-          onClick={toggleAddCustomerModal}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1 }}
-        >
-          <Plus size={18} className="mr-1 sm:mr-2" />
-          <span className="font-medium text-sm sm:text-base">
-            Thêm khách hàng
-          </span>
-        </motion.button>
-      </div>
+
 
       {/* Customer Detail Modal */}
       <AnimatePresence mode="wait">
