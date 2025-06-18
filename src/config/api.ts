@@ -30,3 +30,9 @@ Module product
 //     return axios.delete<IBackendRes<void>>(`/api/v1/products/${id}`);
 // }
 ////block code above is example
+/**
+ * Module khach hang
+ */
+export const callGetAllCustomers = () => {
+    return axios.get<any>("/api/v1/khach-hang");
+}
