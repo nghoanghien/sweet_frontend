@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Menu, Phone, X, Percent, Calendar, CreditCard, PiggyBank, TrendingUp, ShieldCheck, CloudSun, Star, Award, Users, Zap, Gift, Play, Maximize2, Heart, ArrowUp, Rocket } from 'lucide-react';
 import { FaPlus, FaUser } from "react-icons/fa";
+import LoadingOverlay from '@/components/common/LoadingOverlay';
 
 // Tạo component chính
 export default function SweetLandingPage() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -19,6 +22,16 @@ export default function SweetLandingPage() {
   const cardSectionRef = useRef(null);
   const homeRef = useRef(null);
   const interestRef = useRef(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Hàm chuyển trang đến login
+  const navigateToLogin = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
+  };
 
   const scrollToFeatures = () => {
     const navHeight = 60; // Chiều cao của thanh điều hướng cố định
@@ -169,6 +182,7 @@ export default function SweetLandingPage() {
 
   return (
     <div className="relative pt-20 w-full min-h-screen overflow-x-hidden bg-sky-50">
+      <LoadingOverlay isLoading={isLoading} message='Đang chuyển hướng đến trang đăng nhập' />
       {/* Page Load Animation Overlay (Cloud-inspired) */}
       <div
         className={`fixed inset-0 bg-gradient-to-b from-sky-300 via-pink-200 to-transparent origin-top transform transition-transform duration-[1500ms] ease-in-out ${pageLoaded ? 'scale-y-0' : 'scale-y-100'
@@ -249,7 +263,7 @@ export default function SweetLandingPage() {
 
         {/* Contact Button */}
         <div className="hidden md:flex items-center">
-          <button className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 hover:bg-pink-700 hover:shadow-lg transform hover:-translate-y-1">
+          <button onClick={navigateToLogin} className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-6 py-2 rounded-full font-medium transition-all duration-300 hover:bg-pink-700 hover:shadow-lg transform hover:-translate-y-1">
             <FaUser size={16} />
             <span>Đăng Nhập</span>
           </button>
@@ -320,12 +334,12 @@ export default function SweetLandingPage() {
         </p>
 
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <button className="group flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-full font-medium transition-all duration-300 hover:bg-black hover:shadow-xl transform hover:-translate-y-1">
+          <button onClick={navigateToLogin} className="group flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-full font-medium transition-all duration-300 hover:bg-black hover:shadow-xl transform hover:-translate-y-1">
             <span>Bắt Đầu Tiết Kiệm</span>
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </button>
 
-          <button className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-gray-800 px-8 py-4 rounded-full font-medium border border-gray-200 transition-all duration-300 hover:bg-white hover:shadow-lg transform hover:-translate-y-1">
+          <button onClick={navigateToLogin} className="flex items-center gap-2 bg-white/80 backdrop-blur-sm text-gray-800 px-8 py-4 rounded-full font-medium border border-gray-200 transition-all duration-300 hover:bg-white hover:shadow-lg transform hover:-translate-y-1">
             Khám Phá Lợi Ích
           </button>
         </div>
@@ -633,7 +647,7 @@ export default function SweetLandingPage() {
                 </div>
 
                 <div className="absolute bottom-8 right-8 opacity-0 transform translate-y-4 transition-all duration-500 group-hover:opacity-100 group-hover:translate-y-0">
-                  <button className="flex items-center gap-1 bg-white/50 backdrop-blur-lg text-sm font-medium text-gray-600 bg-white px-3 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
+                  <button onClick={navigateToLogin} className="flex items-center gap-1 bg-white/50 backdrop-blur-lg text-sm font-medium text-gray-600 bg-white px-3 py-1.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300">
                     <Maximize2 size={14} />
                     <span>Trải Nghiệm Ngay</span>
                   </button>
@@ -653,7 +667,7 @@ export default function SweetLandingPage() {
           <p className="text-gray-600 text-3xl font-light max-w-2xl mx-auto mb-8 transition-all duration-700 delay-200">
             Giờ đây bạn có thể <span className='text-pink-600 font-normal'>rút tiền mọi lúc mọi nơi</span> (ngay cả khi vừa gửi tiền) mà <span className='text-pink-600 font-normal'>không lo mất lãi</span>.
           </p>
-          <button className="group flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-8 py-4 rounded-full font-medium transition-all duration-700 delay-300 hover:bg-pink-700 hover:shadow-xl transform hover:-translate-y-1 mx-auto">
+          <button onClick={navigateToLogin} className="group flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-8 py-4 rounded-full font-medium transition-all duration-700 delay-300 hover:bg-pink-700 hover:shadow-xl transform hover:-translate-y-1 mx-auto">
             <span>Trải Nghiệm Ngay</span>
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </button>
@@ -864,7 +878,7 @@ export default function SweetLandingPage() {
           </div>
 
           <div className='mt-12'>
-            <button className="group flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-8 py-4 rounded-full font-medium transition-all duration-300 delay-200 hover:bg-pink-700 hover:shadow-xl transform hover:-translate-y-1 mx-auto">
+            <button onClick={navigateToLogin} className="group flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-8 py-4 rounded-full font-medium transition-all duration-300 delay-200 hover:bg-pink-700 hover:shadow-xl transform hover:-translate-y-1 mx-auto">
               <span>Chớp Lấy Lãi Suất Ưu Đãi Ngay Thôi!</span>
               <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </button>
@@ -880,7 +894,7 @@ export default function SweetLandingPage() {
         <p className="text-gray-600 text-xl font-light max-w-2xl mx-auto mb-8 transition-all duration-700 delay-200">
           Với lãi suất ưu đãi 6% cho kỳ hạn từ 6 tháng và khả năng rút gốc linh hoạt, Sweet là lựa chọn hoàn hảo cho mục tiêu tài chính của bạn.
         </p>
-        <button className="group flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-8 py-4 rounded-full font-medium transition-all duration-700 delay-300 hover:bg-pink-700 hover:shadow-xl transform hover:-translate-y-1 mx-auto">
+        <button onClick={navigateToLogin} className="group flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-400 text-white px-8 py-4 rounded-full font-medium transition-all duration-700 delay-300 hover:bg-pink-700 hover:shadow-xl transform hover:-translate-y-1 mx-auto">
           <span>Mở Tài Khoản Ngay</span>
           <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
         </button>

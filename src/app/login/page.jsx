@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, Eye, EyeOff, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Eye, EyeOff, Sparkles, AlertCircle } from 'lucide-react';
 import CustomDatePicker from './CustomDatePicker';
-import SingleSelect from './SingleSelect'
+import SingleSelect from './SingleSelect';
+import LoadingOverlay from '@/components/common/LoadingOverlay';
 
 // Placeholder data for dropdowns
 const provinces = ["Hà Nội", "TP Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ"];
@@ -40,6 +42,7 @@ const colors = {
 };
 
 export default function LoginRegistrationForm() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isSameAddress, setIsSameAddress] = useState(false);
@@ -50,9 +53,16 @@ export default function LoginRegistrationForm() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
   
   // Effect to trigger initial animation
   useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 4000);
+
     setAnimateForm(true);
   }, []);
   
@@ -385,6 +395,8 @@ export default function LoginRegistrationForm() {
     if (!hasErrors) {
       console.log('Login form submitted:', loginForm);
       // Implement actual login logic here
+      // Chuyển hướng đến trang sweet-main sau khi đăng nhập thành công
+      router.push('/sweet-main');
     } else {
       // Add shake animation to invalid fields
       const invalidInputs = document.querySelectorAll('.border-red-500');
@@ -470,6 +482,7 @@ export default function LoginRegistrationForm() {
   
   return (
     <div className="w-full min-h-screen bg-sky-50 flex items-center justify-center p-4 relative">
+      <LoadingOverlay isLoading={isLoading} message='Đang chuyển hướng đăng nhập' />
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-[#FFB2CF]/30 to-transparent"></div>
