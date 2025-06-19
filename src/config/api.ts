@@ -1,4 +1,7 @@
+import { IRegisterDTO, IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/types/auth';
 import axios from './axios-customize';
+import { IBackendRes } from '@/types/backend';
+import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 
 //write all function call api here
 /**
@@ -31,8 +34,21 @@ Module product
 // }
 ////block code above is example
 /**
- * Module khach hang
+ * Module auth
  */
-export const callGetAllCustomers = () => {
-    return axios.get<any>("/api/v1/khach-hang");
+export const callLogin = (reqLoginDTO: IReqLoginDTO) => {
+    return axios.post<IBackendRes<IResLoginDTO>>('/api/v1/auth/login', reqLoginDTO);
+}
+
+export const callLogout = () =>{
+    return axios.post<IBackendRes<void>>('/api/v1/auth/logout');
+}
+
+export const callRegister = (data: IRegisterDTO<IKhachHangReqDTO>) =>{
+    return axios.post<IBackendRes<IRegisterDTO<IKhachHangResDTO>>>('/api/v1/auth/register', data);
+
+}
+
+export const callGetAccountInformation = () =>{
+    return axios.get<IBackendRes<IUserGetAccountDTO>>('/api/v1/auth/account');
 }

@@ -5,3 +5,4 @@ export interface IBackendRes<T> {
     statusCode: number | string;
     data?: T;
   }
+
