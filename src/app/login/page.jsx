@@ -62,7 +62,6 @@ export default function LoginRegistrationForm() {
       setIsLoading(false);
     }, 4000);
 
-   
 
     setAnimateForm(true);
   }, []);

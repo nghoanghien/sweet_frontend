@@ -28,7 +28,6 @@ import React, { useState, useEffect } from 'react';
   import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
 import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
 import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer';
-
   export default function EmployeeManagement() {
     // State for employee data
     const [employees, setEmployees] = useState([
