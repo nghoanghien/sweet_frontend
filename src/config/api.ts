@@ -2,7 +2,8 @@ import { IRegisterDTO, IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/
 import axios from './axios-customize';
 import { IBackendRes } from '@/types/backend';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
-import { IGiaoDichReqDTO, IGiaoDichResponseDTO, ILSGD_TKTTResponseDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
+import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
+import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
 
 //write all function call api here
 /**
@@ -54,15 +55,15 @@ export const callGetAccountInformation = () =>{
 }
 
 export const callGetAllGiaoDich = () => {
-    return axios.get<IBackendRes<IGiaoDichResponseDTO[]>>('/api/v1/giao-dich');
+    return axios.get<IBackendRes<IGiaoDichResDTO[]>>('/api/v1/giao-dich');
 }
 
 export const callGetGiaoDichByID = (id: number) => {
-    return axios.get<IBackendRes<IGiaoDichResponseDTO>>('/api/v1/giao-dich/' + id);
+    return axios.get<IBackendRes<IGiaoDichResDTO>>('/api/v1/giao-dich/' + id);
 }
 
 export const callCreateGiaoDich = (data: IGiaoDichReqDTO) => {
-    return axios.post<IBackendRes<IGiaoDichResponseDTO>>('/api/v1/giao-dich', data);
+    return axios.post<IBackendRes<IGiaoDichResDTO>>('/api/v1/giao-dich', data);
 }
 
 export const callGetAllTaiKhoanThanhToan = () => {
@@ -78,9 +79,25 @@ export const callCreateTaiKhoanThanhToan = (data: ITKTTReqDTO) => {
 }
 
 export const callGetAllLSGD_TKTT = () => {
-    return axios.get<IBackendRes<ILSGD_TKTTResponseDTO[]>>('/api/v1/giao-dich/tktt/lich-su');
+    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>('/api/v1/giao-dich/tktt/lich-su');
 }
 
 export const callGetLSGD_TKTTByID = (id: number) => {
-    return axios.get<IBackendRes<ILSGD_TKTTResponseDTO[]>>('/api/v1/giao-dich/tktt/lich-su/' + id);
+    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>('/api/v1/giao-dich/tktt/lich-su/' + id);
+}
+
+export const callGetAllQuyDinhLaiSuat = () => {
+    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO[]>>('/api/v1/quy-dinh-lai-suat');
+}
+
+export const callGetAllChiTietQuyDinhLaiSuat = () => {
+    return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO[]>>('/api/v1/quy-dinh-lai-suat/chi-tiet');
+}
+
+export const callGetQuyDinhLaiSuatByID = (id: number) => {
+    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>('/api/v1/quy-dinh-lai-suat/' + id);
+}
+
+export const callGetChiTietQuyDinhLaiSuatByID = (id: number) => {
+    return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>('/api/v1/quy-dinh-lai-suat/chi-tiet/' + id);
 }
