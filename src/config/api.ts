@@ -59,6 +59,7 @@ export const callDeactivateKhachHang = (id: string) => {
 //activate khach hang
 export const callActivateKhachHang = (id: string) => {
     return axios.put<IBackendRes<void>>(`/api/v1/khach-hang/${id}/kich-hoat`)
+}
 export const callGetAllGiaoDich = () => {
     return axios.get<IBackendRes<IGiaoDichResDTO[]>>('/api/v1/giao-dich');
 }
