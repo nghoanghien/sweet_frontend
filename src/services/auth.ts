@@ -1,5 +1,4 @@
 import axios from '@/config/axios-customize';
-import { IBackendRes } from '../types/backend';
 import { User, LoginCredentials } from '@/types/user';
 
 // Response types
