@@ -2,6 +2,7 @@ import { IRegisterDTO, IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/
 import axios from './axios-customize';
 import { IBackendRes } from '@/types/backend';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
+import { IGiaoDichReqDTO, IGiaoDichResponseDTO, ILSGD_TKTTResponseDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 
 //write all function call api here
 /**
@@ -46,9 +47,40 @@ export const callLogout = () =>{
 
 export const callRegister = (data: IRegisterDTO<IKhachHangReqDTO>) =>{
     return axios.post<IBackendRes<IRegisterDTO<IKhachHangResDTO>>>('/api/v1/auth/register', data);
-
 }
 
 export const callGetAccountInformation = () =>{
     return axios.get<IBackendRes<IUserGetAccountDTO>>('/api/v1/auth/account');
+}
+
+export const callGetAllGiaoDich = () => {
+    return axios.get<IBackendRes<IGiaoDichResponseDTO[]>>('/api/v1/giao-dich');
+}
+
+export const callGetGiaoDichByID = (id: number) => {
+    return axios.get<IBackendRes<IGiaoDichResponseDTO>>('/api/v1/giao-dich/' + id);
+}
+
+export const callCreateGiaoDich = (data: IGiaoDichReqDTO) => {
+    return axios.post<IBackendRes<IGiaoDichResponseDTO>>('/api/v1/giao-dich', data);
+}
+
+export const callGetAllTaiKhoanThanhToan = () => {
+    return axios.get<IBackendRes<ITKTTResDTO[]>>('/api/v1/giao-dich/tktt');
+}
+
+export const callGetTaiKhoanThanhToanByID = (id: number) => {
+    return axios.get<IBackendRes<ITKTTResDTO[]>>('/api/v1/giao-dich/tktt/' + id);
+}
+
+export const callCreateTaiKhoanThanhToan = (data: ITKTTReqDTO) => {
+    return axios.post<IBackendRes<ITKTTResDTO>>('/api/v1/giao-dich/tktt', data);
+}
+
+export const callGetAllLSGD_TKTT = () => {
+    return axios.get<IBackendRes<ILSGD_TKTTResponseDTO[]>>('/api/v1/giao-dich/tktt/lich-su');
+}
+
+export const callGetLSGD_TKTTByID = (id: number) => {
+    return axios.get<IBackendRes<ILSGD_TKTTResponseDTO[]>>('/api/v1/giao-dich/tktt/lich-su/' + id);
 }
