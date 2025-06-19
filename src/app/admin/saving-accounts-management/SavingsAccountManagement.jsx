@@ -12,10 +12,12 @@ import SearchFilterBar from '../../../components/common/SearchFilterBar';
 import DataTable from '../../../components/common/DataTable';
 import ExportDataModal from '../../../components/common/ExportDataModal';
 import ExportNotification from '../../../components/common/ExportNotification';
-import SwipeConfirmationModal from '../../../components/modals/ConfirmationModal/SwipeConfirmationModal';
 import { formatCurrency } from '../../../utils/accountUtils';
 import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
 import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
+import { useAllSavingAccounts } from '@/hooks/useSavingAccounts';
+import { getInterestFrequencyLabel, getDepositTypeLabel, getMaturityOptionLabel } from '@/utils/regulation-interest';
+import { formatDate } from '@/utils/saving-account';
 // Các component phụ trợ sẽ bổ sung sau: InputField, SearchFilterBar, DataTable, ...
 
 // Dữ liệu mẫu cho giao dịch tiết kiệm
@@ -99,87 +101,6 @@ const sampleWithdrawalHistory = {
 };
 
 export default function SavingsAccountManagement() {
-  // State cho danh sách phiếu gửi tiền
-  const [accounts, setAccounts] = useState([
-    {
-      id: 1,
-      accountNumber: 'TK000001',
-      amount: 10000000,
-      remainingAmount: 1000000,
-      term: '12 tháng',
-      termDays: 365, 
-      daysRemaining: 120,
-      interestRate: 6.8,
-      interestFrequency: 'Cuối kỳ',
-      depositType: 'Tiền gửi tiêu chuẩn',
-      maturityOption: 'Tự động tái tục gốc',
-      startDate: "15/06/2024",
-      endDate: '15/06/2025',
-      receivedInterest: 0,
-      totalReceivable: 10720000,
-      nickname: 'Sổ tiết kiệm A',
-      status: 'closed',
-      customer: {
-        fullName: 'Nguyễn Văn A',
-        birthDate: '12/05/1985',
-        idNumber: '036085123456',
-        email: 'nguyenvana@email.com',
-        phone: '0901234567',
-      }
-    },
-    {
-      id: 2,
-      accountNumber: 'TK000002',
-      amount: 5000000,
-      remainingAmount: 0,
-      term: '6 tháng',
-      termDays: 180,
-      daysRemaining: 0,
-      interestRate: 6.8,
-      interestFrequency: 'Hàng tháng',
-      depositType: 'Rút gốc linh hoạt',
-      maturityOption: 'Tất toán',
-      startDate: "20/02/2024",
-      endDate: '20/08/2024',
-      receivedInterest: 0,
-      totalReceivable: 5170000,
-      nickname: 'Sổ tiết kiệm B',
-      status: 'closed',
-      customer: {
-        fullName: 'Trần Thị B',
-        birthDate: '25/11/1990',
-        idNumber: '024190789123',
-        email: 'tranthib@email.com',
-        phone: '0912345678',
-      }
-    },
-    {
-      id: 3,
-      accountNumber: 'TK000003',
-      amount: 20000000,
-      remainingAmount: 20000000,
-      term: '24 tháng',
-      termDays: 730,
-      daysRemaining: 150,
-      interestRate: 7.8,
-      interestFrequency: 'Cuối kỳ',
-      depositType: 'Rút gốc linh hoạt',
-      maturityOption: 'Tái tục cả gốc và lãi',
-      startDate: "05/11/2024",
-      endDate: '05/11/2026',
-      receivedInterest: 0,
-      totalReceivable: 23120000,
-      nickname: 'Sổ tiết kiệm C',
-      status: 'inTerm',
-      customer: {
-        fullName: 'Lê Văn C',
-        birthDate: '10/03/1978',
-        idNumber: '025781234567',
-        email: 'levanc@email.com',
-        phone: '0923456789',
-      }
-    }
-  ]);
 
   //State cho việc ẩn các thông tin nhạy cảm
   const [hiddenAccounts, setHiddenAccounts] = useState({});
@@ -188,20 +109,16 @@ export default function SavingsAccountManagement() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
 
-  // State cho modal thêm mới
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
   // Loading states
-  const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
   const [isLoadingSearch, setIsLoadingSearch] = useState(true);
 
   // State cho filter, sort, search (sẽ bổ sung sau)
   const [filteredAccounts, setFilteredAccounts] = useState([]);
-  const [sortField, setSortField] = useState('accountNumber');
+  const [sortField, setSortField] = useState('id');
   const [sortDirection, setSortDirection] = useState('asc');
   const [searchFields, setSearchFields] = useState({
-    accountNumber: '',
-    idNumber: '',
+    id: '',
+    idCardNumber: '',
     fullName: '',
     phone: ''
   });
@@ -209,7 +126,6 @@ export default function SavingsAccountManagement() {
   // State cho export
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportData, setExporData] = useState([]);
-  const [exportSuccess, setExportSuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [exportNotification, setExportNotification] = useState({
     visible: false,
@@ -217,45 +133,8 @@ export default function SavingsAccountManagement() {
     message: '',
     format: ''
   });
-  
-  // State for notification
-  const [notificationVisible, setNotificationVisible] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [notificationFormat, setNotificationFormat] = useState('pdf');
-  const [notificationType, setNotificationType] = useState('success');
 
-  // State cho xác nhận
-  const [confirmationModal, setConfirmationModal] = useState({
-    isOpen: false,
-    title: '',
-    description: '',
-    confirmText: '',
-    confirmDetails: null,
-    isProcessing: false,
-    onConfirm: null
-  });
-
-  // State cho form thêm mới
-  const [newAccount, setNewAccount] = useState({
-    accountNumber: '',
-    amount: '',
-    term: '',
-    interestRate: '',
-    interestFrequency: '',
-    depositType: '',
-    maturityOption: '',
-    endDate: '',
-    nickname: '',
-    status: 'active',
-    customer: {
-      fullName: '',
-      birthDate: '',
-      idNumber: '',
-      email: '',
-      phone: ''
-    }
-  });
-  const [errors, setErrors] = useState({});
+  const { allSavingAccounts, isLoading, error } = useAllSavingAccounts();
 
   // useEffect to simulate loading states
   useEffect(() => {
@@ -264,28 +143,24 @@ export default function SavingsAccountManagement() {
       setIsLoadingSearch(false);
     }, 2000);
 
-    // Simulate loading for accounts data
-    setTimeout(() => {
-      setIsLoadingAccounts(false);
-    }, 2000);
   }, []);
 
   // useEffect filter + sort (sẽ bổ sung logic sau)
   useEffect(() => {
-    let result = [...accounts];
+    let result = [...allSavingAccounts];
     // Filter
     result = result.filter(acc => {
-      const accNumMatch = searchFields.accountNumber === '' || acc.accountNumber.toLowerCase().includes(searchFields.accountNumber.toLowerCase());
-      const idMatch = searchFields.idNumber === '' || acc.customer.idNumber.toLowerCase().includes(searchFields.idNumber.toLowerCase());
+      const accNumMatch = searchFields.id === '' || String(acc.id).includes(searchFields.id);
+      const idMatch = searchFields.idCardNumber === '' || acc.customer.idCardNumber.toLowerCase().includes(searchFields.idCardNumber.toLowerCase());
       const nameMatch = searchFields.fullName === '' || acc.customer.fullName.toLowerCase().includes(searchFields.fullName.toLowerCase());
-      const phoneMatch = searchFields.phone === '' || acc.customer.phone.toLowerCase().includes(searchFields.phone.toLowerCase());
+      const phoneMatch = searchFields.phone === '' || acc.customer.phoneNumber.toLowerCase().includes(searchFields.phone.toLowerCase());
       return accNumMatch && idMatch && nameMatch && phoneMatch;
     });
     // Sort
     result.sort((a, b) => {
       let valueA = a[sortField], valueB = b[sortField];
-      if (sortField === 'idNumber') {
-        valueA = a.customer.idNumber; valueB = b.customer.idNumber;
+      if (sortField === 'idCardNumber') {
+        valueA = a.customer.idCardNumber; valueB = b.customer.idCardNumber;
       } else if (sortField === 'fullName') {
         valueA = a.customer.fullName; valueB = b.customer.fullName;
       }
@@ -297,65 +172,13 @@ export default function SavingsAccountManagement() {
       else return valueA < valueB ? 1 : -1;
     });
     setFilteredAccounts(result);
-  }, [accounts, searchFields, sortField, sortDirection]);
+  }, [allSavingAccounts, searchFields, sortField, sortDirection]);
   
-  // Lắng nghe sự kiện rút tiền từ SavingsAccountDetailDrawer
-  useEffect(() => {
-    // Xử lý sự kiện rút toàn bộ tiền
-    const handleAccountFullyWithdrawn = (event) => {
-      const { accountId } = event.detail;
-      
-      // Tìm tài khoản trong danh sách
-      const account = accounts.find(acc => acc.id === accountId);
-      if (!account) return;
-      
-      // Thay vì xóa tài khoản, cập nhật trạng thái thành 'closed' và remainingAmount về 0
-      setAccounts(prevAccounts => 
-        prevAccounts.map(acc => 
-          acc.id === accountId 
-            ? { ...acc, status: 'closed', remainingAmount: 0, receivedInterest: acc.receivedInterest || 0 } 
-            : acc
-        )
-      );
-      
-      // Hiển thị thông báo
-      setNotificationMessage(`Đã rút toàn bộ tiền từ tài khoản ${account.accountNumber}`);
-      setNotificationType('success');
-      setNotificationVisible(true);
-      
-      // Tự động ẩn thông báo sau 5 giây
-      setTimeout(() => {
-        setNotificationVisible(false);
-      }, 5000);
-    };
-    
-    // Xử lý sự kiện rút một phần tiền
-    const handleAccountPartiallyWithdrawn = (event) => {
-      const { accountId, updatedAccount, transaction } = event.detail;
-      
-      // Cập nhật tài khoản trong danh sách
-      setAccounts(prevAccounts => 
-        prevAccounts.map(acc => 
-          acc.id === accountId ? updatedAccount : acc
-        )
-      );
-    };
-    
-    // Đăng ký lắng nghe sự kiện
-    window.addEventListener('accountFullyWithdrawn', handleAccountFullyWithdrawn);
-    window.addEventListener('accountPartiallyWithdrawn', handleAccountPartiallyWithdrawn);
-    
-    // Hủy đăng ký khi component unmount
-    return () => {
-      window.removeEventListener('accountFullyWithdrawn', handleAccountFullyWithdrawn);
-      window.removeEventListener('accountPartiallyWithdrawn', handleAccountPartiallyWithdrawn);
-    };
-  }, [accounts]);
 
   // Cột bảng dữ liệu
   const accountColumns = [
     {
-      key: 'accountNumber',
+      key: 'id',
       label: 'Số tài khoản',
       sortable: true,
       formatter: (value, item) => (
@@ -370,7 +193,7 @@ export default function SavingsAccountManagement() {
       )
     },
     {
-      key: 'amount',
+      key: 'initialAmount',
       label: 'Số tiền gửi',
       sortable: true,
       formatter: (value) => formatCurrency(value),
@@ -380,6 +203,7 @@ export default function SavingsAccountManagement() {
       key: 'term',
       label: 'Kỳ hạn',
       sortable: true,
+      formatter: (value) => `${value} tháng`, 
       className: 'hidden sm:table-cell' // Ẩn trên mobile
     },
     {
@@ -389,11 +213,11 @@ export default function SavingsAccountManagement() {
       type: 'status' // Sử dụng StatusBadge component
     },
     {
-      key: 'idNumber',
+      key: 'idCardNumber',
       label: 'CCCD người gửi',
       sortable: true,
       className: 'hidden md:table-cell', // Ẩn trên mobile và tablet
-      formatter: (value, item) => item.customer?.idNumber || '-'
+      formatter: (value, item) => item.customer?.idCardNumber || '-'
     },
     {
       key: 'fullName',
@@ -425,8 +249,8 @@ export default function SavingsAccountManagement() {
 
   // SearchFilterBar config
   const searchFieldsConfig = [
-    { key: 'accountNumber', label: 'Số tài khoản', icon: FileText, placeholder: 'Tìm theo số tài khoản...' },
-    { key: 'idNumber', label: 'Số CCCD', icon: FileText, placeholder: 'Tìm theo CCCD...' },
+    { key: 'id', label: 'Số tài khoản', icon: FileText, placeholder: 'Tìm theo số tài khoản...' },
+    { key: 'idCardNumber', label: 'Số CCCD', icon: FileText, placeholder: 'Tìm theo CCCD...' },
     { key: 'fullName', label: 'Tên người gửi', icon: User, placeholder: 'Tìm theo tên...' },
     { key: 'phone', label: 'Số điện thoại', icon: Phone, placeholder: 'Tìm theo số điện thoại...' }
   ];
@@ -436,52 +260,12 @@ export default function SavingsAccountManagement() {
     setSearchFields(prev => ({ ...prev, [field]: value }));
   };
   const clearSearchFields = () => {
-    setSearchFields({ accountNumber: '', idNumber: '', fullName: '', phone: '' });
+    setSearchFields({ id: '', idCardNumber: '', fullName: '', phone: '' });
   };
   // Handle sort
   const handleSort = (field) => {
     if (field === sortField) setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     else { setSortField(field); setSortDirection('asc'); }
-  };
-
-  // Validate field
-  const validateField = (field, value) => {
-    if (['accountNumber', 'nickname', 'term', 'interestRate', 'interestFrequency', 'depositType', 'maturityOption', 'endDate', 'amount'].includes(field)) {
-      if (!value || value.toString().trim() === '') return 'Không được để trống';
-      if (field === 'amount' && (!/^[0-9]+$/.test(value) || value < 100000)) return 'Số tiền phải là số >= 100.000';
-      if (field === 'interestRate' && (isNaN(value) || value <= 0 || value > 20)) return 'Lãi suất phải từ 0-20%';
-    }
-    if (['fullName', 'birthDate', 'idNumber', 'email', 'phone'].includes(field)) {
-      if (!value || value.toString().trim() === '') return 'Không được để trống';
-      if (field === 'email' && !/^\S+@\S+\.\S+$/.test(value)) return 'Email không hợp lệ';
-      if (field === 'phone' && !/^0\d{9,10}$/.test(value)) return 'Số điện thoại phải bắt đầu bằng 0 và có 10-11 số';
-      if (field === 'idNumber' && !/^\d{9,12}$/.test(value)) return 'CCCD phải có 9-12 số';
-    }
-    return '';
-  };
-  // Validate all fields
-  const validateAllFields = () => {
-    const newErrors = {};
-    const fields = ['accountNumber', 'amount', 'term', 'interestRate', 'interestFrequency', 'depositType', 'maturityOption', 'endDate', 'nickname'];
-    fields.forEach(f => { const err = validateField(f, newAccount[f]); if (err) newErrors[f] = err; });
-    const customerFields = ['fullName', 'birthDate', 'idNumber', 'email', 'phone'];
-    customerFields.forEach(f => { const err = validateField(f, newAccount.customer[f]); if (err) newErrors['customer.'+f] = err; });
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle blur
-  const handleFieldBlur = (field) => {
-    if (field.startsWith('customer.')) {
-      const key = field.split('.')[1];
-      setErrors(prev => ({ ...prev, [field]: validateField(key, newAccount.customer[key]) }));
-    } else {
-      setErrors(prev => ({ ...prev, [field]: validateField(field, newAccount[field]) }));
-    }
-  };
-  // Copy customer info
-  const copyCustomerInfo = () => {
-    setNewAccount(prev => ({ ...prev, customer: { ...prev.customer } }));
   };
   
   // Export
@@ -512,18 +296,7 @@ export default function SavingsAccountManagement() {
       setExportNotification(prev => ({...prev, visible: false})); 
     }, 5000);
   };
-  // Confirmation modal
-  const openConfirmationModal = ({ title, description, confirmText = 'Vuốt để xác nhận', confirmDetails = null, onConfirm }) => {
-    setConfirmationModal({ isOpen: true, title, description, confirmText, confirmDetails, isProcessing: false, onConfirm });
-  };
-  const closeConfirmationModal = () => { setConfirmationModal(prev => ({ ...prev, isOpen: false })); };
 
-  const toggleHideAccountInfo = (accountId) => {
-    setHiddenAccounts(prev => ({
-      ...prev,
-      [accountId]: !prev[accountId]
-    }));
-  };
   // Render UI
   return (
     <div className="container mx-auto px-2 sm:px-3 md:px-4 lg:px-6 xl:pl-2 xl:px-8">
@@ -557,7 +330,7 @@ export default function SavingsAccountManagement() {
           />
         )}
       </div>
-      {isLoadingAccounts ? (
+      {isLoading ? (
         <DataTableShimmer
           showFilter={true}
         />
@@ -598,27 +371,12 @@ export default function SavingsAccountManagement() {
             isHidden={hiddenAccounts[selectedAccount.id]}
             customerInfo={selectedAccount.customer}
             showCustomerInfo={true}
-            onToggleHide={() => toggleHideAccountInfo(selectedAccount.id)}
+            onToggleHide={() => setHiddenAccounts(prev => ({ ...prev, [selectedAccount.id]: !prev[selectedAccount.id] }))}
             canWithdraw={false}
           />
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Confirmation modal cho các thao tác đặc biệt */}
-      {confirmationModal.isOpen && (
-        <SwipeConfirmationModal
-          isOpen={confirmationModal.isOpen}
-          onClose={closeConfirmationModal}
-          onConfirm={confirmationModal.onConfirm}
-          title={confirmationModal.title}
-          description={confirmationModal.description}
-          confirmText={confirmationModal.confirmText}
-          confirmDetails={confirmationModal.confirmDetails}
-          isProcessing={confirmationModal.isProcessing}
-          type="warning"
-        />
-      )}
       {/* Export notification */}
       <ExportNotification 
         isVisible={exportNotification.visible} 
@@ -629,17 +387,7 @@ export default function SavingsAccountManagement() {
         autoHideDuration={5000}
         position="center"
       />
-      
-      {/* Notification for account withdrawal */}
-      <ExportNotification 
-        isVisible={notificationVisible} 
-        format={notificationFormat} 
-        onClose={() => setNotificationVisible(false)} 
-        message={notificationMessage}
-        type={notificationType}
-        autoHideDuration={5000}
-        position="center"
-      />
+
       {/* Export Data Modal */}
       <ExportDataModal 
         isOpen={isExportModalOpen}
@@ -648,53 +396,60 @@ export default function SavingsAccountManagement() {
         onExport={handleExportData}
         title="Xuất dữ liệu phiếu gửi tiền"
         initialSelectedColumns={[
-          'accountNumber',
-          'amount',
+          'id',
+          'initialAmount',
           'term',
           'interestRate',
           'interestFrequency',
           'depositType',
           'maturityOption',
+          'startDate',
           'endDate',
           'nickname',
           'customer.fullName',
-          'customer.idNumber',
-          'customer.birthDate',
+          'customer.idCardNumber',
+          'customer.dateOfBirth',
           'customer.email',
-          'customer.phone',
+          'customer.phoneNumber',
           'totalReceivable',
           'receivedInterest',
         ]}
         columnLabels={{
-          accountNumber: 'Số tài khoản',
-          amount: 'Số tiền gửi',
+          id: 'Số tài khoản',
+          initialAmount: 'Số tiền gửi',
           term: 'Kỳ hạn',
           interestRate: 'Lãi suất (%)',
           interestFrequency: 'Tần suất nhận lãi',
           depositType: 'Loại tiết kiệm',
           maturityOption: 'Hình thức đáo hạn',
+          startDate: 'Ngày bắt đầu',
           endDate: 'Ngày đáo hạn',
           nickname: 'Tên gợi nhớ',
           'customer.fullName': 'Họ tên',
-          'customer.birthDate': 'Ngày sinh',
-          'customer.idNumber': 'Số CCCD',
+          'customer.dateOfBirth': 'Ngày sinh',
+          'customer.idCardNumber': 'Số CCCD',
           'customer.email': 'Email',
-          'customer.phone': 'Số điện thoại',
+          'customer.phoneNumber': 'Số điện thoại',
           'totalReceivable': 'Tổng tiền nhận',
           'receivedInterest': 'Lãi đã nhận'
         }}
         formatData={(value, column) => {
-          if (column === 'amount' || column === 'totalReceivable' || column === 'receivedInterest') 
+          if (column === 'initialAmount' || column === 'totalReceivable' || column === 'receivedInterest') 
             return formatCurrency(value);
-          if (column === 'interestRate') return value + '%';
+          if (column === 'interestRate') return value * 100 + '%';
+          if (column === 'interestFrequency') return getInterestFrequencyLabel(value);
+          if (column === 'depositType') return getDepositTypeLabel(value);
+          if (column === 'maturityOption') return getMaturityOptionLabel(value);
+          if (column === 'startDate' || column === 'endDate') return formatDate(new Date(value));
+          if (column === 'customer.dateOfBirth') return formatDate(new Date(value));
           if (column.startsWith('customer.')) return value || 'N/A';
           return value || '';
         }}
         defaultFormat="excel"
         customColumnCategories={{
-          account: ['accountNumber', 'nickname', 'depositType', 'maturityOption'],
-          financial: ['amount', 'term', 'interestRate', 'interestFrequency', 'endDate', 'totalReceivable', 'receivedInterest'],
-          customer: ['customer.fullName', 'customer.birthDate', 'customer.idNumber', 'customer.email', 'customer.phone'],
+          account: ['id', 'nickname', 'depositType', 'maturityOption'],
+          financial: ['initialAmount', 'term', 'interestRate', 'interestFrequency', 'startDate', 'endDate', 'totalReceivable', 'receivedInterest'],
+          customer: ['customer.fullName', 'customer.dateOfBirth', 'customer.idCardNumber', 'customer.email', 'customer.phoneNumber'],
           other: []
         }}
         enableGrouping={true}

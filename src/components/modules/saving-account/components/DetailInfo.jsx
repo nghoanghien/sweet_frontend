@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Wallet, Calendar, TrendingUp, CreditCard, Settings, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../../../../utils/accountUtils';
+import { formatDate } from '../../../../utils/saving-account';
 import CustomerInfoCard from './CustomerInfoCard';
+import { getDepositTypeDescription, getDepositTypeLabel, getInterestFrequencyLabel, getMaturityOptionLabel } from '@/utils/regulation-interest';
 
 const DetailInfo = ({ 
   account, 
@@ -50,25 +52,25 @@ const DetailInfo = ({
   const depositInfoItems = [
     { 
       label: 'Số tiền gốc', 
-      value: formatCurrency(account.amount), 
+      value: formatCurrency(account.initialAmount), 
       color: 'text-blue-600',
       icon: <Wallet size={14} className="text-blue-500" />
     },
     { 
       label: 'Kỳ hạn', 
-      value: account.term, 
+      value: `${account.term} tháng`, 
       color: 'text-gray-700',
       icon: <Calendar size={14} className="text-gray-500" />
     },
     { 
       label: 'Lãi suất', 
-      value: `${account.interestRate}%/năm`, 
+      value: `${account.interestRate * 100}%/năm`, 
       color: 'text-green-600',
       icon: <TrendingUp size={14} className="text-green-500" />
     },
     { 
       label: 'Ngày đáo hạn', 
-      value: account.endDate, 
+      value: formatDate(account.endDate), 
       color: 'text-gray-700',
       icon: <Calendar size={14} className="text-gray-500" />
     },
@@ -96,25 +98,25 @@ const DetailInfo = ({
   const accountInfoItems = [
     { 
       label: 'Số tài khoản', 
-      value: account.accountNumber, 
+      value: account.id, 
       color: 'text-gray-700',
       icon: <CreditCard size={14} className="text-gray-500" />
     },
     { 
       label: 'Loại tiết kiệm', 
-      value: account.depositType, 
+      value: getDepositTypeLabel(account.depositType), 
       color: 'text-blue-600',
       icon: <Settings size={14} className="text-blue-500" />
     },
     { 
       label: 'Tần suất nhận lãi', 
-      value: account.interestFrequency, 
+      value: getInterestFrequencyLabel(account.interestFrequency), 
       color: 'text-gray-700',
       icon: <Calendar size={14} className="text-gray-500" />
     },
     { 
       label: 'Hình thức đáo hạn', 
-      value: account.maturityOption, 
+      value: getMaturityOptionLabel(account.maturityOption), 
       color: 'text-gray-700',
       icon: <Settings size={14} className="text-gray-500" />
     },

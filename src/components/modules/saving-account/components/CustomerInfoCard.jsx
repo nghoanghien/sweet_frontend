@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Calendar, CreditCard, Phone, Mail, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatDate } from '../../../../utils/saving-account';
 
 const CustomerInfoCard = ({ info }) => {
   const [isHidden, setIsHidden] = useState(false);
@@ -39,19 +40,19 @@ const CustomerInfoCard = ({ info }) => {
     },
     {
       label: 'Ngày sinh',
-      value: info?.birthDate || '-',
+      value: info?.dateOfBirth ? formatDate(info.dateOfBirth) : '-',
       icon: Calendar,
       sensitive: false
     },
     {
       label: 'Số CCCD',
-      value: info?.idNumber || '-',
+      value: info?.idCardNumber || '-',
       icon: CreditCard,
       sensitive: true
     },
     {
       label: 'Số điện thoại',
-      value: info?.phone || '-',
+      value: info?.phoneNumber || '-',
       icon: Phone,
       sensitive: true
     },
