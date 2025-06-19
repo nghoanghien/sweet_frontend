@@ -1,5 +1,7 @@
 import React from 'react';
 import { DollarSign, FileIcon, FileText, PiggyBank } from 'lucide-react';
+import { formatDate } from '../../../../utils/saving-account';
+import { getDepositTypeLabel, getInterestFrequencyLabel, getMaturityOptionLabel } from '@/utils/regulation-interest';
 
 const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
   return (
@@ -22,19 +24,19 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
             <p className="text-base font-semibold text-gray-800">
               {isHidden
                 ? "••••••••"
-                : formatCurrency(account.amount)}
+                : formatCurrency(account.initialAmount)}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-1">Kỳ hạn</p>
             <p className="text-base font-semibold text-gray-800">
-              {account.term}
+              {`${account.term} tháng`}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-1">Lãi suất</p>
             <p className="text-base font-semibold text-gray-800">
-              {account.interestRate}%/năm
+              {account.interestRate * 100}%/năm
             </p>
           </div>
           <div>
@@ -73,7 +75,7 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
               Số tài khoản tiền gửi
             </p>
             <p className="text-base font-semibold text-gray-800">
-              {account.accountNumber}
+              {account.id}
             </p>
           </div>
           <div>
@@ -81,7 +83,7 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
               Loại tiết kiệm
             </p>
             <p className="text-base font-semibold text-gray-800">
-              {account.depositType}
+              {getDepositTypeLabel(account.depositType)}
             </p>
           </div>
           <div>
@@ -89,7 +91,7 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
               Tần suất nhận lãi
             </p>
             <p className="text-base font-semibold text-gray-800">
-              {account.interestFrequency}
+              {getInterestFrequencyLabel(account.interestFrequency)}
             </p>
           </div>
           <div>
@@ -97,7 +99,7 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
               Ngày đáo hạn
             </p>
             <p className="text-base font-semibold text-gray-800">
-              {account.endDate}
+              {formatDate(account.endDate)}
             </p>
           </div>
           <div>
@@ -105,7 +107,7 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
               Hình thức đáo hạn
             </p>
             <p className="text-base font-semibold text-gray-800">
-              {account.maturityOption}
+              {getMaturityOptionLabel(account.maturityOption)}
             </p>
           </div>
           <div>

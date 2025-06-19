@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { formatCurrency } from '@/utils/accountUtils';
+import { formatDate } from '@/utils/saving-account';
 import ExportNotification from '../../common/ExportNotification';
 
 // Import các component con từ file index.js
@@ -996,7 +997,7 @@ const SavingsAccounts = ({ customerId }) => {
                 <div className="mb-3 relative z-10">
                   <div className="flex justify-between text-xs mb-1.5">
                     <span className="text-slate-600">
-                      Ngày đáo hạn: {account.endDate}
+                      Ngày đáo hạn: {formatDate(account.endDate)}
                     </span>
                     <span className="text-indigo-600 font-medium">
                       {account.daysRemaining} ngày nữa
@@ -1023,7 +1024,7 @@ const SavingsAccounts = ({ customerId }) => {
                       className="text-slate-400 group-hover:text-slate-500 transition-colors duration-300"
                     />
                     <span className="group-hover:text-slate-600 transition-colors duration-300">
-                      {account.startDate}
+                      {formatDate(account.startDate)}
                     </span>
                   </div>
                   <button
@@ -1108,7 +1109,7 @@ const SavingsAccounts = ({ customerId }) => {
                               Đáo hạn
                             </p>
                             <p className="text-sm font-medium text-slate-800">
-                              {account.endDate}
+                              {formatDate(account.endDate)}
                             </p>
                           </div>
                         </div>

@@ -1,8 +1,10 @@
 import { AccountStatus, CustomerStatus, Permission } from "./enums";
 
 export interface Role {
-  roleID: string;
+  roleID: number;
   roleName: string;
+  description: string;
+  active: boolean;
   permissions: Permission[];
 }
 
