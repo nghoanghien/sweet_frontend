@@ -1,4 +1,4 @@
-import { AccountStatus, CustomerStatus, Permission } from "./enums";
+import { AccountStatus, CustomerStatus, Permission } from "./enums/enums";
 
 export interface Role {
   roleID: number;

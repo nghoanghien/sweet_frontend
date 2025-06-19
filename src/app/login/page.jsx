@@ -6,7 +6,6 @@ import { Eye, EyeOff, Sparkles, AlertCircle } from 'lucide-react';
 import CustomDatePicker from './CustomDatePicker';
 import SingleSelect from './SingleSelect';
 import LoadingOverlay from '@/components/common/LoadingOverlay';
-
 // Placeholder data for dropdowns
 const provinces = ["Hà Nội", "TP Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ"];
 const districts = {
@@ -62,6 +61,8 @@ export default function LoginRegistrationForm() {
     setTimeout(() => {
       setIsLoading(false);
     }, 4000);
+
+   
 
     setAnimateForm(true);
   }, []);
