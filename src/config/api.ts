@@ -270,7 +270,7 @@ export const callGetAllTaiKhoanThanhToan = () => {
 }
 
 export const callGetTaiKhoanThanhToanByID = (id: number) => {
-    return axios.get<IBackendRes<ITKTTResDTO[]>>('/api/v1/giao-dich/tktt/' + id);
+    return axios.get<IBackendRes<ITKTTResDTO[]>>(`/api/v1/giao-dich/tktt/${id}`);
 }
 
 export const callCreateTaiKhoanThanhToan = (data: ITKTTReqDTO) => {

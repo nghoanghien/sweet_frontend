@@ -8,7 +8,6 @@ const AccountHeader = ({
   hideAllSensitiveInfo, 
   toggleAllSensitiveInfo,
   formatCurrency,
-  onCreateAccountClick
 }) => {
   return (
     <div className="mb-6">

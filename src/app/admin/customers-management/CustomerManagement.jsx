@@ -2011,19 +2011,7 @@ export default function CustomerManagement() {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                       <PaymentAccountsNew
-                        paymentAccounts={paymentAccounts}
-                        transactionHistory={transactionHistory}
-                        hiddenAccountInfo={hiddenAccountInfo}
-                        setHiddenAccountInfo={setHiddenAccountInfo}
-                        formatCurrency={formatCurrency}
-                        maskAccountNumber={maskAccountNumber}
-                        getAccountStatusInfo={getAccountStatusInfo}
-                        toggleAccountVisibility={toggleAccountVisibility}
-                        toggleAccountStatus={toggleAccountStatus}
-                        toggleNewAccountModal={toggleNewAccountModal}
-                        openTransactionDrawer={openTransactionDrawer}
-                        selectedCustomer={selectedCustomer.customerID}
-                        isInModal={true}
+                        customerId={selectedCustomer.customerID}
                       />
                     </motion.div>
                   )}

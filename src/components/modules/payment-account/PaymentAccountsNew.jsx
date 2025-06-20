@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { sampleAccounts } from '../../../data/sampleData';
 import { formatCurrency } from '../../../utils/accountUtils';
 
 // Import các component con từ file index.js
@@ -17,6 +16,7 @@ import EmptyAccountState from "../ui/EmptyAccountState";
 import AccountDetailDrawer from './components/AccountDetailDrawer';
 import SwipeConfirmationModal from '../../modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '../../common/ExportNotification';
+import { usePaymentAccountByCustomerId } from '@/hooks/usePaymentAccount';
 
 // Dữ liệu mẫu cho giao dịch
 const sampleTransactions = [
@@ -58,18 +58,12 @@ const accountColors = [
   "bg-gradient-to-r from-emerald-400 to-green-500"
 ];
 
-// Ẩn số tài khoản
-const maskAccountNumber = (accountNumber) => {
-  if (!accountNumber) return '';
-  const lastFourDigits = accountNumber.slice(-4);
-  return '•••• •••• •••• ' + lastFourDigits;
-};
+
 
 const PaymentAccountsNew = ({ customerId }) => {
   // State cho việc hiển thị/ẩn thông tin nhạy cảm
   const [hideAllSensitiveInfo, setHideAllSensitiveInfo] = useState(true);
   const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   // State cho việc ẩn/hiện thông tin nhạy cảm của từng tài khoản
   const [hiddenAccounts, setHiddenAccounts] = useState({});
@@ -91,6 +85,8 @@ const PaymentAccountsNew = ({ customerId }) => {
   const [notificationType, setNotificationType] = useState('success');
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationFormat, setNotificationFormat] = useState('');
+
+  const { paymentAccounts, isLoading, error } = usePaymentAccountByCustomerId(customerId);
   
   // Khởi tạo trạng thái ẩn cho tất cả tài khoản
   useEffect(() => {
@@ -147,21 +143,25 @@ const PaymentAccountsNew = ({ customerId }) => {
     }
   }, [hideAllSensitiveInfo, accounts]);
 
-  // Giả lập việc lấy dữ liệu từ API dựa trên customerId
+  // Cập nhật accounts từ hook data
   useEffect(() => {
-    const fetchData = async () => {
-      // Trong thực tế, bạn sẽ gọi API ở đây với customerId
-      // Ví dụ: const response = await fetch(`/api/customers/${customerId}/accounts`);
-      
-      // Giả lập độ trễ của mạng
-      setTimeout(() => {
-        setAccounts(sampleAccounts);
-        setIsLoading(false);
-      }, 800);
-    };
-
-    fetchData();
-  }, [customerId]);
+    if (paymentAccounts && paymentAccounts.length > 0) {
+      // Transform data để phù hợp với UI
+      const transformedAccounts = paymentAccounts.map((account, index) => ({
+        id: account.id,
+        accountNumber: account.id.toString(), // accountNumber chính là id
+        type: "Tài khoản chính", // Luôn là "Tài khoản chính"
+        balance: account.balance,
+        status: account.paymentAccountStatus === 'active' ? 'active' : 'locked',
+        openDate: new Date(account.creationDate).toLocaleDateString('vi-VN'),
+        color: accountColors[0], // Luôn dùng màu đầu tiên
+        description: "Tài khoản thanh toán chính"
+      }));
+      setAccounts(transformedAccounts);
+    } else {
+      setAccounts([]);
+    }
+  }, [paymentAccounts]);
 
   // Tính tổng số dư và số tài khoản
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
@@ -253,7 +253,7 @@ const PaymentAccountsNew = ({ customerId }) => {
   };
 
   // Hiển thị khi không có tài khoản nào
-  if (!isLoading && accounts.length === 0) {
+  if (!isLoading && paymentAccounts && paymentAccounts.length === 0) {
     return <EmptyAccountState />;
   }
 
@@ -279,7 +279,6 @@ const PaymentAccountsNew = ({ customerId }) => {
             hideAllSensitiveInfo={hideAllSensitiveInfo}
             toggleAllSensitiveInfo={toggleAllSensitiveInfo}
             formatCurrency={formatCurrency}
-            onCreateAccountClick={() => setIsNewAccountModalOpen(true)}
           />
         )}
       </motion.div>
