@@ -1,5 +1,5 @@
 export interface IDiaChi {
-    diaChiID: string;
+    diaChiID?: string;
     soNha: string;
     tenDuong: string;
     phuongXa: string;
