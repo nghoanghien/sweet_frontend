@@ -1,9 +1,35 @@
+import { IDiaChi } from "./address";
+import { IVaiTro } from "./role";
+import { ITrangThai } from "./status";
+
 export interface INhanVien {
+    nhanVienID: string;
+    hoTen: string;
+    ngaySinh: string;
+    tuoi: number;
+    cccd: string;
+    soDienThoai: string;
+    email: string;
+    diaChiThuongTru: IDiaChi;
+    diaChiLienLac: IDiaChi;
+    ngayTuyenDung: string;
+    matKhau: string;
+    vaiTro: IVaiTro;
+    trangThaiTaiKhoan: ITrangThai
 
 }
 
 export interface INhanVienReqDTO {
-
+    hoTen: string;
+    ngaySinh: string;
+    cccd: string;
+    email: string;
+    soDienThoai: string;
+    diaChiThuongTru: IDiaChi;
+    diaChiLienLac: IDiaChi;
+    matKhau: string;
+    vaiTroId: string;
+    trangThaiTaiKhoanId: string;
 }
 
 export interface INhanVienResDTO {
@@ -14,8 +40,8 @@ export interface INhanVienResDTO {
     email: string;
     cccd: string;
     soDienThoai: string;
-    diaChiThuongTruId: string;
-    diaChiLienLacId: string;
+    diaChiThuongTru: IDiaChi;
+    diaChiLienLac: IDiaChi;
     ngayTuyenDung: string;
     vaiTro: IVaiTroDTO;
     trangThaiTaiKhoan: ITrangThaiDTO
