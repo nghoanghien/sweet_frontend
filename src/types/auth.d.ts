@@ -34,8 +34,8 @@ export interface IUserGetAccountDTO {
     email: string;
     cccd: string;
     soDienThoai: string;
-    diaChiThuongTruId: string;
-    diaChiLienLacId: string;
+    diaChiThuongTru: IDiaChi;
+    diaChiLienLac: IDiaChi;
     vaiTro: IVaiTroDTO;
     trangThaiTaiKhoan: ITrangThaiDTO
 

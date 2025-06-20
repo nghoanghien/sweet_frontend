@@ -25,8 +25,8 @@ export interface IKhachHangReqDTO {
     cccd: string;
     email: string;
     soDienThoai: string;
-    diaChiThuongTruId: string;
-    diaChiLienLacId: string;
+    diaChiThuongTru: IDiaChi;
+    diaChiLienLac: IDiaChi;
     trangThaiKhachHangId?: string;
     matKhau: string;
     vaiTroId?: string;
@@ -42,8 +42,8 @@ export interface IKhachHangResDTO {
     email: string;
     cccd: string;
     soDienThoai: string;
-    diaChiThuongTruId: string;
-    diaChiLienLacId: string;
+    diaChiThuongTru: IDiaChi;
+    diaChiLienLac: IDiaChi;
     ngayDangKy: string;
     trangThaiKhachHang: ITrangThaiDTO;
     vaiTro: IVaiTroDTO;
