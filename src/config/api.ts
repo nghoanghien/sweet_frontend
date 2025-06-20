@@ -4,6 +4,48 @@ import { IBackendRes } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
+import { INhanVienReqDTO, INhanVienResDTO } from '@/types/employee';
+import { IDiaChi } from '@/types/address';
+import { ILoaiTrangThai, ITrangThaiDTO } from '@/types/status';
+import { IThamSo } from '@/types/thamSo';
+import { IQuyenHan } from '@/types/permission';
+import { IVaiTro, IVaiTroDTO } from '@/types/role';
+
+/**
+ * Module nhan vien 
+ */
+//create new nhan vien
+export const callCreateNewNhanVien = (nhanVien: INhanVienReqDTO) =>{
+
+    return axios.post<IBackendRes<INhanVienResDTO>>('/api/v1/nhan-vien', nhanVien);
+}
+
+//get nhan vien by id
+export const callGetNhanVienById = (id: string) =>{
+    return axios.get<IBackendRes<INhanVienResDTO>>(`/api/v1/nhan-vien/${id}`);
+}
+
+//get all nhan vien can filter
+export const callGetAllNhanVien = (filter?: string) =>{
+    const params = new URLSearchParams();
+    if(filter) params.append('filter', filter);
+    return axios.get<IBackendRes<INhanVienResDTO[]>>(`/api/v1/nhan-vien?${params.toString()}`);
+}
+
+//update nhan vien
+export const callUpdateNhanVien = (NhanVien: INhanVienReqDTO, id: string) => {
+    return axios.put<IBackendRes<INhanVienResDTO>>(`/ap1/v1/nhan-vien/${id}`, NhanVien);
+}
+
+//deactivate tai khoan nhan vien
+export const callDeactivateNhanVien = (id: string) => {
+    return axios.put<IBackendRes<void>>(`/api/v1/nhan-vien/${id}/vo-hieu-hoa`);
+} 
+
+//activate nhan vien
+export const callActivateNhanVien = (id: string) => {
+    return axios.put<IBackendRes<void>>(`/api/v1/nhan-vien/${id}/kich-hoat`)
+}
 
 
 /**
@@ -23,6 +65,132 @@ export const callRegister = (data: IRegisterDTO<IKhachHangReqDTO>) =>{
 
 export const callGetAccountInformation = () =>{
     return axios.get<IBackendRes<IUserGetAccountDTO>>('/api/v1/auth/account');
+}
+
+/**
+ * Module dia chi
+ */
+export const createDiaChi = (diaChi: IDiaChi) => {
+    return axios.post<IBackendRes<IDiaChi>>('/api/v1/dia-chi', diaChi);
+}
+
+export const getDiaChiById = (id: string) => {
+    return axios.get<IBackendRes<IDiaChi>>(`/api/v1/dia-chi/${id}`);
+}
+
+export const getAllDiaChi = (filter?: string) =>{
+    const params = new URLSearchParams();
+    if(filter) params.append('filter', filter);
+    return axios.get<IBackendRes<IDiaChi[]>>(`/api/v1/dia-chi?${params.toString()}`);
+}
+
+export const updateDiaChi = (diaChi: IDiaChi, id: string) => {
+    return axios.put<IBackendRes<IDiaChi>>(`/api/v1/dia-chi/${id}`, diaChi);
+}
+/**
+ * Module loai trang thai
+ */
+
+export const createLoaiTrangThai = (loaiTrangThai: ILoaiTrangThai) => {
+    return axios.post<IBackendRes<ILoaiTrangThai>>('/api/v1/loai-trang-thai', loaiTrangThai);
+}
+
+export const getAllLoaiTrangThai = (filter?: string) =>{
+    const params = new URLSearchParams();
+    if(filter) params.append("filter", filter);
+    return axios.get<IBackendRes<ILoaiTrangThai[]>>(`/api/v1/loai-trang-thai?${params.toString()}`);
+}
+
+export const getLoaiTrangThaiById = (id: string) => {
+    return axios.get<IBackendRes<ILoaiTrangThai>>(`/api/v1/loai-trang-thai/${id}`);
+}
+
+export const updateLoaiTrangThai = (loaiTrangThai: ILoaiTrangThai, id: string) =>{
+    return axios.put<IBackendRes<ILoaiTrangThai>>(`/api/v1/loai-trang-thai/${id}`, loaiTrangThai);
+}
+
+export const deleteLoaiTrangThai = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/loai-trang-thai/${id}`);
+}
+
+/**
+ * Module trang thai
+ */
+
+export const createTrangThai = (trangThai: ITrangThaiDTO) => {
+    return axios.post<IBackendRes<ITrangThaiDTO>>('/api/v1/trang-thai', trangThai);
+}
+
+export const getAllTrangThaiByLoaiTrangThaiId = (id: string) =>{
+    return axios.get<IBackendRes<ITrangThaiDTO[]>>(`/api/v1/trang-thai/loai/${id}`);
+}
+
+export const getTrangThaiById = (id: string) =>{
+    return axios.get<IBackendRes<ITrangThaiDTO>>(`/api/v1/trang-thai/${id}`);
+}
+
+export const getAllTrangThai = (filter?: string) =>{
+    const params = new URLSearchParams();
+    if(filter) params.append('filter', filter);
+    return axios.get<IBackendRes<ITrangThaiDTO[]>>(`/api/v1/trang-thai?${params.toString()}`);
+}
+
+export const updateTrangThai = (id: string, trangThai: ITrangThaiDTO) =>{
+    return axios.put<IBackendRes<ITrangThaiDTO>>(`/api/v1/trang-thai/${id}`, trangThai);
+}
+
+export const deleteTrangThai  = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/trang-thai/${id}`);
+}
+
+/**
+ * Module quyen han
+ */
+export const createQuyenHan = (quyenHan: IQuyenHan) => {
+    return axios.post<IBackendRes<IQuyenHan>>('/api/v1/quyen-han', quyenHan);
+}
+
+export const getAllQuyenHan = (filter?: string) =>{
+    const params = new URLSearchParams();
+    if(filter) params.append('filter', filter);
+    return axios.get<IBackendRes<IQuyenHan[]>>(`/api/v1/quyen-han?${params.toString()}`);
+}
+
+export const getQuyenHanById = (id: string) => {
+    return axios.get<IBackendRes<IQuyenHan>>(`/api/v1/quyen-han/${id}`);
+}
+
+export const updateQuyenHan = (id: string, quyenHan: IQuyenHan) => {
+    return axios.put<IBackendRes<IQuyenHan>>(`/api/v1/quyen-han/${id}`, quyenHan);
+}
+
+export const deleteQuyenHan = (id: string) =>{
+    return axios.delete<IBackendRes<void>>(`/api/v1/quyen-han/${id}`);
+}
+
+/**
+ * Module vai tro
+ */
+export const createVaiTro = (vaiTro: IVaiTroDTO) => {
+    return axios.post<IBackendRes<IVaiTro>>('/api/v1/vai-tro', vaiTro);
+}
+
+export const getAllVaiTro = (filter?: string) => {
+    const params = new URLSearchParams();
+    if(filter) params.append('filter', filter);
+    return axios.get<IBackendRes<IVaiTro[]>>(`/api/v1/vai-tro?${params.toString()}`);
+}
+
+export const getVaiTroById = (id: string) => {
+    return axios.get<IBackendRes<IVaiTro>>(`/api/v1/vai-tro/${id}`);
+}
+
+export const updateVaiTro = (id: string, vaiTro: IVaiTroDTO) => {
+    return axios.put<IBackendRes<IVaiTro>>(`/api/v1/vai-tro/${id}`, vaiTro);
+}
+
+export const deleteVaiTro = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/vai-tro/${id}`);
 }
 
 /**
@@ -60,6 +228,31 @@ export const callDeactivateKhachHang = (id: string) => {
 export const callActivateKhachHang = (id: string) => {
     return axios.put<IBackendRes<void>>(`/api/v1/khach-hang/${id}/kich-hoat`)
 }
+/**
+ * Module tham so
+ */
+export const createThamSo = (thamSo: IThamSo) =>{
+    return axios.post<IBackendRes<IThamSo>>('/api/v1/tham-so', thamSo);
+}
+
+export const getAllThamSo = (filter?: string) => {
+    const params = new URLSearchParams();
+    if(filter) params.append('filter', filter);
+    return axios.get<IBackendRes<IThamSo[]>>(`/api/v1/tham-so?${params.toString()}`);
+}
+
+export const getThamSoById = (id: string) => {
+    return axios.get<IBackendRes<IThamSo>>(`/api/v1/tham-so/${id}`);
+}
+
+export const updateThamSo = (id: string, thamSo: IThamSo) =>{
+    return axios.put<IBackendRes<IThamSo>>(`/api/v1/tham-so/${id}`, thamSo);
+} 
+
+/**
+ * 
+ * Module giao dich
+ */
 export const callGetAllGiaoDich = () => {
     return axios.get<IBackendRes<IGiaoDichResDTO[]>>('/api/v1/giao-dich');
 }
