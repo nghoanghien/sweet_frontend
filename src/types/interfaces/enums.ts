@@ -14,6 +14,11 @@ export enum SavingAccountStatus {
   IN_TERM = 'inTerm',
 }
 
+export enum paymentAccountStatus {
+  ACTIVE = 'active',
+  DISABLED = 'disabled',
+}
+
 // Enums for permission
 export enum Permission {
   PAYMENT_ACCOUNT = 'manage_payment_account',
