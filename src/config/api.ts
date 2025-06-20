@@ -1,6 +1,6 @@
 import { IRegisterDTO, IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/types/auth';
 import axios from './axios-customize';
-import { IBackendRes } from '@/types/backend.d';
+import { IBackendRes, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
@@ -191,6 +191,14 @@ export const updateVaiTro = (id: string, vaiTro: IVaiTroDTO) => {
 
 export const deleteVaiTro = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/vai-tro/${id}`);
+}
+
+export const capQuyenModuleToVaiTro = (id: string, moduleDTO: IModuleDTO) => {
+    return axios.put<IBackendRes<IVaiTro>>(`/api/v1/vai-tro/${id}/cap-quyen-module`, moduleDTO);
+}
+
+export const xoaQuyenModuleFromVaiTro = (id: string, moduleDTO: IModuleDTO) => {
+    return axios.put<IBackendRes<IVaiTro>>(`/api/v1/vai-tro/${id}/xoa-quyen-module`, moduleDTO);
 }
 
 /**
