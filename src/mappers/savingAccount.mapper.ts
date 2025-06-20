@@ -1,4 +1,4 @@
-import { SavingAccount } from "@/types/savingAccount";
+import { SavingAccount } from "@/types/interfaces/savingAccount";
 import { getDepositTypeByCode, getInterestFrequencyByCode, getMaturityOptionByCode, getSavingAccountStatusByCode } from "@/utils/regulation-interest";
 import { calculateDaysBetween, calculateDaysFromNow } from "@/utils/saving-account";
 import { mapApiToUser } from "./user.mapper";

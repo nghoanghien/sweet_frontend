@@ -20,7 +20,6 @@ export const useAllSavingAccounts = () => {
         setIsLoading(false);
       }
     }
-    console.log('lay xong du lieu r ne');
 
     fetchData();
   }, []); // Thêm dependency array rỗng để chỉ chạy 1 lần khi component mount

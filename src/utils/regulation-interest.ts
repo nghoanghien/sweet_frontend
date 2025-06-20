@@ -1,4 +1,4 @@
-import { InterestFrequency, InterestFrequencyInfo, DepositType, DepositTypeInfo, MaturityOption, MaturityOptionInfo, SavingAccountStatus } from "@/types/enums";
+import { InterestFrequency, InterestFrequencyInfo, DepositType, DepositTypeInfo, MaturityOption, MaturityOptionInfo, SavingAccountStatus } from "@/types/interfaces/enums";
 
 export function getInterestFrequencyLabel(freq: InterestFrequency): string {
   return InterestFrequencyInfo[freq]?.label ?? 'Không rõ';

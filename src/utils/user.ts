@@ -1,21 +1,21 @@
-import { AccountStatus, CustomerStatus } from "@/types/enums";
+import { AccountStatus, CustomerStatus } from "@/types/interfaces/enums";
 
-export function getAccountStatusByCode(code: number): AccountStatus {
+export function getAccountStatusByCode(code: string): AccountStatus {
   switch (code) {
-    case 1:
+    case 'active':
       return AccountStatus.ACTIVE;
-    case 2:
+    case 'locked':
       return AccountStatus.DISABLED;
     default:
       return AccountStatus.ACTIVE;
   }
 }
 
-export function getCustomerStatusByCode(code: number): CustomerStatus {
+export function getCustomerStatusByCode(code: string): CustomerStatus {
   switch (code) {
-    case 1:
+    case 'active':
       return CustomerStatus.ACTIVE;
-    case 2:
+    case 'locked':
       return CustomerStatus.DISABLED;
     default:
       return CustomerStatus.ACTIVE;
