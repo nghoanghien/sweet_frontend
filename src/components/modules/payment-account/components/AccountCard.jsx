@@ -1,25 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, Lock as LockIcon, Unlock as UnlockIcon, Calendar, ChevronRight, CreditCard } from 'lucide-react';
+import React, { useRef } from 'react';
+import { Eye, EyeOff, Lock as LockIcon, Unlock as UnlockIcon, Calendar, CreditCard } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getStatusInfo, maskAccountNumber, formatCurrency } from '@/utils/accountUtils';
+import { maskAccountNumber, formatCurrency } from '@/utils/accountUtils';
 
-const AccountCard = ({ account, isHidden, onToggleHide, onLockToggle, onViewDetail }) => {
-  const [isLocked, setIsLocked] = useState(account.status === 'locked' || account.status === 'permanent_locked');
-  const [isHovered, setIsHovered] = useState(false);
+const AccountCard = ({ account, isHidden, onToggleHide, onViewDetail }) => {
   const cardRef = useRef(null);
-
-  const statusInfo = getStatusInfo(account.status);
-  
-  // Cập nhật trạng thái khóa khi account.status thay đổi
-  useEffect(() => {
-    setIsLocked(account.status === 'locked' || account.status === 'permanent_locked');
-  }, [account.status]);
-  
-  const handleLockToggle = () => {
-    if (account.status === 'permanent_locked') return;
-    const newLockedState = !isLocked;
-    onLockToggle(account.id, newLockedState);
-  };
 
   return (
     <AnimatePresence mode='wait'>

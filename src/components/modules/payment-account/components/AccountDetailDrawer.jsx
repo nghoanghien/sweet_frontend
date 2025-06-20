@@ -87,7 +87,6 @@ const AccountDetailDrawer = ({
   onClose, 
   account,
   onToggleHide,
-  onLockToggle,
   onUpdateAccount,
   isDataHidden // Nhận trạng thái ẩn/hiện từ component cha
 }) => {
@@ -574,30 +573,6 @@ const AccountDetailDrawer = ({
                     variant='indigo'
                   />
                 </div>
-                {/* <div className="flex border-b border-gray-200 sm:hidden">
-                  <button
-                    onClick={() => handleTabChange("history")}
-                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center ${
-                      activeTab === "history"
-                        ? "text-indigo-600 border-b-2 border-indigo-600"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    <History size={14} className="mr-2" />
-                    Lịch sử giao dịch
-                  </button>
-                  <button
-                    onClick={() => handleTabChange("details")}
-                    className={`flex-1 py-3 text-sm font-medium flex items-center justify-center ${
-                      activeTab === "details"
-                        ? "text-indigo-600 border-b-2 border-indigo-600"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
-                  >
-                    <DollarSign size={14} className="mr-2" />
-                    Chi tiết tài khoản
-                  </button>
-                </div> */}
 
                 {/* Desktop navigation - Only visible on larger screens */}
               </>

@@ -28,6 +28,7 @@ import NewSavingsAccountModal from '../create-new-saving-account/NewSavingsAccou
 import { SavingsAccountDetailDrawer } from './components';
 import SwipeConfirmationModal from '../../modals/ConfirmationModal/SwipeConfirmationModal';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSavingAccountsByCustomerId } from '@/hooks/useSavingAccounts';
 
 // Dữ liệu mẫu cho tài khoản tiết kiệm
 const sampleSavingsAccounts = [
@@ -52,7 +53,6 @@ const sampleSavingsAccounts = [
     color: "bg-gradient-to-r from-blue-400 to-indigo-500",
     iconColor: 'text-blue-600',
     status: "active",
-    tooltip: "Lãi suất ưu đãi +0.3%"
   },
   {
     id: 2,
@@ -97,7 +97,6 @@ const sampleSavingsAccounts = [
     color: "bg-gradient-to-r from-green-400 to-teal-500",
     iconColor: 'text-green-600',
     status: "active",
-    tooltip: "VIP - Miễn phí rút tiền trước hạn"
   }
 ];
 
@@ -299,7 +298,6 @@ const SavingsAccounts = ({ customerId }) => {
   // State cho việc hiển thị/ẩn thông tin nhạy cảm
   const [hideAllSensitiveInfo, setHideAllSensitiveInfo] = useState(true);
   const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   // State cho việc ẩn/hiện thông tin nhạy cảm của từng tài khoản
   const [hiddenAccounts, setHiddenAccounts] = useState({});
@@ -325,28 +323,31 @@ const SavingsAccounts = ({ customerId }) => {
   const [accountTransactions, setAccountTransactions] = useState({});
   const [accountInterestHistory, setAccountInterestHistory] = useState({});
   const [accountWithdrawalHistory, setAccountWithdrawalHistory] = useState({});
+
+  // Hook lấy dữ liệu từ db
+  const { savingAccounts, isLoading, error } = useSavingAccountsByCustomerId(customerId);
   
   // Khởi tạo trạng thái ẩn cho tất cả tài khoản
   useEffect(() => {
-    if (accounts.length > 0) {
-      const initialHiddenState = accounts.reduce((acc, account) => {
+    if (savingAccounts.length > 0) {
+      const initialHiddenState = savingAccounts.reduce((acc, account) => {
         acc[account.id] = hideAllSensitiveInfo;
         return acc;
       }, {});
       setHiddenAccounts(initialHiddenState);
     }
-  }, [accounts, hideAllSensitiveInfo]);
+  }, [savingAccounts, hideAllSensitiveInfo]);
 
   // Thêm event listeners cho việc rút tiền
   useEffect(() => {
-    console.log('useEffect cho event listeners được gọi lại, accounts:', accounts);
+    console.log('useEffect cho event listeners được gọi lại, accounts:', savingAccounts);
     // Xử lý sự kiện rút toàn bộ tiền
     const handleFullWithdrawal = (event) => {
       console.log('Sự kiện rút toàn bộ tiền được kích hoạt:', event.detail);
       const { accountId } = event.detail;
       
       // Tìm tài khoản để cập nhật và hiển thị thông báo
-      const accountToUpdate = accounts.find(account => account.id === accountId);
+      const accountToUpdate = savingAccounts.find(account => account.id === accountId);
       console.log('Tài khoản cần cập nhật:', accountToUpdate);
       
       // Cập nhật tài khoản thành trạng thái đóng và remainingAmount = 0
@@ -420,7 +421,7 @@ const SavingsAccounts = ({ customerId }) => {
       delete window.removeAccount;
       delete window.updateAccount;
     };
-  }, [accounts]); // Thêm accounts vào dependency array để cập nhật event handlers khi accounts thay đổi
+  }, [savingAccounts]); // Thêm accounts vào dependency array để cập nhật event handlers khi accounts thay đổi
   
   // Toggle ẩn/hiện thông tin nhạy cảm cho một tài khoản cụ thể
   const toggleHideAccountInfo = (accountId) => {
@@ -434,13 +435,8 @@ const SavingsAccounts = ({ customerId }) => {
   const openSavingsDetailDrawer = (accountId) => {
     
 
-    const account = accounts.find(acc => acc.id === accountId);
+    const account = savingAccounts.find(acc => acc.id === accountId);
     if (!account) return;
-    
-    // Lấy lịch sử giao dịch, lãi và rút tiền cho tài khoản này
-    const accountTxns = accountTransactions[accountId] || sampleSavingsTransactions[accountId] || [];
-    const accountInterest = accountInterestHistory[accountId] || sampleInterestHistory[accountId] || [];
-    const accountWithdrawals = accountWithdrawalHistory[accountId] || sampleWithdrawalHistory[accountId] || [];
     
     setSelectedAccount(account);
     setIsDetailDrawerOpen(true);
@@ -452,24 +448,13 @@ const SavingsAccounts = ({ customerId }) => {
   
   // Giả lập việc lấy dữ liệu từ API dựa trên customerId
   useEffect(() => {
-    const fetchData = async () => {
-      // Trong thực tế, bạn sẽ gọi API ở đây với customerId
-      // Ví dụ: const response = await fetch(`/api/customers/${customerId}/savings-accounts`);
-      
-      // Giả lập độ trễ của mạng
-      setTimeout(() => {
-        setAccounts(sampleSavingsAccounts);
-        setIsLoading(false);
-      }, 800);
-    };
 
-    fetchData();
   }, [customerId]);
 
   // Tính tổng số dư và số tài khoản
-  const totalDeposit = accounts.reduce((sum, account) => sum + account.amount, 0);
-  const totalInterest = accounts.reduce((sum, account) => sum + (account.totalReceivable - account.amount), 0);
-  const activeAccountsCount = accounts.length;
+  const totalDeposit = savingAccounts.reduce((sum, account) => sum + account.remainingAmount, 0);
+  const totalInterest = savingAccounts.reduce((sum, account) => sum + (account.totalReceivable - account.remainingAmount), 0);
+  const activeAccountsCount = savingAccounts.length;
 
   // Toggle ẩn/hiện tất cả thông tin nhạy cảm
   const toggleAllSensitiveInfo = () => {
@@ -479,18 +464,18 @@ const SavingsAccounts = ({ customerId }) => {
   // Lọc tài khoản dựa trên từ khóa tìm kiếm
   useEffect(() => {
     if (searchQuery.trim() === '') {
-      setFilteredAccounts(accounts);
+      setFilteredAccounts(savingAccounts);
     } else {
       const query = searchQuery.toLowerCase();
-      const filtered = accounts.filter(account => 
+      const filtered = savingAccounts.filter(account => 
         account.nickname.toLowerCase().includes(query) || 
-        account.depositNumber.toLowerCase().includes(query) || 
+        account.id.toLowerCase().includes(query) || 
         account.term.toLowerCase().includes(query) ||
         account.depositType.toLowerCase().includes(query)
       );
       setFilteredAccounts(filtered);
     }
-  }, [searchQuery, accounts]);
+  }, [searchQuery, savingAccounts]);
   
   // Chuẩn bị tài khoản mới và hiển thị modal xác nhận
   const prepareNewAccount = (formData, calculatedInterest) => {
@@ -573,7 +558,7 @@ const SavingsAccounts = ({ customerId }) => {
     const newAccount = {
       id: `acc_${Date.now()}`,
       nickname: formData.nickname,
-      depositNumber: `TK${Date.now().toString().slice(-8)}`,
+      id: `TK${Date.now().toString().slice(-8)}`,
       term: termDisplay,
       termDays: termDays,
       amount: amount,
@@ -634,7 +619,7 @@ const SavingsAccounts = ({ customerId }) => {
   };
 
   // Hiển thị khi không có tài khoản nào và không đang loading
-  if (!isLoading && accounts.length === 0) {
+  if (!isLoading && savingAccounts.length === 0) {
     return <EmptyAccountState />;
   }
 
@@ -917,7 +902,7 @@ const SavingsAccounts = ({ customerId }) => {
               className="bg-white backdrop-blur-md rounded-3xl shadow-md hover:shadow-lg overflow-hidden account-card group"
             >
               <div
-                className={`p-5 ${account.color} relative overflow-hidden group-hover:shadow-lg`}
+                className={`p-5 bg-gradient-to-r from-blue-400 to-indigo-500 relative overflow-hidden group-hover:shadow-lg`}
               >
                 {/* Hiệu ứng hover */}
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -933,7 +918,7 @@ const SavingsAccounts = ({ customerId }) => {
                         {account.nickname}
                       </h3>
                       <p className="text-xs text-white/80 font-mono tracking-wide group-hover:text-white">
-                        {account.depositNumber}
+                        {account.id}
                       </p>
                     </div>
                   </div>
@@ -973,7 +958,7 @@ const SavingsAccounts = ({ customerId }) => {
                       Kỳ hạn
                     </p>
                     <p className="text-sm font-medium text-slate-800">
-                      {account.term}
+                      {`${account.term} tháng`}
                     </p>
                   </div>
 
@@ -1005,7 +990,7 @@ const SavingsAccounts = ({ customerId }) => {
                   </div>
                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full ${account.color}`}
+                      className={`h-full rounded-full bg-gradient-to-r from-blue-400 to-indigo-500`}
                       style={{
                         width: `${calculateTermProgress(
                           account.daysRemaining,
@@ -1029,7 +1014,7 @@ const SavingsAccounts = ({ customerId }) => {
                   </div>
                   <button
                     onClick={() => openSavingsDetailDrawer(account.id)}
-                    className={`${account.color} text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300 transform group-hover:scale-105 hover:translate-y-[-2px]`}
+                    className={`bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-medium px-4 py-1.5 rounded-full hover:shadow-md transition-all duration-300 transform group-hover:scale-105 hover:translate-y-[-2px]`}
                   >
                     Chi tiết
                   </button>
@@ -1061,7 +1046,7 @@ const SavingsAccounts = ({ customerId }) => {
                   <div className="flex flex-col sm:flex-row sm:items-center">
                     {/* Left colored section */}
                     <div
-                      className={`${account.color} p-4 sm:w-64 flex items-center space-x-3 relative overflow-hidden`}
+                      className={`bg-gradient-to-r from-blue-400 to-indigo-500 p-4 sm:w-64 flex items-center space-x-3 relative overflow-hidden`}
                     >
                       {/* Shimmer effect */}
                       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 animate-shimmer"></div>
@@ -1074,7 +1059,7 @@ const SavingsAccounts = ({ customerId }) => {
                           {account.nickname}
                         </h3>
                         <p className="text-xs text-white/80 font-mono tracking-wide">
-                          {account.depositNumber}
+                          {account.id}
                         </p>
                       </div>
                     </div>
@@ -1089,7 +1074,7 @@ const SavingsAccounts = ({ customerId }) => {
                               Kỳ hạn
                             </p>
                             <p className="text-sm font-medium text-slate-800">
-                              {account.term}
+                              {`${account.term} tháng`}
                             </p>
                           </div>
                           <div>
@@ -1100,7 +1085,7 @@ const SavingsAccounts = ({ customerId }) => {
                               {hiddenAccounts[account.id] ? (
                                 <span className="text-slate-400">••••••••</span>
                               ) : (
-                                formatCurrency(account.amount)
+                                formatCurrency(account.remainingAmount)
                               )}
                             </p>
                           </div>
@@ -1131,7 +1116,7 @@ const SavingsAccounts = ({ customerId }) => {
                           </button>
                           <button
                             onClick={() => openSavingsDetailDrawer(account.id)}
-                            className={`${account.color} text-white text-xs font-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300`}
+                            className={`bg-gradient-to-r from-blue-400 to-indigo-500 text-white text-xs font-medium px-4 py-2 rounded-full hover:shadow-md transition-all duration-300`}
                           >
                             Chi tiết
                           </button>
@@ -1190,7 +1175,7 @@ const SavingsAccounts = ({ customerId }) => {
         confirmDetails={
           newAccountData
             ? {
-                "Số tiền gửi": formatCurrency(newAccountData.amount),
+                "Số tiền gửi": formatCurrency(newAccountData.remainingAmount),
                 "Kỳ hạn": newAccountData.term,
                 "Lãi suất": `${newAccountData.interestRate}%/năm`,
                 "Tổng tiền nhận dự kiến": formatCurrency(

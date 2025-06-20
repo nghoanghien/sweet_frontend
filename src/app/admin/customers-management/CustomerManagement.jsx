@@ -110,104 +110,6 @@ export default function CustomerManagement() {
 
   const { allCustomers, isLoading, error, refreshCustomers } = useAllCustomers();
 
-  // State for payment accounts
-  const [paymentAccounts, setPaymentAccounts] = useState({
-    1: [
-      {
-        id: 1,
-        accountNumber: "1234567890123456",
-        status: "active",
-        balance: 15000000,
-        creationDate: "20/04/2022",
-        color: "bg-gradient-to-r from-blue-400 to-indigo-500",
-        nickname: "Tài khoản chính"
-      },
-      {
-        id: 2,
-        accountNumber: "9876543210987654",
-        status: "active",
-        balance: 7500000,
-        creationDate: "15/06/2022",
-        color: "bg-gradient-to-r from-pink-400 to-purple-500",
-        nickname: "Tài khoản phụ"
-      }
-    ],
-    2: [
-      {
-        id: 3,
-        accountNumber: "5678901234567890",
-        status: "active",
-        balance: 12000000,
-        creationDate: "05/08/2022",
-        color: "bg-gradient-to-r from-green-400 to-teal-500",
-        nickname: "Tài khoản tiêu dùng"
-      }
-    ],
-    3: [
-      {
-        id: 4,
-        accountNumber: "6543210987654321",
-        status: "locked",
-        balance: 2300000,
-        creationDate: "10/12/2022",
-        color: "bg-gradient-to-r from-orange-400 to-amber-500",
-        nickname: "Tài khoản tiết kiệm"
-      }
-    ],
-    4: [],
-    5: []
-  });
-
-  // State for transaction history
-  const [transactionHistory, setTransactionHistory] = useState({
-    1: [
-      {
-        id: 1,
-        time: "15:30 - 12/05/2023",
-        type: "Nhận tiền chuyển khoản",
-        channel: "Internet Banking",
-        amount: 5000000,
-        balanceAfter: 20000000,
-        content: "Chuyển tiền thanh toán dự án website",
-        isIncoming: true
-      },
-      {
-        id: 2,
-        time: "09:15 - 10/05/2023",
-        type: "Chuyển tiền",
-        channel: "ATM",
-        amount: 1500000,
-        balanceAfter: 15000000,
-        content: "Chuyển tiền học phí",
-        isIncoming: false
-      }
-    ],
-    2: [
-      {
-        id: 1,
-        time: "14:45 - 05/05/2023",
-        type: "Thanh toán hóa đơn",
-        channel: "Mobile Banking",
-        amount: 850000,
-        balanceAfter: 6650000,
-        content: "Thanh toán hóa đơn điện tháng 5",
-        isIncoming: false
-      },
-      {
-        id: 2,
-        time: "08:30 - 01/05/2023",
-        type: "Nhận lương",
-        channel: "Chuyển khoản liên ngân hàng",
-        amount: 7500000,
-        balanceAfter: 7500000,
-        content: "Lương tháng 4/2023",
-        isIncoming: true
-      }
-    ],
-    3: [],
-    4: []
-  });
-
   // State for savings accounts
   const [savingsAccounts, setSavingsAccounts] = useState({
     1: [
@@ -1144,113 +1046,8 @@ export default function CustomerManagement() {
     }));
   };
 
-  // Function to toggle account status (active/locked)
-  const toggleAccountStatus = (accountId) => {
-    const customerId = Object.entries(paymentAccounts).find(([_, accounts]) => 
-      accounts.some(account => account.id === accountId)
-    )?.[0];
-    
-    if (customerId) {
-      const account = paymentAccounts[customerId].find(acc => acc.id === accountId);
-      if (!account || account.status === "permanent_locked") return;
-      
-      const newStatus = account.status === "active" ? "locked" : "active";
-      const actionText = newStatus === "active" ? "mở khóa" : "khóa";
-      const customer = allCustomers.find(c => c.customerID === parseInt(customerId));
-      
-      openConfirmationModal({
-        title: `Xác nhận ${actionText} tài khoản`,
-        message: `Bạn có chắc chắn muốn ${actionText} tài khoản ${maskAccountNumber(account.accountNumber)} của khách hàng "${customer?.fullName || 'Không xác định'}" không?`,
-        confirmText: `Quẹt để ${actionText}`,
-        confirmDetails: {
-          'Số tài khoản': maskAccountNumber(account.accountNumber),
-          'Chủ tài khoản': customer?.fullName || 'Không xác định',
-          'Trạng thái hiện tại': account.status === "active" ? "Hoạt động" : "Đã khóa",
-          'Trạng thái mới': newStatus === "active" ? "Hoạt động" : "Đã khóa",
-        },
-        type: `${account.status === "active" ? 'warning' : 'unlock'}`,
-        onConfirm: () => {
-          setPaymentAccounts(prev => ({
-            ...prev,
-            [customerId]: prev[customerId].map(acc => {
-              if (acc.id === accountId) {
-                return {
-                  ...acc,
-                  status: newStatus
-                };
-              }
-              return acc;
-            })
-          }));
-          
-          // Hiển thị thông báo thành công
-          setExportNotification({
-            visible: true,
-            type: 'success',
-            message: `${newStatus === 'active' ? 'Mở khóa' : 'Khóa'} tài khoản thành công!`,
-            format: `${newStatus === 'active' ? 'Mở khóa' : 'Khóa'} tài khoản thành công!`
-          });
-          
-          // Tự động ẩn thông báo sau 5 giây
-          setTimeout(() => {
-            setExportNotification(prev => ({...prev, visible: false}));
-          }, 5000);
-          
-          // Close menu if open
-          setAccountActionMenuOpen(null);
-        }
-      });
-    }
-  };
-
-  // Function to toggle new account modal
-  const toggleNewAccountModal = () => {
-    if (!newAccountModalOpen && !newAccountModalAnimating) {
-      setNewAccountModalAnimating(true);
-      setNewAccountModalOpen(true);
-      setTimeout(() => {
-        setNewAccountModalAnimating(false);
-      }, 300);
-    } else if (newAccountModalOpen && !newAccountModalAnimating) {
-      setNewAccountModalAnimating(true);
-      const modalOverlay = document.getElementById('newAccountModalOverlay');
-      const modalContent = document.getElementById('newAccountModalContent');
-      if (modalOverlay && modalContent) {
-        modalOverlay.classList.remove('modal-enter');
-        modalContent.classList.remove('modal-enter-content');
-        modalOverlay.classList.add('modal-exit');
-        modalContent.classList.add('modal-exit-content');
-        setTimeout(() => {
-          setNewAccountModalOpen(false);
-          setNewAccountModalAnimating(false);
-        }, 300);
-      } else {
-        setNewAccountModalOpen(false);
-        setNewAccountModalAnimating(false);
-      }
-    }
-  };
-
-  // Function to open transaction drawer
-  const openTransactionDrawer = (accountId) => {
-    const customerId = Object.entries(paymentAccounts).find(([_, accounts]) => 
-      accounts.some(account => account.id === accountId)
-    )?.[0];
-    
-    if (customerId) {
-      setSelectedAccountId(parseInt(customerId));
-      const accountDetail = paymentAccounts[customerId].find(acc => acc.id === accountId);
-      setSelectedCardDetail(accountDetail);
-      setDrawerVisible(true);
-      setTimeout(() => {
-        setCardDetailVisible(true);
-      }, 100);
-    }
-  };
-
   // Add state for export data modal
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [exportSuccess, setExportSuccess] = useState(false);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [exportNotification, setExportNotification] = useState({
     visible: false,
@@ -2025,13 +1822,7 @@ export default function CustomerManagement() {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                       <SavingsAccounts
-                        savingsAccounts={savingsAccounts}
-                        savingsTransactionHistory={savingsTransactionHistory}
-                        formatCurrency={formatCurrency}
-                        calculateTermProgress={calculateTermProgress}
-                        openSavingsDetail={openSavingsDetail}
-                        selectedCustomer={selectedCustomer}
-                        isInModal={true}
+                        customerId={selectedCustomer.customerID}
                       />
                     </motion.div>
                   )}

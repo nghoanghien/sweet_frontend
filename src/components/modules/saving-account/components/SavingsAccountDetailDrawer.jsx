@@ -674,7 +674,7 @@ const SavingsAccountDetailDrawer = ({
                       <div className="text-right">
                         <p className="text-white/80 text-sm">Lãi suất</p>
                         <p className="text-xl font-semibold text-white mt-1">
-                          {account.interestRate}%/năm
+                          {account.interestRate * 100}%/năm
                         </p>
                       </div>
                     </div>

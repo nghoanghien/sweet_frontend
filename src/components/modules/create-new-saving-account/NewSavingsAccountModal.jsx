@@ -191,7 +191,6 @@ const interestRateData = {
   // Reset form khi đóng modal
   useEffect(() => {
     setTimeout(() => {
-      console.log("loadingStates: ", loadingStates);
       if (isOpen) {
         setLoadingStates({
           depositType: false,
@@ -255,11 +254,6 @@ const interestRateData = {
       }, 800);
     }
   }, [formData.sourceAccount, isOpen, step]);
-
-  useEffect(() => {
-    console.log('isOpen: ', isOpen);
-    console.log('sloadingStates: ', loadingStates);
-  }, [isOpen]);
 
   // Cập nhật lãi suất dựa trên kỳ hạn và loại tiền gửi
   useEffect(() => {

@@ -14,37 +14,8 @@ import EmptyAccountState from "../ui/EmptyAccountState";
 
 // Import các modal và drawer
 import AccountDetailDrawer from './components/AccountDetailDrawer';
-import SwipeConfirmationModal from '../../modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '../../common/ExportNotification';
 import { usePaymentAccountByCustomerId } from '@/hooks/usePaymentAccount';
-
-// Dữ liệu mẫu cho giao dịch
-const sampleTransactions = [
-  {
-    id: 1,
-    type: 'Deposit',
-    account: '1234 5678 9012 3456',
-    date: 'Hôm nay, 10:45 AM',
-    amount: 5000000,
-    status: 'Completed',
-  },
-  {
-    id: 2,
-    type: 'Withdrawal',
-    account: '2345 6789 0123 4567',
-    date: 'Hôm qua, 12:30 PM',
-    amount: 2000000,
-    status: 'Completed',
-  },
-  {
-    id: 3,
-    type: 'Transfer',
-    account: '3456 7890 1234 5678',
-    date: '25/10/2023',
-    amount: 15000000,
-    status: 'Completed',
-  },
-];
 
 // Mảng màu gradient cho tài khoản
 const accountColors = [
@@ -57,8 +28,6 @@ const accountColors = [
   "bg-gradient-to-r from-violet-400 to-purple-500",
   "bg-gradient-to-r from-emerald-400 to-green-500"
 ];
-
-
 
 const PaymentAccountsNew = ({ customerId }) => {
   // State cho việc hiển thị/ẩn thông tin nhạy cảm
@@ -73,7 +42,6 @@ const PaymentAccountsNew = ({ customerId }) => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   
   // State cho modal và drawer
-  const [isNewAccountModalOpen, setIsNewAccountModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
   const [isLockConfirmModalOpen, setIsLockConfirmModalOpen] = useState(false);
@@ -110,15 +78,6 @@ const PaymentAccountsNew = ({ customerId }) => {
   // Hàm toggle hiển thị/ẩn thông tin tài khoản (cho phù hợp với thiết kế mới)
   const toggleAccountVisibility = (accountId) => {
     toggleHideAccountInfo(accountId);
-  };
-  
-  // Hàm toggle trạng thái khóa/mở khóa tài khoản (cho phù hợp với thiết kế mới)
-  const toggleAccountStatus = (accountId) => {
-    const account = accounts.find(acc => acc.id === accountId);
-    if (!account || account.status === 'permanent_locked') return;
-    
-    const isLocking = account.status === 'active';
-    handleLockToggle(accountId, isLocking);
   };
   
   // Hàm mở drawer chi tiết giao dịch tài khoản
@@ -165,7 +124,6 @@ const PaymentAccountsNew = ({ customerId }) => {
 
   // Tính tổng số dư và số tài khoản
   const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
-  const activeAccountsCount = accounts.filter(account => account.status === 'active').length;
 
   // Toggle ẩn/hiện tất cả thông tin nhạy cảm
   const toggleAllSensitiveInfo = () => {
@@ -186,71 +144,6 @@ const PaymentAccountsNew = ({ customerId }) => {
       setFilteredAccounts(filtered);
     }
   }, [searchQuery, accounts]);
-
-  // Xử lý khóa/mở khóa tài khoản
-  const handleLockToggle = (accountId, isLocked) => {
-    // Hiển thị modal xác nhận trước khi thực hiện hành động
-    setLockConfirmData({ accountId, isLocking: isLocked });
-    setIsLockConfirmModalOpen(true);
-  };
-
-  // Xử lý xác nhận khóa/mở khóa
-  const confirmLockToggle = () => {
-    try {
-      const { accountId, isLocking } = lockConfirmData;
-      console.log(`${isLocking ? 'Khóa' : 'Mở khóa'} tài khoản ${accountId}`);
-      
-      // Set processing state
-      setIsProcessing(true);
-      
-      // Tìm thông tin tài khoản để hiển thị trong thông báo
-      const account = accounts.find(acc => acc.id === accountId);
-      
-      // Xử lý sau một khoảng thời gian ngắn để hiển thị trạng thái đang xử lý
-      setTimeout(() => {
-        // Cập nhật trạng thái tài khoản trong state
-        setAccounts(prevAccounts => 
-          prevAccounts.map(account => 
-            account.id === accountId 
-              ? { ...account, status: isLocking ? 'locked' : 'active' } 
-              : account
-          )
-        );
-        
-        // Hiển thị thông báo thành công
-        setNotificationType('success');
-        setNotificationMessage(`
-          ${isLocking ? 'Khóa' : 'Mở khóa'} tài khoản thành công`
-        );
-        setNotificationFormat(`
-          ${isLocking ? 'Khóa' : 'Mở khóa'} tài khoản ${account ? account.accountNumber : ''} thành công`
-        );
-        setShowNotification(true);
-        
-        // Đóng modal và reset trạng thái xử lý
-        setIsLockConfirmModalOpen(false);
-        setIsProcessing(false);
-        
-        // Trong thực tế, bạn sẽ gọi API để cập nhật trạng thái khóa của tài khoản
-        // Ví dụ: await fetch(`/api/accounts/${accountId}/toggle-lock`, { method: 'POST', body: JSON.stringify({ locked: isLocking }) });
-      }, 2000);
-    } catch (error) {
-      // Hiển thị thông báo lỗi nếu có lỗi xảy ra
-      setNotificationType('error');
-      setNotificationMessage(`Có lỗi xảy ra khi ${lockConfirmData.isLocking ? 'khóa' : 'mở khóa'} tài khoản. Vui lòng thử lại sau.`);
-      setNotificationFormat(`Có lỗi xảy ra khi ${lockConfirmData.isLocking ? 'khóa' : 'mở khóa'} tài khoản. Vui lòng thử lại sau.`);
-      setShowNotification(true);
-      
-      // Reset trạng thái xử lý
-      setIsProcessing(false);
-    }
-  };
-  
-  // Xử lý xem chi tiết tài khoản
-  const handleViewAccountDetail = (account) => {
-    setSelectedAccount(account);
-    setIsDetailDrawerOpen(true);
-  };
 
   // Hiển thị khi không có tài khoản nào
   if (!isLoading && paymentAccounts && paymentAccounts.length === 0) {
@@ -312,7 +205,6 @@ const PaymentAccountsNew = ({ customerId }) => {
                   account={account}
                   isHidden={hiddenAccounts[account.id]}
                   onToggleHide={toggleAccountVisibility}
-                  onLockToggle={toggleAccountStatus}
                   onViewDetail={() => openTransactionDrawer(account.id)}
                 />
               </motion.div>
@@ -327,7 +219,6 @@ const PaymentAccountsNew = ({ customerId }) => {
         onClose={() => setIsDetailDrawerOpen(false)}
         account={selectedAccount}
         onToggleHide={toggleAccountVisibility}
-        onLockToggle={toggleAccountStatus}
         onUpdateAccount={(updatedAccount) => {
           // Update the account in the accounts array
           setAccounts(prevAccounts => 
@@ -336,20 +227,6 @@ const PaymentAccountsNew = ({ customerId }) => {
             )
           );
         }}
-      />
-      
-      {/* Modal xác nhận khóa/mở khóa */}
-      <SwipeConfirmationModal
-        isOpen={isLockConfirmModalOpen}
-        onClose={() => setIsLockConfirmModalOpen(false)}
-        onConfirm={confirmLockToggle}
-        title={lockConfirmData.isLocking ? 'Xác nhận khóa tài khoản' : 'Xác nhận mở khóa tài khoản'}
-        description={lockConfirmData.isLocking 
-          ? 'Khi khóa tài khoản, mọi giao dịch sẽ bị tạm dừng cho đến khi tài khoản được mở khóa.' 
-          : 'Khi mở khóa tài khoản, tài khoản sẽ hoạt động bình thường trở lại.'}
-        confirmText={lockConfirmData.isLocking ? 'Vuốt để khóa tài khoản' : 'Vuốt để mở khóa tài khoản'}
-        type={lockConfirmData.isLocking ? 'warning' : 'unlock'}
-        isProcessing={isProcessing}
       />
       
       {/* Notification */}

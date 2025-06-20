@@ -30,13 +30,13 @@ export function getMaturityOptionDescription(option: MaturityOption): string {
 export function getInterestFrequencyByCode(code: number): InterestFrequency {
   switch (code) {
     case 1:
-      return InterestFrequency.BEGIN_OF_TERM;
-    case 2:
-      return InterestFrequency.END_OF_TERM;
-    case 3:
       return InterestFrequency.MONTHLY;
-    case 4:
+    case 2:
       return InterestFrequency.QUARTERLY;
+    case 3:
+      return InterestFrequency.END_OF_TERM;
+    case 4:
+      return InterestFrequency.BEGIN_OF_TERM;
     default:
       return InterestFrequency.BEGIN_OF_TERM;
   }
