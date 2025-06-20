@@ -13,5 +13,7 @@ export enum Module {
   QuyenHan = 'QuyenHan',
   ThamSo = 'ThamSo',
   TrangThai = 'TrangThai',
-  VaiTro = 'VaiTro'
+  VaiTro = 'VaiTro',
+  PhieuDaoHan ='PhieuDaoHan',
+  PhieuRutTien ='PhieuRutTien'
 }
