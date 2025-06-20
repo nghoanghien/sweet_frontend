@@ -1,5 +1,5 @@
 import axios from '@/config/axios-customize';
-import { User, LoginCredentials } from '@/types/user';
+import { User, LoginCredentials } from '@/types/interfaces/user';
 
 // Response types
 export interface LoginResponse {

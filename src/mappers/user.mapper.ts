@@ -1,5 +1,5 @@
-import { Permission } from "@/types/enums";
-import { Address, Role, User } from "@/types/user";
+import { Permission } from "@/types/interfaces/enums";
+import { Address, Role, User } from "@/types/interfaces/user";
 import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
 
 export const mapApiToAddress = (item: any): Address => {
@@ -33,17 +33,18 @@ export const mapApiToUser = (item: any): User => {
     idCardNumber: item.cccd,
     email: item.email,
     phoneNumber: item.soDienThoai,
-    permanentAddressID: mapApiToAddress(item.diaChiThuongTru),
-    contactAddressID: mapApiToAddress(item.diaChiLienLac),
+    permanentAddress: mapApiToAddress(item.diaChiThuongTru),
+    contactAddress: mapApiToAddress(item.diaChiLienLac),
     role: mapApiToRole(item.vaiTro),
     accountStatus: getAccountStatusByCode(item.trangThaiTaiKhoan.trangThaiID),
 
     //only for customer
     customerID: item.khachHangID || null,
     registrationDate: new Date(item.ngayDangKy) || null,
-    //customerStatus: getCustomerStatusByCode(item.trangThaiKhachHang.trangThaiID) || null,
+    customerStatus: getCustomerStatusByCode(item.trangThaiKhachHang.trangThaiID) || null,
 
     //only for employee
+    
     
   };
 }

@@ -34,16 +34,37 @@ const CalendarDatePicker = ({
   // Parse value to date object when value changes externally
   useEffect(() => {
     if (value) {
-      const parts = value.split('/');
-      if (parts.length === 3) {
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[2], 10);
+      let dateValue;
+      
+      // Handle Date object
+      if (value instanceof Date) {
+        dateValue = value;
+      }
+      // Handle string value
+      else if (typeof value === 'string') {
+        const parts = value.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const year = parseInt(parts[2], 10);
+          dateValue = new Date(year, month, day);
+        }
+      }
+      
+      if (dateValue && !isNaN(dateValue.getTime())) {
+        const day = dateValue.getDate();
+        const month = dateValue.getMonth();
+        const year = dateValue.getFullYear();
         
         setSelectedDay(day);
         setCurrentMonth(month);
         setCurrentYear(year);
-        setInternalValue(value);
+        
+        // Format to DD/MM/YYYY string for display
+        const formattedDay = String(day).padStart(2, '0');
+        const formattedMonth = String(month + 1).padStart(2, '0');
+        const formattedDate = `${formattedDay}/${formattedMonth}/${year}`;
+        setInternalValue(formattedDate);
       }
     } else {
       setSelectedDay(null);
@@ -179,7 +200,14 @@ const CalendarDatePicker = ({
       const formattedMonth = String(currentMonth + 1).padStart(2, '0');
       const formattedDate = `${formattedDay}/${formattedMonth}/${currentYear}`;
       setInternalValue(formattedDate);
-      onChange(formattedDate);
+      
+      // Return Date object if original value was Date object, otherwise return string
+      const selectedDate = new Date(currentYear, currentMonth, day);
+      if (value instanceof Date) {
+        onChange(selectedDate);
+      } else {
+        onChange(formattedDate);
+      }
       setIsOpen(false);
     }
   };
@@ -211,10 +239,16 @@ const CalendarDatePicker = ({
       setSelectedDay(day);
       setCurrentMonth(month);
       setCurrentYear(year);
-      onChange(newValue);
+      
+      // Return Date object if original value was Date object, otherwise return string
+      if (value instanceof Date) {
+        onChange(selectedDate);
+      } else {
+        onChange(newValue);
+      }
     } else if (newValue === '') {
       setSelectedDay(null);
-      onChange('');
+      onChange(value instanceof Date ? null : '');
     }
   };
 
@@ -489,4 +523,4 @@ const CalendarDatePicker = ({
   );
 };
 
-export default CalendarDatePicker; 
+export default CalendarDatePicker;

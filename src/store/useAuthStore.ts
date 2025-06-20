@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { callLogin, callLogout, callGetProfile } from '@/services/auth';
-import { LoginCredentials, User } from '@/types/user';
+import { LoginCredentials, User } from '@/types/interfaces/user';
 
 interface AuthState {
   user: User | null;

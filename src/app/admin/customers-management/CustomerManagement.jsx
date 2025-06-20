@@ -8,21 +8,10 @@ import {
   XCircle, 
   Plus,
   Download,
-  FileText,
   Lock,
   Unlock,
   Save,
   HelpCircle,
-  ArrowDownLeft,
-  ArrowUpRight,
-  PlusCircle,
-  TrendingUp,
-  MinusCircle,
-  Info,
-  CreditCard,
-  Globe,
-  Smartphone,
-  Building,
   Calendar
 } from 'lucide-react';
 import SearchFilterBar from '@/components/common/SearchFilterBar';
@@ -42,6 +31,8 @@ import AddressFields from '../../../components/ui/custom/AddressFields';
 import StatusBadge from '../../../components/ui/custom/StatusBadge';
 import ModalHeader from '../../../components/ui/custom/ModalHeader';
 import AnimatedTabNavigation from '../../../components/ui/custom/AnimatedTabNavigation';
+import { useAllCustomers } from '@/hooks/useCustomers';
+import { formatDate } from '@/utils/saving-account';
 
 export default function CustomerManagement() {
   // Define columns for DataTable
@@ -59,9 +50,10 @@ export default function CustomerManagement() {
       )
     },
     {
-      key: 'birthDate',
+      key: 'dateOfBirth',
       label: 'Ngày sinh',
       sortable: true,
+      formatter: (value) => formatDate(value),
       className: 'hidden sm:table-cell' // Ẩn trên mobile
     },
     {
@@ -71,19 +63,19 @@ export default function CustomerManagement() {
       className: 'hidden sm:table-cell' // Ẩn trên mobile
     },
     {
-      key: 'phone',
+      key: 'phoneNumber',
       label: 'Số điện thoại',
       sortable: true,
       className: 'hidden sm:table-cell' // Ẩn trên mobile
     },
     {
-      key: 'idNumber',
+      key: 'idCardNumber',
       label: 'Số CCCD',
       sortable: true,
       className: 'hidden sm:table-cell' // Ẩn trên mobile
     },
     {
-      key: 'status',
+      key: 'customerStatus',
       label: 'Trạng thái',
       sortable: true,
       type: 'status' // Sử dụng StatusBadge component
@@ -103,410 +95,20 @@ export default function CustomerManagement() {
           <Edit size={18} />
         </motion.button>
         <motion.button
-          onClick={() => toggleCustomerStatus(customer.id)}
+          onClick={() => toggleCustomerStatus(customer.customerID)}
           whileHover={{ scale: 1.15, rotate: -5 }}
           whileTap={{ scale: 0.95 }}
-          className={`p-1.5 rounded-full ${customer.status === 'active' ? 'text-red-600 hover:text-red-800 hover:bg-red-50' : 'text-green-600 hover:text-green-800 hover:bg-green-50'}`}
+          className={`p-1.5 rounded-full ${customer.customerStatus === 'active' ? 'text-red-600 hover:text-red-800 hover:bg-red-50' : 'text-green-600 hover:text-green-800 hover:bg-green-50'}`}
         >
-          {customer.status === 'active' ? <Lock size={18} /> : <Unlock size={18} />}
+          {customer.customerStatus === 'active' ? <Lock size={18} /> : <Unlock size={18} />}
         </motion.button>
       </>
     );
   };
 
-  // State for customer data
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      code: 'KH000001',
-      fullName: 'Nguyễn Văn A',
-      birthDate: '12/05/1985',
-      age: 38,
-      idNumber: '036085123456',
-      email: 'nguyenvana@email.com',
-      phone: '0901234567',
-      permanentAddress: {
-        province: 'Hà Nội',
-        district: 'Cầu Giấy',
-        ward: 'Dịch Vọng',
-        street: 'Trần Thái Tông',
-        houseNumber: '125'
-      },
-      contactAddress: {
-        province: 'Hà Nội',
-        district: 'Cầu Giấy',
-        ward: 'Dịch Vọng',
-        street: 'Trần Thái Tông',
-        houseNumber: '125'
-      },
-      registrationDate: '15/06/2022',
-      status: 'active'
-    },
-    {
-      id: 2,
-      code: 'KH000002',
-      fullName: 'Trần Thị B',
-      birthDate: '25/11/1990',
-      age: 33,
-      idNumber: '024190789123',
-      email: 'tranthib@email.com',
-      phone: '0912345678',
-      permanentAddress: {
-        province: 'TP. Hồ Chí Minh',
-        district: 'Quận 1',
-        ward: 'Bến Nghé',
-        street: 'Lê Duẩn',
-        houseNumber: '78'
-      },
-      contactAddress: {
-        province: 'TP. Hồ Chí Minh',
-        district: 'Quận 1',
-        ward: 'Bến Nghé',
-        street: 'Lê Duẩn',
-        houseNumber: '78'
-      },
-      registrationDate: '20/08/2022',
-      status: 'active'
-    },
-    {
-      id: 3,
-      code: 'KH000003',
-      fullName: 'Lê Văn C',
-      birthDate: '10/03/1978',
-      age: 45,
-      idNumber: '025781234567',
-      email: 'levanc@email.com',
-      phone: '0923456789',
-      permanentAddress: {
-        province: 'Đà Nẵng',
-        district: 'Hải Châu',
-        ward: 'Thuận Phước',
-        street: 'Bạch Đằng',
-        houseNumber: '45'
-      },
-      contactAddress: {
-        province: 'Đà Nẵng',
-        district: 'Hải Châu',
-        ward: 'Thuận Phước',
-        street: 'Bạch Đằng',
-        houseNumber: '45'
-      },
-      registrationDate: '05/11/2022',
-      status: 'disabled'
-    },
-    {
-      id: 4,
-      code: 'KH000004',
-      fullName: 'Phạm Thị D',
-      birthDate: '18/07/1995',
-      age: 28,
-      idNumber: '038095345678',
-      email: 'phamthid@email.com',
-      phone: '0934567890',
-      permanentAddress: {
-        province: 'Hải Phòng',
-        district: 'Hồng Bàng',
-        ward: 'Hoàng Văn Thụ',
-        street: 'Lê Lợi',
-        houseNumber: '102'
-      },
-      contactAddress: {
-        province: 'Hải Phòng',
-        district: 'Hồng Bàng',
-        ward: 'Hoàng Văn Thụ',
-        street: 'Lê Lợi',
-        houseNumber: '102'
-      },
-      registrationDate: '12/02/2023',
-      status: 'active'
-    },
-    {
-      id: 5,
-      code: 'KH000005',
-      fullName: 'Hoàng Văn E',
-      birthDate: '30/09/1982',
-      age: 41,
-      idNumber: '026082456789',
-      email: 'hoangvane@email.com',
-      phone: '0945678901',
-      permanentAddress: {
-        province: 'Hà Nội',
-        district: 'Đống Đa',
-        ward: 'Quang Trung',
-        street: 'Nguyễn Lương Bằng',
-        houseNumber: '56'
-      },
-      contactAddress: {
-        province: 'Hà Nội',
-        district: 'Đống Đa',
-        ward: 'Quang Trung',
-        street: 'Nguyễn Lương Bằng',
-        houseNumber: '56'
-      },
-      registrationDate: '25/04/2023',
-      status: 'disabled'
-    },
-    {
-      id: 6,
-      code: 'KH000006',
-      fullName: 'Trần Thị A',
-      birthDate: '12/05/1990',
-      age: 34,
-      idNumber: '012345678901',
-      email: 'tranthea@email.com',
-      phone: '0912345678',
-      permanentAddress: {
-        province: 'Hà Nội',
-        district: 'Ba Đình',
-        ward: 'Ngọc Hà',
-        street: 'Đội Cấn',
-        houseNumber: '15'
-      },
-      contactAddress: {
-        province: 'Hà Nội',
-        district: 'Ba Đình',
-        ward: 'Ngọc Hà',
-        street: 'Đội Cấn',
-        houseNumber: '15'
-      },
-      registrationDate: '10/01/2024',
-      status: 'active'
-    },
-    {
-      id: 7,
-      code: 'KH000007',
-      fullName: 'Nguyễn Văn B',
-      birthDate: '01/01/1985',
-      age: 40,
-      idNumber: '023456789012',
-      email: 'nguyenvanb@email.com',
-      phone: '0934567890',
-      permanentAddress: {
-        province: 'TP.HCM',
-        district: 'Quận 1',
-        ward: 'Bến Nghé',
-        street: 'Lê Lợi',
-        houseNumber: '21A'
-      },
-      contactAddress: {
-        province: 'TP.HCM',
-        district: 'Quận 1',
-        ward: 'Bến Nghé',
-        street: 'Lê Lợi',
-        houseNumber: '21A'
-      },
-      registrationDate: '12/02/2024',
-      status: 'active'
-    },
-    {
-      id: 8,
-      code: 'KH000008',
-      fullName: 'Lê Thị C',
-      birthDate: '08/08/1995',
-      age: 29,
-      idNumber: '034567890123',
-      email: 'lethic@email.com',
-      phone: '0967890123',
-      permanentAddress: {
-        province: 'Đà Nẵng',
-        district: 'Hải Châu',
-        ward: 'Hòa Thuận Đông',
-        street: 'Nguyễn Văn Linh',
-        houseNumber: '58B'
-      },
-      contactAddress: {
-        province: 'Đà Nẵng',
-        district: 'Hải Châu',
-        ward: 'Hòa Thuận Đông',
-        street: 'Nguyễn Văn Linh',
-        houseNumber: '58B'
-      },
-      registrationDate: '20/03/2024',
-      status: 'disabled'
-    },
-    {
-      id: 9,
-      code: 'KH000009',
-      fullName: 'Phạm Văn D',
-      birthDate: '22/03/1980',
-      age: 44,
-      idNumber: '045678901234',
-      email: 'phamvand@email.com',
-      phone: '0978901234',
-      permanentAddress: {
-        province: 'Cần Thơ',
-        district: 'Ninh Kiều',
-        ward: 'Tân An',
-        street: 'Nguyễn Trãi',
-        houseNumber: '33'
-      },
-      contactAddress: {
-        province: 'Cần Thơ',
-        district: 'Ninh Kiều',
-        ward: 'Tân An',
-        street: 'Nguyễn Trãi',
-        houseNumber: '33'
-      },
-      registrationDate: '05/04/2024',
-      status: 'active'
-    },
-    {
-      id: 10,
-      code: 'KH000010',
-      fullName: 'Đỗ Thị F',
-      birthDate: '30/12/1988',
-      age: 36,
-      idNumber: '056789012345',
-      email: 'dothif@email.com',
-      phone: '0989012345',
-      permanentAddress: {
-        province: 'Hà Nam',
-        district: 'Phủ Lý',
-        ward: 'Lê Hồng Phong',
-        street: 'Trần Hưng Đạo',
-        houseNumber: '12'
-      },
-      contactAddress: {
-        province: 'Hà Nam',
-        district: 'Phủ Lý',
-        ward: 'Lê Hồng Phong',
-        street: 'Trần Hưng Đạo',
-        houseNumber: '12'
-      },
-      registrationDate: '11/05/2024',
-      status: 'disabled'
-    },
-    {
-      id: 11,
-      code: 'KH000011',
-      fullName: 'Bùi Văn G',
-      birthDate: '15/04/1992',
-      age: 33,
-      idNumber: '067890123456',
-      email: 'buivang@email.com',
-      phone: '0911122233',
-      permanentAddress: {
-        province: 'Hải Phòng',
-        district: 'Lê Chân',
-        ward: 'An Dương',
-        street: 'Hoàng Diệu',
-        houseNumber: '44'
-      },
-      contactAddress: {
-        province: 'Hải Phòng',
-        district: 'Lê Chân',
-        ward: 'An Dương',
-        street: 'Hoàng Diệu',
-        houseNumber: '44'
-      },
-      registrationDate: '25/05/2024',
-      status: 'active'
-    },
-    {
-      id: 12,
-      code: 'KH000012',
-      fullName: 'Ngô Thị H',
-      birthDate: '09/06/1998',
-      age: 27,
-      idNumber: '078901234567',
-      email: 'ngothih@email.com',
-      phone: '0933344455',
-      permanentAddress: {
-        province: 'Thanh Hóa',
-        district: 'Thành phố Thanh Hóa',
-        ward: 'Quảng Thắng',
-        street: 'Phan Chu Trinh',
-        houseNumber: '90'
-      },
-      contactAddress: {
-        province: 'Thanh Hóa',
-        district: 'Thành phố Thanh Hóa',
-        ward: 'Quảng Thắng',
-        street: 'Phan Chu Trinh',
-        houseNumber: '90'
-      },
-      registrationDate: '29/05/2024',
-      status: 'active'
-    },
-    {
-      id: 13,
-      code: 'KH000013',
-      fullName: 'Đặng Văn I',
-      birthDate: '14/02/1987',
-      age: 38,
-      idNumber: '089012345678',
-      email: 'dangvani@email.com',
-      phone: '0966667777',
-      permanentAddress: {
-        province: 'Nghệ An',
-        district: 'Vinh',
-        ward: 'Hưng Bình',
-        street: 'Nguyễn Phong Sắc',
-        houseNumber: '11'
-      },
-      contactAddress: {
-        province: 'Nghệ An',
-        district: 'Vinh',
-        ward: 'Hưng Bình',
-        street: 'Nguyễn Phong Sắc',
-        houseNumber: '11'
-      },
-      registrationDate: '01/06/2024',
-      status: 'disabled'
-    },
-    {
-      id: 14,
-      code: 'KH000014',
-      fullName: 'Trịnh Thị J',
-      birthDate: '03/03/1993',
-      age: 32,
-      idNumber: '090123456789',
-      email: 'trinhthij@email.com',
-      phone: '0988889999',
-      permanentAddress: {
-        province: 'Huế',
-        district: 'Thành phố Huế',
-        ward: 'Thuận Hòa',
-        street: 'Hùng Vương',
-        houseNumber: '27'
-      },
-      contactAddress: {
-        province: 'Huế',
-        district: 'Thành phố Huế',
-        ward: 'Thuận Hòa',
-        street: 'Hùng Vương',
-        houseNumber: '27'
-      },
-      registrationDate: '04/06/2024',
-      status: 'active'
-    },
-    {
-      id: 15,
-      code: 'KH000015',
-      fullName: 'Vũ Văn K',
-      birthDate: '19/11/1979',
-      age: 45,
-      idNumber: '091234567890',
-      email: 'vuvank@email.com',
-      phone: '0909090909',
-      permanentAddress: {
-        province: 'Bắc Ninh',
-        district: 'Từ Sơn',
-        ward: 'Đình Bảng',
-        street: 'Lý Thái Tổ',
-        houseNumber: '77'
-      },
-      contactAddress: {
-        province: 'Bắc Ninh',
-        district: 'Từ Sơn',
-        ward: 'Đình Bảng',
-        street: 'Lý Thái Tổ',
-        houseNumber: '77'
-      },
-      registrationDate: '06/06/2024',
-      status: 'disabled'
-    }
-  ]);
+  // Remove mock data - now using real data from API
+
+  const { allCustomers, isLoading, error, refreshCustomers } = useAllCustomers();
 
   // State for payment accounts
   const [paymentAccounts, setPaymentAccounts] = useState({
@@ -729,33 +331,37 @@ export default function CustomerManagement() {
   // State for multi-field search
   const [searchFields, setSearchFields] = useState({
     fullName: '',
-    idNumber: '',
+    idCardNumber: '',
     email: '',
-    phone: ''
+    phoneNumber: ''
   });
 
   // For new customer
   const [newCustomer, setNewCustomer] = useState({
     fullName: '',
-    birthDate: '',
-    idNumber: '',
+    dateOfBirth: '',
+    idCardNumber: '',
     email: '',
-    phone: '',
+    phoneNumber: '',
     permanentAddress: {
       province: '',
       district: '',
       ward: '',
-      street: '',
+      streetName: '',
       houseNumber: ''
     },
     contactAddress: {
       province: '',
       district: '',
       ward: '',
-      street: '',
+      streetName: '',
       houseNumber: ''
     }
   });
+  
+  // State for contact address visibility
+  const [isContactAddressSameAsPermanent, setIsContactAddressSameAsPermanent] = useState(false);
+  const [showContactAddressForm, setShowContactAddressForm] = useState(true);
   
   const [editedCustomer, setEditedCustomer] = useState(null);
 
@@ -764,9 +370,6 @@ export default function CustomerManagement() {
 
   // Add state for active tab in customer details modal
   const [activeDetailTab, setActiveDetailTab] = useState('information');
-  
-  // State for overview section
-  const [activeSection, setActiveSection] = useState("overview"); // Trạng thái cho tài khoản thanh toán (dữ liệu chính của tab overview)
   
   // State for hiding account information
   const [hiddenAccountInfo, setHiddenAccountInfo] = useState({});
@@ -794,13 +397,9 @@ export default function CustomerManagement() {
   });
   
   // State for responsive layout
-  const [navHovered, setNavHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Loading states
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
-  const [isLoadingSearch, setIsLoadingSearch] = useState(true);
   const [isLoadingForm, setIsLoadingForm] = useState(true);
   
   // Check if viewing on mobile device
@@ -815,16 +414,6 @@ export default function CustomerManagement() {
   
   // Simulate loading states
   useEffect(() => {
-    // Simulate search filter loading
-    setTimeout(() => {
-      setIsLoadingSearch(false);
-    }, 2000);
-    
-    // Simulate customers data loading
-    setTimeout(() => {
-      setIsLoadingCustomers(false);
-    }, 2000);
-    
     // Simulate form loading
     setTimeout(() => {
       setIsLoadingForm(false);
@@ -833,7 +422,7 @@ export default function CustomerManagement() {
 
   // useEffect to filter and sort customers
   useEffect(() => {
-    let result = [...customers];
+    let result = [...allCustomers];
     
     // Apply search filtering across all search fields
     result = result.filter(customer => {
@@ -841,14 +430,14 @@ export default function CustomerManagement() {
       const nameMatch = searchFields.fullName === '' || 
         customer.fullName.toLowerCase().includes(searchFields.fullName.toLowerCase());
       
-      const idMatch = searchFields.idNumber === '' || 
-        customer.idNumber.toLowerCase().includes(searchFields.idNumber.toLowerCase());
+      const idMatch = searchFields.idCardNumber === '' || 
+        customer.idCardNumber.toLowerCase().includes(searchFields.idCardNumber.toLowerCase());
       
       const emailMatch = searchFields.email === '' || 
         customer.email.toLowerCase().includes(searchFields.email.toLowerCase());
       
-      const phoneMatch = searchFields.phone === '' || 
-        customer.phone.toLowerCase().includes(searchFields.phone.toLowerCase());
+      const phoneMatch = searchFields.phoneNumber === '' || 
+        customer.phoneNumber.toLowerCase().includes(searchFields.phoneNumber.toLowerCase());
       
       // Customer must match all non-empty search criteria
       return nameMatch && idMatch && emailMatch && phoneMatch;
@@ -882,7 +471,7 @@ export default function CustomerManagement() {
     });
     
     setFilteredCustomers(result);
-  }, [customers, searchFields, sortField, sortDirection]);
+  }, [allCustomers, searchFields, sortField, sortDirection]);
 
   // Add useEffect to reset form data when modal state changes
   useEffect(() => {
@@ -907,22 +496,22 @@ export default function CustomerManagement() {
         if (!isAddCustomerModalOpen) {
           setNewCustomer({
             fullName: '',
-            birthDate: '',
-            idNumber: '',
+            dateOfBirth: '',
+            idCardNumber: '',
             email: '',
-            phone: '',
+            phoneNumber: '',
             permanentAddress: {
               province: '',
               district: '',
               ward: '',
-              street: '',
+              streetName: '',
               houseNumber: ''
             },
             contactAddress: {
               province: '',
               district: '',
               ward: '',
-              street: '',
+              streetName: '',
               houseNumber: ''
             }
           });
@@ -943,9 +532,9 @@ export default function CustomerManagement() {
   const clearSearchFields = () => {
     setSearchFields({
       fullName: '',
-      idNumber: '',
+      idCardNumber: '',
       email: '',
-      phone: ''
+      phoneNumber: ''
     });
   };
 
@@ -982,10 +571,10 @@ export default function CustomerManagement() {
 
   // Toggle customer status (active/disabled)
   const toggleCustomerStatus = (customerId) => {
-    const customer = customers.find(c => c.id === customerId);
+    const customer = allCustomers.find(c => c.customerID === customerId);
     if (!customer) return;
     
-    const newStatus = customer.status === 'active' ? 'disabled' : 'active';
+    const newStatus = customer.customerStatus === 'active' ? 'disabled' : 'active';
     const actionText = newStatus === 'active' ? 'kích hoạt' : 'vô hiệu hóa';
     
     openConfirmationModal({
@@ -993,9 +582,9 @@ export default function CustomerManagement() {
       description: `Bạn có chắc chắn muốn ${actionText} tài khoản của khách hàng "${customer.fullName}" không?`,
       confirmText: `Quẹt để ${actionText}`,
       confirmDetails: {
-        'Mã khách hàng': customer.code,
+        'Mã khách hàng': customer.customerID,
         'Họ tên': customer.fullName,
-        'Trạng thái hiện tại': customer.status === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
+        'Trạng thái hiện tại': customer.customerStatus === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
         'Trạng thái mới': newStatus === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
       },
       type: `${newStatus === 'active' ? 'unlock' : 'warning'}`,
@@ -1003,14 +592,8 @@ export default function CustomerManagement() {
         setConfirmationProcessing(true);
 
         setTimeout(() => {
-          setCustomers(prevCustomers => 
-            prevCustomers.map(c => {
-              if (c.id === customerId) {
-                return { ...c, status: newStatus };
-              }
-              return c;
-            })
-          );
+          // TODO: Call API to update customer status
+          // For now, just show success notification
           
           // Hiển thị thông báo thành công
           setExportNotification({
@@ -1041,7 +624,7 @@ export default function CustomerManagement() {
     setEditedCustomer({
       ...customer,
       contactAddress: { ...customer.contactAddress },
-      phone: customer.phone,
+      phoneNumber: customer.phoneNumber,
       status: customer.status
     });
     setIsEditMode(true);
@@ -1084,16 +667,16 @@ export default function CustomerManagement() {
   // Save edited customer with validation
   const saveCustomerChanges = () => {
     // Validate all fields before saving
-    const fieldsToValidate = ['phone'];
-    const addressFields = ['province', 'district', 'ward', 'street', 'houseNumber'];
+    const fieldsToValidate = ['phoneNumber'];
+    const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
     
     let isValid = true;
     const newErrors = {};
     
     // Validate phone
-    const phoneError = validateField('phone', editedCustomer.phone);
+    const phoneError = validateField('phoneNumber', editedCustomer.phoneNumber);
     if (phoneError) {
-      newErrors.phone = phoneError;
+      newErrors.phoneNumber = phoneError;
       isValid = false;
     }
     
@@ -1112,24 +695,13 @@ export default function CustomerManagement() {
     setErrors(newErrors);
     
     if (isValid) {
-      setCustomers(prevCustomers => 
-        prevCustomers.map(customer => {
-          if (customer.id === editedCustomer.id) {
-            return {
-              ...customer,
-              contactAddress: editedCustomer.contactAddress,
-              phone: editedCustomer.phone,
-              status: editedCustomer.status
-            };
-          }
-          return customer;
-        })
-      );
+      // TODO: Call API to update customer data
+      // For now, just update the selected customer state
       setIsEditMode(false);
       setSelectedCustomer(prev => ({
         ...prev,
         contactAddress: editedCustomer.contactAddress,
-        phone: editedCustomer.phone,
+        phoneNumber: editedCustomer.phoneNumber,
         status: editedCustomer.status
       }));
       
@@ -1177,22 +749,22 @@ export default function CustomerManagement() {
       // If opening, reset the form first then open the modal
       setNewCustomer({
         fullName: '',
-        birthDate: '',
-        idNumber: '',
+        dateOfBirth: '',
+        idCardNumber: '',
         email: '',
-        phone: '',
+        phoneNumber: '',
         permanentAddress: {
           province: '',
           district: '',
           ward: '',
-          street: '',
+          streetName: '',
           houseNumber: ''
         },
         contactAddress: {
           province: '',
           district: '',
           ward: '',
-          street: '',
+          streetName: '',
           houseNumber: ''
         }
       });
@@ -1243,6 +815,24 @@ export default function CustomerManagement() {
       ...prev,
       contactAddress: { ...prev.permanentAddress }
     }));
+    setIsContactAddressSameAsPermanent(true);
+    setShowContactAddressForm(false);
+  };
+  
+  // Show different contact address form
+  const showDifferentContactAddress = () => {
+    setNewCustomer(prev => ({
+      ...prev,
+      contactAddress: {
+        province: '',
+        district: '',
+        ward: '',
+        streetName: '',
+        houseNumber: ''
+      }
+    }));
+    setIsContactAddressSameAsPermanent(false);
+    setShowContactAddressForm(true);
   };
 
   // Validation functions
@@ -1253,7 +843,7 @@ export default function CustomerManagement() {
       return '';
     }
     
-    if (field === 'birthDate') {
+    if (field === 'dateOfBirth') {
       if (!value.trim()) return 'Ngày sinh không được để trống';
       const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
       if (!dateRegex.test(value)) return 'Ngày sinh không đúng định dạng DD/MM/YYYY';
@@ -1261,12 +851,12 @@ export default function CustomerManagement() {
       // Validate age > 18
       if (dateRegex.test(value)) {
         const parts = value.split('/');
-        const birthDate = new Date(parts[2], parts[1] - 1, parts[0]);
+        const dateOfBirth = new Date(parts[2], parts[1] - 1, parts[0]);
         const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
+        let age = today.getFullYear() - dateOfBirth.getFullYear();
+        const monthDiff = today.getMonth() - dateOfBirth.getMonth();
         
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
           age--;
         }
         
@@ -1278,7 +868,7 @@ export default function CustomerManagement() {
       return '';
     }
     
-    if (field === 'idNumber') {
+    if (field === 'idCardNumber') {
       if (!value.trim()) return 'Số CCCD/CMND không được để trống';
       if (!/^\d{9,12}$/.test(value)) return 'Số CCCD/CMND phải có 9-12 chữ số';
       return '';
@@ -1291,13 +881,13 @@ export default function CustomerManagement() {
       return '';
     }
     
-    if (field === 'phone') {
+    if (field === 'phoneNumber') {
       if (!value.trim()) return 'Số điện thoại không được để trống';
       if (!/^0\d{9,10}$/.test(value)) return 'Số điện thoại phải bắt đầu bằng số 0 và có 10-11 chữ số';
       return '';
     }
     
-    if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('street')) {
+    if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('streetName')) {
       if (!value.trim()) return 'Thông tin địa chỉ không được để trống';
       return '';
     }
@@ -1328,7 +918,7 @@ export default function CustomerManagement() {
     let isValid = true;
     
     // Validate personal info
-    const personalFields = ['fullName', 'birthDate', 'idNumber', 'email', 'phone'];
+    const personalFields = ['fullName', 'dateOfBirth', 'idCardNumber', 'email', 'phoneNumber'];
     personalFields.forEach(field => {
       const error = validateField(field, newCustomer[field]);
       if (error) {
@@ -1339,7 +929,7 @@ export default function CustomerManagement() {
     
     // Validate permanent address
     const addressPrefixes = ['permanentAddress', 'contactAddress'];
-    const addressFields = ['province', 'district', 'ward', 'street', 'houseNumber'];
+    const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
     
     addressPrefixes.forEach(prefix => {
       addressFields.forEach(field => {
@@ -1377,11 +967,10 @@ export default function CustomerManagement() {
   const addNewCustomer = () => {
     if (validateAllFields()) {
       // Generate ID and code
-      const newId = customers.length > 0 ? Math.max(...customers.map(c => c.id)) + 1 : 1;
-      const newCode = `KH${String(newId).padStart(6, '0')}`;
+      const newId = allCustomers.length > 0 ? Math.max(...allCustomers.map(c => parseInt(c.customerID))) + 1 : 1;
       
       // Calculate age from birthDate
-      const birthDateParts = newCustomer.birthDate.split('/');
+      const birthDateParts = newCustomer.dateOfBirth.split('/');
       const birthYear = parseInt(birthDateParts[2]);
       const currentYear = new Date().getFullYear();
       const age = currentYear - birthYear;
@@ -1391,18 +980,17 @@ export default function CustomerManagement() {
       const registrationDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
       
       const customerToAdd = {
-        id: newId,
-        code: newCode,
+        customerID: newId.toString(),
         fullName: newCustomer.fullName,
-        birthDate: newCustomer.birthDate,
+        dateOfBirth: new Date(newCustomer.dateOfBirth.split('/').reverse().join('-')),
         age: age,
-        idNumber: newCustomer.idNumber,
+        idCardNumber: newCustomer.idCardNumber,
         email: newCustomer.email,
-        phone: newCustomer.phone,
+        phoneNumber: newCustomer.phoneNumber,
         permanentAddress: { ...newCustomer.permanentAddress },
         contactAddress: { ...newCustomer.contactAddress },
-        registrationDate: registrationDate,
-        status: 'active'
+        registrationDate: new Date(),
+        customerStatus: 'active'
       };
       
       // Hiển thị modal xác nhận trước khi thêm khách hàng
@@ -1411,12 +999,11 @@ export default function CustomerManagement() {
         message: 'Bạn có chắc chắn muốn thêm khách hàng mới này không?',
         confirmText: 'Quẹt để thêm khách hàng',
         confirmDetails: {
-          'Mã khách hàng': newCode,
           'Họ tên': newCustomer.fullName,
-          'Ngày sinh': newCustomer.birthDate,
-          'Số CCCD/CMND': newCustomer.idNumber,
+          'Ngày sinh': newCustomer.dateOfBirth,
+          'Số CCCD/CMND': newCustomer.idCardNumber,
           'Email': newCustomer.email,
-          'Số điện thoại': newCustomer.phone
+          'Số điện thoại': newCustomer.phoneNumber
         },
         type: 'add',
         onConfirm: () => {
@@ -1426,8 +1013,15 @@ export default function CustomerManagement() {
           // Simulate API call with a delay
           setTimeout(() => {
             try {
-              // Add new customer
-              setCustomers(prev => [...prev, customerToAdd]);
+              // TODO: Call API to add new customer
+              // For now, just show success notification
+              
+              // Refresh customer list
+              refreshCustomers();
+              
+              // Reset form states
+              setIsContactAddressSameAsPermanent(false);
+              setShowContactAddressForm(true);
               
               // Close modals
               closeConfirmationModal();
@@ -1524,7 +1118,7 @@ export default function CustomerManagement() {
 
   // Open savings account detail
   const openSavingsDetail = (customerId, savingsId) => {
-    setSelectedCustomer(customers.find(c => c.id === customerId));
+    setSelectedCustomer(allCustomers.find(c => c.customerID === customerId));
     setSelectedSavingsId(savingsId);
     setSavingsDetailVisible(true);
   };
@@ -1562,7 +1156,7 @@ export default function CustomerManagement() {
       
       const newStatus = account.status === "active" ? "locked" : "active";
       const actionText = newStatus === "active" ? "mở khóa" : "khóa";
-      const customer = customers.find(c => c.id === parseInt(customerId));
+      const customer = allCustomers.find(c => c.customerID === parseInt(customerId));
       
       openConfirmationModal({
         title: `Xác nhận ${actionText} tài khoản`,
@@ -2014,7 +1608,7 @@ export default function CustomerManagement() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          {isLoadingSearch ? (
+          {isLoading ? (
             <SearchFilterBarShimmer />
           ) : (
             <SearchFilterBar
@@ -2038,7 +1632,7 @@ export default function CustomerManagement() {
         transition={{ duration: 0.6, delay: 0.4 }}
         className="mb-6"
       >
-        {isLoadingCustomers ? (
+        {isLoading ? (
           <DataTableShimmer 
             rowCount={10}
             columnCount={6}
@@ -2054,20 +1648,20 @@ export default function CustomerManagement() {
             handleSort={handleSort}
             onRowClick={openCustomerDetail}
             onEditClick={enableEditMode}
-            keyField="id"
+            keyField="customerID"
             className="mb-6"
             headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
             renderActions={renderActions}
             emptyMessage="Không tìm thấy khách hàng nào phù hợp với điều kiện tìm kiếm"
             // Bộ lọc trạng thái
             statusFilters={{
-              status: ['active', 'disabled']
+              customerStatus: ['active', 'disabled']
             }}
             changeTableData={setExporData}
             // Bộ lọc khoảng thời gian
             dateRangeFilters={{
               registrationDate: { label: 'Ngày đăng ký' },
-              birthDate: { label: 'Ngày sinh' }
+              dateOfBirth: { label: 'Ngày sinh' }
             }}
           />
         )}
@@ -2106,7 +1700,7 @@ export default function CustomerManagement() {
             ></motion.div>
 
             <motion.div
-              layoutId={selectedCustomer ? `row-${selectedCustomer.id}` : ""}
+              layoutId={selectedCustomer ? `row-${selectedCustomer.customerID}` : ""}
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 40 }}
@@ -2209,7 +1803,7 @@ export default function CustomerManagement() {
                             >
                               <InputField
                                 label="Mã khách hàng"
-                                value={selectedCustomer.code}
+                                value={selectedCustomer.customerID}
                                 disabled={true}
                               />
                             </motion.div>
@@ -2233,7 +1827,7 @@ export default function CustomerManagement() {
                             >
                               <CalendarDatePicker
                                 label="Ngày sinh"
-                                value={selectedCustomer.birthDate}
+                                value={selectedCustomer.dateOfBirth}
                                 onChange={() => {}}
                                 disabled={true}
                               />
@@ -2258,7 +1852,7 @@ export default function CustomerManagement() {
                             >
                               <InputField
                                 label="Số CCCD"
-                                value={selectedCustomer.idNumber}
+                                value={selectedCustomer.idCardNumber}
                                 disabled={true}
                               />
                             </motion.div>
@@ -2282,7 +1876,7 @@ export default function CustomerManagement() {
                             >
                               <InputField
                                 label="Số điện thoại"
-                                value={selectedCustomer.phone}
+                                value={selectedCustomer.phoneNumber}
                                 disabled={true}
                               />
                             </motion.div>
@@ -2300,7 +1894,7 @@ export default function CustomerManagement() {
                                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/50 to-green-100/50 rounded-2xl blur-sm"></div>
                                   <div className="relative bg-white/80 backdrop-blur-sm p-3 rounded-2xl border border-emerald-200/50">
                                     <StatusBadge
-                                      status={selectedCustomer.status}
+                                      status={selectedCustomer.customerStatus}
                                     />
                                   </div>
                                 </div>
@@ -2428,7 +2022,7 @@ export default function CustomerManagement() {
                         toggleAccountStatus={toggleAccountStatus}
                         toggleNewAccountModal={toggleNewAccountModal}
                         openTransactionDrawer={openTransactionDrawer}
-                        selectedCustomer={selectedCustomer.id}
+                        selectedCustomer={selectedCustomer.customerID}
                         isInModal={true}
                       />
                     </motion.div>
@@ -2490,12 +2084,12 @@ export default function CustomerManagement() {
                             >
                               <InputField
                                 label="Số điện thoại"
-                                value={editedCustomer.phone}
+                                value={editedCustomer.phoneNumber}
                                 onChange={(value) =>
-                                  handleEditChange("phone", value)
+                                  handleEditChange("phoneNumber", value)
                                 }
                                 placeholder="Nhập số điện thoại..."
-                                error={errors.phone}
+                                error={errors.phoneNumber}
                                 required={true}
                               />
                             </motion.div>
@@ -2705,22 +2299,22 @@ export default function CustomerManagement() {
               if (definition === "exit") {
                 setNewCustomer({
                   fullName: "",
-                  birthDate: "",
-                  idNumber: "",
+                  dateOfBirth: "",
+                  idCardNumber: "",
                   email: "",
-                  phone: "",
+                  phoneNumber: "",
                   permanentAddress: {
                     province: "",
                     district: "",
                     ward: "",
-                    street: "",
+                    streetName: "",
                     houseNumber: "",
                   },
                   contactAddress: {
                     province: "",
                     district: "",
                     ward: "",
-                    street: "",
+                    streetName: "",
                     houseNumber: "",
                   },
                 });
@@ -2809,23 +2403,23 @@ export default function CustomerManagement() {
                         <CalendarDatePicker
                           label="Ngày sinh"
                           placeholder="DD/MM/YYYY"
-                          value={newCustomer.birthDate}
+                          value={newCustomer.dateOfBirth}
                           onChange={(val) =>
-                            handleNewCustomerChange("birthDate", val)
+                            handleNewCustomerChange("dateOfBirth", val)
                           }
-                          onBlur={() => handleFieldBlur("birthDate")}
-                          error={errors.birthDate}
+                          onBlur={() => handleFieldBlur("dateOfBirth")}
+                          error={errors.dateOfBirth}
                           required={true}
                         />
                         <InputField
                           label="Số CCCD/CMND"
                           placeholder="Nhập số CCCD/CMND..."
-                          value={newCustomer.idNumber}
+                          value={newCustomer.idCardNumber}
                           onChange={(val) =>
-                            handleNewCustomerChange("idNumber", val)
+                            handleNewCustomerChange("idCardNumber", val)
                           }
-                          onBlur={() => handleFieldBlur("idNumber")}
-                          error={errors.idNumber}
+                          onBlur={() => handleFieldBlur("idCardNumber")}
+                          error={errors.idCardNumber}
                           required={true}
                         />
                         <InputField
@@ -2843,12 +2437,12 @@ export default function CustomerManagement() {
                         <InputField
                           label="Số điện thoại"
                           placeholder="Nhập số điện thoại..."
-                          value={newCustomer.phone}
+                          value={newCustomer.phoneNumber}
                           onChange={(val) =>
-                            handleNewCustomerChange("phone", val)
+                            handleNewCustomerChange("phoneNumber", val)
                           }
-                          onBlur={() => handleFieldBlur("phone")}
-                          error={errors.phone}
+                          onBlur={() => handleFieldBlur("phoneNumber")}
+                          error={errors.phoneNumber}
                           required={true}
                         />
                       </motion.div>
@@ -2905,44 +2499,113 @@ export default function CustomerManagement() {
                     </div>
                     <div className="p-8">
                       <div className="flex justify-end mb-6">
-                        <motion.button
-                          type="button"
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={copyPermanentAddressToContact}
-                          className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-cyan-400 hover:to-blue-500 flex items-center gap-2"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
+                        {!isContactAddressSameAsPermanent ? (
+                          <motion.button
+                            type="button"
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={copyPermanentAddressToContact}
+                            className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-cyan-400 hover:to-blue-500 flex items-center gap-2"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                            ></path>
-                          </svg>
-                          <span className="text-sm">
-                            Giống địa chỉ thường trú
-                          </span>
-                        </motion.button>
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              ></path>
+                            </svg>
+                            <span className="text-sm">
+                              Giống địa chỉ thường trú
+                            </span>
+                          </motion.button>
+                        ) : (
+                          <motion.button
+                            type="button"
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={showDifferentContactAddress}
+                            className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-orange-400 hover:to-red-500 flex items-center gap-2"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              ></path>
+                            </svg>
+                            <span className="text-sm">
+                              Địa chỉ liên lạc khác
+                            </span>
+                          </motion.button>
+                        )}
                       </div>
-                      <AddressFields
-                        prefix="contactAddress"
-                        values={newCustomer.contactAddress}
-                        onChange={handleNewCustomerChange}
-                        errors={errors}
-                        required
-                        onBlur={handleFieldBlur}
-                      />
+                      
+                      {isContactAddressSameAsPermanent ? (
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                          className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 text-center"
+                        >
+                          <div className="flex items-center justify-center gap-3 text-green-700">
+                            <svg
+                              className="w-6 h-6"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                              ></path>
+                            </svg>
+                            <span className="text-lg font-semibold">
+                              Địa chỉ liên lạc giống với địa chỉ thường trú
+                            </span>
+                          </div>
+                          <p className="text-green-600 mt-2">
+                            Hệ thống sẽ sử dụng địa chỉ thường trú làm địa chỉ liên lạc
+                          </p>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <AddressFields
+                            prefix="contactAddress"
+                            values={newCustomer.contactAddress}
+                            onChange={handleNewCustomerChange}
+                            errors={errors}
+                            required
+                            onBlur={handleFieldBlur}
+                          />
+                        </motion.div>
+                      )}
                     </div>
                   </motion.div>
                 </form>
-              </div>
+                </div>
               )}
 
               {/* Fixed Footer */}
@@ -3022,45 +2685,46 @@ export default function CustomerManagement() {
         onExport={handleExportData}
         title="Xuất dữ liệu khách hàng"
         initialSelectedColumns={[
-          "code",
+          "customerID",
           "fullName",
-          "birthDate",
+          "dateOfBirth",
           "age",
-          "idNumber",
+          "idCardNumber",
           "email",
-          "phone",
+          "phoneNumber",
           "permanentAddress",
           "contactAddress",
           "registrationDate",
-          "status",
+          "customerStatus",
         ]}
         columnLabels={{
-          code: "Mã khách hàng",
+          customerID: "Mã khách hàng",
           fullName: "Họ và tên",
-          birthDate: "Ngày sinh",
+          dateOfBirth: "Ngày sinh",
           age: "Tuổi",
-          idNumber: "Số CCCD/CMND",
+          idCardNumber: "Số CCCD/CMND",
           email: "Email",
-          phone: "Số điện thoại",
+          phoneNumber: "Số điện thoại",
           permanentAddress: "Địa chỉ thường trú",
           contactAddress: "Địa chỉ liên lạc",
           registrationDate: "Ngày đăng ký",
-          status: "Trạng thái",
+          customerStatus: "Trạng thái",
         }}
         formatData={(value, column) => {
-          if (column === "status")
+          if (column === "customerStatus")
             return value === "active" ? "Hoạt động" : "Vô hiệu hóa";
           if (column === "permanentAddress" || column === "contactAddress") {
             if (!value) return "";
-            return `${value.houseNumber} ${value.street}, ${value.ward}, ${value.district}, ${value.province}`;
+            return `${value.houseNumber} ${value.streetName}, ${value.ward}, ${value.district}, ${value.province}`;
           }
+          if (column === 'dateOfBirth' || column === 'registrationDate') return formatDate(new Date(value));
           return value;
         }}
         customColumnCategories={{
-          personal: ["code", "fullName", "birthDate", "age", "idNumber"],
-          contact: ["email", "phone"],
+          personal: ["customerID", "fullName", "dateOfBirth", "age", "idCardNumber"],
+          contact: ["email", "phoneNumber"],
           address: ["permanentAddress", "contactAddress"],
-          other: ["registrationDate", "status"],
+          other: ["registrationDate", "customerStatus"],
         }}
         enableGrouping={true}
       />

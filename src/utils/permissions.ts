@@ -1,4 +1,4 @@
-import { Permission, PermissionInfo } from '../types/enums';
+import { Permission, PermissionInfo } from '../types/interfaces/enums';
 
 /**
  * Lấy label của permission

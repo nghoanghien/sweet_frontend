@@ -1,4 +1,4 @@
-import { AccountStatus, CustomerStatus, Permission } from "@/types/enums";
+import { AccountStatus, CustomerStatus, Permission } from "@/types/interfaces/enums";
 
 export interface Role {
   roleID: number;
@@ -24,8 +24,8 @@ export interface User {
   idCardNumber: string;
   email: string;
   phoneNumber: string;
-  permanentAddressID: Address;
-  contactAddressID: Address;
+  permanentAddress: Address;
+  contactAddress: Address;
   role: Role;
   accountStatus: AccountStatus;
 
