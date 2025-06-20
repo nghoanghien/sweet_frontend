@@ -249,6 +249,10 @@ export const updateThamSo = (id: string, thamSo: IThamSo) =>{
     return axios.put<IBackendRes<IThamSo>>(`/api/v1/tham-so/${id}`, thamSo);
 } 
 
+export const deleteThamSo = (id: string) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/tham-so/${id}`);
+}
+
 /**
  * 
  * Module giao dich
