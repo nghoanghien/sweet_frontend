@@ -423,7 +423,6 @@ export default function LoginRegistrationForm() {
           setIsLoading(true);
           
           setTimeout(() => {
-            setIsLoading(false);
             // Redirect to sweet-main on successful login
             router.push('/sweet-main');
           }, 3000);
