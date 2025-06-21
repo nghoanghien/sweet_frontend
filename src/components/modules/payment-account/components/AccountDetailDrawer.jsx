@@ -17,70 +17,7 @@ import { WithdrawalPanel, DepositPanel } from '.';
 import FilterableAccountTransactionList from './FilterableAccountTransactionList';
 import ExportNotification from '../../../common/ExportNotification';
 import AnimatedTabNavigation from '../../../ui/custom/AnimatedTabNavigation';
-
-// Dữ liệu mẫu cho giao dịch
-const sampleTransactions = [
-  {
-    id: 1,
-    type: 'Nạp tiền',
-    time: 'Hôm nay, 10:45 AM',
-    amount: 5000000,
-    isIncoming: true,
-    channel: 'internet_banking',
-    balanceAfter: 20000000,
-    content: 'Nạp tiền vào tài khoản',
-  },
-  {
-    id: 2,
-    type: 'Rút tiền',
-    time: 'Hôm qua, 12:30 PM',
-    amount: 2000000,
-    isIncoming: false,
-    channel: 'atm',
-    balanceAfter: 15000000,
-    content: 'Rút tiền tại ATM',
-  },
-  {
-    id: 3,
-    type: 'Chuyển khoản',
-    time: '25/10/2023',
-    amount: 3000000,
-    isIncoming: false,
-    channel: 'mobile_app',
-    balanceAfter: 17000000,
-    content: 'Chuyển tiền cho Nguyễn Văn A',
-  },
-  {
-    id: 4,
-    type: 'Chuyển khoản',
-    time: '25/10/2023',
-    amount: 3000000,
-    isIncoming: false,
-    channel: 'mobile_app',
-    balanceAfter: 17000000,
-    content: 'Chuyển tiền cho Nguyễn Văn A',
-  },
-  {
-    id: 5,
-    type: 'Chuyển khoản',
-    time: '25/10/2023',
-    amount: 3000000,
-    isIncoming: false,
-    channel: 'mobile_app',
-    balanceAfter: 17000000,
-    content: 'Chuyển tiền cho Nguyễn Văn A',
-  },
-  {
-    id: 6,
-    type: 'Chuyển khoản',
-    time: '25/10/2023',
-    amount: 3000000,
-    isIncoming: false,
-    channel: 'mobile_app',
-    balanceAfter: 17000000,
-    content: 'Chuyển tiền cho Nguyễn Văn A',
-  },
-];
+import { useAllTransactionByPaymentAccountId } from '@/hooks/usePaymentTransaction';
 
 const AccountDetailDrawer = ({ 
   isOpen, 
@@ -103,10 +40,11 @@ const AccountDetailDrawer = ({
   const [notificationMessage, setNotificationMessage] = useState('');
   
   const [activeTab, setActiveTab] = useState('history'); // 'history', 'details'
-  const [transactions, setTransactions] = useState(sampleTransactions);
   
   // State for mobile action bar
   const [mobileActionBarVisible, setMobileActionBarVisible] = useState(true);
+
+  const { allTransactions, isLoading, error, refreshTransactions } = useAllTransactionByPaymentAccountId(account?.id || 0);
   
   // Cập nhật state nội bộ khi props thay đổi
   useEffect(() => {
@@ -178,8 +116,8 @@ const AccountDetailDrawer = ({
       content: 'Rút tiền tại quầy giao dịch'
     };
     
-    // Add the new transaction to the list
-    setTransactions([newTransaction, ...transactions]);
+    // Refresh transactions after withdrawal
+    refreshTransactions();
     
     // Update the account balance
     const updatedAccount = {
@@ -224,8 +162,8 @@ const AccountDetailDrawer = ({
       content: 'Nạp tiền tại quầy giao dịch'
     };
     
-    // Add the new transaction to the list
-    setTransactions([newTransaction, ...transactions]);
+    // Refresh transactions after deposit
+    refreshTransactions();
     
     // Update the account balance
     const updatedAccount = {
@@ -585,12 +523,14 @@ const AccountDetailDrawer = ({
                   <div className="overflow-y-auto mb-8 h-full">
                     <div className="p-4">
                       <FilterableAccountTransactionList
-                        transactions={transactions}
+                        transactions={allTransactions}
                         isHidden={isHidden}
                         emptyMessage="Không có giao dịch nào cho tài khoản này"
+                        isLoading={isLoading}
                         emptyIcon={
                           <FileText size={48} className="text-gray-400" />
                         }
+                        accountId={account?.id}
                       />
                     </div>
                   </div>
@@ -649,71 +589,12 @@ const AccountDetailDrawer = ({
                           </div>
                           <div className="flex justify-between">
                             <span className="text-sm text-gray-600">
-                              Trạng thái
-                            </span>
-                            <span className="text-sm font-medium flex items-center">
-                              {getStatusInfo(account.status).icon}
-                              {getStatusInfo(account.status).text}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">
                               Số dư hiện tại
                             </span>
                             <span className="text-sm font-medium text-indigo-700">
                               {isHidden
                                 ? "••••••••"
                                 : formatCurrency(account.balance)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
-                        <div className="flex justify-between items-center mb-3">
-                          <h4 className="text-base font-medium text-gray-800">
-                            Thông tin chủ tài khoản
-                          </h4>
-                          <button
-                            onClick={toggleVisibility}
-                            className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                          >
-                            {isHidden ? (
-                              <Eye size={16} className="text-gray-600" />
-                            ) : (
-                              <EyeOff size={16} className="text-gray-600" />
-                            )}
-                          </button>
-                        </div>
-                        <div className="space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">
-                              Họ và tên
-                            </span>
-                            <span className="text-sm font-medium">
-                              {account.ownerName || "Nguyễn Văn A"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">
-                              Số điện thoại
-                            </span>
-                            <span className="text-sm font-medium">
-                              {account.phone || "0912 345 678"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">Email</span>
-                            <span className="text-sm font-medium">
-                              {account.email || "example@gmail.com"}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600">
-                              Địa chỉ
-                            </span>
-                            <span className="text-sm font-medium">
-                              {account.address || "Hà Nội, Việt Nam"}
                             </span>
                           </div>
                         </div>
