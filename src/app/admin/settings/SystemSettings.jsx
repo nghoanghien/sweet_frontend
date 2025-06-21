@@ -27,16 +27,23 @@ const SystemSettings = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const editFormRef = useRef(null);
 
-  const { allParameters, isLoading, error, refreshParameters } = useAllParameters();
+  const { data, allParameters, isLoading, error, refreshParameters, updateAllParameters } = useAllParameters();
 
   // Loading state management
   useEffect(() => {
-    setMinEmployeeAge(allParameters.MIN_AGE_EMPLOYEE);
-    setMinCustomerAge(allParameters.MIN_AGE_CUSTOMER);
-    setMinTransactionAmountForPaymentAccount(allParameters.MIN_TRANSACTION_PAYMENT);
-    setMaxTransactionAmountForPaymentAccount(allParameters.MAX_TRANSACTION_PAYMENT);
-    setMinWithdrawalAmountForSavingAccount(allParameters.MIN_WITHDRAWAL_SAVING);
-  }, [allParameters]);
+    setMinEmployeeAge(data.MIN_AGE_EMPLOYEE);
+    setMinCustomerAge(data.MIN_AGE_CUSTOMER);
+    setMinTransactionAmountForPaymentAccount(data.MIN_TRANSACTION_PAYMENT);
+    setMaxTransactionAmountForPaymentAccount(data.MAX_TRANSACTION_PAYMENT);
+    setMinWithdrawalAmountForSavingAccount(data.MIN_WITHDRAWAL_SAVING);
+    
+    // Đồng bộ giá trị edited với giá trị hiện tại
+    setEditedMinEmployeeAge(data.MIN_AGE_EMPLOYEE);
+    setEditedMinCustomerAge(data.MIN_AGE_CUSTOMER);
+    setEditedMinTransactionAmountForPaymentAccount(data.MIN_TRANSACTION_PAYMENT);
+    setEditedMaxTransactionAmountForPaymentAccount(data.MAX_TRANSACTION_PAYMENT);
+    setEditedMinWithdrawalAmountForSavingAccount(data.MIN_WITHDRAWAL_SAVING);
+  }, [data]);
 
   // Xử lý lưu thay đổi
   const handleSave = () => {
@@ -44,32 +51,41 @@ const SystemSettings = () => {
   };
 
   // Xác nhận thay đổi
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     // Set processing state to true
     setIsProcessing(true);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      try {
-        // Update all settings
-        setMinEmployeeAge(editedMinEmployeeAge);
-        setMinCustomerAge(editedMinCustomerAge);
-        setMinTransactionAmountForPaymentAccount(editedMinTransactionAmountForPaymentAccount);
-        setMaxTransactionAmountForPaymentAccount(editedMaxTransactionAmountForPaymentAccount);
-        setMinWithdrawalAmountForSavingAccount(editedMinWithdrawalAmountForSavingAccount);
-        
-        // Update UI state
-        setIsEditing(false);
-        setShowConfirmModal(false);
-        setShowSuccessNotification(true);
-      } catch (error) {
-        console.error('Error updating settings:', error);
-        // In a real app, show error notification here
-      } finally {
-        // Reset processing state
-        setIsProcessing(false);
-      }
-    }, 1500); // 1.5 second delay to simulate API call
+    try {
+      // Chuẩn bị dữ liệu update
+      const updates = {
+        'MIN_AGE_EMPLOYEE': editedMinEmployeeAge,
+        'MIN_AGE_CUSTOMER': editedMinCustomerAge,
+        'MIN_TRANSACTION_PAYMENT': editedMinTransactionAmountForPaymentAccount,
+        'MAX_TRANSACTION_PAYMENT': editedMaxTransactionAmountForPaymentAccount,
+        'MIN_WITHDRAWAL_SAVING': editedMinWithdrawalAmountForSavingAccount
+      };
+      
+      // Gọi API update
+      await updateAllParameters(updates);
+      
+      // Update local state
+      setMinEmployeeAge(editedMinEmployeeAge);
+      setMinCustomerAge(editedMinCustomerAge);
+      setMinTransactionAmountForPaymentAccount(editedMinTransactionAmountForPaymentAccount);
+      setMaxTransactionAmountForPaymentAccount(editedMaxTransactionAmountForPaymentAccount);
+      setMinWithdrawalAmountForSavingAccount(editedMinWithdrawalAmountForSavingAccount);
+      
+      // Update UI state
+      setIsEditing(false);
+      setShowConfirmModal(false);
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      // Có thể thêm thông báo lỗi ở đây
+    } finally {
+      // Reset processing state
+      setIsProcessing(false);
+    }
   };
 
   // Hủy chỉnh sửa
