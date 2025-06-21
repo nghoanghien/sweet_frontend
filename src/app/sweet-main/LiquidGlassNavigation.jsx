@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   User, 
@@ -15,6 +15,9 @@ import {
 import NavItem from '@/components/ui/custom/NavItem';
 import NavItemShimmer from '@/components/ui/custom/shimmer-types/NavItemShimmer';
 import ProfileShimmer from '@/components/ui/custom/shimmer-types/ProfileShimmer';
+import { useUser } from '@/store/useUserStore';
+import { getPermissions } from '@/utils/permissions';
+import { Permission } from '@/types/interfaces/enums';
 
 // Main Navigation Component
 const LiquidGlassNavigation = ({
@@ -27,13 +30,13 @@ const LiquidGlassNavigation = ({
     { id: "deposits", icon: Wallet, text: "Quản lý tiền gửi" }
   ],
   adminMenuItems = [
-    { id: "customers", icon: Users, text: "Quản lý khách hàng & tiền gửi" },
-    { id: "employees", icon: User, text: "Quản lý nhân viên" },
-    { id: "deposit-slips", icon: Receipt, text: "Tra cứu phiếu gửi tiền" },
-    { id: "savings-products", icon: PiggyBank, text: "Quản lý sản phẩm tiết kiệm" },
-    { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số" },
-    { id: "settings", icon: Settings, text: "Cài đặt hệ thống" },
-    { id: "permissions", icon: Lock, text: "Quản lý phân quyền" }
+    { id: "customers", icon: Users, text: "Quản lý khách hàng & tiền gửi", permission: Permission.CUSTOMERS },
+    { id: "employees", icon: User, text: "Quản lý nhân viên", permission: Permission.EMPLOYEES },
+    { id: "deposit-slips", icon: Receipt, text: "Tra cứu phiếu gửi tiền", permission: Permission.CUSTOMERS },
+    { id: "savings-products", icon: PiggyBank, text: "Quản lý sản phẩm tiết kiệm", permission: Permission.SAVING_PRODUCTS },
+    { id: "sales-reports", icon: LineChart, text: "Báo cáo doanh số", permission: Permission.SALE_REPORTS },
+    { id: "settings", icon: Settings, text: "Cài đặt hệ thống", permission: Permission.SETTINGS },
+    { id: "permissions", icon: Lock, text: "Quản lý phân quyền", permission: Permission.PERMISSIONS }
   ],
   onLogout = () => {},
   customerSectionTitle = "Dành cho khách hàng",
@@ -43,6 +46,7 @@ const LiquidGlassNavigation = ({
 }) => {
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, detailInfo, isAuthenticated } = useUser();
 
   useEffect(() => {
     // Simulate loading for 2 seconds
@@ -52,6 +56,36 @@ const LiquidGlassNavigation = ({
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Determine user permissions and filter menu items
+  const { filteredCustomerItems, filteredAdminItems, shouldShowCustomerSection, shouldShowAdminSection } = useMemo(() => {
+    if (!isAuthenticated || !user || !detailInfo) {
+      return {
+        filteredCustomerItems: [],
+        filteredAdminItems: [],
+        shouldShowCustomerSection: false,
+        shouldShowAdminSection: false
+      };
+    }
+
+    const isEmployee = detailInfo.type === "NHANVIEN";
+    
+    // Get user permissions from role
+    const userPermissions = user.vaiTro?.quyenHanIds ? getPermissions(user.vaiTro.quyenHanIds) : [];
+    
+    // Filter admin items based on permissions
+    const filteredAdminItems = adminMenuItems.filter(item => {
+      if (!item.permission) return true; // Items without permission requirement are always shown
+      return userPermissions.includes(item.permission);
+    });
+
+    return {
+      filteredCustomerItems: customerMenuItems,
+      filteredAdminItems,
+      shouldShowCustomerSection: !isEmployee, // Hide customer section if user is employee
+      shouldShowAdminSection: isEmployee && showAdminSection // Show admin section only if user is employee
+    };
+  }, [isAuthenticated, user, detailInfo, customerMenuItems, adminMenuItems, showAdminSection]);
 
   const handleSectionChange = (sectionId) => {
     if (sectionId === "logout") {
@@ -284,49 +318,53 @@ const LiquidGlassNavigation = ({
         {/* Navigation items */}
         <div className="relative flex-1 py-6 px-3 flex flex-col overflow-hidden">
           {/* Customer Group */}
-          <div className={`mb-4 ${navHovered ? "px-4" : "text-center"}`}>
-            <p className="text-xs text-gray-600 uppercase font-medium mb-3 drop-shadow-sm whitespace-nowrap overflow-hidden tracking-wider">
-              {navHovered ? customerSectionTitle : "KH"}
-            </p>
-          </div>
+          {shouldShowCustomerSection && (
+            <>
+              <div className={`mb-4 ${navHovered ? "px-4" : "text-center"}`}>
+                <p className="text-xs text-gray-600 uppercase font-medium mb-3 drop-shadow-sm whitespace-nowrap overflow-hidden tracking-wider">
+                  {navHovered ? customerSectionTitle : "KH"}
+                </p>
+              </div>
 
-          {isLoading ? (
-            // Show shimmer placeholders for customer items
-            Array.from({ length: customerMenuItems.length }, (_, index) => (
-              <NavItemShimmer
-                key={`customer-shimmer-${index}`}
-                expanded={navHovered}
-                index={index}
-              />
-            ))
-          ) : (
-            customerMenuItems.map((item) => {
-              const IconComponent = item.icon;
-              return (
-                <NavItem
-                  key={item.id}
-                  icon={
-                    <IconComponent
-                      size={20}
-                      className="text-gray-600"
-                      strokeWidth={2.3}
+              {isLoading ? (
+                // Show shimmer placeholders for customer items
+                Array.from({ length: filteredCustomerItems.length }, (_, index) => (
+                  <NavItemShimmer
+                    key={`customer-shimmer-${index}`}
+                    expanded={navHovered}
+                    index={index}
+                  />
+                ))
+              ) : (
+                filteredCustomerItems.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <NavItem
+                      key={item.id}
+                      icon={
+                        <IconComponent
+                          size={20}
+                          className="text-gray-600"
+                          strokeWidth={2.3}
+                        />
+                      }
+                      text={item.text}
+                      expanded={navHovered}
+                      active={activeSection === item.id}
+                      onClick={() => handleSectionChange(item.id)}
+                      className="liquid-glass-nav-item shadow-[inset_0_0_20px_12px_rgba(255,255,255,0.5)]"
                     />
-                  }
-                  text={item.text}
-                  expanded={navHovered}
-                  active={activeSection === item.id}
-                  onClick={() => handleSectionChange(item.id)}
-                  className="liquid-glass-nav-item shadow-[inset_0_0_20px_12px_rgba(255,255,255,0.5)]"
-                />
-              );
-            })
+                  );
+                })
+              )}
+            </>
           )}
 
           {/* Admin Group */}
-          {showAdminSection && (
+          {shouldShowAdminSection && (
             <>
               <div
-                className={`mt-8 mb-4 ${navHovered ? "px-4" : "text-center"}`}
+                className={`mt-0 mb-4 ${navHovered ? "px-4" : "hidden text-center"}`}
               >
                 <p className="text-xs text-gray-600 uppercase font-medium mb-3 drop-shadow-sm whitespace-nowrap overflow-hidden tracking-wider">
                   {navHovered ? adminSectionTitle : "QTV"}
@@ -343,15 +381,15 @@ const LiquidGlassNavigation = ({
               >
                 {isLoading ? (
                   // Show shimmer placeholders for admin items
-                  Array.from({ length: adminMenuItems.length }, (_, index) => (
+                  Array.from({ length: filteredAdminItems.length }, (_, index) => (
                     <NavItemShimmer
                       key={`admin-shimmer-${index}`}
                       expanded={navHovered}
-                      index={index + customerMenuItems.length}
+                      index={index + filteredCustomerItems.length}
                     />
                   ))
                 ) : (
-                  adminMenuItems.map((item) => {
+                  filteredAdminItems.map((item) => {
                     const IconComponent = item.icon;
                     return (
                       <NavItem
@@ -388,7 +426,7 @@ const LiquidGlassNavigation = ({
           {isLoading ? (
             <NavItemShimmer
               expanded={navHovered}
-              index={customerMenuItems.length + adminMenuItems.length}
+              index={filteredCustomerItems.length + filteredAdminItems.length}
             />
           ) : (
             <NavItem

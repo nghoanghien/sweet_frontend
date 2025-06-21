@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { login, logout, getAccountInformation } from '@/services/auth';
+import { callGetAccountInformation } from '@/config/api';
 import { IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO, IUserLogin } from '@/types/auth';
 import { TypeUserEnum } from '@/types/enums/TypeUserEnum';
 
 interface UserState {
   user: IUserLogin | null;
   token: string | null;
+  detailInfo: IUserGetAccountDTO | null;
+  isAdmin: boolean;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -25,6 +28,8 @@ export const useUserStore = create<UserState>()(
     (set, get) => ({
       user: null,
       token: null,
+      detailInfo: null,
+      isAdmin: false,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -74,6 +79,29 @@ export const useUserStore = create<UserState>()(
             console.log('Is Authenticated:', true);
             console.log('===================================');
             
+            // Get detailed account information
+            try {
+              const detailResponse = await callGetAccountInformation();
+              if (detailResponse && detailResponse.data) {
+                const detailInfo = detailResponse.data;
+                const isAdmin = detailInfo.hasOwnProperty('employeeID');
+                
+                set({
+                  detailInfo,
+                  isAdmin,
+                });
+                
+                // Log detailed information
+                console.log('=== Detailed Account Information ===');
+                console.log('Detail Info:', detailInfo);
+                console.log('Has employeeID:', detailInfo.hasOwnProperty('employeeID'));
+                console.log('Is Admin:', isAdmin);
+                console.log('=====================================');
+              }
+            } catch (detailError) {
+              console.error('Error getting detailed account information:', detailError);
+            }
+            
             return { success: true };
           } else {
             throw new Error('Đăng nhập thất bại');
@@ -92,6 +120,8 @@ export const useUserStore = create<UserState>()(
           set({
             user: null,
             token: null,
+            detailInfo: null,
+            isAdmin: false,
             isAuthenticated: false,
             isLoading: false,
             error: errorMessage,
@@ -114,6 +144,8 @@ export const useUserStore = create<UserState>()(
           set({
             user: null,
             token: null,
+            detailInfo: null,
+            isAdmin: false,
             isAuthenticated: false,
             isLoading: false,
             error: null,
@@ -127,6 +159,8 @@ export const useUserStore = create<UserState>()(
           set({
             user: null,
             token: null,
+            detailInfo: null,
+            isAdmin: false,
             isAuthenticated: false,
             isLoading: false,
             error: null,
@@ -145,7 +179,7 @@ export const useUserStore = create<UserState>()(
             : null;
           
           if (!token) {
-            set({ user: null, token: null, isAuthenticated: false });
+            set({ user: null, token: null, detailInfo: null, isAdmin: false, isAuthenticated: false });
             return;
           }
           
@@ -180,6 +214,8 @@ export const useUserStore = create<UserState>()(
           set({
             user: null,
             token: null,
+            detailInfo: null,
+            isAdmin: false,
             isAuthenticated: false,
             isLoading: false,
             error: error.message || 'Phiên đăng nhập đã hết hạn',
@@ -211,6 +247,8 @@ export const useUserStore = create<UserState>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        detailInfo: state.detailInfo,
+        isAdmin: state.isAdmin,
         isAuthenticated: state.isAuthenticated,
       }),
     }
@@ -219,8 +257,8 @@ export const useUserStore = create<UserState>()(
 
 // Selectors for better performance
 export const useUser = () => {
-  const { user, isAuthenticated, isLoading, error } = useUserStore();
-  return { user, isAuthenticated, isLoading, error };
+  const { user, detailInfo, isAdmin, isAuthenticated, isLoading, error } = useUserStore();
+  return { user, detailInfo, isAdmin, isAuthenticated, isLoading, error };
 };
 
 export const useUserActions = () => {
