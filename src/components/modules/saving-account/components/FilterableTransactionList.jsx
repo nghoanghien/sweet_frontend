@@ -9,7 +9,8 @@ const FilterableTransactionList = ({
   isHidden = false,
   externalIsLoading = false,
   emptyMessage = "Không có giao dịch nào",
-  emptyIcon = <Search size={48} className="text-gray-400" />
+  emptyIcon = <Search size={48} className="text-gray-400" />,
+  channelLabels = {}
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
@@ -88,8 +89,9 @@ const FilterableTransactionList = ({
           // Search across multiple fields
           return (
             (transaction.type && transaction.type.toLowerCase().includes(searchTermLower)) ||
-            (transaction.time && transaction.time.toLowerCase().includes(searchTermLower)) ||
+            (transaction.time && (transaction.time instanceof Date ? transaction.time.toLocaleString('vi-VN') : transaction.time).toLowerCase().includes(searchTermLower)) ||
             (transaction.channel && transaction.channel.toLowerCase().includes(searchTermLower)) ||
+            (transaction.channel && channelLabels[transaction.channel] && channelLabels[transaction.channel].toLowerCase().includes(searchTermLower)) ||
             (transaction.content && transaction.content.toLowerCase().includes(searchTermLower)) ||
             (transaction.status && transaction.status.toLowerCase().includes(searchTermLower))
           );
@@ -104,7 +106,7 @@ const FilterableTransactionList = ({
 
   // Get enhanced transaction icon
   const getTransactionIcon = (transaction) => {
-    if (transaction.isIncoming) {
+    if (transaction.isDeposit) {
       return <ArrowDownLeft size={20} className="text-white" />;
     } else {
       return <ArrowUpRight size={20} className="text-white" />;
@@ -195,7 +197,7 @@ const FilterableTransactionList = ({
                       {/* Enhanced icon */}
                       <div className="relative">
                         <div className={`h-12 w-12 rounded-xl ${
-                          transaction.isIncoming 
+                          transaction.isDeposit 
                             ? 'bg-gradient-to-br from-green-500 to-emerald-600' 
                             : 'bg-gradient-to-br from-amber-500 to-orange-600'
                         } flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300`}>
@@ -213,7 +215,7 @@ const FilterableTransactionList = ({
                         </h4>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           <Calendar size={14} />
-                          <span>{highlightText(transaction.time, searchTerm)}</span>
+                          <span>{highlightText(transaction.time instanceof Date ? transaction.time.toLocaleString('vi-VN') : transaction.time, searchTerm)}</span>
                         </div>
                       </div>
                     </div>
@@ -221,17 +223,17 @@ const FilterableTransactionList = ({
                     {/* Enhanced amount display */}
                     <div className="text-right">
                       <div className={`text-lg font-bold ${
-                        transaction.isIncoming 
+                        transaction.isDeposit 
                           ? 'bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent' 
                           : 'bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent'
                       }`}>
                         {isHidden ? 
                           '••••••••' : 
-                          (transaction.isIncoming ? '+' : '-') + formatCurrency(transaction.amount)
+                          (transaction.isDeposit ? '+' : '-') + formatCurrency(transaction.amount)
                         }
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
-                        {transaction.isIncoming ? 'Tiền vào' : 'Tiền ra'}
+                        {transaction.isDeposit ? 'Tiền vào' : 'Tiền ra'}
                       </div>
                     </div>
                   </div>
@@ -245,7 +247,7 @@ const FilterableTransactionList = ({
                           Kênh:
                         </span>
                         <span className="font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-full">
-                          {highlightText(transaction.channel, searchTerm)}
+                          {highlightText(channelLabels[transaction.channel] || transaction.channel, searchTerm)}
                         </span>
                       </div>
                     )}
@@ -281,7 +283,7 @@ const FilterableTransactionList = ({
                             </strong>
                           </span>
                         ) : (
-                          <span>Giao dịch <strong className="text-blue-600">{transaction.isIncoming ? 'nhận' : 'chuyển'}</strong></span>
+                          <span>Giao dịch <strong className="text-blue-600">{transaction.isDeposit ? 'nhận' : 'chuyển'}</strong></span>
                         )}
                       </div>
                       <button className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-200 text-sm">
