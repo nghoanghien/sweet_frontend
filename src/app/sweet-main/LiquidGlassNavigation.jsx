@@ -48,7 +48,7 @@ const LiquidGlassNavigation = ({
     // Simulate loading for 2 seconds
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 5000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
