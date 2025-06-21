@@ -6,7 +6,6 @@ import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
 
 export const getAllCustomers = async () => {
   const response = await callGetAllKhachHang();
-  console.log("Du lieu truoc khi mapping: ", response.data);
 
   return response.data?.map(mapApiToUser);
 }

@@ -6,8 +6,6 @@ import React, { useState, useEffect } from 'react';
     MapPin, 
     Plus,
     Download,
-    Lock,
-    Unlock,
     Save,
     Calendar,
     FileText,
@@ -28,23 +26,27 @@ import React, { useState, useEffect } from 'react';
   import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
 import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
 import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer';
+import { useAllEmployees } from '@/hooks/useEmployees';
+import { formatDate } from '@/utils/saving-account';
   export default function EmployeeManagement() {
-    // State for employee data
+    // Remove mock data - now using real data from API
+    const { allEmployees, isLoading, error, refreshEmployees } = useAllEmployees();
+
+    // State for employee data (keeping for backward compatibility)
     const [employees, setEmployees] = useState([
       {
         id: 1,
-        code: 'NV000001',
         fullName: 'Nguyễn Văn A',
-        birthDate: '12/05/1985',
+        dateOfBirth: '12/05/1985',
         age: 38,
-        idNumber: '036085123456',
+        idCardNumber: '036085123456',
         email: 'nguyenvana@email.com',
-        phone: '0901234567',
+        phoneNumber: '0901234567',
         permanentAddress: {
           province: 'Hà Nội',
           district: 'Cầu Giấy',
           ward: 'Dịch Vọng',
-          street: 'Trần Thái Tông',
+          streetName: 'Trần Thái Tông',
           houseNumber: '125'
         },
         transactions: [
@@ -98,820 +100,11 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
           province: 'Hà Nội',
           district: 'Cầu Giấy',
           ward: 'Dịch Vọng',
-          street: 'Trần Thái Tông',
+          streetName: 'Trần Thái Tông',
           houseNumber: '125'
         },
-        registrationDate: '15/06/2022',
-        status: 'active'
-      },
-      {
-        id: 2,
-        code: 'NV000002',
-        fullName: 'Trần Thị B',
-        birthDate: '25/11/1990',
-        age: 33,
-        idNumber: '024190789123',
-        email: 'tranthib@email.com',
-        phone: '0912345678',
-        permanentAddress: {
-          province: 'TP. Hồ Chí Minh',
-          district: 'Quận 1',
-          ward: 'Bến Nghé',
-          street: 'Lê Duẩn',
-          houseNumber: '78'
-        },
-        contactAddress: {
-          province: 'Hồ Chí Minh',
-          district: 'Quận 1',
-          ward: 'Bến Nghé',
-          street: 'Lê Lợi',
-          houseNumber: '76'
-        },
-        transactions: [
-          {
-            id: 1,
-            type: 'incoming',
-            description: 'Lương tháng 5/2023',
-            date: '25/05/2023',
-            amount: 18000000,
-            channel: 'bank',
-            note: 'Chuyển khoản lương tháng 5/2023'
-          },
-          {
-            id: 2,
-            type: 'outgoing',
-            description: 'Tạm ứng chi phí dự án',
-            date: '05/06/2023',
-            amount: 5000000,
-            channel: 'cash',
-            note: 'Tạm ứng chi phí dự án XYZ'
-          },
-          {
-            id: 3,
-            type: 'incoming',
-            description: 'Hoàn ứng dự án',
-            date: '20/06/2023',
-            amount: 2000000,
-            channel: 'cash',
-            note: 'Hoàn ứng chi phí dự án XYZ không sử dụng hết'
-          }
-        ],
-        registrationDate: '15/08/2022',
-        status: 'active'
-      },
-      {
-        id: 3,
-        code: 'NV000003',
-        fullName: 'Lê Văn C',
-        birthDate: '10/03/1978',
-        age: 45,
-        idNumber: '025781234567',
-        email: 'levanc@email.com',
-        phone: '0923456789',
-        permanentAddress: {
-          province: 'Đà Nẵng',
-          district: 'Hải Châu',
-          ward: 'Thuận Phước',
-          street: 'Bạch Đằng',
-          houseNumber: '45'
-        },
-        contactAddress: {
-          province: 'Đà Nẵng',
-          district: 'Hải Châu',
-          ward: 'Thuận Phước',
-          street: 'Bạch Đằng',
-          houseNumber: '45'
-        },
-        registrationDate: '05/11/2022',
-        status: 'disabled'
-      },
-      {
-        id: 4,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 5,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 14,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 15,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 6,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 7,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 8,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 9,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 10,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 11,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 12,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 13,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 21,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 20,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 22,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 23,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 24,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 25,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 27,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 26,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 29,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 28,
-        code: 'NV000005',
-        fullName: 'Hoàng Văn E',
-        birthDate: '30/09/1982',
-        age: 41,
-        idNumber: '026082456789',
-        email: 'hoangvane@email.com',
-        phone: '0945678901',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Đống Đa',
-          ward: 'Quang Trung',
-          street: 'Nguyễn Lương Bằng',
-          houseNumber: '56'
-        },
-        registrationDate: '25/04/2023',
-        status: 'disabled'
-      },
-      {
-        id: 30,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 31,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 32,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 33,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 34,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
-      },
-      {
-        id: 35,
-        code: 'NV000004',
-        fullName: 'Phạm Thị D',
-        birthDate: '18/07/1995',
-        age: 28,
-        idNumber: '038095345678',
-        email: 'phamthid@email.com',
-        phone: '0934567890',
-        permanentAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        contactAddress: {
-          province: 'Hải Phòng',
-          district: 'Hồng Bàng',
-          ward: 'Hoàng Văn Thụ',
-          street: 'Lê Lợi',
-          houseNumber: '102'
-        },
-        registrationDate: '12/02/2023',
-        status: 'active'
+        recruitmentDate: '15/06/2022',
+        accountStatus: 'active'
       },
     ]);
   
@@ -930,32 +123,32 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
     // State for multi-field search
     const [searchFields, setSearchFields] = useState({
       fullName: '',
-      idNumber: '',
+      idCardNumber: '',
       email: '',
-      phone: ''
+      phoneNumber: ''
     });
   
     // For new employee
     const [newEmployee, setNewEmployee] = useState({
       fullName: '',
-      birthDate: '',
-      idNumber: '',
+      dateOfBirth: '',
+      idCardNumber: '',
       idIssueDate: '',
       idIssuePlace: '',
       email: '',
-      phone: '',
+      phoneNumber: '',
       permanentAddress: {
         province: '',
         district: '',
         ward: '',
-        street: '',
+        streetName: '',
         houseNumber: ''
       },
       contactAddress: {
         province: '',
         district: '',
         ward: '',
-        street: '',
+        streetName: '',
         houseNumber: ''
       }
     });
@@ -981,13 +174,10 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
     });
     
     // State for responsive layout
-    const [navHovered, setNavHovered] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     
     // Loading states
-    const [isLoadingEmployees, setIsLoadingEmployees] = useState(true);
-    const [isLoadingSearch, setIsLoadingSearch] = useState(true);
     const [isLoadingForm, setIsLoadingForm] = useState(true);
   
     const employeeColumns = [
@@ -1004,9 +194,10 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         )
       },
       {
-        key: 'birthDate',
+        key: 'dateOfBirth',
         label: 'Ngày sinh',
         sortable: true,
+        formatter: (value) => formatDate(value),
         className: 'hidden sm:table-cell' // Ẩn trên mobile
       },
       {
@@ -1016,19 +207,19 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         className: 'hidden sm:table-cell' // Ẩn trên mobile
       },
       {
-        key: 'phone',
+        key: 'phoneNumber',
         label: 'Số điện thoại',
         sortable: true,
         className: 'hidden sm:table-cell' // Ẩn trên mobile
       },
       {
-        key: 'idNumber',
+        key: 'idCardNumber',
         label: 'Số CCCD',
         sortable: true,
         className: 'hidden sm:table-cell' // Ẩn trên mobile
       },
       {
-        key: 'status',
+        key: 'accountStatus',
         label: 'Trạng thái',
         sortable: true,
         type: 'status' // Sử dụng StatusBadge component
@@ -1045,20 +236,20 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         getValue: (data) => data.fullName || ''
       },
       {
-        name: 'birthDate',
+        name: 'dateOfBirth',
         type: 'date',
         label: 'Ngày sinh',
         placeholder: 'DD/MM/YYYY',
         required: true,
-        getValue: (data) => data.birthDate || ''
+        getValue: (data) => data.dateOfBirth || ''
       },
       {
-        name: 'idNumber',
+        name: 'idCardNumber',
         type: 'text',
         label: 'Số CCCD/CMND',
         placeholder: 'Nhập số CCCD/CMND...',
         required: true,
-        getValue: (data) => data.idNumber || ''
+        getValue: (data) => data.idCardNumber || ''
       },
       {
         name: 'email',
@@ -1069,12 +260,12 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         getValue: (data) => data.email || ''
       },
       {
-        name: 'phone',
+        name: 'phoneNumber',
         type: 'tel',
         label: 'Số điện thoại',
         placeholder: 'Nhập số điện thoại...',
         required: true,
-        getValue: (data) => data.phone || ''
+        getValue: (data) => data.phoneNumber || ''
       },
       {
         name: 'permanentAddress',
@@ -1085,7 +276,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
           province: '',
           district: '',
           ward: '',
-          street: '',
+          streetName: '',
           houseNumber: ''
         }
       },
@@ -1098,7 +289,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
           province: '',
           district: '',
           ward: '',
-          street: '',
+          streetName: '',
           houseNumber: ''
         }
       }
@@ -1131,15 +322,6 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
     
     // Simulate loading states
     useEffect(() => {
-      // Simulate search filter loading
-      setTimeout(() => {
-        setIsLoadingSearch(false);
-      }, 2000);
-      
-      // Simulate employees data loading
-      setTimeout(() => {
-        setIsLoadingEmployees(false);
-      }, 2000);
       
       // Simulate form loading
       setTimeout(() => {
@@ -1149,7 +331,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
   
     // useEffect to filter and sort employees
     useEffect(() => {
-      let result = [...employees];
+      let result = [...allEmployees];
       
       // Apply search filtering across all search fields
       result = result.filter(employee => {
@@ -1157,14 +339,14 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         const nameMatch = searchFields.fullName === '' || 
           employee.fullName.toLowerCase().includes(searchFields.fullName.toLowerCase());
         
-        const idMatch = searchFields.idNumber === '' || 
-          employee.idNumber.toLowerCase().includes(searchFields.idNumber.toLowerCase());
+        const idMatch = searchFields.idCardNumber === '' || 
+          employee.idCardNumber.toLowerCase().includes(searchFields.idCardNumber.toLowerCase());
         
         const emailMatch = searchFields.email === '' || 
           (employee.email && employee.email.toLowerCase().includes(searchFields.email.toLowerCase()));
         
-        const phoneMatch = searchFields.phone === '' || 
-          employee.phone.toLowerCase().includes(searchFields.phone.toLowerCase());
+        const phoneMatch = searchFields.phoneNumber === '' || 
+          employee.phoneNumber.toLowerCase().includes(searchFields.phoneNumber.toLowerCase());
         
         // Employee must match all non-empty search criteria
         return nameMatch && idMatch && emailMatch && phoneMatch;
@@ -1198,7 +380,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
       });
       
       setFilteredEmployees(result);
-    }, [employees, searchFields, sortField, sortDirection]);
+    }, [allEmployees, searchFields, sortField, sortDirection]);
   
     // Add useEffect to reset form data when modal state changes
     useEffect(() => {
@@ -1222,24 +404,24 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         setTimeout(() => {
           setNewEmployee({
             fullName: '',
-            birthDate: '',
-            idNumber: '',
+            dateOfBirth: '',
+            idCardNumber: '',
             idIssueDate: '',
             idIssuePlace: '',
             email: '',
-            phone: '',
+            phoneNumber: '',
             permanentAddress: {
               province: '',
               district: '',
               ward: '',
-              street: '',
+              streetName: '',
               houseNumber: ''
             },
             contactAddress: {
               province: '',
               district: '',
               ward: '',
-              street: '',
+              streetName: '',
               houseNumber: ''
             }
           });
@@ -1260,9 +442,9 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
     const clearSearchFields = () => {
       setSearchFields({
         fullName: '',
-        idNumber: '',
+        idCardNumber: '',
         email: '',
-        phone: ''
+        phoneNumber: ''
       });
     };
   
@@ -1296,96 +478,25 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
       }, 300); // Wait for animation to complete
     };
   
-    // Toggle employee status (active/disabled)
-    const toggleEmployeeStatus = (employeeId) => {
-      const employee = employees.find(c => c.id === employeeId);
-      if (!employee) return;
-      
-      const newStatus = employee.status === 'active' ? 'disabled' : 'active';
-      const actionText = newStatus === 'active' ? 'kích hoạt' : 'vô hiệu hóa';
-      
-      openConfirmationModal({
-        title: `Xác nhận ${actionText} tài khoản`,
-        description: `Bạn có chắc chắn muốn ${actionText} tài khoản của nhân viên "${employee.fullName}" không?`,
-        confirmText: `Quẹt để ${actionText}`,
-        confirmDetails: {
-          'Mã nhân viên': employee.code,
-          'Họ tên': employee.fullName,
-          'Trạng thái hiện tại': employee.status === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
-          'Trạng thái mới': newStatus === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
-        },
-        type: `${newStatus === 'active' ? 'unlock' : 'warning'}`,
-        onConfirm: () => {
-          // Set processing state to true
-          setConfirmationProcessing(true);
-          
-          // Simulate API call with a delay
-          setTimeout(() => {
-            try {
-              // Update employee status
-              setEmployees(prevEmployees => 
-                prevEmployees.map(c => {
-                  if (c.id === employeeId) {
-                    return { ...c, status: newStatus };
-                  }
-                  return c;
-                })
-              );
-              
-              // Hiển thị thông báo thành công
-              setExportNotification({
-                visible: true,
-                type: 'success',
-                message: `${newStatus === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa'} nhân viên thành công!`,
-                format: `${newStatus === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa'} nhân viên thành công!`
-              });
-              
-              // Tự động ẩn thông báo sau 5 giây
-              setTimeout(() => {
-                setExportNotification(prev => ({...prev, visible: false}));
-              }, 5000);
-              
-              // Reset processing state and close modal
-              setConfirmationProcessing(false);
-              closeConfirmationModal();
-            } catch (error) {
-              console.error('Error updating employee status:', error);
-              
-              // Show error notification
-              setExportNotification({
-                visible: true,
-                type: 'error',
-                message: 'Có lỗi xảy ra. Vui lòng thử lại sau!',
-                format: 'Hệ thống báo lỗi. Hãy thử lại'
-              });
-              
-              // Reset processing state
-              setConfirmationProcessing(false);
-            }
-          }, 1500); // 1.5 second delay
-        }
-      });
-    };
-  
     // Enable edit mode for an employee
     const enableEditMode = (employee) => {
       setSelectedEmployee(employee);
       setEditedEmployee({
         ...employee,
-        birthDate: employee.birthDate || '',
+        dateOfBirth: employee.dateOfBirth || '',
         idIssueDate: employee.idIssueDate || '',
         permanentAddress: {
           province: employee.permanentAddress?.province || '',
           district: employee.permanentAddress?.district || '',
           ward: employee.permanentAddress?.ward || '',
-          street: employee.permanentAddress?.street || '',
+          streetName: employee.permanentAddress?.streetName || '',
           houseNumber: employee.permanentAddress?.houseNumber || '',
         },
         contactAddress: {
           province: employee.contactAddress?.province || '',
           district: employee.contactAddress?.district || '',
           ward: employee.contactAddress?.ward || '',
-          street: employee.contactAddress?.street || '',
+          streetName: employee.contactAddress?.streetName || '',
           houseNumber: employee.contactAddress?.houseNumber || '',
         }
       });
@@ -1426,16 +537,16 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
     // Save edited employee with validation
     const saveEmployeeChanges = () => {
       // Validate all fields before saving
-      const fieldsToValidate = ['phone'];
-      const addressFields = ['province', 'district', 'ward', 'street', 'houseNumber'];
+      const fieldsToValidate = ['phoneNumber'];
+      const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
       
       let isValid = true;
       const newErrors = {};
       
-      // Validate phone
-      const phoneError = validateField('phone', editedEmployee.phone);
+      // Validate phoneNumber
+      const phoneError = validateField('phoneNumber', editedEmployee.phoneNumber);
       if (phoneError) {
-        newErrors.phone = phoneError;
+        newErrors.phoneNumber = phoneError;
         isValid = false;
       }
       
@@ -1460,8 +571,8 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
               return {
                 ...employee,
                 contactAddress: editedEmployee.contactAddress,
-                phone: editedEmployee.phone,
-                status: editedEmployee.status
+                phoneNumber: editedEmployee.phoneNumber,
+                accountStatus: editedEmployee.accountStatus
               };
             }
             return employee;
@@ -1471,8 +582,8 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         setSelectedEmployee(prev => ({
           ...prev,
           contactAddress: editedEmployee.contactAddress,
-          phone: editedEmployee.phone,
-          status: editedEmployee.status
+          phoneNumber: editedEmployee.phoneNumber,
+          accountStatus: editedEmployee.accountStatus
         }));
         
         // Hiển thị thông báo thành công
@@ -1519,24 +630,24 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         // If opening, reset the form first then open the modal
         setNewEmployee({
           fullName: '',
-          birthDate: '',
-          idNumber: '',
+          dateOfBirth: '',
+          idCardNumber: '',
           idIssueDate: '',
           idIssuePlace: '',
           email: '',
-          phone: '',
+          phoneNumber: '',
           permanentAddress: {
             province: '',
             district: '',
             ward: '',
-            street: '',
+            streetName: '',
             houseNumber: ''
           },
           contactAddress: {
             province: '',
             district: '',
             ward: '',
-            street: '',
+            streetName: '',
             houseNumber: ''
           }
         });
@@ -1600,7 +711,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         return '';
       }
       
-      if (field === 'birthDate') {
+      if (field === 'dateOfBirth') {
         if (!safeValue.trim()) return 'Ngày sinh không được để trống';
         const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
         if (!dateRegex.test(safeValue)) return 'Ngày sinh không đúng định dạng DD/MM/YYYY';
@@ -1608,12 +719,12 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         // Validate age > 18
         if (dateRegex.test(safeValue)) {
           const parts = safeValue.split('/');
-          const birthDate = new Date(parts[2], parts[1] - 1, parts[0]);
-          const today = new Date();
-          let age = today.getFullYear() - birthDate.getFullYear();
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          
-          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          const dateOfBirth = new Date(parts[2], parts[1] - 1, parts[0]);
+    const today = new Date();
+    let age = today.getFullYear() - dateOfBirth.getFullYear();
+    const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
             age--;
           }
           
@@ -1625,7 +736,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         return '';
       }
       
-      if (field === 'idNumber') {
+      if (field === 'idCardNumber') {
         if (!safeValue.trim()) return 'Số CCCD/CMND không được để trống';
         if (!/^\d{9,12}$/.test(safeValue)) return 'Số CCCD/CMND phải có 9-12 chữ số';
         return '';
@@ -1638,13 +749,13 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
         return '';
       }
       
-      if (field === 'phone') {
+      if (field === 'phoneNumber') {
         if (!safeValue.trim()) return 'Số điện thoại không được để trống';
         if (!/^0\d{9,10}$/.test(safeValue)) return 'Số điện thoại phải bắt đầu bằng số 0 và có 10-11 chữ số';
         return '';
       }
       
-      if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('street')) {
+      if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('streetName')) {
         if (!safeValue.trim()) return 'Thông tin địa chỉ không được để trống';
         return '';
       }
@@ -1675,7 +786,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
       let isValid = true;
       
       // Validate personal info
-      const personalFields = ['fullName', 'birthDate', 'idNumber', 'email', 'phone'];
+      const personalFields = ['fullName', 'dateOfBirth', 'idCardNumber', 'email', 'phoneNumber'];
       personalFields.forEach(field => {
         const error = validateField(field, newEmployee[field]);
         if (error) {
@@ -1686,7 +797,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
       
       // Validate permanent address
       const addressPrefixes = ['permanentAddress', 'contactAddress'];
-      const addressFields = ['province', 'district', 'ward', 'street', 'houseNumber'];
+      const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
       
       addressPrefixes.forEach(prefix => {
         addressFields.forEach(field => {
@@ -1725,31 +836,29 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
       if (validateAllFields()) {
         // Generate ID and code
         const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
-        const newCode = `NV${String(newId).padStart(6, '0')}`;
         
-        // Calculate age from birthDate
-        const birthDateParts = newEmployee.birthDate.split('/');
+        // Calculate age from dateOfBirth
+        const birthDateParts = newEmployee.dateOfBirth.split('/');
         const birthYear = parseInt(birthDateParts[2]);
         const currentYear = new Date().getFullYear();
         const age = currentYear - birthYear;
         
         // Create new employee object with current date as registration date
         const today = new Date();
-        const registrationDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+        const recruitmentDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
         
         const employeeToAdd = {
           id: newId,
-          code: newCode,
           fullName: newEmployee.fullName,
-          birthDate: newEmployee.birthDate,
+          dateOfBirth: newEmployee.dateOfBirth,
           age: age,
-          idNumber: newEmployee.idNumber,
+          idCardNumber: newEmployee.idCardNumber,
           email: newEmployee.email,
-          phone: newEmployee.phone,
+          phoneNumber: newEmployee.phoneNumber,
           permanentAddress: { ...newEmployee.permanentAddress },
           contactAddress: { ...newEmployee.contactAddress },
-          registrationDate: registrationDate,
-          status: 'active'
+          recruitmentDate: recruitmentDate,
+          accountStatus: 'active'
         };
         
         // Hiển thị modal xác nhận trước khi thêm nhân viên
@@ -1758,12 +867,11 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
           message: 'Bạn có chắc chắn muốn thêm nhân viên mới này không?',
           confirmText: 'Quẹt để thêm nhân viên',
           confirmDetails: {
-            'Mã nhân viên': newCode,
             'Họ tên': newEmployee.fullName,
-            'Ngày sinh': newEmployee.birthDate,
-            'Số CCCD/CMND': newEmployee.idNumber,
+            'Ngày sinh': newEmployee.dateOfBirth,
+            'Số CCCD/CMND': newEmployee.idCardNumber,
             'Email': newEmployee.email,
-            'Số điện thoại': newEmployee.phone
+            'Số điện thoại': newEmployee.phoneNumber
           },
           type: 'add',
           onConfirm: () => {
@@ -2249,7 +1357,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            {isLoadingSearch ? (
+            {isLoading ? (
               <SearchFilterBarShimmer />
             ) : (
               <SearchFilterBar
@@ -2270,7 +1378,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          {isLoadingEmployees ? (
+          {isLoading ? (
             <DataTableShimmer
               showFilter={true}
             />
@@ -2292,12 +1400,12 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
               renderActions={renderActions}
               // Bộ lọc trạng thái
               statusFilters={{
-                status: ['active', 'disabled']
+                accountStatus: ['active', 'disabled']
               }}
               // Bộ lọc khoảng thời gian
               dateRangeFilters={{
-                 registrationDate: { label: 'Ngày đăng ký' },
-                 birthDate: { label: 'Ngày sinh' }
+                 recruitmentDate: { label: 'Ngày tuyển dụng' },
+                 dateOfBirth: { label: 'Ngày sinh' }
                }}
                changeTableData={setExporData}
              />
@@ -2430,7 +1538,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                             >
                               <InputField
                                 label="Mã nhân viên"
-                                value={selectedEmployee.code}
+                                value={selectedEmployee.employeeID}
                                 disabled={true}
                               />
                             </motion.div>
@@ -2454,7 +1562,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                             >
                               <CalendarDatePicker
                                 label="Ngày sinh"
-                                value={selectedEmployee.birthDate}
+                                value={selectedEmployee.dateOfBirth}
                                 onChange={() => {}}
                                 disabled={true}
                               />
@@ -2479,7 +1587,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                             >
                               <InputField
                                 label="Số CCCD"
-                                value={selectedEmployee.idNumber}
+                                value={selectedEmployee.idCardNumber}
                                 disabled={true}
                               />
                             </motion.div>
@@ -2503,7 +1611,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                             >
                               <InputField
                                 label="Số điện thoại"
-                                value={selectedEmployee.phone}
+                                value={selectedEmployee.phoneNumber}
                                 disabled={true}
                               />
                             </motion.div>
@@ -2520,7 +1628,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                                 <div className="relative">
                                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/50 to-green-100/50 rounded-2xl blur-sm"></div>
                                   <div className="relative bg-white/80 backdrop-blur-sm p-3 rounded-2xl border border-emerald-200/50">
-                                    <StatusBadge status={selectedEmployee.status} />
+                                    <StatusBadge accountStatus={selectedEmployee.accountStatus} />
                                   </div>
                                 </div>
                               </div>
@@ -2618,7 +1726,7 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                           <CalendarDatePicker
                             label="Ngày đăng ký"
                             placeholder="DD/MM/YYYY"
-                            value={selectedEmployee.registrationDate}
+                            value={selectedEmployee.recruitmentDate}
                             onChange={() => {}}
                             disabled={true}
                           />
@@ -2663,12 +1771,12 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                             >
                               <InputField
                                 label="Số điện thoại"
-                                value={editedEmployee.phone}
+                                value={editedEmployee.phoneNumber}
                                 onChange={(value) =>
-                                  handleFormChange("phone", value)
+                                  handleFormChange("phoneNumber", value)
                                 }
                                 placeholder="Nhập số điện thoại..."
-                                error={errors.phone}
+                                error={errors.phoneNumber}
                                 required={true}
                               />
                             </motion.div>
@@ -2681,13 +1789,13 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                               <CustomSelect
                                 label="Trạng thái"
                                 value={
-                                  editedEmployee.status === "active"
+                                  editedEmployee.accountStatus === "active"
                                     ? "Hoạt động"
                                     : "Vô hiệu hóa"
                                 }
                                 onChange={(value) =>
                                   handleFormChange(
-                                    "status",
+                                    "accountStatus",
                                     value === "Hoạt động"
                                       ? "active"
                                       : "disabled"
@@ -2892,24 +2000,24 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                 if (definition === "exit") {
                   setNewEmployee({
                     fullName: "",
-                    birthDate: "",
-                    idNumber: "",
+                    dateOfBirth: "",
+                    idCardNumber: "",
                     idIssueDate: "",
                     idIssuePlace: "",
                     email: "",
-                    phone: "",
+                    phoneNumber: "",
                     permanentAddress: {
                       province: "",
                       district: "",
                       ward: "",
-                      street: "",
+                      streetName: "",
                       houseNumber: "",
                     },
                     contactAddress: {
                       province: "",
                       district: "",
                       ward: "",
-                      street: "",
+                      streetName: "",
                       houseNumber: "",
                     },
                   });
@@ -2998,23 +2106,23 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                           <CalendarDatePicker
                             label="Ngày sinh"
                             placeholder="DD/MM/YYYY"
-                            value={newEmployee.birthDate}
-                            onChange={(val) =>
-                              handleNewEmployeeChange("birthDate", val)
-                            }
-                            onBlur={() => handleFieldBlur("birthDate")}
-                            error={errors.birthDate}
+                            value={newEmployee.dateOfBirth}
+                              onChange={(val) =>
+                                handleNewEmployeeChange("dateOfBirth", val)
+                              }
+                              onBlur={() => handleFieldBlur("dateOfBirth")}
+                              error={errors.dateOfBirth}
                             required={true}
                           />
                           <InputField
                             label="Số CCCD/CMND"
                             placeholder="Nhập số CCCD/CMND..."
-                            value={newEmployee.idNumber}
-                            onChange={(val) =>
-                              handleNewEmployeeChange("idNumber", val)
-                            }
-                            onBlur={() => handleFieldBlur("idNumber")}
-                            error={errors.idNumber}
+                            value={newEmployee.idCardNumber}
+                              onChange={(val) =>
+                                handleNewEmployeeChange("idCardNumber", val)
+                              }
+                              onBlur={() => handleFieldBlur("idCardNumber")}
+                              error={errors.idCardNumber}
                             required={true}
                           />
                           <InputField
@@ -3032,12 +2140,12 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
                           <InputField
                             label="Số điện thoại"
                             placeholder="Nhập số điện thoại..."
-                            value={newEmployee.phone}
-                            onChange={(val) =>
-                              handleNewEmployeeChange("phone", val)
-                            }
-                            onBlur={() => handleFieldBlur("phone")}
-                            error={errors.phone}
+                            value={newEmployee.phoneNumber}
+                              onChange={(val) =>
+                                handleNewEmployeeChange("phoneNumber", val)
+                              }
+                              onBlur={() => handleFieldBlur("phoneNumber")}
+                              error={errors.phoneNumber}
                             required={true}
                           />
                         </motion.div>
@@ -3215,45 +2323,48 @@ import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer
           onExport={handleExportData}
           title="Xuất dữ liệu nhân viên"
           initialSelectedColumns={[
-            "code",
+            "employeeID",
             "fullName",
-            "birthDate",
+            "dateOfBirth",
             "age",
-            "idNumber",
+            "idCardNumber",
             "email",
-            "phone",
+            "phoneNumber",
             "permanentAddress",
             "contactAddress",
-            "registrationDate",
-            "status",
+            "recruitmentDate",
+            "accountStatus",
           ]}
           columnLabels={{
-            code: "Mã nhân viên",
+            employeeID: "Mã nhân viên",
             fullName: "Họ và tên",
-            birthDate: "Ngày sinh",
+            dateOfBirth: "Ngày sinh",
             age: "Tuổi",
-            idNumber: "Số CCCD/CMND",
+            idCardNumber: "Số CCCD/CMND",
             email: "Email",
-            phone: "Số điện thoại",
+            phoneNumber: "Số điện thoại",
             permanentAddress: "Địa chỉ thường trú",
             contactAddress: "Địa chỉ liên lạc",
-            registrationDate: "Ngày đăng ký",
-            status: "Trạng thái",
+            recruitmentDate: "Ngày tuyển dụng",
+            accountStatus: "Trạng thái",
           }}
           formatData={(value, column) => {
-            if (column === "status")
+            if (column === "accountStatus")
               return value === "active" ? "Hoạt động" : "Vô hiệu hóa";
             if (column === "permanentAddress" || column === "contactAddress") {
               if (!value) return "";
-              return `${value.houseNumber} ${value.street}, ${value.ward}, ${value.district}, ${value.province}`;
+              return `${value.houseNumber} ${value.streetName}, ${value.ward}, ${value.district}, ${value.province}`;
+            }
+            if (column === "recruitmentDate" || column === "dateOfBirth") {
+              return formatDate(new Date(value));
             }
             return value;
           }}
           customColumnCategories={{
-            personal: ["code", "fullName", "birthDate", "age", "idNumber"],
-            contact: ["email", "phone"],
+            personal: ["employeeID", "fullName", "dateOfBirth", "age", "idCardNumber"],
+            contact: ["email", "phoneNumber"],
             address: ["permanentAddress", "contactAddress"],
-            other: ["registrationDate", "status"],
+            other: ["recruitmentDate", "accountStatus"],
           }}
           enableGrouping={true}
         />
