@@ -1392,7 +1392,7 @@ import { formatDate } from '@/utils/saving-account';
               onRowClick={openEmployeeDetail}
               onEditClick={enableEditMode}
               onDeleteClick={null} // Không sử dụng delete, dùng custom actions
-              keyField="id"
+              keyField="employeeID"
               className="mb-6"
               // Custom header styling
               headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
@@ -1447,7 +1447,7 @@ import { formatDate } from '@/utils/saving-account';
               ></motion.div>
 
               <motion.div
-                layoutId={`row-${selectedEmployee.id}`}
+                layoutId={`row-${selectedEmployee.employeeID}`}
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 40 }}
