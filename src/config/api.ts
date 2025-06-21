@@ -1,6 +1,6 @@
 import { IRegisterDTO, IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/types/auth';
 import axios from './axios-customize';
-import { IBackendRes } from '@/types/backend.d';
+import { IBackendRes, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
@@ -193,6 +193,14 @@ export const deleteVaiTro = (id: string) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/vai-tro/${id}`);
 }
 
+export const capQuyenModuleToVaiTro = (id: string, moduleDTO: IModuleDTO) => {
+    return axios.put<IBackendRes<IVaiTro>>(`/api/v1/vai-tro/${id}/cap-quyen-module`, moduleDTO);
+}
+
+export const xoaQuyenModuleFromVaiTro = (id: string, moduleDTO: IModuleDTO) => {
+    return axios.put<IBackendRes<IVaiTro>>(`/api/v1/vai-tro/${id}/xoa-quyen-module`, moduleDTO);
+}
+
 /**
  * Module khach hang
  */
@@ -258,19 +266,27 @@ export const deleteThamSo = (id: string) => {
  * Module giao dich
  */
 export const callGetAllGiaoDich = () => {
-    return axios.get<IBackendRes<IGiaoDichResDTO[]>>('/api/v1/giao-dich');
+    return axios.get<IBackendRes<IGiaoDichResDTO[]>>(`/api/v1/giao-dich`);
 }
 
 export const callGetGiaoDichByID = (id: number) => {
-    return axios.get<IBackendRes<IGiaoDichResDTO>>('/api/v1/giao-dich/' + id);
+    return axios.get<IBackendRes<IGiaoDichResDTO>>(`/api/v1/giao-dich/${id}`);
+}
+
+export const callGetGiaoDichByTaiKhoanID = (id: number) => {
+    return axios.get<IBackendRes<IGiaoDichResDTO>>(`/api/v1/giao-dich/by/tktt/${id}`);
+}
+
+export const callGetGiaoDichByNhanVienID = (id: number) => {
+    return axios.get<IBackendRes<IGiaoDichResDTO>>(`/api/v1/giao-dich/by/nhan-vien/${id}`);
 }
 
 export const callCreateGiaoDich = (data: IGiaoDichReqDTO) => {
-    return axios.post<IBackendRes<IGiaoDichResDTO>>('/api/v1/giao-dich', data);
+    return axios.post<IBackendRes<IGiaoDichResDTO>>(`/api/v1/giao-dich`, data);
 }
 
 export const callGetAllTaiKhoanThanhToan = () => {
-    return axios.get<IBackendRes<ITKTTResDTO[]>>('/api/v1/giao-dich/tktt');
+    return axios.get<IBackendRes<ITKTTResDTO[]>>(`/api/v1/giao-dich/tktt`);
 }
 
 export const callGetTaiKhoanThanhToanByID = (id: number) => {
@@ -278,29 +294,33 @@ export const callGetTaiKhoanThanhToanByID = (id: number) => {
 }
 
 export const callCreateTaiKhoanThanhToan = (data: ITKTTReqDTO) => {
-    return axios.post<IBackendRes<ITKTTResDTO>>('/api/v1/giao-dich/tktt', data);
+    return axios.post<IBackendRes<ITKTTResDTO>>(`/api/v1/giao-dich/tktt`, data);
 }
 
 export const callGetAllLSGD_TKTT = () => {
-    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>('/api/v1/giao-dich/tktt/lich-su');
+    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>(`/api/v1/giao-dich/tktt/lich-su`);
 }
 
 export const callGetLSGD_TKTTByID = (id: number) => {
-    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>('/api/v1/giao-dich/tktt/lich-su/' + id);
+    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>(`/api/v1/giao-dich/tktt/lich-su/${id}`);
+}
+
+export const callGetLSGD_TKTTByTaiKhoanID = (id: number) => {
+    return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>(`/api/v1/giao-dich/tktt/lich-su/by/${id}`);
 }
 
 export const callGetAllQuyDinhLaiSuat = () => {
-    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO[]>>('/api/v1/quy-dinh-lai-suat');
+    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat`);
 }
 
 export const callGetAllChiTietQuyDinhLaiSuat = () => {
-    return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO[]>>('/api/v1/quy-dinh-lai-suat/chi-tiet');
+    return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat/chi-tiet`);
 }
 
 export const callGetQuyDinhLaiSuatByID = (id: number) => {
-    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>('/api/v1/quy-dinh-lai-suat/' + id);
+    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/${id}`);
 }
 
 export const callGetChiTietQuyDinhLaiSuatByID = (id: number) => {
-    return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>('/api/v1/quy-dinh-lai-suat/chi-tiet/' + id);
+    return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/chi-tiet/${id}`);
 }

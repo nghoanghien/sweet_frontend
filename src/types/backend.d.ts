@@ -5,4 +5,7 @@ export interface IBackendRes<T> {
     statusCode: number | string;
     data?: T;
   }
-
+export interface IModuleDTO {
+  module: string;
+  description?: string;
+} 

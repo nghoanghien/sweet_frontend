@@ -1,5 +1,8 @@
 export enum TypeStatusEnum {
-    TRANGTHAI_KHACHHANG = "TRANGTHAI_KHACHHANG",
-    TRANGTHAI_TAIKHOAN = "TRANGTHAI_TAIKHOAN",
-    TRANGTHAI_GIAODICH = "TRANGTHAI_GIAODICH",
+     Customer = 'customer',
+  Employee = 'employee',
+  PaymentAccount = 'payment_account',
+  Transaction = 'transaction',
+  DepositReceipt = 'deposit_receipt',
+  LoginAccount = 'login_account',
 }
