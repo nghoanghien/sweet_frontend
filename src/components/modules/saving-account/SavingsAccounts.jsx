@@ -21,6 +21,7 @@ import { SkeletonCard } from '../../ui/custom/Skeleton';
 
 import EmptyAccountState from '../ui/EmptyAccountState';
 import EmptySearchResult from './ui/EmptySearchResult';
+import EmptySavingAccounts from './ui/EmptySavingAccounts';
 import SearchAndViewToggle from './ui/SearchAndViewToggle';
 
 // Import các modal và drawer
@@ -620,7 +621,49 @@ const SavingsAccounts = ({ customerId }) => {
 
   // Hiển thị khi không có tài khoản nào và không đang loading
   if (!isLoading && savingAccounts.length === 0) {
-    return <EmptyAccountState />;
+    return (
+      <>
+        <EmptySavingAccounts onOpenNewAccount={() => setIsNewAccountModalOpen(true)} />
+        
+        {/* Modal tạo tài khoản mới */}
+        <NewSavingsAccountModal
+          isOpen={isNewAccountModalOpen}
+          onClose={() => setIsNewAccountModalOpen(false)}
+          onCreateAccount={prepareNewAccount}
+          isAdmin={true}
+        />
+        
+        {/* Modal xác nhận tạo tài khoản mới */}
+        <SwipeConfirmationModal
+          isOpen={isCreateConfirmModalOpen}
+          onClose={() => setIsCreateConfirmModalOpen(false)}
+          onConfirm={handleCreateAccount}
+          title="Xác nhận mở sổ tiết kiệm mới"
+          description={`Bạn đang mở sổ tiết kiệm "${newAccountData?.nickname}" với kỳ hạn ${newAccountData?.term}.`}
+          confirmText="Vuốt để mở sổ tiết kiệm"
+          type="pink"
+          isProcessing={isProcessing}
+          confirmDetails={
+            newAccountData
+              ? {
+                  "Số tiền gửi": formatCurrency(newAccountData.amount),
+                  "Kỳ hạn": newAccountData.term,
+                  "Lãi suất": `${newAccountData.interestRate}%/năm`,
+                  "Ngày đáo hạn": newAccountData.endDate
+                }
+              : {}
+          }
+        />
+        
+        {/* Thông báo xuất dữ liệu */}
+        <ExportNotification
+          isVisible={notificationVisible}
+          message={notificationMessage}
+          format={notificationFormat}
+          onClose={handleCloseNotification}
+        />
+      </>
+    );
   }
 
   return (

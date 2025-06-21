@@ -39,12 +39,13 @@ export const mapApiToUser = (item: any): User => {
     accountStatus: getAccountStatusByCode(item.trangThaiTaiKhoan.trangThaiID),
 
     //only for customer
-    customerID: item.khachHangID || null,
-    registrationDate: new Date(item.ngayDangKy) || null,
-    customerStatus: getCustomerStatusByCode(item.trangThaiKhachHang.trangThaiID) || null,
+    customerID: item?.khachHangID || null,
+    registrationDate: new Date(item?.ngayDangKy) || null,
+    customerStatus: getCustomerStatusByCode(item?.trangThaiKhachHang?.trangThaiID) || null,
 
     //only for employee
-    
+    employeeID: item?.nhanVienID || null,
+    recruitmentDate: new Date(item?.ngayTuyenDung) || null,
     
   };
 }

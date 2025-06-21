@@ -57,6 +57,7 @@ import DetailInfo from "@/components/modules/saving-account/components/DetailInf
 import ProfileModal from "@/components/modals/ProfileModal/ProfileModal";
 import LiquidGlassNavigation from "./LiquidGlassNavigation";
 import LiquidGlassMobileNavigation from "./LiquidGlassMobileNavigation";
+import { useUser, useUserActions } from "@/store/useUserStore";
 // Add custom scrollbar styles
 const scrollbarStyles = `
   /* Hide scrollbar by default */
@@ -203,6 +204,10 @@ const scrollbarStyles = `
 `;
 
 export default function Dashboard() {
+  // User store hooks
+  const { user, isAuthenticated, isLoading: userLoading, error: userError } = useUser();
+  const { refreshUserInfo } = useUserActions();
+  
   const [navHovered, setNavHovered] = useState(false);
   const [rightPanelVisible, setRightPanelVisible] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
@@ -295,6 +300,20 @@ export default function Dashboard() {
       clearTimeout(statsTimer);
     };
   }, []);
+  
+  // Log user information when component mounts or user changes
+  useEffect(() => {
+    console.log('=== Sweet Main Page - User Information ===');
+    console.log('User:', user);
+    console.log('Is Authenticated:', isAuthenticated);
+    console.log('User Loading:', userLoading);
+    console.log('User Error:', userError);
+    
+    if (typeof window !== 'undefined') {
+      console.log('localStorage access_token:', localStorage.getItem('access_token'));
+    }
+    console.log('=========================================');
+  }, [user, isAuthenticated, userLoading, userError]);
 
   // State for notifications
   const [notificationVisible, setNotificationVisible] = useState(false);

@@ -1,5 +1,7 @@
 import { IVaiTroDTO } from "./role";
 import { ITrangThaiDTO } from "./status";
+import { IDiaChi } from "./address";
+import { TypeUserEnum } from "./enums/TypeUserEnum";
 
 export interface IRegisterDTO <T> {
     data: T;

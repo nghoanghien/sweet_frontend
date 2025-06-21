@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, TrendingUp, Clock, CheckCircle2, AlertCircle, Wallet } from 'lucide-react';
-import { formatCurrency, getChannelInfo } from '../../../../utils/accountUtils';
+import { Search, ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, TrendingUp, Clock, CheckCircle2, AlertCircle, Wallet, Globe, Building2 } from 'lucide-react';
+import { formatCurrency } from '../../../../utils/accountUtils';
 import SearchBar, { highlightText } from '../../ui/SearchBar'
 import  FilterableAccountTransactionListShimmer  from '@/components/ui/custom/shimmer-types/FilterableAccountTransactionListShimmer';
 
@@ -9,7 +9,8 @@ const FilterableAccountTransactionList = ({
   isHidden = false,
   isLoading: externalIsLoading = false,
   emptyMessage = "Không có giao dịch nào",
-  emptyIcon = <Wallet size={48} className="text-gray-400" />
+  emptyIcon = <Wallet size={48} className="text-gray-400" />,
+  accountId = null
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTransactions, setFilteredTransactions] = useState(transactions);
@@ -76,6 +77,53 @@ const FilterableAccountTransactionList = ({
     if (node) observerRef.current.observe(node);
   }, [isLoadingMore, hasMoreData, loadMoreTransactions]);
 
+  // Get channel info based on new structure
+  const getChannelInfo = (channel) => {
+    switch (channel) {
+      case 'online':
+        return {
+          name: 'Giao dịch trực tuyến',
+          icon: <Globe size={14} className="text-blue-500" />
+        };
+      case 'over_the_counter':
+        return {
+          name: 'Giao dịch tại quầy',
+          icon: <Building2 size={14} className="text-green-500" />
+        };
+      default:
+        return {
+          name: channel || 'Không xác định',
+          icon: <CreditCard size={14} className="text-gray-500" />
+        };
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateValue) => {
+    if (!dateValue) return 'Không xác định';
+    
+    try {
+      const date = new Date(dateValue);
+      if (isNaN(date.getTime())) return 'Không xác định';
+      
+      return date.toLocaleString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Không xác định';
+    }
+  };
+
+  // Determine if transaction is incoming based on sourceAccount
+  const isIncomingTransaction = (transaction) => {
+    if (transaction.sourceAccount === accountId && transaction.sourceAccountCode === 0) return false;
+    return true;
+  };
+
   // Filter transactions với animation effect
   useEffect(() => {
     setIsSearching(true);
@@ -85,13 +133,16 @@ const FilterableAccountTransactionList = ({
       } else {
         const searchTermLower = searchTerm.toLowerCase();
         const filtered = transactions.filter(transaction => {
+          const formattedTime = formatDate(transaction.time);
+          const channelInfo = getChannelInfo(transaction.channel);
+          
           // Search across multiple fields
           return (
             (transaction.type && transaction.type.toLowerCase().includes(searchTermLower)) ||
-            (transaction.time && transaction.time.toLowerCase().includes(searchTermLower)) ||
+            (formattedTime && formattedTime.toLowerCase().includes(searchTermLower)) ||
             (transaction.channel && transaction.channel.toLowerCase().includes(searchTermLower)) ||
             (transaction.content && transaction.content.toLowerCase().includes(searchTermLower)) ||
-            (getChannelInfo(transaction.channel).name.toLowerCase().includes(searchTermLower))
+            (channelInfo.name.toLowerCase().includes(searchTermLower))
           );
         });
         setFilteredTransactions(filtered);
@@ -100,11 +151,12 @@ const FilterableAccountTransactionList = ({
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, transactions]);
+  }, [searchTerm, transactions, accountId]);
 
   // Get enhanced transaction icon
   const getTransactionIcon = (transaction) => {
-    if (transaction.isIncoming) {
+    const isIncoming = isIncomingTransaction(transaction);
+    if (isIncoming) {
       return <ArrowDownLeft size={20} className="text-white" />;
     } else {
       return <ArrowUpRight size={20} className="text-white" />;
@@ -179,6 +231,8 @@ const FilterableAccountTransactionList = ({
             const channelInfo = getChannelInfo(transaction.channel);
             const statusConfig = transaction.status ? getStatusConfig(transaction.status) : null;
             const StatusIcon = statusConfig?.icon;
+            const isIncoming = isIncomingTransaction(transaction);
+            const formattedTime = formatDate(transaction.time);
             
             const isLastTransaction = index === displayedTransactions.length - 1;
             
@@ -201,7 +255,7 @@ const FilterableAccountTransactionList = ({
                       {/* Enhanced icon */}
                       <div className="relative">
                         <div className={`h-12 w-12 rounded-xl ${
-                          transaction.isIncoming 
+                          isIncoming 
                             ? 'bg-gradient-to-br from-teal-500 to-cyan-600' 
                             : 'bg-gradient-to-br from-rose-500 to-pink-600'
                         } flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-300`}>
@@ -219,7 +273,7 @@ const FilterableAccountTransactionList = ({
                         </h4>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           <Calendar size={14} />
-                          <span>{highlightText(transaction.time, searchTerm)}</span>
+                          <span>{highlightText(formattedTime, searchTerm)}</span>
                         </div>
                       </div>
                     </div>
@@ -227,17 +281,17 @@ const FilterableAccountTransactionList = ({
                     {/* Enhanced amount display */}
                     <div className="text-right">
                       <div className={`text-lg font-bold ${
-                        transaction.isIncoming 
+                        isIncoming 
                           ? 'bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent' 
                           : 'bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent'
                       }`}>
                         {isHidden ? 
                           '••••••••' : 
-                          (transaction.isIncoming ? '+' : '-') + formatCurrency(transaction.amount)
+                          (isIncoming ? '+' : '-') + formatCurrency(transaction.amount)
                         }
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
-                        {transaction.isIncoming ? 'Tiền vào' : 'Tiền ra'}
+                        {isIncoming ? 'Tiền vào' : 'Tiền ra'}
                       </div>
                     </div>
                   </div>

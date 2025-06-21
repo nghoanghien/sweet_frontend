@@ -1,74 +1,42 @@
-import axios from '@/config/axios-customize';
-import { User, LoginCredentials } from '@/types/interfaces/user';
+import { callLogin, callLogout, callGetAccountInformation } from '@/config/api';
+import { IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/types/auth';
+import { IBackendRes } from '@/types/backend.d';
 
-// Response types
-export interface LoginResponse {
-  user: User;
-  accessToken: string;
-  refreshToken?: string;
-}
+export const login = async (loginCredentials: IReqLoginDTO): Promise<IBackendRes<IResLoginDTO>> => {
+  try {
+    const response = await callLogin(loginCredentials);
+    console.log(loginCredentials);
+    console.log(response);
+    if (!response || !response.data) {
+      throw new Error('Không nhận được phản hồi từ server');
+    }
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
 
-export interface RegisterData {
-  userName: string;
-  password: string;
-  email?: string;
-  fullName?: string;
-  role: 'customer' | 'employee';
-  phone?: string;
-  address?: string;
-}
+export const logout = async (): Promise<IBackendRes<void>> => {
+  try {
+    const response = await callLogout();
+    if (!response || !response.data) {
+      throw new Error('Không thể đăng xuất');
+    }
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
 
-/**
- * Đăng nhập người dùng
- */
-// export const callLogin = (credentials: LoginCredentials) => {
-//   return axios.post<IBackendRes<LoginResponse>>('/api/v1/auth/login', credentials);
-// };
+export const getAccountInformation = async (): Promise<IBackendRes<IUserGetAccountDTO>> => {
+  try {
+    const response = await callGetAccountInformation();
+    if (!response || !response.data) {
+      throw new Error('Không thể lấy thông tin tài khoản');
+    }
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
 
-// /**
-//  * Đăng xuất người dùng
-//  */
-// export const callLogout = () => {
-//   return axios.post<IBackendRes<void>>('/api/v1/auth/logout');
-// };
-
-// /**
-//  * Lấy thông tin profile người dùng hiện tại
-//  */
-// export const callGetProfile = () => {
-//   return axios.get<IBackendRes<User>>('/api/v1/auth/profile');
-// };
-
-// /**
-//  * Đăng ký tài khoản mới
-//  */
-// export const callRegister = (data: RegisterData) => {
-//   return axios.post<IBackendRes<User>>('/api/v1/auth/register', data);
-// };
-
-// /**
-//  * Refresh access token
-//  */
-// export const callRefreshToken = (refreshToken: string) => {
-//   return axios.post<IBackendRes<{ accessToken: string; refreshToken: string }>>(
-//     '/api/v1/auth/refresh',
-//     { refreshToken }
-//   );
-// };
-
-// /**
-//  * Thay đổi mật khẩu
-//  */
-// export const callChangePassword = (data: {
-//   currentPassword: string;
-//   newPassword: string;
-// }) => {
-//   return axios.put<IBackendRes<void>>('/api/v1/auth/change-password', data);
-// };
-
-// /**
-//  * Cập nhật thông tin profile
-//  */
-// export const callUpdateProfile = (data: Partial<User>) => {
-//   return axios.put<IBackendRes<User>>('/api/v1/auth/profile', data);
-// };

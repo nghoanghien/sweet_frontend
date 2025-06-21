@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Sparkles, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
 import CustomDatePicker from './CustomDatePicker';
 import SingleSelect from './SingleSelect';
 import LoadingOverlay from '@/components/common/LoadingOverlay';
+import ExportNotification from '@/components/common/ExportNotification';
+import { useUserActions, useUser } from '@/store/useUserStore';
+import { TypeUserEnum } from '@/types/enums/TypeUserEnum';
 // Placeholder data for dropdowns
 const provinces = ["Hà Nội", "TP Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ"];
 const districts = {
@@ -55,6 +58,14 @@ export default function LoginRegistrationForm() {
 
   const [isLoading, setIsLoading] = useState(false);
   
+  // User store
+  const { loginUser, clearError } = useUserActions();
+  const { isLoading: isLoginLoading, error: loginError } = useUser();
+  
+  // Notification state
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  
   // Effect to trigger initial animation
   useEffect(() => {
     setIsLoading(true);
@@ -70,7 +81,7 @@ export default function LoginRegistrationForm() {
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: '',
-    role: 'employee',
+    role: 'customer',
     rememberMe: false
   });
   
@@ -83,7 +94,7 @@ export default function LoginRegistrationForm() {
     phone: '',
     password: '',
     confirmPassword: '',
-    role: 'employee',
+    role: 'customer',
     permanentAddress: {
       province: '',
       district: '',
@@ -375,7 +386,7 @@ export default function LoginRegistrationForm() {
   };
   
   // Handle login submission with validation
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     
     // Set form as submitted for validation styling
@@ -393,10 +404,38 @@ export default function LoginRegistrationForm() {
     const hasErrors = Object.values(validationErrors).some(error => error !== '');
     
     if (!hasErrors) {
-      console.log('Login form submitted:', loginForm);
-      // Implement actual login logic here
-      // Chuyển hướng đến trang sweet-main sau khi đăng nhập thành công
-      router.push('/sweet-main');
+      // Clear any previous errors
+      clearError();
+      
+      // Prepare login credentials
+      const credentials = {
+        username: loginForm.email,
+        password: loginForm.password,
+        type: loginForm.role === 'customer' ? TypeUserEnum.KHACHHANG : TypeUserEnum.NHANVIEN
+      };
+      
+      console.log("role: ", loginForm.role);
+      try {
+        const result = await loginUser(credentials);
+        
+        if (result.success) {
+          // Show loading overlay for 3 seconds before redirecting
+          setIsLoading(true);
+          
+          setTimeout(() => {
+            // Redirect to sweet-main on successful login
+            router.push('/sweet-main');
+          }, 3000);
+        } else {
+          // Show error notification
+          setNotificationMessage(result.error || 'Tên đăng nhập hoặc mật khẩu không chính xác');
+          setShowNotification(true);
+        }
+      } catch (error) {
+        // Show error notification
+        setNotificationMessage('Tên đăng nhập hoặc mật khẩu không chính xác');
+        setShowNotification(true);
+      }
     } else {
       // Add shake animation to invalid fields
       const invalidInputs = document.querySelectorAll('.border-red-500');
@@ -482,7 +521,7 @@ export default function LoginRegistrationForm() {
   
   return (
     <div className="w-full min-h-screen bg-sky-50 flex items-center justify-center p-4 relative">
-      <LoadingOverlay isLoading={isLoading} message='Đang chuyển hướng đăng nhập' />
+      <LoadingOverlay isLoading={isLoading} message={isLoginLoading ? 'Đang đăng nhập...' : 'Đăng nhập thành công! Đang chuyển hướng...'} />
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-[#FFB2CF]/30 to-transparent"></div>
@@ -837,8 +876,8 @@ export default function LoginRegistrationForm() {
                       <input
                         type="radio"
                         name="role"
-                        value="employee"
-                        checked={loginForm.role === "employee"}
+                        value="customer"
+                        checked={loginForm.role === "customer"}
                         onChange={handleLoginChange}
                         className="w-4 h-4 text-[#FF4081] focus:ring-[#FF89B0] border-[#FFD6E0]"
                       />
@@ -869,9 +908,15 @@ export default function LoginRegistrationForm() {
                 
                 <button
                   type="submit"
-                  className="w-full py-3 px-4 bg-gradient-to-r from-[#FF89B0] to-[#FF4081] text-white rounded-full font-medium shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#F06292] focus:ring-opacity-50 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 mt-2"
+                  disabled={isLoginLoading}
+                  className={`w-full py-3 px-4 bg-gradient-to-r from-[#FF89B0] to-[#FF4081] text-white rounded-full font-medium shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#F06292] focus:ring-opacity-50 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 mt-2 flex items-center justify-center gap-2 ${
+                    isLoginLoading ? 'opacity-75 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Đăng nhập
+                  {isLoginLoading && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  {isLoginLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </button>
                 
                 <div className="relative flex items-center justify-center mt-2">
@@ -1377,6 +1422,17 @@ export default function LoginRegistrationForm() {
           )}
         </div>
       </div>
+      
+      {/* Error Notification */}
+      <ExportNotification
+        isVisible={showNotification}
+        onClose={() => setShowNotification(false)}
+        message={notificationMessage}
+        type="error"
+        format="error"
+        autoHideDuration={5000}
+        position="top-center"
+      />
     </div>
   );
 }

@@ -4,6 +4,8 @@ import { CreditCard, Edit2, Save, User, UserCheck } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
 import Skeleton from '@/components/ui/custom/Skeleton';
+import { useAllParameters } from '@/hooks/useParameters';
+import { all } from 'axios';
 
 const SystemSettings = () => {
   // State cho giá trị hiện tại
@@ -23,17 +25,25 @@ const SystemSettings = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const editFormRef = useRef(null);
+
+  const { data, allParameters, isLoading, error, refreshParameters, updateAllParameters } = useAllParameters();
 
   // Loading state management
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    setMinEmployeeAge(data.MIN_AGE_EMPLOYEE);
+    setMinCustomerAge(data.MIN_AGE_CUSTOMER);
+    setMinTransactionAmountForPaymentAccount(data.MIN_TRANSACTION_PAYMENT);
+    setMaxTransactionAmountForPaymentAccount(data.MAX_TRANSACTION_PAYMENT);
+    setMinWithdrawalAmountForSavingAccount(data.MIN_WITHDRAWAL_SAVING);
     
-    return () => clearTimeout(timer);
-  }, []);
+    // Đồng bộ giá trị edited với giá trị hiện tại
+    setEditedMinEmployeeAge(data.MIN_AGE_EMPLOYEE);
+    setEditedMinCustomerAge(data.MIN_AGE_CUSTOMER);
+    setEditedMinTransactionAmountForPaymentAccount(data.MIN_TRANSACTION_PAYMENT);
+    setEditedMaxTransactionAmountForPaymentAccount(data.MAX_TRANSACTION_PAYMENT);
+    setEditedMinWithdrawalAmountForSavingAccount(data.MIN_WITHDRAWAL_SAVING);
+  }, [data]);
 
   // Xử lý lưu thay đổi
   const handleSave = () => {
@@ -41,32 +51,41 @@ const SystemSettings = () => {
   };
 
   // Xác nhận thay đổi
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     // Set processing state to true
     setIsProcessing(true);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      try {
-        // Update all settings
-        setMinEmployeeAge(editedMinEmployeeAge);
-        setMinCustomerAge(editedMinCustomerAge);
-        setMinTransactionAmountForPaymentAccount(editedMinTransactionAmountForPaymentAccount);
-        setMaxTransactionAmountForPaymentAccount(editedMaxTransactionAmountForPaymentAccount);
-        setMinWithdrawalAmountForSavingAccount(editedMinWithdrawalAmountForSavingAccount);
-        
-        // Update UI state
-        setIsEditing(false);
-        setShowConfirmModal(false);
-        setShowSuccessNotification(true);
-      } catch (error) {
-        console.error('Error updating settings:', error);
-        // In a real app, show error notification here
-      } finally {
-        // Reset processing state
-        setIsProcessing(false);
-      }
-    }, 1500); // 1.5 second delay to simulate API call
+    try {
+      // Chuẩn bị dữ liệu update
+      const updates = {
+        'MIN_AGE_EMPLOYEE': editedMinEmployeeAge,
+        'MIN_AGE_CUSTOMER': editedMinCustomerAge,
+        'MIN_TRANSACTION_PAYMENT': editedMinTransactionAmountForPaymentAccount,
+        'MAX_TRANSACTION_PAYMENT': editedMaxTransactionAmountForPaymentAccount,
+        'MIN_WITHDRAWAL_SAVING': editedMinWithdrawalAmountForSavingAccount
+      };
+      
+      // Gọi API update
+      await updateAllParameters(updates);
+      
+      // Update local state
+      setMinEmployeeAge(editedMinEmployeeAge);
+      setMinCustomerAge(editedMinCustomerAge);
+      setMinTransactionAmountForPaymentAccount(editedMinTransactionAmountForPaymentAccount);
+      setMaxTransactionAmountForPaymentAccount(editedMaxTransactionAmountForPaymentAccount);
+      setMinWithdrawalAmountForSavingAccount(editedMinWithdrawalAmountForSavingAccount);
+      
+      // Update UI state
+      setIsEditing(false);
+      setShowConfirmModal(false);
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      // Có thể thêm thông báo lỗi ở đây
+    } finally {
+      // Reset processing state
+      setIsProcessing(false);
+    }
   };
 
   // Hủy chỉnh sửa

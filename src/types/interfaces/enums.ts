@@ -131,3 +131,8 @@ export const MaturityOptionInfo: Record<MaturityOption, { label: string; descrip
     description: 'Tự động gia hạn với số tiền gốc cộng lãi, tối ưu hóa lợi nhuận tích lũy',
   },
 }
+
+export enum Channel {
+  OVER_THE_COUNTER = 'over_the_counter',
+  ONLINE = 'online',
+}
