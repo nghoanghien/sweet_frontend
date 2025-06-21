@@ -7,13 +7,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 const EmptySavingAccounts = ({ onOpenNewAccount }) => {
   return (
     <motion.div 
-      className="flex flex-col items-center justify-center h-full p-8 text-center bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 rounded-3xl"
+      className="flex flex-col items-center justify-center min-h-[500px] p-8 text-center bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100 rounded-3xl relative"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       {/* Floating decorative elements */}
-      <div className="absolute inset-0 overflow-hidden rounded-3xl">
+      <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
         <motion.div 
           className="absolute top-10 left-10 w-20 h-20 bg-pink-200/30 rounded-full blur-xl"
           animate={{ 
