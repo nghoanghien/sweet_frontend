@@ -11,6 +11,6 @@ export const mapApiToPaymentTransaction = (item: any): PaymentTransaction => {
     sourceAccountCode: item.giaoDich.loaiTaiKhoanNguon.maLoaiTaiKhoan,
     channel: getChannelByCode(item.giaoDich.kenhGiaoDich.maKenhGiaoDich),
     balanceAfter: item.soDuSauGD,
-    content: item.noiDung,
+    content: item.giaoDich.noiDung,
   }
 }
