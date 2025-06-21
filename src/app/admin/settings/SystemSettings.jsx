@@ -4,6 +4,8 @@ import { CreditCard, Edit2, Save, User, UserCheck } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
 import Skeleton from '@/components/ui/custom/Skeleton';
+import { useAllParameters } from '@/hooks/useParameters';
+import { all } from 'axios';
 
 const SystemSettings = () => {
   // State cho giá trị hiện tại
@@ -23,17 +25,18 @@ const SystemSettings = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const editFormRef = useRef(null);
+
+  const { allParameters, isLoading, error, refreshParameters } = useAllParameters();
 
   // Loading state management
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    setMinEmployeeAge(allParameters.MIN_AGE_EMPLOYEE);
+    setMinCustomerAge(allParameters.MIN_AGE_CUSTOMER);
+    setMinTransactionAmountForPaymentAccount(allParameters.MIN_TRANSACTION_PAYMENT);
+    setMaxTransactionAmountForPaymentAccount(allParameters.MAX_TRANSACTION_PAYMENT);
+    setMinWithdrawalAmountForSavingAccount(allParameters.MIN_WITHDRAWAL_SAVING);
+  }, [allParameters]);
 
   // Xử lý lưu thay đổi
   const handleSave = () => {
