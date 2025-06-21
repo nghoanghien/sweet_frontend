@@ -309,6 +309,18 @@ export const callGetLSGD_TKTTByTaiKhoanID = (id: number) => {
     return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>(`/api/v1/giao-dich/tktt/lich-su/by/${id}`);
 }
 
+export const callGetAllLSGD_PGT = () => {
+    return axios.get<IBackendRes<any[]>>(`/api/v1/giao-dich/pgt/lich-su`);
+}
+
+export const callGetLSGD_PGTByID = (id: number) => {
+    return axios.get<IBackendRes<any[]>>(`/api/v1/giao-dich/pgt/lich-su/${id}`);
+}
+
+export const callGetLSGD_PGTByPhieuGuiTienID = (id: number) => {
+    return axios.get<IBackendRes<any[]>>(`/api/v1/giao-dich/pgt/lich-su/by/${id}`);
+}
+
 export const callGetAllQuyDinhLaiSuat = () => {
     return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat`);
 }
