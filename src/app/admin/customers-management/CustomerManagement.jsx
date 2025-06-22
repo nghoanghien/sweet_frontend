@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Edit, 
-  User, 
-  MapPin, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Edit,
+  User,
+  MapPin,
+  CheckCircle,
+  XCircle,
   Plus,
   Download,
   Lock,
@@ -33,6 +33,7 @@ import ModalHeader from '../../../components/ui/custom/ModalHeader';
 import AnimatedTabNavigation from '../../../components/ui/custom/AnimatedTabNavigation';
 import { useAllCustomers } from '@/hooks/useCustomers';
 import { formatDate } from '@/utils/saving-account';
+import { createNewCustomer } from '@/utils/createNewCustomer';
 
 export default function CustomerManagement() {
   // Define columns for DataTable
@@ -223,13 +224,13 @@ export default function CustomerManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
-  
+
   // State for search and filter
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [sortField, setSortField] = useState('fullName');
   const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
   const [exportData, setExporData] = useState([]);
-  
+
   // State for multi-field search
   const [searchFields, setSearchFields] = useState({
     fullName: '',
@@ -260,11 +261,11 @@ export default function CustomerManagement() {
       houseNumber: ''
     }
   });
-  
+
   // State for contact address visibility
   const [isContactAddressSameAsPermanent, setIsContactAddressSameAsPermanent] = useState(false);
   const [showContactAddressForm, setShowContactAddressForm] = useState(true);
-  
+
   const [editedCustomer, setEditedCustomer] = useState(null);
 
   // State for validation errors
@@ -272,20 +273,20 @@ export default function CustomerManagement() {
 
   // Add state for active tab in customer details modal
   const [activeDetailTab, setActiveDetailTab] = useState('information');
-  
+
   // State for hiding account information
   const [hiddenAccountInfo, setHiddenAccountInfo] = useState({});
-  
+
   // State for new account modal
   const [newAccountModalOpen, setNewAccountModalOpen] = useState(false);
   const [newAccountModalAnimating, setNewAccountModalAnimating] = useState(false);
-  
+
   // State for account action menu
   const [accountActionMenuOpen, setAccountActionMenuOpen] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [cardDetailVisible, setCardDetailVisible] = useState(false);
   const [selectedCardDetail, setSelectedCardDetail] = useState(null);
-  
+
   // State for confirmation modal
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
@@ -297,13 +298,13 @@ export default function CustomerManagement() {
     isProcessing: false,
     onConfirm: null
   });
-  
+
   // State for responsive layout
   const [isMobile, setIsMobile] = useState(false);
-  
+
   // Loading states
   const [isLoadingForm, setIsLoadingForm] = useState(true);
-  
+
   // Check if viewing on mobile device
   useEffect(() => {
     const checkIfMobile = () => {
@@ -313,7 +314,7 @@ export default function CustomerManagement() {
     window.addEventListener('resize', checkIfMobile);
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
-  
+
   // Simulate loading states
   useEffect(() => {
     // Simulate form loading
@@ -325,30 +326,30 @@ export default function CustomerManagement() {
   // useEffect to filter and sort customers
   useEffect(() => {
     let result = [...allCustomers];
-    
+
     // Apply search filtering across all search fields
     result = result.filter(customer => {
       // Check each search field
-      const nameMatch = searchFields.fullName === '' || 
+      const nameMatch = searchFields.fullName === '' ||
         customer.fullName.toLowerCase().includes(searchFields.fullName.toLowerCase());
-      
-      const idMatch = searchFields.idCardNumber === '' || 
+
+      const idMatch = searchFields.idCardNumber === '' ||
         customer.idCardNumber.toLowerCase().includes(searchFields.idCardNumber.toLowerCase());
-      
-      const emailMatch = searchFields.email === '' || 
+
+      const emailMatch = searchFields.email === '' ||
         customer.email.toLowerCase().includes(searchFields.email.toLowerCase());
-      
-      const phoneMatch = searchFields.phoneNumber === '' || 
+
+      const phoneMatch = searchFields.phoneNumber === '' ||
         customer.phoneNumber.toLowerCase().includes(searchFields.phoneNumber.toLowerCase());
-      
+
       // Customer must match all non-empty search criteria
       return nameMatch && idMatch && emailMatch && phoneMatch;
     });
-    
+
     // Apply sorting
     result.sort((a, b) => {
       let valueA, valueB;
-      
+
       // Handle nested properties
       if (sortField.includes('.')) {
         const [parent, child] = sortField.split('.');
@@ -358,20 +359,20 @@ export default function CustomerManagement() {
         valueA = a[sortField];
         valueB = b[sortField];
       }
-      
+
       // Handle string/number comparison
       if (typeof valueA === 'string') {
         valueA = valueA.toLowerCase();
         valueB = valueB.toLowerCase();
       }
-      
+
       if (sortDirection === 'asc') {
         return valueA > valueB ? 1 : -1;
       } else {
         return valueA < valueB ? 1 : -1;
       }
     });
-    
+
     setFilteredCustomers(result);
   }, [allCustomers, searchFields, sortField, sortDirection]);
 
@@ -463,10 +464,10 @@ export default function CustomerManagement() {
   const closeModal = () => {
     // Use AnimatePresence exit animations by setting isModalOpen to false
     setIsModalOpen(false);
-    
+
     // Immediately clear errors
     setErrors({});
-    
+
     // Reset form data after animation completes in onExitComplete callback
     // The actual state reset happens in the AnimatePresence onExitComplete
   };
@@ -475,10 +476,10 @@ export default function CustomerManagement() {
   const toggleCustomerStatus = (customerId) => {
     const customer = allCustomers.find(c => c.customerID === customerId);
     if (!customer) return;
-    
+
     const newStatus = customer.customerStatus === 'active' ? 'disabled' : 'active';
     const actionText = newStatus === 'active' ? 'kích hoạt' : 'vô hiệu hóa';
-    
+
     openConfirmationModal({
       title: `Xác nhận ${actionText} tài khoản`,
       description: `Bạn có chắc chắn muốn ${actionText} tài khoản của khách hàng "${customer.fullName}" không?`,
@@ -496,7 +497,7 @@ export default function CustomerManagement() {
         setTimeout(() => {
           // TODO: Call API to update customer status
           // For now, just show success notification
-          
+
           // Hiển thị thông báo thành công
           setExportNotification({
             visible: true,
@@ -504,10 +505,10 @@ export default function CustomerManagement() {
             message: `${newStatus === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa'} khách hàng thành công!`,
             format: `${newStatus === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa'} khách hàng thành công!`
           });
-          
+
           // Tự động ẩn thông báo sau 5 giây
           setTimeout(() => {
-            setExportNotification(prev => ({...prev, visible: false}));
+            setExportNotification(prev => ({ ...prev, visible: false }));
           }, 5000);
 
           setConfirmationProcessing(false);
@@ -558,10 +559,10 @@ export default function CustomerManagement() {
           [field]: value
         };
       }
-      
+
       // Validate immediately
       validateAndUpdateField(field, value);
-      
+
       return updated;
     });
   };
@@ -571,31 +572,31 @@ export default function CustomerManagement() {
     // Validate all fields before saving
     const fieldsToValidate = ['phoneNumber'];
     const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
-    
+
     let isValid = true;
     const newErrors = {};
-    
+
     // Validate phone
     const phoneError = validateField('phoneNumber', editedCustomer.phoneNumber);
     if (phoneError) {
       newErrors.phoneNumber = phoneError;
       isValid = false;
     }
-    
+
     // Validate address fields
     addressFields.forEach(field => {
       const fullField = `contactAddress.${field}`;
       const value = editedCustomer.contactAddress[field];
       const error = validateField(fullField, value);
-      
+
       if (error) {
         newErrors[fullField] = error;
         isValid = false;
       }
     });
-    
+
     setErrors(newErrors);
-    
+
     if (isValid) {
       // TODO: Call API to update customer data
       // For now, just update the selected customer state
@@ -606,7 +607,7 @@ export default function CustomerManagement() {
         phoneNumber: editedCustomer.phoneNumber,
         status: editedCustomer.status
       }));
-      
+
       // Hiển thị thông báo thành công
       setExportNotification({
         visible: true,
@@ -614,10 +615,10 @@ export default function CustomerManagement() {
         message: 'Lưu thay đổi thành công!',
         format: 'Hệ thống đã lưu thay đổi'
       });
-      
+
       // Tự động ẩn thông báo sau 5 giây
       setTimeout(() => {
-        setExportNotification(prev => ({...prev, visible: false}));
+        setExportNotification(prev => ({ ...prev, visible: false }));
       }, 5000);
     } else {
       // Hiển thị thông báo lỗi nếu không hợp lệ
@@ -627,10 +628,10 @@ export default function CustomerManagement() {
         message: 'Không thể lưu thay đổi!',
         format: 'Có lỗi khi lưu thay đổi. Vui lòng kiểm tra lại thông tin!'
       });
-      
+
       // Tự động ẩn thông báo sau 5 giây
       setTimeout(() => {
-        setExportNotification(prev => ({...prev, visible: false}));
+        setExportNotification(prev => ({ ...prev, visible: false }));
       }, 5000);
     }
   };
@@ -640,7 +641,7 @@ export default function CustomerManagement() {
     if (isAddCustomerModalOpen) {
       // If closing, just toggle the state and let AnimatePresence handle the reset
       setIsAddCustomerModalOpen(false);
-      
+
       // Immediately clear errors
       setErrors({});
     } else {
@@ -703,10 +704,10 @@ export default function CustomerManagement() {
           [field]: value
         };
       }
-      
+
       // Validate immediately
       validateAndUpdateField(field, value);
-      
+
       return updated;
     });
   };
@@ -720,7 +721,7 @@ export default function CustomerManagement() {
     setIsContactAddressSameAsPermanent(true);
     setShowContactAddressForm(false);
   };
-  
+
   // Show different contact address form
   const showDifferentContactAddress = () => {
     setNewCustomer(prev => ({
@@ -744,12 +745,12 @@ export default function CustomerManagement() {
       if (value.trim().length < 3) return 'Họ tên phải có ít nhất 3 ký tự';
       return '';
     }
-    
+
     if (field === 'dateOfBirth') {
       if (!value.trim()) return 'Ngày sinh không được để trống';
       const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
       if (!dateRegex.test(value)) return 'Ngày sinh không đúng định dạng DD/MM/YYYY';
-      
+
       // Validate age > 18
       if (dateRegex.test(value)) {
         const parts = value.split('/');
@@ -757,53 +758,53 @@ export default function CustomerManagement() {
         const today = new Date();
         let age = today.getFullYear() - dateOfBirth.getFullYear();
         const monthDiff = today.getMonth() - dateOfBirth.getMonth();
-        
+
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
           age--;
         }
-        
+
         if (age < 18) {
           return 'Khách hàng phải từ 18 tuổi trở lên';
         }
       }
-      
+
       return '';
     }
-    
+
     if (field === 'idCardNumber') {
       if (!value.trim()) return 'Số CCCD/CMND không được để trống';
       if (!/^\d{9,12}$/.test(value)) return 'Số CCCD/CMND phải có 9-12 chữ số';
       return '';
     }
-    
+
     if (field === 'email') {
       if (!value.trim()) return 'Email không được để trống';
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) return 'Email không đúng định dạng';
       return '';
     }
-    
+
     if (field === 'phoneNumber') {
       if (!value.trim()) return 'Số điện thoại không được để trống';
       if (!/^0\d{9,10}$/.test(value)) return 'Số điện thoại phải bắt đầu bằng số 0 và có 10-11 chữ số';
       return '';
     }
-    
+
     if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('streetName')) {
       if (!value.trim()) return 'Thông tin địa chỉ không được để trống';
       return '';
     }
-    
+
     if (field.includes('houseNumber')) {
       if (!value.trim()) return 'Số nhà không được để trống';
       // Add validation for house number - should be a valid number or number with letters (e.g., 123A)
       if (!/^[0-9]+[A-Za-z]?$/.test(value)) return 'Số nhà phải là số hoặc số kèm chữ cái (VD: 123 hoặc 123A)';
       return '';
     }
-    
+
     return '';
   };
-  
+
   // Validate a single field and update errors state
   const validateAndUpdateField = (field, value) => {
     const error = validateField(field, value);
@@ -813,12 +814,12 @@ export default function CustomerManagement() {
     }));
     return !error;
   };
-  
+
   // Validate all fields in new customer form
   const validateAllFields = () => {
     const newErrors = {};
     let isValid = true;
-    
+
     // Validate personal info
     const personalFields = ['fullName', 'dateOfBirth', 'idCardNumber', 'email', 'phoneNumber'];
     personalFields.forEach(field => {
@@ -828,18 +829,18 @@ export default function CustomerManagement() {
         isValid = false;
       }
     });
-    
+
     // Validate permanent address
     const addressPrefixes = ['permanentAddress', 'contactAddress'];
     const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
-    
+
     addressPrefixes.forEach(prefix => {
       addressFields.forEach(field => {
         const fullField = `${prefix}.${field}`;
-        const value = prefix === 'permanentAddress' 
+        const value = prefix === 'permanentAddress'
           ? newCustomer.permanentAddress[field]
           : newCustomer.contactAddress[field];
-        
+
         const error = validateField(fullField, value);
         if (error) {
           newErrors[fullField] = error;
@@ -847,16 +848,16 @@ export default function CustomerManagement() {
         }
       });
     });
-    
+
     setErrors(newErrors);
     return isValid;
   };
-  
+
   // Handle field blur for validation
   const handleFieldBlur = (field) => {
     if (field.includes('.')) {
       const [prefix, fieldName] = field.split('.');
-      const value = prefix === 'permanentAddress' 
+      const value = prefix === 'permanentAddress'
         ? newCustomer.permanentAddress[fieldName]
         : newCustomer.contactAddress[fieldName];
       validateAndUpdateField(field, value);
@@ -870,19 +871,19 @@ export default function CustomerManagement() {
     if (validateAllFields()) {
       // Generate ID and code
       const newId = allCustomers.length > 0 ? Math.max(...allCustomers.map(c => parseInt(c.customerID))) + 1 : 1;
-      
+
       // Calculate age from birthDate
       const birthDateParts = newCustomer.dateOfBirth.split('/');
       const birthYear = parseInt(birthDateParts[2]);
       const currentYear = new Date().getFullYear();
       const age = currentYear - birthYear;
-      
+
       // Create new customer object with current date as registration date
       const today = new Date();
       const registrationDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-      
+
       const customerToAdd = {
-        customerID: newId.toString(),
+        customerID: null,
         fullName: newCustomer.fullName,
         dateOfBirth: new Date(newCustomer.dateOfBirth.split('/').reverse().join('-')),
         age: age,
@@ -892,9 +893,10 @@ export default function CustomerManagement() {
         permanentAddress: { ...newCustomer.permanentAddress },
         contactAddress: { ...newCustomer.contactAddress },
         registrationDate: new Date(),
-        customerStatus: 'active'
+        customerStatus: 'active',
+        password: 123456,
       };
-      
+
       // Hiển thị modal xác nhận trước khi thêm khách hàng
       openConfirmationModal({
         title: 'Xác nhận thêm khách hàng mới',
@@ -911,39 +913,48 @@ export default function CustomerManagement() {
         onConfirm: () => {
           // Set processing state to true
           setConfirmationProcessing(true);
-          
+
           // Simulate API call with a delay
           setTimeout(() => {
             try {
               // TODO: Call API to add new customer
               // For now, just show success notification
-              
+              const createUser = async (customerToAdd) => {
+                const result = await createNewCustomer(customerToAdd);
+                setExportNotification({
+                  visible: true,
+                  type: result.success ? 'success' : 'error',
+                  message: result.success
+                    ? 'Thêm khách hàng thành công!'
+                    : 'Thêm khách hàng thất bại!',
+                  format: result.message
+                });
+              }
+              createUser();
+
+
+
               // Refresh customer list
               refreshCustomers();
-              
+
               // Reset form states
               setIsContactAddressSameAsPermanent(false);
               setShowContactAddressForm(true);
-              
+
               // Close modals
               closeConfirmationModal();
               toggleAddCustomerModal();
-              
-              // Hiển thị thông báo thành công
-              setExportNotification({
-                visible: true,
-                type: 'success',
-                message: 'Thêm khách hàng mới thành công!',
-                format: 'Hệ thống đã ghi nhận khách hàng mới'
-              });
-              
+
+
+
+
               // Tự động ẩn thông báo sau 5 giây
               setTimeout(() => {
-                setExportNotification(prev => ({...prev, visible: false}));
+                setExportNotification(prev => ({ ...prev, visible: false }));
               }, 5000);
             } catch (error) {
               console.error('Error adding new customer:', error);
-              
+
               // Show error notification
               setExportNotification({
                 visible: true,
@@ -951,7 +962,7 @@ export default function CustomerManagement() {
                 message: 'Có lỗi xảy ra. Vui lòng thử lại sau!',
                 format: 'Hệ thống báo lỗi. Hãy thử lại'
               });
-              
+
               // Reset processing state
               setConfirmationProcessing(false);
             }
@@ -970,11 +981,11 @@ export default function CustomerManagement() {
   const maskAccountNumber = (accountNumber) => {
     if (!accountNumber) return "";
     if (accountNumber.length <= 8) return accountNumber;
-    
+
     const firstFour = accountNumber.substring(0, 4);
     const lastFour = accountNumber.substring(accountNumber.length - 4);
     const masked = "*".repeat(accountNumber.length - 8);
-    
+
     return `${firstFour}${masked}${lastFour}`;
   };
 
@@ -1029,11 +1040,11 @@ export default function CustomerManagement() {
   const openConfirmationModal = ({ title, message, confirmText = "Quẹt để xác nhận", confirmDetails = null, type, onConfirm }) => {
     setConfirmationModal({ isOpen: true, title, description: message, confirmText, confirmDetails, type, isProcessing: false, onConfirm });
   };
-  
+
   const closeConfirmationModal = () => {
     setConfirmationModal(prev => ({ ...prev, isOpen: false }));
   };
-  
+
   const setConfirmationProcessing = (isProcessing) => {
     setConfirmationModal(prev => ({ ...prev, isProcessing }));
   };
@@ -1055,21 +1066,21 @@ export default function CustomerManagement() {
     message: '',
     format: ''
   });
-  
+
   // Handle export data
   const handleExportData = (data, format) => {
     console.log('Exporting data:', data);
     console.log('Format:', format);
-    
+
     // In a real application, this would trigger an API call or use a library
     // to generate and download the file
-    
+
     // For demonstration purposes, we'll randomly show success or error notification
     setExportFormat(format);
-    
+
     // Simulate random success/error (80% success rate)
     const isSuccess = Math.random() > 0.2;
-    
+
     if (isSuccess) {
       // Show success notification
       setExportNotification({
@@ -1087,13 +1098,13 @@ export default function CustomerManagement() {
         format: format
       });
     }
-    
+
     // Hide the notification after 5 seconds
     setTimeout(() => {
-      setExportNotification(prev => ({...prev, visible: false}));
+      setExportNotification(prev => ({ ...prev, visible: false }));
     }, 5000);
   };
-  
+
   // Render component UI
   return (
     <div className="container mx-auto sm:px-3 md:px-4 lg:pl-2 lg:px-6 xl:pl-2 xl:px-8">
@@ -1430,7 +1441,7 @@ export default function CustomerManagement() {
         className="mb-6"
       >
         {isLoading ? (
-          <DataTableShimmer 
+          <DataTableShimmer
             rowCount={10}
             columnCount={6}
             showFilter={true}
@@ -1625,7 +1636,7 @@ export default function CustomerManagement() {
                               <CalendarDatePicker
                                 label="Ngày sinh"
                                 value={selectedCustomer.dateOfBirth}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 disabled={true}
                               />
                             </motion.div>
@@ -1728,7 +1739,7 @@ export default function CustomerManagement() {
                             <AddressFields
                               prefix="permanentAddress"
                               values={selectedCustomer.permanentAddress}
-                              onChange={() => {}}
+                              onChange={() => { }}
                               disabled={true}
                             />
                           </motion.div>
@@ -1762,7 +1773,7 @@ export default function CustomerManagement() {
                             <AddressFields
                               prefix="contactAddress"
                               values={selectedCustomer.contactAddress}
-                              onChange={() => {}}
+                              onChange={() => { }}
                               disabled={true}
                             />
                           </motion.div>
@@ -1791,7 +1802,7 @@ export default function CustomerManagement() {
                             label="Ngày đăng ký"
                             placeholder="DD/MM/YYYY"
                             value={selectedCustomer.registrationDate}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             disabled={true}
                           />
                         </div>
@@ -1972,7 +1983,7 @@ export default function CustomerManagement() {
                                     validateAndUpdateField(
                                       field,
                                       editedCustomer.contactAddress[
-                                        field.split(".")[1]
+                                      field.split(".")[1]
                                       ]
                                     )
                                   }
@@ -2144,246 +2155,246 @@ export default function CustomerManagement() {
                   style={{ scrollbarWidth: "thin" }}
                 >
                   <form className="space-y-8">
-                  {/* Thông tin cá nhân */}
-                  <motion.div
-                    layout
-                    transition={{
-                      layout: { duration: 0.3, type: "spring" },
-                      height: { duration: 0.3, type: "spring" },
-                    }}
-                    className="bg-white/90 border border-cyan-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500"
-                  >
-                    <div className="flex items-center gap-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-4">
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        <User size={20} className="text-white" />
+                    {/* Thông tin cá nhân */}
+                    <motion.div
+                      layout
+                      transition={{
+                        layout: { duration: 0.3, type: "spring" },
+                        height: { duration: 0.3, type: "spring" },
+                      }}
+                      className="bg-white/90 border border-cyan-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500"
+                    >
+                      <div className="flex items-center gap-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-4">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                          <User size={20} className="text-white" />
+                        </div>
+                        <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                          Thông tin cá nhân
+                        </h4>
+                        <div className="flex-1 h-px bg-white/30"></div>
                       </div>
-                      <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                        Thông tin cá nhân
-                      </h4>
-                      <div className="flex-1 h-px bg-white/30"></div>
-                    </div>
-                    <div className="p-8">
-                      <motion.div
-                        layout
-                        transition={{ duration: 0.3 }}
-                        className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-                      >
-                        <InputField
-                          label="Họ và tên"
-                          placeholder="Nhập họ và tên..."
-                          value={newCustomer.fullName}
-                          onChange={(val) =>
-                            handleNewCustomerChange("fullName", val)
-                          }
-                          onBlur={() => handleFieldBlur("fullName")}
-                          error={errors.fullName}
-                          required={true}
-                        />
-                        <CalendarDatePicker
-                          label="Ngày sinh"
-                          placeholder="DD/MM/YYYY"
-                          value={newCustomer.dateOfBirth}
-                          onChange={(val) =>
-                            handleNewCustomerChange("dateOfBirth", val)
-                          }
-                          onBlur={() => handleFieldBlur("dateOfBirth")}
-                          error={errors.dateOfBirth}
-                          required={true}
-                        />
-                        <InputField
-                          label="Số CCCD/CMND"
-                          placeholder="Nhập số CCCD/CMND..."
-                          value={newCustomer.idCardNumber}
-                          onChange={(val) =>
-                            handleNewCustomerChange("idCardNumber", val)
-                          }
-                          onBlur={() => handleFieldBlur("idCardNumber")}
-                          error={errors.idCardNumber}
-                          required={true}
-                        />
-                        <InputField
-                          label="Email"
-                          type="email"
-                          placeholder="example@email.com"
-                          value={newCustomer.email}
-                          onChange={(val) =>
-                            handleNewCustomerChange("email", val)
-                          }
-                          onBlur={() => handleFieldBlur("email")}
-                          error={errors.email}
-                          required={true}
-                        />
-                        <InputField
-                          label="Số điện thoại"
-                          placeholder="Nhập số điện thoại..."
-                          value={newCustomer.phoneNumber}
-                          onChange={(val) =>
-                            handleNewCustomerChange("phoneNumber", val)
-                          }
-                          onBlur={() => handleFieldBlur("phoneNumber")}
-                          error={errors.phoneNumber}
-                          required={true}
-                        />
-                      </motion.div>
-                    </div>
-                  </motion.div>
-
-                  {/* Địa chỉ thường trú */}
-                  <motion.div
-                    layout
-                    transition={{
-                      layout: { duration: 0.3, type: "spring" },
-                      height: { duration: 0.3, type: "spring" },
-                    }}
-                    className="bg-white/90 border border-blue-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500"
-                  >
-                    <div className="flex items-center gap-4 bg-gradient-to-r from-teal-400 via-cyan-500 to-teal-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-4">
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        <MapPin size={20} className="text-white" />
-                      </div>
-                      <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                        Địa chỉ thường trú
-                      </h4>
-                      <div className="flex-1 h-px bg-white/30"></div>
-                    </div>
-                    <div className="p-8">
-                      <AddressFields
-                        prefix="permanentAddress"
-                        values={newCustomer.permanentAddress}
-                        onChange={handleNewCustomerChange}
-                        errors={errors}
-                        required
-                        onBlur={handleFieldBlur}
-                      />
-                    </div>
-                  </motion.div>
-
-                  {/* Địa chỉ liên lạc */}
-                  <motion.div
-                    layout
-                    transition={{
-                      layout: { duration: 0.3, type: "spring" },
-                      height: { duration: 0.3, type: "spring" },
-                    }}
-                    className="bg-white/90 border border-indigo-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500"
-                  >
-                    <div className="flex items-center gap-4 bg-gradient-to-r from-indigo-400 via-blue-500 to-indigo-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-4">
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                        <MapPin size={20} className="text-white" />
-                      </div>
-                      <h4 className="text-xl font-bold text-white flex items-center gap-2">
-                        Địa chỉ liên lạc
-                      </h4>
-                      <div className="flex-1 h-px bg-white/30"></div>
-                    </div>
-                    <div className="p-8">
-                      <div className="flex justify-end mb-6">
-                        {!isContactAddressSameAsPermanent ? (
-                          <motion.button
-                            type="button"
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={copyPermanentAddressToContact}
-                            className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-cyan-400 hover:to-blue-500 flex items-center gap-2"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                              ></path>
-                            </svg>
-                            <span className="text-sm">
-                              Giống địa chỉ thường trú
-                            </span>
-                          </motion.button>
-                        ) : (
-                          <motion.button
-                            type="button"
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={showDifferentContactAddress}
-                            className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-orange-400 hover:to-red-500 flex items-center gap-2"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              ></path>
-                            </svg>
-                            <span className="text-sm">
-                              Địa chỉ liên lạc khác
-                            </span>
-                          </motion.button>
-                        )}
-                      </div>
-                      
-                      {isContactAddressSameAsPermanent ? (
+                      <div className="p-8">
                         <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
+                          layout
                           transition={{ duration: 0.3 }}
-                          className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 text-center"
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
                         >
-                          <div className="flex items-center justify-center gap-3 text-green-700">
-                            <svg
-                              className="w-6 h-6"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                              ></path>
-                            </svg>
-                            <span className="text-lg font-semibold">
-                              Địa chỉ liên lạc giống với địa chỉ thường trú
-                            </span>
-                          </div>
-                          <p className="text-green-600 mt-2">
-                            Hệ thống sẽ sử dụng địa chỉ thường trú làm địa chỉ liên lạc
-                          </p>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <AddressFields
-                            prefix="contactAddress"
-                            values={newCustomer.contactAddress}
-                            onChange={handleNewCustomerChange}
-                            errors={errors}
-                            required
-                            onBlur={handleFieldBlur}
+                          <InputField
+                            label="Họ và tên"
+                            placeholder="Nhập họ và tên..."
+                            value={newCustomer.fullName}
+                            onChange={(val) =>
+                              handleNewCustomerChange("fullName", val)
+                            }
+                            onBlur={() => handleFieldBlur("fullName")}
+                            error={errors.fullName}
+                            required={true}
+                          />
+                          <CalendarDatePicker
+                            label="Ngày sinh"
+                            placeholder="DD/MM/YYYY"
+                            value={newCustomer.dateOfBirth}
+                            onChange={(val) =>
+                              handleNewCustomerChange("dateOfBirth", val)
+                            }
+                            onBlur={() => handleFieldBlur("dateOfBirth")}
+                            error={errors.dateOfBirth}
+                            required={true}
+                          />
+                          <InputField
+                            label="Số CCCD/CMND"
+                            placeholder="Nhập số CCCD/CMND..."
+                            value={newCustomer.idCardNumber}
+                            onChange={(val) =>
+                              handleNewCustomerChange("idCardNumber", val)
+                            }
+                            onBlur={() => handleFieldBlur("idCardNumber")}
+                            error={errors.idCardNumber}
+                            required={true}
+                          />
+                          <InputField
+                            label="Email"
+                            type="email"
+                            placeholder="example@email.com"
+                            value={newCustomer.email}
+                            onChange={(val) =>
+                              handleNewCustomerChange("email", val)
+                            }
+                            onBlur={() => handleFieldBlur("email")}
+                            error={errors.email}
+                            required={true}
+                          />
+                          <InputField
+                            label="Số điện thoại"
+                            placeholder="Nhập số điện thoại..."
+                            value={newCustomer.phoneNumber}
+                            onChange={(val) =>
+                              handleNewCustomerChange("phoneNumber", val)
+                            }
+                            onBlur={() => handleFieldBlur("phoneNumber")}
+                            error={errors.phoneNumber}
+                            required={true}
                           />
                         </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                </form>
+                      </div>
+                    </motion.div>
+
+                    {/* Địa chỉ thường trú */}
+                    <motion.div
+                      layout
+                      transition={{
+                        layout: { duration: 0.3, type: "spring" },
+                        height: { duration: 0.3, type: "spring" },
+                      }}
+                      className="bg-white/90 border border-blue-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500"
+                    >
+                      <div className="flex items-center gap-4 bg-gradient-to-r from-teal-400 via-cyan-500 to-teal-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-4">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                          <MapPin size={20} className="text-white" />
+                        </div>
+                        <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                          Địa chỉ thường trú
+                        </h4>
+                        <div className="flex-1 h-px bg-white/30"></div>
+                      </div>
+                      <div className="p-8">
+                        <AddressFields
+                          prefix="permanentAddress"
+                          values={newCustomer.permanentAddress}
+                          onChange={handleNewCustomerChange}
+                          errors={errors}
+                          required
+                          onBlur={handleFieldBlur}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Địa chỉ liên lạc */}
+                    <motion.div
+                      layout
+                      transition={{
+                        layout: { duration: 0.3, type: "spring" },
+                        height: { duration: 0.3, type: "spring" },
+                      }}
+                      className="bg-white/90 border border-indigo-200/50 rounded-3xl shadow-lg hover:shadow-xl pt-0 px-0 p-0 space-y-0 transition-all duration-500"
+                    >
+                      <div className="flex items-center gap-4 bg-gradient-to-r from-indigo-400 via-blue-500 to-indigo-600 rounded-t-3xl border-b-0 mb-0 mx-0 px-8 py-4">
+                        <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                          <MapPin size={20} className="text-white" />
+                        </div>
+                        <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                          Địa chỉ liên lạc
+                        </h4>
+                        <div className="flex-1 h-px bg-white/30"></div>
+                      </div>
+                      <div className="p-8">
+                        <div className="flex justify-end mb-6">
+                          {!isContactAddressSameAsPermanent ? (
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.05, y: -2 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={copyPermanentAddressToContact}
+                              className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-cyan-400 hover:to-blue-500 flex items-center gap-2"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                ></path>
+                              </svg>
+                              <span className="text-sm">
+                                Giống địa chỉ thường trú
+                              </span>
+                            </motion.button>
+                          ) : (
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.05, y: -2 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={showDifferentContactAddress}
+                              className="group px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-0 hover:from-orange-400 hover:to-red-500 flex items-center gap-2"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                ></path>
+                              </svg>
+                              <span className="text-sm">
+                                Địa chỉ liên lạc khác
+                              </span>
+                            </motion.button>
+                          )}
+                        </div>
+
+                        {isContactAddressSameAsPermanent ? (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 text-center"
+                          >
+                            <div className="flex items-center justify-center gap-3 text-green-700">
+                              <svg
+                                className="w-6 h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                ></path>
+                              </svg>
+                              <span className="text-lg font-semibold">
+                                Địa chỉ liên lạc giống với địa chỉ thường trú
+                              </span>
+                            </div>
+                            <p className="text-green-600 mt-2">
+                              Hệ thống sẽ sử dụng địa chỉ thường trú làm địa chỉ liên lạc
+                            </p>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <AddressFields
+                              prefix="contactAddress"
+                              values={newCustomer.contactAddress}
+                              onChange={handleNewCustomerChange}
+                              errors={errors}
+                              required
+                              onBlur={handleFieldBlur}
+                            />
+                          </motion.div>
+                        )}
+                      </div>
+                    </motion.div>
+                  </form>
                 </div>
               )}
 
@@ -2413,11 +2424,10 @@ export default function CustomerManagement() {
                       whileTap={!isLoadingForm ? { scale: 0.95 } : {}}
                       onClick={!isLoadingForm ? addNewCustomer : undefined}
                       disabled={isLoadingForm}
-                      className={`px-4 md:px-6 py-3 font-medium rounded-xl transition-all duration-500 flex items-center ${
-                        isLoadingForm
+                      className={`px-4 md:px-6 py-3 font-medium rounded-xl transition-all duration-500 flex items-center ${isLoadingForm
                           ? 'bg-gray-400 text-gray-300 cursor-not-allowed'
                           : 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:shadow-lg'
-                      }`}
+                        }`}
                     >
                       <Plus size={16} className="mr-2 font-medium" />
                       Thêm khách hàng

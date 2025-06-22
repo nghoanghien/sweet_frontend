@@ -50,3 +50,25 @@ export interface IKhachHangResDTO {
     trangThaiTaiKhoan: ITrangThaiDTO
 
 }
+export interface ICustomerFrontend {
+    customerID?: string|number;
+    fullName: string;
+    dateOfBirth: Date;
+    age: number;
+    idCardNumber: string;
+    email: string;
+    phoneNumber: string;
+    permanentAddress: IAddressFrontend;
+    contactAddress: IAddressFrontend;
+    registrationDate?: Date;
+    customerStatus?: string;
+    password: string;
+}
+
+export interface IAddressFrontend {
+     province: string;
+  district: string;
+  ward: string;
+  streetName: string;
+  houseNumber: string;
+}
