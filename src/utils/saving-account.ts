@@ -52,10 +52,26 @@ export function isFutureDate(date: Date): boolean {
 
 /**
  * Format ngày theo định dạng dd/mm/yyyy
- * @param date - Ngày cần format
+ * @param date - Ngày cần format (có thể là Date object hoặc string)
  * @returns Chuỗi ngày theo định dạng dd/mm/yyyy
  */
-export function formatDate(date: Date): string {
+export function formatDate(date: Date | string): string {
+  // Nếu date đã là string và có định dạng dd/mm/yyyy, trả về luôn
+  if (typeof date === 'string') {
+    // Kiểm tra xem string có đúng định dạng dd/mm/yyyy không
+    const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (dateRegex.test(date)) {
+      return date;
+    }
+    // Nếu không đúng định dạng, thử parse thành Date
+    date = new Date(date);
+  }
+  
+  // Kiểm tra xem date có phải là Date object hợp lệ không
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return '-'; // Trả về dấu gạch ngang nếu date không hợp lệ
+  }
+  
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const year = date.getFullYear();
