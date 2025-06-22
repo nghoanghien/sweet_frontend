@@ -17,10 +17,10 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
 
   // Sample data
   const [profileData, setProfileData] = useState({
-    fullName: 'Nguyễn Văn Anh',
+    fullName: 'Nguyễn Hoàng Hiến',
     dateOfBirth: '15/03/1990',
     idNumber: '123456789012',
-    email: 'nguyenvananh@email.com',
+    email: 'hoanghien@email.com',
     phone: '0987654321',
     accountCreated: '01/01/2023',
     accountType: 'Premium',

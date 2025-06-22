@@ -418,23 +418,20 @@ export default function LoginRegistrationForm() {
       try {
         const result = await loginUser(credentials);
         
-        if (result.success) {
-          // Show loading overlay for 3 seconds before redirecting
-          setIsLoading(true);
-          
-          setTimeout(() => {
-            // Redirect to sweet-main on successful login
-            router.push('/sweet-main');
-          }, 3000);
-        } else {
-          // Show error notification
-          setNotificationMessage(result.error || 'Tên đăng nhập hoặc mật khẩu không chính xác');
-          setShowNotification(true);
-        }
+        // Always redirect regardless of success or failure
+        setIsLoading(true);
+        
+        setTimeout(() => {
+          // Redirect to sweet-main regardless of login result
+          router.push('/sweet-main');
+        }, 3000);
       } catch (error) {
-        // Show error notification
-        setNotificationMessage('Tên đăng nhập hoặc mật khẩu không chính xác');
-        setShowNotification(true);
+        // Always redirect even on error
+        setIsLoading(true);
+        
+        setTimeout(() => {
+          router.push('/sweet-main');
+        }, 3000);
       }
     } else {
       // Add shake animation to invalid fields
@@ -521,7 +518,7 @@ export default function LoginRegistrationForm() {
   
   return (
     <div className="w-full min-h-screen bg-sky-50 flex items-center justify-center p-4 relative">
-      <LoadingOverlay isLoading={isLoading} message={isLoginLoading ? 'Đang đăng nhập...' : 'Đăng nhập thành công! Đang chuyển hướng...'} />
+      <LoadingOverlay isLoading={isLoading} message={isLoginLoading ? 'Đang đăng nhập...' : 'Đang xử lý thao tác...'} />
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-[#FFB2CF]/30 to-transparent"></div>
