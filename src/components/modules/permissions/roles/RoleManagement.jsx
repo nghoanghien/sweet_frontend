@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserCheck, Plus, Search, Filter, Users, Settings } from 'lucide-react';
 import RoleCard from '../ui/RoleCard';
@@ -6,11 +6,10 @@ import RoleFormModal from './RoleFormModal';
 import DeleteRoleModal from './DeleteRoleModal';
 import ExportNotification from '../../../common/ExportNotification';
 import RoleCardShimmer from '../../../ui/custom/shimmer-types/RoleCardShimmer';
+import { useAllRoles } from '@/hooks/useAllRoles';
+import { getPermissionLabel } from '@/utils/permissions';
 
 const RoleManagement = () => {
-  // State cho loading
-  const [isLoading, setIsLoading] = useState(true);
-  
   // State cho modal
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -20,15 +19,6 @@ const RoleManagement = () => {
   // State cho filter
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // useEffect để xử lý loading state 3 giây
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-    
-    return () => clearTimeout(timer);
-  }, []);
   
   // State cho modal xác nhận
   const [confirmModal, setConfirmModal] = useState({
@@ -47,96 +37,35 @@ const RoleManagement = () => {
     type: 'success',
     format: '',
   });
+
+  const { allRoles, isLoading, error, refreshRoles } = useAllRoles();
   
-  // Mock data cho danh sách vai trò
-  const [rolesList, setRolesList] = useState([
-    // Vai trò khách hàng (cố định)
-    {
-      id: 'role1',
-      name: 'Không có quyền',
-      type: 'customer',
-      description: 'Tài khoản không có quyền thực hiện bất kỳ thao tác nào',
-      permissions: [],
-      accountCount: 5,
-      isSystem: true
-    },
-    {
-      id: 'role2',
-      name: 'Quyền thanh toán',
-      type: 'customer',
-      description: 'Chỉ có quyền thực hiện các giao dịch thanh toán',
-      permissions: [
-        { id: 'perm1', name: 'Thanh toán' }
-      ],
-      accountCount: 120,
-      isSystem: true
-    },
-    {
-      id: 'role3',
-      name: 'Quyền tiết kiệm',
-      type: 'customer',
-      description: 'Có quyền thanh toán và sử dụng các tính năng tiết kiệm',
-      permissions: [
-        { id: 'perm1', name: 'Thanh toán' },
-        { id: 'perm2', name: 'Tiết kiệm' }
-      ],
-      accountCount: 85,
-      isSystem: true
-    },
-    
-    // Vai trò nhân viên (có thể thêm/sửa/xóa)
-    {
-      id: 'role4',
-      name: 'Quản trị viên',
-      type: 'staff',
-      description: 'Có toàn quyền trong hệ thống',
-      permissions: [
-        { id: 'perm4', name: 'Quản lý khách hàng và phiếu gửi tiền' },
-        { id: 'perm5', name: 'Quản lý nhân viên' },
-        { id: 'perm7', name: 'Quản lý sản phẩm tiết kiệm' },
-        { id: 'perm8', name: 'Báo cáo doanh số' },
-        { id: 'perm9', name: 'Cài đặt hệ thống' },
-        { id: 'perm10', name: 'Quản lý phân quyền' }
-      ],
-      accountCount: 3,
-      isSystem: true
-    },
-    {
-      id: 'role4.0',
-      name: 'Không có quyền',
-      type: 'staff',
-      description: 'Không có quyền truy cập vào hệ thống',
-      permissions: [],
-      accountCount: 0,
-      isSystem: true  
-    },
-    {
-      id: 'role5',
-      name: 'Nhân viên giao dịch',
-      type: 'staff',
-      description: 'Xử lý các giao dịch của khách hàng',
-      permissions: [
-        { id: 'perm3', name: 'Xem tổng quan ngân hàng' },
-        { id: 'perm4', name: 'Quản lý khách hàng' },
-        { id: 'perm6', name: 'Quản lý phiếu gửi tiền' }
-      ],
-      accountCount: 12,
-      isSystem: false
-    },
-    {
-      id: 'role6',
-      name: 'Nhân viên tiếp thị',
-      type: 'staff',
-      description: 'Quản lý các sản phẩm và báo cáo',
-      permissions: [
-        { id: 'perm3', name: 'Xem tổng quan ngân hàng' },
-        { id: 'perm7', name: 'Quản lý sản phẩm tiết kiệm' },
-        { id: 'perm8', name: 'Báo cáo doanh số' }
-      ],
-      accountCount: 8,
-      isSystem: false
-    }
-  ]);
+  // Transform API data to component format
+  const transformRoleData = (apiRoles) => {
+    return apiRoles.map(role => {
+      console.log('Role permissions:', role.permissions);
+      return {
+        id: role.roleID,
+        name: role.roleName,
+        type: role.customerRole ? 'customer' : 'staff',
+        description: role.description,
+        permissions: role.permissions.map(permission => {
+          console.log('Permission:', permission);
+          console.log('Permission label:', getPermissionLabel(permission));
+          return {
+            id: permission,
+            name: getPermissionLabel(permission)
+          };
+        }),
+        accountCount: 0, // This would need to come from API
+        isSystem: true, // This would need to come from API
+        active: role.active
+      };
+    });
+  };
+  
+  // Use transformed data instead of mock data
+  const rolesList = allRoles ? transformRoleData(allRoles) : [];
 
   // Hàm hiển thị thông báo
   const showNotification = (message, type = 'success', format = '') => {
@@ -197,13 +126,9 @@ const RoleManagement = () => {
 
   // Xử lý khi lưu vai trò (thêm hoặc sửa)
   const handleSaveRole = (role, notificationInfo) => {
-    if (isEditing) {
-      // Cập nhật vai trò hiện có
-      setRolesList(rolesList.map(r => r.id === role.id ? role : r));
-    } else {
-      // Thêm vai trò mới
-      setRolesList([...rolesList, { ...role, id: `role${rolesList.length + 1}`, accountCount: 0 }]);
-    }
+    // TODO: Implement API calls for creating/updating roles
+    // For now, just refresh the data
+    refreshRoles();
     setShowFormModal(false);
     
     // Hiển thị thông báo nếu có
@@ -219,7 +144,9 @@ const RoleManagement = () => {
   // Xử lý khi xác nhận xóa vai trò
   const handleConfirmDelete = (notificationInfo) => {
     if (selectedRole) {
-      setRolesList(rolesList.filter(r => r.id !== selectedRole.id));
+      // TODO: Implement API call for deleting role
+      // For now, just refresh the data
+      refreshRoles();
       setShowDeleteModal(false);
       
       // Hiển thị thông báo nếu có
@@ -262,6 +189,21 @@ const RoleManagement = () => {
           </div>
         </div>
         <RoleCardShimmer cardCount={9} />
+      </div>
+    );
+  }
+
+  // Hiển thị lỗi nếu có
+  if (error) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-red-500 mb-4">Có lỗi xảy ra khi tải danh sách vai trò</p>
+        <button 
+          onClick={refreshRoles}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Thử lại
+        </button>
       </div>
     );
   }

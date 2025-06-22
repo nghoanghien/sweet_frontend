@@ -6,6 +6,7 @@ export interface Role {
   description: string;
   active: boolean;
   permissions: Permission[];
+  customerRole: boolean;
 }
 
 export interface Address {

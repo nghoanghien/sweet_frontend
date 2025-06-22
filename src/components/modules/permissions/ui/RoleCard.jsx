@@ -15,8 +15,12 @@ import {
   ChevronDown,
   ChevronUp 
 } from 'lucide-react';
+import { Permission } from '@/types/interfaces/enums';
 
 const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
+  // Kiểm tra xem có phải vai trò hệ thống không (id từ 1-5)
+  const isSystemRoleByID = role.id >= 1 && role.id <= 5;
+  const finalIsSystemRole = isSystemRoleByID;
   const [isExpanded, setIsExpanded] = useState(false);
   
   // Hàm chọn icon dựa trên loại vai trò
@@ -34,14 +38,14 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
   // Hàm chọn icon cho quyền hạn
   const getPermissionIcon = (permissionId) => {
     const iconMap = {
-      'perm1': CreditCard,
-      'perm2': PiggyBank,
-      'perm4': Users,
-      'perm5': UserCog,
-      'perm7': Package,
-      'perm8': BarChart3,
-      'perm9': Settings,
-      'perm10': Shield
+      [Permission.PAYMENT_ACCOUNT]: CreditCard,
+      [Permission.SAVING_ACCOUNTS]: PiggyBank,
+      [Permission.CUSTOMERS]: Users,
+      [Permission.EMPLOYEES]: UserCog,
+      [Permission.SAVING_PRODUCTS]: Package,
+      [Permission.SALE_REPORTS]: BarChart3,
+      [Permission.SETTINGS]: Settings,
+      [Permission.PERMISSIONS]: Shield
     };
    
     return iconMap[permissionId] || Shield;
@@ -110,7 +114,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       </div>
 
       {/* System role badge */}
-      {isSystemRole && (
+      {finalIsSystemRole && (
         <motion.span 
           className="absolute top-3 right-3 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-2xl text-xs font-semibold shadow-sm border border-amber-200"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -233,7 +237,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
         </div>
 
         {/* Action buttons */}
-        {!isSystemRole && (
+        {!finalIsSystemRole && (
           <div className="flex gap-2">
             <motion.button
               onClick={() => onEdit(role.id)}

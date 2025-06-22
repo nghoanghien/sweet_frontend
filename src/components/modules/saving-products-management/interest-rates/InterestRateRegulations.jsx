@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+  import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, User, Save, DollarSign, TrendingUp } from 'lucide-react';
 

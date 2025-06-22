@@ -3,6 +3,7 @@ import { INhanVienReqDTO } from "@/types/employee";
 import { Permission } from "@/types/interfaces/enums";
 import { Address, Role, User } from "@/types/interfaces/user";
 import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
+import { getPermissions } from "@/utils/permissions";
 
 export const mapApiToAddress = (item: any): Address => {
   return {
@@ -15,15 +16,15 @@ export const mapApiToAddress = (item: any): Address => {
   };
 }
 
-//còn thiếu cái quyền hạn chưa mapping được
 export const mapApiToRole = (item: any): Role => {
   return {
     roleID: item.id,
     roleName: item.name,
     description: item.description,
     active: item.active,
-    permissions: item.quyenHans
-  };
+    customerRole: item.customerRole,
+    permissions: getPermissions(item.quyenHanIds),
+  }
 }
 
 //Còn thiếu nhân viên chưa mapping được

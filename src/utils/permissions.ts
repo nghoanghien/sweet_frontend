@@ -86,11 +86,14 @@ export const isSubsetOf = (mainArray: number[], subArray: number[]): boolean => 
 };
 
 /**
- * Lấy danh sách permissions dựa trên array action codes đầu vào
- * @param actionCodes - Array các action codes
+ * Lấy danh sách permissions dựa trên array object có thuộc tính .id
+ * @param actionObjects - Array các object có thuộc tính .id
  * @returns Array các permissions có action codes thuộc về actionCodes đầu vào
  */
-export const getPermissions = (actionCodes: number[]): Permission[] => {
+export const getPermissions = (actionObjects: any[]): Permission[] => {
+  // Trích xuất tất cả .id từ array object thành mảng số
+  const actionCodes = actionObjects.map(obj => obj.id).filter(id => typeof id === 'number');
+  
   const permissions: Permission[] = [];
   
   Object.values(Permission).forEach(permission => {
