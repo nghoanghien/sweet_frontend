@@ -827,6 +827,7 @@ export default function Dashboard() {
     return maskedPart + lastFourDigits;
   };
 
+
   const [profileData, setProfileData] = useState({
     fullName: "Nguyễn Hoàng Hiến",
     dateOfBirth: "15/08/1990",
@@ -857,6 +858,7 @@ export default function Dashboard() {
       setIsMobile(window.innerWidth < 768);
     };
 
+   
     // Initial check
     checkIfMobile();
 
