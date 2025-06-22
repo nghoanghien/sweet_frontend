@@ -8,6 +8,6 @@ export const mapApiToRole = (item: any): Role => {
     description: item.description,
     active: item.active,
     customerRole: item.customerRole,
-    permissions: getPermissions(item.quyenHans),
+    permissions: item.quyenHanIds ? getPermissions(item.quyenHanIds) : getPermissions(item.quyenHans),
   }
 }
