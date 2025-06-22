@@ -1,633 +1,408 @@
 import React, { useState, useEffect } from 'react';
-  import { motion, AnimatePresence } from 'framer-motion';
-  import { 
-    Edit, 
-    User, 
-    MapPin, 
-    Plus,
-    Download,
-    Save,
-    Calendar,
-    FileText,
-  } from 'lucide-react';
-  import { SwipeConfirmationModal } from '@/components/ui';
-  import CalendarDatePicker from '../../../components/ui/CalendarDatePicker';
-  import ExportDataModal from '../../../components/common/ExportDataModal';
-  import ExportNotification from '../../../components/common/ExportNotification';
-  import InputField from '../../../components/ui/custom/Inputfield';
-  import CustomSelect from '../../../components/ui/custom/CustomSelect';
-  import AddressFields from '../../../components/ui/custom/AddressFields';
-  import StatusBadge from '../../../components/ui/custom/StatusBadge';
-  import SearchFilterBar from '../../../components/common/SearchFilterBar';
-  import DataTable from '../../../components/common/DataTable';
-  import ModalHeader from '../../../components/ui/custom/ModalHeader';
-  import AnimatedTabNavigation from '../../../components/ui/custom/AnimatedTabNavigation';
-  import EmployeeTransactionHistory from '../../../components/modules/employees-management/EmployeeTransactionHistory';
-  import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Edit,
+  User,
+  MapPin,
+  Plus,
+  Download,
+  Save,
+  Calendar,
+  FileText,
+} from 'lucide-react';
+import { SwipeConfirmationModal } from '@/components/ui';
+import CalendarDatePicker from '../../../components/ui/CalendarDatePicker';
+import ExportDataModal from '../../../components/common/ExportDataModal';
+import ExportNotification from '../../../components/common/ExportNotification';
+import InputField from '../../../components/ui/custom/Inputfield';
+import CustomSelect from '../../../components/ui/custom/CustomSelect';
+import AddressFields from '../../../components/ui/custom/AddressFields';
+import StatusBadge from '../../../components/ui/custom/StatusBadge';
+import SearchFilterBar from '../../../components/common/SearchFilterBar';
+import DataTable from '../../../components/common/DataTable';
+import ModalHeader from '../../../components/ui/custom/ModalHeader';
+import AnimatedTabNavigation from '../../../components/ui/custom/AnimatedTabNavigation';
+import EmployeeTransactionHistory from '../../../components/modules/employees-management/EmployeeTransactionHistory';
+import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
 import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
 import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer';
 import { useAllEmployees } from '@/hooks/useEmployees';
 import { formatDate } from '@/utils/saving-account';
-  export default function EmployeeManagement() {
-    // Remove mock data - now using real data from API
-    const { allEmployees, isLoading, error, refreshEmployees } = useAllEmployees();
+import { createNewEmployee } from '@/utils/functionalUtil';
+export default function EmployeeManagement() {
+  // Remove mock data - now using real data from API
+  const { allEmployees, isLoading, error, refreshEmployees } = useAllEmployees();
 
-    // State for employee data (keeping for backward compatibility)
-    const [employees, setEmployees] = useState([
-      {
-        id: 1,
-        fullName: 'Nguyễn Văn A',
-        dateOfBirth: '12/05/1985',
-        age: 38,
-        idCardNumber: '036085123456',
-        email: 'nguyenvana@email.com',
-        phoneNumber: '0901234567',
-        permanentAddress: {
-          province: 'Hà Nội',
-          district: 'Cầu Giấy',
-          ward: 'Dịch Vọng',
-          streetName: 'Trần Thái Tông',
-          houseNumber: '125'
-        },
-        transactions: [
-          {
-            id: 1,
-            type: 'incoming',
-            description: 'Lương tháng 5/2023',
-            date: '25/05/2023',
-            amount: 15000000,
-            channel: 'bank',
-            note: 'Chuyển khoản lương tháng 5/2023'
-          },
-          {
-            id: 2,
-            type: 'incoming',
-            description: 'Thưởng dự án ABC',
-            date: '30/05/2023',
-            amount: 5000000,
-            channel: 'bank',
-            note: 'Thưởng hoàn thành dự án ABC'
-          },
-          {
-            id: 3,
-            type: 'outgoing',
-            description: 'Ứng lương',
-            date: '10/06/2023',
-            amount: 3000000,
-            channel: 'cash',
-            note: 'Ứng lương tháng 6/2023'
-          },
-          {
-            id: 4,
-            type: 'incoming',
-            description: 'Lương tháng 6/2023',
-            date: '25/06/2023',
-            amount: 15000000,
-            channel: 'bank',
-            note: 'Chuyển khoản lương tháng 6/2023'
-          },
-          {
-            id: 4,
-            type: 'incoming',
-            description: 'Lương tháng 6/2023',
-            date: '25/06/2023',
-            amount: 15000000,
-            channel: 'bank',
-            note: 'Chuyển khoản lương tháng 6/2023'
-          }
-        ],
-        contactAddress: {
-          province: 'Hà Nội',
-          district: 'Cầu Giấy',
-          ward: 'Dịch Vọng',
-          streetName: 'Trần Thái Tông',
-          houseNumber: '125'
-        },
-        recruitmentDate: '15/06/2022',
-        accountStatus: 'active'
-      },
-    ]);
-  
-    // State for employee detail modal
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
-    
-    // State for search and filter
-    const [filteredEmployees, setFilteredEmployees] = useState([]);
-    const [sortField, setSortField] = useState('fullName');
-    const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
-    const [exportData, setExporData] = useState([]);
-    
-    // State for multi-field search
-    const [searchFields, setSearchFields] = useState({
-      fullName: '',
-      idCardNumber: '',
-      email: '',
-      phoneNumber: ''
-    });
-  
-    // For new employee
-    const [newEmployee, setNewEmployee] = useState({
-      fullName: '',
-      dateOfBirth: '',
-      idCardNumber: '',
-      idIssueDate: '',
-      idIssuePlace: '',
-      email: '',
-      phoneNumber: '',
+  // State for employee data (keeping for backward compatibility)
+  const [employees, setEmployees] = useState([
+    {
+      id: 1,
+      fullName: 'Nguyễn Văn A',
+      dateOfBirth: '12/05/1985',
+      age: 38,
+      idCardNumber: '036085123456',
+      email: 'nguyenvana@email.com',
+      phoneNumber: '0901234567',
       permanentAddress: {
-        province: '',
-        district: '',
-        ward: '',
-        streetName: '',
-        houseNumber: ''
+        province: 'Hà Nội',
+        district: 'Cầu Giấy',
+        ward: 'Dịch Vọng',
+        streetName: 'Trần Thái Tông',
+        houseNumber: '125'
       },
-      contactAddress: {
-        province: '',
-        district: '',
-        ward: '',
-        streetName: '',
-        houseNumber: ''
-      }
-    });
-    
-    const [editedEmployee, setEditedEmployee] = useState(null);
-  
-    // State for validation errors
-    const [errors, setErrors] = useState({});
-    
-    // Add state for active tab in employee details modal
-    const [activeDetailTab, setActiveDetailTab] = useState('information');
-    
-    // State for confirmation modal
-    const [confirmationModal, setConfirmationModal] = useState({
-      isOpen: false,
-      title: "",
-      description: "",
-      confirmText: "",
-      confirmDetails: null,
-      type: "",
-      isProcessing: false,
-      onConfirm: null
-    });
-    
-    // State for responsive layout
-    const [isMobile, setIsMobile] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    
-    // Loading states
-    const [isLoadingForm, setIsLoadingForm] = useState(true);
-  
-    const employeeColumns = [
-      {
-        key: 'fullName',
-        label: 'Họ tên',
-        sortable: true,
-        formatter: (value, item) => (
-          <div className="flex items-center">
-            <div className="">
-              <div className="text-sm font-medium text-gray-900">{value}</div>
-            </div>
-          </div>
-        )
-      },
-      {
-        key: 'dateOfBirth',
-        label: 'Ngày sinh',
-        sortable: true,
-        formatter: (value) => formatDate(value),
-        className: 'hidden sm:table-cell' // Ẩn trên mobile
-      },
-      {
-        key: 'email',
-        label: 'Email',
-        sortable: true,
-        className: 'hidden sm:table-cell' // Ẩn trên mobile
-      },
-      {
-        key: 'phoneNumber',
-        label: 'Số điện thoại',
-        sortable: true,
-        className: 'hidden sm:table-cell' // Ẩn trên mobile
-      },
-      {
-        key: 'idCardNumber',
-        label: 'Số CCCD',
-        sortable: true,
-        className: 'hidden sm:table-cell' // Ẩn trên mobile
-      },
-      {
-        key: 'accountStatus',
-        label: 'Trạng thái',
-        sortable: true,
-        type: 'status' // Sử dụng StatusBadge component
-      }
-    ];  
-  
-    const addEmployeeFormFields = [
-      {
-        name: 'fullName',
-        type: 'text',
-        label: 'Họ và tên',
-        placeholder: 'Nhập họ và tên...',
-        required: true,
-        getValue: (data) => data.fullName || ''
-      },
-      {
-        name: 'dateOfBirth',
-        type: 'date',
-        label: 'Ngày sinh',
-        placeholder: 'DD/MM/YYYY',
-        required: true,
-        getValue: (data) => data.dateOfBirth || ''
-      },
-      {
-        name: 'idCardNumber',
-        type: 'text',
-        label: 'Số CCCD/CMND',
-        placeholder: 'Nhập số CCCD/CMND...',
-        required: true,
-        getValue: (data) => data.idCardNumber || ''
-      },
-      {
-        name: 'email',
-        type: 'email',
-        label: 'Email',
-        placeholder: 'example@email.com',
-        required: true,
-        getValue: (data) => data.email || ''
-      },
-      {
-        name: 'phoneNumber',
-        type: 'tel',
-        label: 'Số điện thoại',
-        placeholder: 'Nhập số điện thoại...',
-        required: true,
-        getValue: (data) => data.phoneNumber || ''
-      },
-      {
-        name: 'permanentAddress',
-        type: 'address',
-        label: 'Địa chỉ thường trú',
-        required: true,
-        getValue: (data) => data.permanentAddress || {
-          province: '',
-          district: '',
-          ward: '',
-          streetName: '',
-          houseNumber: ''
-        }
-      },
-      {
-        name: 'contactAddress',
-        type: 'address',
-        label: 'Địa chỉ liên lạc',
-        required: true,
-        getValue: (data) => data.contactAddress || {
-          province: '',
-          district: '',
-          ward: '',
-          streetName: '',
-          houseNumber: ''
-        }
-      }
-    ];  
-  
-    // Custom action buttons cho mỗi row
-    const renderActions = (employee) => (
-      <div className="flex justify-end space-x-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            enableEditMode(employee);
-          }}
-          className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50"
-        >
-          <Edit size={16} />
-        </button>
-      </div>
-    );
-    
-    // Check if viewing on mobile device
-    useEffect(() => {
-      const checkIfMobile = () => {
-        setIsMobile(window.innerWidth < 768);
-      };
-      checkIfMobile();
-      window.addEventListener('resize', checkIfMobile);
-      return () => window.removeEventListener('resize', checkIfMobile);
-    }, []);
-    
-    // Simulate loading states
-    useEffect(() => {
-      
-      // Simulate form loading
-      setTimeout(() => {
-        setIsLoadingForm(false);
-      }, 3000);
-    }, []);
-  
-    // useEffect to filter and sort employees
-    useEffect(() => {
-      let result = [...allEmployees];
-      
-      // Apply search filtering across all search fields
-      result = result.filter(employee => {
-        // Check each search field
-        const nameMatch = searchFields.fullName === '' || 
-          employee.fullName.toLowerCase().includes(searchFields.fullName.toLowerCase());
-        
-        const idMatch = searchFields.idCardNumber === '' || 
-          employee.idCardNumber.toLowerCase().includes(searchFields.idCardNumber.toLowerCase());
-        
-        const emailMatch = searchFields.email === '' || 
-          (employee.email && employee.email.toLowerCase().includes(searchFields.email.toLowerCase()));
-        
-        const phoneMatch = searchFields.phoneNumber === '' || 
-          employee.phoneNumber.toLowerCase().includes(searchFields.phoneNumber.toLowerCase());
-        
-        // Employee must match all non-empty search criteria
-        return nameMatch && idMatch && emailMatch && phoneMatch;
-      });
-      
-      // Apply sorting
-      result.sort((a, b) => {
-        let valueA, valueB;
-        
-        // Handle nested properties
-        if (sortField.includes('.')) {
-          const [parent, child] = sortField.split('.');
-          valueA = a[parent][child];
-          valueB = b[parent][child];
-        } else {
-          valueA = a[sortField];
-          valueB = b[sortField];
-        }
-        
-        // Handle string/number comparison
-        if (typeof valueA === 'string') {
-          valueA = valueA.toLowerCase();
-          valueB = valueB.toLowerCase();
-        }
-        
-        if (sortDirection === 'asc') {
-          return valueA > valueB ? 1 : -1;
-        } else {
-          return valueA < valueB ? 1 : -1;
-        }
-      });
-      
-      setFilteredEmployees(result);
-    }, [allEmployees, searchFields, sortField, sortDirection]);
-  
-    // Add useEffect to reset form data when modal state changes
-    useEffect(() => {
-      if (!isModalOpen) {
-        // Reset employee detail modal data when modal is closed
-        setTimeout(() => {
-          if (!isModalOpen) {
-            setSelectedEmployee(null);
-            setIsEditMode(false);
-            setActiveDetailTab('information');
-            setEditedEmployee(null);
-          }
-        }, 300); // Wait for animation to complete
-      }
-    }, [isModalOpen]);
-  
-    // Add useEffect to reset new employee form when add employee modal state changes
-    useEffect(() => {
-      if (!isAddEmployeeModalOpen) {
-        // Reset add employee modal data when modal is closed
-        setTimeout(() => {
-          setNewEmployee({
-            fullName: '',
-            dateOfBirth: '',
-            idCardNumber: '',
-            idIssueDate: '',
-            idIssuePlace: '',
-            email: '',
-            phoneNumber: '',
-            permanentAddress: {
-              province: '',
-              district: '',
-              ward: '',
-              streetName: '',
-              houseNumber: ''
-            },
-            contactAddress: {
-              province: '',
-              district: '',
-              ward: '',
-              streetName: '',
-              houseNumber: ''
-            }
-          });
-          setErrors({});
-        }, 300);
-      }
-    }, [isAddEmployeeModalOpen]);
-  
-    // Handle search field changes
-    const handleSearchChange = (field, value) => {
-      setSearchFields(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    };
-  
-    // Clear all search fields
-    const clearSearchFields = () => {
-      setSearchFields({
-        fullName: '',
-        idCardNumber: '',
-        email: '',
-        phoneNumber: ''
-      });
-    };
-  
-    // Handle sort column click
-    const handleSort = (field) => {
-      // If clicking on the same field, toggle direction
-      if (field === sortField) {
-        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-      } else {
-        // If clicking on a new field, set it as sort field and reset direction to asc
-        setSortField(field);
-        setSortDirection('asc');
-      }
-    };
-  
-    // Open employee detail modal
-    const openEmployeeDetail = (employee) => {
-      setSelectedEmployee(employee);
-      setIsModalOpen(true);
-      setIsEditMode(false);
-    };
-  
-    // Close employee detail modal
-    const closeModal = () => {
-      setIsModalOpen(false);
-      setTimeout(() => {
-        setSelectedEmployee(null);
-        setIsEditMode(false);
-        setActiveDetailTab('information');
-        setEditedEmployee(null);
-      }, 300); // Wait for animation to complete
-    };
-  
-    // Enable edit mode for an employee
-    const enableEditMode = (employee) => {
-      setSelectedEmployee(employee);
-      setEditedEmployee({
-        ...employee,
-        dateOfBirth: employee.dateOfBirth || '',
-        idIssueDate: employee.idIssueDate || '',
-        permanentAddress: {
-          province: employee.permanentAddress?.province || '',
-          district: employee.permanentAddress?.district || '',
-          ward: employee.permanentAddress?.ward || '',
-          streetName: employee.permanentAddress?.streetName || '',
-          houseNumber: employee.permanentAddress?.houseNumber || '',
+      transactions: [
+        {
+          id: 1,
+          type: 'incoming',
+          description: 'Lương tháng 5/2023',
+          date: '25/05/2023',
+          amount: 15000000,
+          channel: 'bank',
+          note: 'Chuyển khoản lương tháng 5/2023'
         },
-        contactAddress: {
-          province: employee.contactAddress?.province || '',
-          district: employee.contactAddress?.district || '',
-          ward: employee.contactAddress?.ward || '',
-          streetName: employee.contactAddress?.streetName || '',
-          houseNumber: employee.contactAddress?.houseNumber || '',
+        {
+          id: 2,
+          type: 'incoming',
+          description: 'Thưởng dự án ABC',
+          date: '30/05/2023',
+          amount: 5000000,
+          channel: 'bank',
+          note: 'Thưởng hoàn thành dự án ABC'
+        },
+        {
+          id: 3,
+          type: 'outgoing',
+          description: 'Ứng lương',
+          date: '10/06/2023',
+          amount: 3000000,
+          channel: 'cash',
+          note: 'Ứng lương tháng 6/2023'
+        },
+        {
+          id: 4,
+          type: 'incoming',
+          description: 'Lương tháng 6/2023',
+          date: '25/06/2023',
+          amount: 15000000,
+          channel: 'bank',
+          note: 'Chuyển khoản lương tháng 6/2023'
+        },
+        {
+          id: 4,
+          type: 'incoming',
+          description: 'Lương tháng 6/2023',
+          date: '25/06/2023',
+          amount: 15000000,
+          channel: 'bank',
+          note: 'Chuyển khoản lương tháng 6/2023'
         }
-      });
-      setIsEditMode(true);
-      setIsModalOpen(true);
-      setActiveDetailTab('information');
-    };
-  
-    // Cancel edit mode and reset form
-    const cancelEdit = () => {
-      setIsEditMode(false);
-      setEditedEmployee(null);
-      setErrors({});
-    };
-  
-    // Handle form field changes
-    const handleFormChange = (field, value) => {
-      setEditedEmployee(prev => {
-        // Handle nested fields (for address)
-        if (field.includes('.')) {
-          const [parent, child] = field.split('.');
-          return {
-            ...prev,
-            [parent]: {
-              ...prev[parent],
-              [child]: value
-            }
-          };
-        }
-        // Handle regular fields
-        return {
-          ...prev,
-          [field]: value
-        };
-      });
-    };
-  
-    // Save edited employee with validation
-    const saveEmployeeChanges = () => {
-      // Validate all fields before saving
-      const fieldsToValidate = ['phoneNumber'];
-      const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
-      
-      let isValid = true;
-      const newErrors = {};
-      
-      // Validate phoneNumber
-      const phoneError = validateField('phoneNumber', editedEmployee.phoneNumber);
-      if (phoneError) {
-        newErrors.phoneNumber = phoneError;
-        isValid = false;
+      ],
+      contactAddress: {
+        province: 'Hà Nội',
+        district: 'Cầu Giấy',
+        ward: 'Dịch Vọng',
+        streetName: 'Trần Thái Tông',
+        houseNumber: '125'
+      },
+      recruitmentDate: '15/06/2022',
+      accountStatus: 'active'
+    },
+  ]);
+
+  // State for employee detail modal
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
+
+  // State for search and filter
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [sortField, setSortField] = useState('fullName');
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
+  const [exportData, setExporData] = useState([]);
+
+  // State for multi-field search
+  const [searchFields, setSearchFields] = useState({
+    fullName: '',
+    idCardNumber: '',
+    email: '',
+    phoneNumber: ''
+  });
+
+  // For new employee
+  const [newEmployee, setNewEmployee] = useState({
+    fullName: '',
+    dateOfBirth: '',
+    idCardNumber: '',
+    idIssueDate: '',
+    idIssuePlace: '',
+    email: '',
+    phoneNumber: '',
+    permanentAddress: {
+      province: '',
+      district: '',
+      ward: '',
+      streetName: '',
+      houseNumber: ''
+    },
+    contactAddress: {
+      province: '',
+      district: '',
+      ward: '',
+      streetName: '',
+      houseNumber: ''
+    }
+  });
+
+  const [editedEmployee, setEditedEmployee] = useState(null);
+
+  // State for validation errors
+  const [errors, setErrors] = useState({});
+
+  // Add state for active tab in employee details modal
+  const [activeDetailTab, setActiveDetailTab] = useState('information');
+
+  // State for confirmation modal
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    title: "",
+    description: "",
+    confirmText: "",
+    confirmDetails: null,
+    type: "",
+    isProcessing: false,
+    onConfirm: null
+  });
+
+  // State for responsive layout
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Loading states
+  const [isLoadingForm, setIsLoadingForm] = useState(true);
+
+  const employeeColumns = [
+    {
+      key: 'fullName',
+      label: 'Họ tên',
+      sortable: true,
+      formatter: (value, item) => (
+        <div className="flex items-center">
+          <div className="">
+            <div className="text-sm font-medium text-gray-900">{value}</div>
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'dateOfBirth',
+      label: 'Ngày sinh',
+      sortable: true,
+      formatter: (value) => formatDate(value),
+      className: 'hidden sm:table-cell' // Ẩn trên mobile
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      sortable: true,
+      className: 'hidden sm:table-cell' // Ẩn trên mobile
+    },
+    {
+      key: 'phoneNumber',
+      label: 'Số điện thoại',
+      sortable: true,
+      className: 'hidden sm:table-cell' // Ẩn trên mobile
+    },
+    {
+      key: 'idCardNumber',
+      label: 'Số CCCD',
+      sortable: true,
+      className: 'hidden sm:table-cell' // Ẩn trên mobile
+    },
+    {
+      key: 'accountStatus',
+      label: 'Trạng thái',
+      sortable: true,
+      type: 'status' // Sử dụng StatusBadge component
+    }
+  ];
+
+  const addEmployeeFormFields = [
+    {
+      name: 'fullName',
+      type: 'text',
+      label: 'Họ và tên',
+      placeholder: 'Nhập họ và tên...',
+      required: true,
+      getValue: (data) => data.fullName || ''
+    },
+    {
+      name: 'dateOfBirth',
+      type: 'date',
+      label: 'Ngày sinh',
+      placeholder: 'DD/MM/YYYY',
+      required: true,
+      getValue: (data) => data.dateOfBirth || ''
+    },
+    {
+      name: 'idCardNumber',
+      type: 'text',
+      label: 'Số CCCD/CMND',
+      placeholder: 'Nhập số CCCD/CMND...',
+      required: true,
+      getValue: (data) => data.idCardNumber || ''
+    },
+    {
+      name: 'email',
+      type: 'email',
+      label: 'Email',
+      placeholder: 'example@email.com',
+      required: true,
+      getValue: (data) => data.email || ''
+    },
+    {
+      name: 'phoneNumber',
+      type: 'tel',
+      label: 'Số điện thoại',
+      placeholder: 'Nhập số điện thoại...',
+      required: true,
+      getValue: (data) => data.phoneNumber || ''
+    },
+    {
+      name: 'permanentAddress',
+      type: 'address',
+      label: 'Địa chỉ thường trú',
+      required: true,
+      getValue: (data) => data.permanentAddress || {
+        province: '',
+        district: '',
+        ward: '',
+        streetName: '',
+        houseNumber: ''
       }
-      
-      // Validate address fields
-      addressFields.forEach(field => {
-        const fullField = `contactAddress.${field}`;
-        const value = editedEmployee.contactAddress[field];
-        const error = validateField(fullField, value);
-        
-        if (error) {
-          newErrors[fullField] = error;
-          isValid = false;
-        }
-      });
-      
-      setErrors(newErrors);
-      
-      if (isValid) {
-        setEmployees(prevEmployees => 
-          prevEmployees.map(employee => {
-            if (employee.id === editedEmployee.id) {
-              return {
-                ...employee,
-                contactAddress: editedEmployee.contactAddress,
-                phoneNumber: editedEmployee.phoneNumber,
-                accountStatus: editedEmployee.accountStatus
-              };
-            }
-            return employee;
-          })
-        );
-        setIsEditMode(false);
-        setSelectedEmployee(prev => ({
-          ...prev,
-          contactAddress: editedEmployee.contactAddress,
-          phoneNumber: editedEmployee.phoneNumber,
-          accountStatus: editedEmployee.accountStatus
-        }));
-        
-        // Hiển thị thông báo thành công
-        setExportNotification({
-          visible: true,
-          type: 'success',
-          message: 'Lưu thay đổi thành công!',
-          format: 'Hệ thống đã ghi nhận thay đổi.'
-        });
-        
-        // Tự động ẩn thông báo sau 5 giây
-        setTimeout(() => {
-          setExportNotification(prev => ({...prev, visible: false}));
-        }, 5000);
-      } else {
-        // Hiển thị thông báo lỗi nếu không hợp lệ
-        setExportNotification({
-          visible: true,
-          type: 'error',
-          message: 'Có lỗi khi lưu thay đổi. Vui lòng kiểm tra lại thông tin!',
-          format: 'Hãy kiểm tra lại xem các trường thông tin đã điền đúng theo quy định chưa nhé!'
-        });
-        
-        // Tự động ẩn thông báo sau 5 giây
-        setTimeout(() => {
-          setExportNotification(prev => ({...prev, visible: false}));
-        }, 5000);
+    },
+    {
+      name: 'contactAddress',
+      type: 'address',
+      label: 'Địa chỉ liên lạc',
+      required: true,
+      getValue: (data) => data.contactAddress || {
+        province: '',
+        district: '',
+        ward: '',
+        streetName: '',
+        houseNumber: ''
       }
+    }
+  ];
+
+  // Custom action buttons cho mỗi row
+  const renderActions = (employee) => (
+    <div className="flex justify-end space-x-2">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          enableEditMode(employee);
+        }}
+        className="text-indigo-600 hover:text-indigo-900 p-1 rounded-full hover:bg-indigo-50"
+      >
+        <Edit size={16} />
+      </button>
+    </div>
+  );
+
+  // Check if viewing on mobile device
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
-  
-    // Toggle add employee modal
-    const toggleAddEmployeeModalOpen = () => {
-      if (isAddEmployeeModalOpen) {
-        // If closing, just toggle the state and let AnimatePresence handle the reset
-        setIsAddEmployeeModalOpen(false);
-        
-        // Immediately clear errors
-        setErrors({});
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  // Simulate loading states
+  useEffect(() => {
+
+    // Simulate form loading
+    setTimeout(() => {
+      setIsLoadingForm(false);
+    }, 3000);
+  }, []);
+
+  // useEffect to filter and sort employees
+  useEffect(() => {
+    let result = [...allEmployees];
+
+    // Apply search filtering across all search fields
+    result = result.filter(employee => {
+      // Check each search field
+      const nameMatch = searchFields.fullName === '' ||
+        employee.fullName.toLowerCase().includes(searchFields.fullName.toLowerCase());
+
+      const idMatch = searchFields.idCardNumber === '' ||
+        employee.idCardNumber.toLowerCase().includes(searchFields.idCardNumber.toLowerCase());
+
+      const emailMatch = searchFields.email === '' ||
+        (employee.email && employee.email.toLowerCase().includes(searchFields.email.toLowerCase()));
+
+      const phoneMatch = searchFields.phoneNumber === '' ||
+        employee.phoneNumber.toLowerCase().includes(searchFields.phoneNumber.toLowerCase());
+
+      // Employee must match all non-empty search criteria
+      return nameMatch && idMatch && emailMatch && phoneMatch;
+    });
+
+    // Apply sorting
+    result.sort((a, b) => {
+      let valueA, valueB;
+
+      // Handle nested properties
+      if (sortField.includes('.')) {
+        const [parent, child] = sortField.split('.');
+        valueA = a[parent][child];
+        valueB = b[parent][child];
       } else {
-        setIsLoadingForm(true);
-        setTimeout(() => {
-          setIsLoadingForm(false);
-        }, 1500)
-        // If opening, reset the form first then open the modal
+        valueA = a[sortField];
+        valueB = b[sortField];
+      }
+
+      // Handle string/number comparison
+      if (typeof valueA === 'string') {
+        valueA = valueA.toLowerCase();
+        valueB = valueB.toLowerCase();
+      }
+
+      if (sortDirection === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
+
+    setFilteredEmployees(result);
+  }, [allEmployees, searchFields, sortField, sortDirection]);
+
+  // Add useEffect to reset form data when modal state changes
+  useEffect(() => {
+    if (!isModalOpen) {
+      // Reset employee detail modal data when modal is closed
+      setTimeout(() => {
+        if (!isModalOpen) {
+          setSelectedEmployee(null);
+          setIsEditMode(false);
+          setActiveDetailTab('information');
+          setEditedEmployee(null);
+        }
+      }, 300); // Wait for animation to complete
+    }
+  }, [isModalOpen]);
+
+  // Add useEffect to reset new employee form when add employee modal state changes
+  useEffect(() => {
+    if (!isAddEmployeeModalOpen) {
+      // Reset add employee modal data when modal is closed
+      setTimeout(() => {
         setNewEmployee({
           fullName: '',
           dateOfBirth: '',
@@ -652,343 +427,580 @@ import { formatDate } from '@/utils/saving-account';
           }
         });
         setErrors({});
-        setIsAddEmployeeModalOpen(true);
+      }, 300);
+    }
+  }, [isAddEmployeeModalOpen]);
+
+  // Handle search field changes
+  const handleSearchChange = (field, value) => {
+    setSearchFields(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Clear all search fields
+  const clearSearchFields = () => {
+    setSearchFields({
+      fullName: '',
+      idCardNumber: '',
+      email: '',
+      phoneNumber: ''
+    });
+  };
+
+  // Handle sort column click
+  const handleSort = (field) => {
+    // If clicking on the same field, toggle direction
+    if (field === sortField) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // If clicking on a new field, set it as sort field and reset direction to asc
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // Open employee detail modal
+  const openEmployeeDetail = (employee) => {
+    setSelectedEmployee(employee);
+    setIsModalOpen(true);
+    setIsEditMode(false);
+  };
+
+  // Close employee detail modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => {
+      setSelectedEmployee(null);
+      setIsEditMode(false);
+      setActiveDetailTab('information');
+      setEditedEmployee(null);
+    }, 300); // Wait for animation to complete
+  };
+
+  // Enable edit mode for an employee
+  const enableEditMode = (employee) => {
+    setSelectedEmployee(employee);
+    setEditedEmployee({
+      ...employee,
+      dateOfBirth: employee.dateOfBirth || '',
+      idIssueDate: employee.idIssueDate || '',
+      permanentAddress: {
+        province: employee.permanentAddress?.province || '',
+        district: employee.permanentAddress?.district || '',
+        ward: employee.permanentAddress?.ward || '',
+        streetName: employee.permanentAddress?.streetName || '',
+        houseNumber: employee.permanentAddress?.houseNumber || '',
+      },
+      contactAddress: {
+        province: employee.contactAddress?.province || '',
+        district: employee.contactAddress?.district || '',
+        ward: employee.contactAddress?.ward || '',
+        streetName: employee.contactAddress?.streetName || '',
+        houseNumber: employee.contactAddress?.houseNumber || '',
       }
-    };
-  
-    // Handle new employee form changes with validation on each keystroke
-    const handleNewEmployeeChange = (field, value) => {
-      setNewEmployee(prev => {
-        let updated;
-        if (field.startsWith('permanentAddress.')) {
-          const addressField = field.split('.')[1];
-          updated = {
-            ...prev,
-            permanentAddress: {
-              ...prev.permanentAddress,
-              [addressField]: value
-            }
-          };
-        } else if (field.startsWith('contactAddress.')) {
-          const addressField = field.split('.')[1];
-          updated = {
-            ...prev,
-            contactAddress: {
-              ...prev.contactAddress,
-              [addressField]: value
-            }
-          };
-        } else {
-          updated = {
-            ...prev,
-            [field]: value
-          };
-        }
-        
-        // Validate immediately
-        validateAndUpdateField(field, value);
-        
-        return updated;
+    });
+    setIsEditMode(true);
+    setIsModalOpen(true);
+    setActiveDetailTab('information');
+  };
+
+  // Cancel edit mode and reset form
+  const cancelEdit = () => {
+    setIsEditMode(false);
+    setEditedEmployee(null);
+    setErrors({});
+  };
+
+  // Handle form field changes
+  const handleFormChange = (field, value) => {
+    setEditedEmployee(prev => {
+      // Handle nested fields (for address)
+      if (field.includes('.')) {
+        const [parent, child] = field.split('.');
+        return {
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: value
+          }
+        };
+      }
+      // Handle regular fields
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
+  };
+
+  // Save edited employee with validation
+  const saveEmployeeChanges = () => {
+    // Validate all fields before saving
+    const fieldsToValidate = ['phoneNumber'];
+    const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
+
+    let isValid = true;
+    const newErrors = {};
+
+    // Validate phoneNumber
+    const phoneError = validateField('phoneNumber', editedEmployee.phoneNumber);
+    if (phoneError) {
+      newErrors.phoneNumber = phoneError;
+      isValid = false;
+    }
+
+    // Validate address fields
+    addressFields.forEach(field => {
+      const fullField = `contactAddress.${field}`;
+      const value = editedEmployee.contactAddress[field];
+      const error = validateField(fullField, value);
+
+      if (error) {
+        newErrors[fullField] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+
+    if (isValid) {
+      setEmployees(prevEmployees =>
+        prevEmployees.map(employee => {
+          if (employee.id === editedEmployee.id) {
+            return {
+              ...employee,
+              contactAddress: editedEmployee.contactAddress,
+              phoneNumber: editedEmployee.phoneNumber,
+              accountStatus: editedEmployee.accountStatus
+            };
+          }
+          return employee;
+        })
+      );
+      setIsEditMode(false);
+      setSelectedEmployee(prev => ({
+        ...prev,
+        contactAddress: editedEmployee.contactAddress,
+        phoneNumber: editedEmployee.phoneNumber,
+        accountStatus: editedEmployee.accountStatus
+      }));
+
+      // Hiển thị thông báo thành công
+      setExportNotification({
+        visible: true,
+        type: 'success',
+        message: 'Lưu thay đổi thành công!',
+        format: 'Hệ thống đã ghi nhận thay đổi.'
       });
-    };
-  
-    // Copy permanent address to contact address
-    const copyPermanentAddressToContact = () => {
-      setNewEmployee(prev => ({
-        ...prev,
-        contactAddress: { ...prev.permanentAddress }
-      }));
-    };
-  
-    // Validation functions
-    const validateField = (field, value) => {
-      // Xử lý trường hợp value là undefined hoặc null
-      const safeValue = value || '';
-      
-      if (field === 'fullName') {
-        if (!safeValue.trim()) return 'Họ tên không được để trống';
-        if (safeValue.trim().length < 3) return 'Họ tên phải có ít nhất 3 ký tự';
-        return '';
-      }
-      
-      if (field === 'dateOfBirth') {
-        if (!safeValue.trim()) return 'Ngày sinh không được để trống';
-        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
-        if (!dateRegex.test(safeValue)) return 'Ngày sinh không đúng định dạng DD/MM/YYYY';
-        
-        // Validate age > 18
-        if (dateRegex.test(safeValue)) {
-          const parts = safeValue.split('/');
-          const dateOfBirth = new Date(parts[2], parts[1] - 1, parts[0]);
-    const today = new Date();
-    let age = today.getFullYear() - dateOfBirth.getFullYear();
-    const monthDiff = today.getMonth() - dateOfBirth.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
-            age--;
-          }
-          
-          if (age < 18) {
-            return 'Nhân viên phải từ 18 tuổi trở lên';
-          }
+
+      // Tự động ẩn thông báo sau 5 giây
+      setTimeout(() => {
+        setExportNotification(prev => ({ ...prev, visible: false }));
+      }, 5000);
+    } else {
+      // Hiển thị thông báo lỗi nếu không hợp lệ
+      setExportNotification({
+        visible: true,
+        type: 'error',
+        message: 'Có lỗi khi lưu thay đổi. Vui lòng kiểm tra lại thông tin!',
+        format: 'Hãy kiểm tra lại xem các trường thông tin đã điền đúng theo quy định chưa nhé!'
+      });
+
+      // Tự động ẩn thông báo sau 5 giây
+      setTimeout(() => {
+        setExportNotification(prev => ({ ...prev, visible: false }));
+      }, 5000);
+    }
+  };
+
+  // Toggle add employee modal
+  const toggleAddEmployeeModalOpen = () => {
+    if (isAddEmployeeModalOpen) {
+      // If closing, just toggle the state and let AnimatePresence handle the reset
+      setIsAddEmployeeModalOpen(false);
+
+      // Immediately clear errors
+      setErrors({});
+    } else {
+      setIsLoadingForm(true);
+      setTimeout(() => {
+        setIsLoadingForm(false);
+      }, 1500)
+      // If opening, reset the form first then open the modal
+      setNewEmployee({
+        fullName: '',
+        dateOfBirth: '',
+        idCardNumber: '',
+        idIssueDate: '',
+        idIssuePlace: '',
+        email: '',
+        phoneNumber: '',
+        permanentAddress: {
+          province: '',
+          district: '',
+          ward: '',
+          streetName: '',
+          houseNumber: ''
+        },
+        contactAddress: {
+          province: '',
+          district: '',
+          ward: '',
+          streetName: '',
+          houseNumber: ''
         }
-        
-        return '';
+      });
+      setErrors({});
+      setIsAddEmployeeModalOpen(true);
+    }
+  };
+
+  // Handle new employee form changes with validation on each keystroke
+  const handleNewEmployeeChange = (field, value) => {
+    setNewEmployee(prev => {
+      let updated;
+      if (field.startsWith('permanentAddress.')) {
+        const addressField = field.split('.')[1];
+        updated = {
+          ...prev,
+          permanentAddress: {
+            ...prev.permanentAddress,
+            [addressField]: value
+          }
+        };
+      } else if (field.startsWith('contactAddress.')) {
+        const addressField = field.split('.')[1];
+        updated = {
+          ...prev,
+          contactAddress: {
+            ...prev.contactAddress,
+            [addressField]: value
+          }
+        };
+      } else {
+        updated = {
+          ...prev,
+          [field]: value
+        };
       }
-      
-      if (field === 'idCardNumber') {
-        if (!safeValue.trim()) return 'Số CCCD/CMND không được để trống';
-        if (!/^\d{9,12}$/.test(safeValue)) return 'Số CCCD/CMND phải có 9-12 chữ số';
-        return '';
-      }
-      
-      if (field === 'email') {
-        if (!safeValue.trim()) return 'Email không được để trống';
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(safeValue)) return 'Email không đúng định dạng';
-        return '';
-      }
-      
-      if (field === 'phoneNumber') {
-        if (!safeValue.trim()) return 'Số điện thoại không được để trống';
-        if (!/^0\d{9,10}$/.test(safeValue)) return 'Số điện thoại phải bắt đầu bằng số 0 và có 10-11 chữ số';
-        return '';
-      }
-      
-      if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('streetName')) {
-        if (!safeValue.trim()) return 'Thông tin địa chỉ không được để trống';
-        return '';
-      }
-      
-      if (field.includes('houseNumber')) {
-        if (!safeValue.trim()) return 'Số nhà không được để trống';
-        // Add validation for house number - should be a valid number or number with letters (e.g., 123A)
-        if (!/^[0-9]+[A-Za-z]?$/.test(safeValue)) return 'Số nhà phải là số hoặc số kèm chữ cái (VD: 123 hoặc 123A)';
-        return '';
-      }
-      
+
+      // Validate immediately
+      validateAndUpdateField(field, value);
+
+      return updated;
+    });
+  };
+
+  // Copy permanent address to contact address
+  const copyPermanentAddressToContact = () => {
+    setNewEmployee(prev => ({
+      ...prev,
+      contactAddress: { ...prev.permanentAddress }
+    }));
+  };
+
+  // Validation functions
+  const validateField = (field, value) => {
+    // Xử lý trường hợp value là undefined hoặc null
+    const safeValue = value || '';
+
+    if (field === 'fullName') {
+      if (!safeValue.trim()) return 'Họ tên không được để trống';
+      if (safeValue.trim().length < 3) return 'Họ tên phải có ít nhất 3 ký tự';
       return '';
-    };
-    
-    // Validate a single field and update errors state
-    const validateAndUpdateField = (field, value) => {
-      const error = validateField(field, value);
-      setErrors(prev => ({
-        ...prev,
-        [field]: error
-      }));
-      return !error;
-    };
-    
-    // Validate all fields in new employee form
-    const validateAllFields = () => {
-      const newErrors = {};
-      let isValid = true;
-      
-      // Validate personal info
-      const personalFields = ['fullName', 'dateOfBirth', 'idCardNumber', 'email', 'phoneNumber'];
-      personalFields.forEach(field => {
-        const error = validateField(field, newEmployee[field]);
+    }
+
+    if (field === 'dateOfBirth') {
+      if (!safeValue.trim()) return 'Ngày sinh không được để trống';
+      const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+      if (!dateRegex.test(safeValue)) return 'Ngày sinh không đúng định dạng DD/MM/YYYY';
+
+      // Validate age > 18
+      if (dateRegex.test(safeValue)) {
+        const parts = safeValue.split('/');
+        const dateOfBirth = new Date(parts[2], parts[1] - 1, parts[0]);
+        const today = new Date();
+        let age = today.getFullYear() - dateOfBirth.getFullYear();
+        const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+          age--;
+        }
+
+        if (age < 18) {
+          return 'Nhân viên phải từ 18 tuổi trở lên';
+        }
+      }
+
+      return '';
+    }
+
+    if (field === 'idCardNumber') {
+      if (!safeValue.trim()) return 'Số CCCD/CMND không được để trống';
+      if (!/^\d{9,12}$/.test(safeValue)) return 'Số CCCD/CMND phải có 9-12 chữ số';
+      return '';
+    }
+
+    if (field === 'email') {
+      if (!safeValue.trim()) return 'Email không được để trống';
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(safeValue)) return 'Email không đúng định dạng';
+      return '';
+    }
+
+    if (field === 'phoneNumber') {
+      if (!safeValue.trim()) return 'Số điện thoại không được để trống';
+      if (!/^0\d{9,10}$/.test(safeValue)) return 'Số điện thoại phải bắt đầu bằng số 0 và có 10-11 chữ số';
+      return '';
+    }
+
+    if (field.includes('province') || field.includes('district') || field.includes('ward') || field.includes('streetName')) {
+      if (!safeValue.trim()) return 'Thông tin địa chỉ không được để trống';
+      return '';
+    }
+
+    if (field.includes('houseNumber')) {
+      if (!safeValue.trim()) return 'Số nhà không được để trống';
+      // Add validation for house number - should be a valid number or number with letters (e.g., 123A)
+      if (!/^[0-9]+[A-Za-z]?$/.test(safeValue)) return 'Số nhà phải là số hoặc số kèm chữ cái (VD: 123 hoặc 123A)';
+      return '';
+    }
+
+    return '';
+  };
+
+  // Validate a single field and update errors state
+  const validateAndUpdateField = (field, value) => {
+    const error = validateField(field, value);
+    setErrors(prev => ({
+      ...prev,
+      [field]: error
+    }));
+    return !error;
+  };
+
+  // Validate all fields in new employee form
+  const validateAllFields = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    // Validate personal info
+    const personalFields = ['fullName', 'dateOfBirth', 'idCardNumber', 'email', 'phoneNumber'];
+    personalFields.forEach(field => {
+      const error = validateField(field, newEmployee[field]);
+      if (error) {
+        newErrors[field] = error;
+        isValid = false;
+      }
+    });
+
+    // Validate permanent address
+    const addressPrefixes = ['permanentAddress', 'contactAddress'];
+    const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
+
+    addressPrefixes.forEach(prefix => {
+      addressFields.forEach(field => {
+        const fullField = `${prefix}.${field}`;
+        const value = prefix === 'permanentAddress'
+          ? newEmployee.permanentAddress[field]
+          : newEmployee.contactAddress[field];
+
+        const error = validateField(fullField, value);
         if (error) {
-          newErrors[field] = error;
+          newErrors[fullField] = error;
           isValid = false;
         }
       });
-      
-      // Validate permanent address
-      const addressPrefixes = ['permanentAddress', 'contactAddress'];
-      const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
-      
-      addressPrefixes.forEach(prefix => {
-        addressFields.forEach(field => {
-          const fullField = `${prefix}.${field}`;
-          const value = prefix === 'permanentAddress' 
-            ? newEmployee.permanentAddress[field]
-            : newEmployee.contactAddress[field];
-          
-          const error = validateField(fullField, value);
-          if (error) {
-            newErrors[fullField] = error;
-            isValid = false;
-          }
-        });
-      });
-      
-      setErrors(newErrors);
-      return isValid;
-    };
-    
-    // Handle field blur for validation
-    const handleFieldBlur = (field) => {
-      if (field.includes('.')) {
-        const [prefix, fieldName] = field.split('.');
-        const value = prefix === 'permanentAddress' 
-          ? newEmployee.permanentAddress[fieldName]
-          : newEmployee.contactAddress[fieldName];
-        validateAndUpdateField(field, value);
-      } else {
-        validateAndUpdateField(field, newEmployee[field]);
-      }
-    };
-  
-    // Add new employee with validation
-    const addNewEmployee = () => {
-      if (validateAllFields()) {
-        // Generate ID and code
-        const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
-        
-        // Calculate age from dateOfBirth
-        const birthDateParts = newEmployee.dateOfBirth.split('/');
-        const birthYear = parseInt(birthDateParts[2]);
-        const currentYear = new Date().getFullYear();
-        const age = currentYear - birthYear;
-        
-        // Create new employee object with current date as registration date
-        const today = new Date();
-        const recruitmentDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
-        
-        const employeeToAdd = {
-          id: newId,
-          fullName: newEmployee.fullName,
-          dateOfBirth: newEmployee.dateOfBirth,
-          age: age,
-          idCardNumber: newEmployee.idCardNumber,
-          email: newEmployee.email,
-          phoneNumber: newEmployee.phoneNumber,
-          permanentAddress: { ...newEmployee.permanentAddress },
-          contactAddress: { ...newEmployee.contactAddress },
-          recruitmentDate: recruitmentDate,
-          accountStatus: 'active'
-        };
-        
-        // Hiển thị modal xác nhận trước khi thêm nhân viên
-        openConfirmationModal({
-          title: 'Xác nhận thêm nhân viên mới',
-          message: 'Bạn có chắc chắn muốn thêm nhân viên mới này không?',
-          confirmText: 'Quẹt để thêm nhân viên',
-          confirmDetails: {
-            'Họ tên': newEmployee.fullName,
-            'Ngày sinh': newEmployee.dateOfBirth,
-            'Số CCCD/CMND': newEmployee.idCardNumber,
-            'Email': newEmployee.email,
-            'Số điện thoại': newEmployee.phoneNumber
-          },
-          type: 'add',
-          onConfirm: () => {
-            // Set processing state to true
-            setConfirmationProcessing(true);
-            
-            // Simulate API call with a delay
-            setTimeout(() => {
-              try {
-                // Add new employee
-                setEmployees(prev => [...prev, employeeToAdd]);
-                
-                // Close modals
-                closeConfirmationModal();
-                toggleAddEmployeeModalOpen();
-                
-                // Hiển thị thông báo thành công
-                setExportNotification({
-                  visible: true,
-                  type: 'success',
-                  message: 'Thêm nhân viên mới thành công!',
-                  format: 'Hệ thống đã ghi nhận hồ sơ nhân viên mới!'
-                });
-                
-                // Tự động ẩn thông báo sau 5 giây
-                setTimeout(() => {
-                  setExportNotification(prev => ({...prev, visible: false}));
-                }, 5000);
-              } catch (error) {
-                console.error('Error adding new employee:', error);
-                
-                // Show error notification
-                setExportNotification({
-                  visible: true,
-                  type: 'error',
-                  message: 'Có lỗi xảy ra. Vui lòng thử lại sau!',
-                  format: 'Hệ thống báo lỗi. Hãy thử lại'
-                });
-                
-                // Reset processing state
-                setConfirmationProcessing(false);
-              }
-            }, 1500); // 1.5 second delay
-          }
-        });
-      }
-      }
-  
-    // Functions for confirmation modal
-    const openConfirmationModal = ({ title, message, confirmText = "Quẹt để xác nhận", confirmDetails = null, type, onConfirm }) => {
-      setConfirmationModal({ isOpen: true, title, description: message, confirmText, confirmDetails, type, isProcessing: false, onConfirm });
-    };
-    
-    const closeConfirmationModal = () => {
-      setConfirmationModal(prev => ({ ...prev, isOpen: false }));
-    };
-    
-    const setConfirmationProcessing = (isProcessing) => {
-      setConfirmationModal(prev => ({ ...prev, isProcessing }));
-    };
-  
-    // Function to toggle mobile menu
-    const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-  
-    // Add state for export data modal
-    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-    const [exportSuccess, setExportSuccess] = useState(false);
-    const [exportFormat, setExportFormat] = useState('pdf');
-    const [exportNotification, setExportNotification] = useState({
-      visible: false,
-      type: 'success',
-      message: '',
-      format: ''
     });
-  
-    // Handle export data
-    const handleExportData = (data, format) => {
-      console.log('Exporting data:', data);
-      console.log('Format:', format);
-      
-      // In a real application, this would trigger an API call or use a library
-      // to generate and download the file
-      
-      // For demonstration purposes, we'll randomly show success or error notification
-      setExportFormat(format);
-      
-      // Simulate random success/error (80% success rate)
-      const isSuccess = Math.random() > 0.2;
-      
-      if (isSuccess) {
-        // Show success notification
-        setExportNotification({
-          visible: true,
-          type: 'success',
-          message: 'Xuất dữ liệu thành công!',
-          format: format
-        });
-      } else {
-        // Show error notification
-        setExportNotification({
-          visible: true,
-          type: 'error',
-          message: 'Có lỗi khi xuất dữ liệu. Vui lòng thử lại!',
-          format: format
-        });
-      }
-      
-      // Hide the notification after 5 seconds
-      setTimeout(() => {
-        setExportNotification(prev => ({...prev, visible: false}));
-      }, 5000);
-    };
-    
-    // Render component UI
-    return (
-      <div className="container mx-auto -mx-1 sm:px-3 md:px-4 lg:px-6 xl:pl-2 xl:px-8">
-        <style jsx global>{`
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Handle field blur for validation
+  const handleFieldBlur = (field) => {
+    if (field.includes('.')) {
+      const [prefix, fieldName] = field.split('.');
+      const value = prefix === 'permanentAddress'
+        ? newEmployee.permanentAddress[fieldName]
+        : newEmployee.contactAddress[fieldName];
+      validateAndUpdateField(field, value);
+    } else {
+      validateAndUpdateField(field, newEmployee[field]);
+    }
+  };
+
+  // Add new employee with validation
+  const addNewEmployee = () => {
+    if (validateAllFields()) {
+      // Generate ID and code
+      const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
+
+      // Calculate age from dateOfBirth
+      const birthDateParts = newEmployee.dateOfBirth.split('/');
+      const birthYear = parseInt(birthDateParts[2]);
+      const currentYear = new Date().getFullYear();
+      const age = currentYear - birthYear;
+
+      // Create new employee object with current date as registration date
+      const today = new Date();
+      const recruitmentDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+
+      const employeeToAdd = {
+        id: newId,
+        fullName: newEmployee.fullName,
+        dateOfBirth: new Date(newEmployee.dateOfBirth.split('/').reverse().join('-')),
+        age: age,
+        idCardNumber: newEmployee.idCardNumber,
+        email: newEmployee.email,
+        phoneNumber: newEmployee.phoneNumber,
+        permanentAddress: { ...newEmployee.permanentAddress },
+        contactAddress: { ...newEmployee.contactAddress },
+        recruitmentDate: new Date(),
+        accountStatus: 'active',
+        password: '123456'
+      };
+
+      // Hiển thị modal xác nhận trước khi thêm nhân viên
+      openConfirmationModal({
+        title: 'Xác nhận thêm nhân viên mới',
+        message: 'Bạn có chắc chắn muốn thêm nhân viên mới này không?',
+        confirmText: 'Quẹt để thêm nhân viên',
+        confirmDetails: {
+          'Họ tên': newEmployee.fullName,
+          'Ngày sinh': newEmployee.dateOfBirth,
+          'Số CCCD/CMND': newEmployee.idCardNumber,
+          'Email': newEmployee.email,
+          'Số điện thoại': newEmployee.phoneNumber
+        },
+        type: 'add',
+        onConfirm: () => {
+          // Set processing state to true
+          setConfirmationProcessing(true);
+
+          // Simulate API call with a delay
+          setTimeout(() => {
+            try {
+              // Add new employee
+              const createEmployee = async (employeeToAdd) => {
+                const result = await createNewEmployee(employeeToAdd);
+                setExportNotification({
+                  visible: true,
+                  type: result.success ? 'success' : 'error',
+                  message: result.success
+                    ? 'Thêm Nhân viên thành công!'
+                    : 'Thêm Nhân viên thất bại!',
+                  format: result.message
+                });
+              }
+              createEmployee(employeeToAdd);
+              // Close modals
+              closeConfirmationModal();
+              toggleAddEmployeeModalOpen();
+
+              // Hiển thị thông báo thành công
+              setExportNotification({
+                visible: true,
+                type: 'success',
+                message: 'Thêm nhân viên mới thành công!',
+                format: 'Hệ thống đã ghi nhận hồ sơ nhân viên mới!'
+              });
+
+              // Tự động ẩn thông báo sau 5 giây
+              setTimeout(() => {
+                setExportNotification(prev => ({ ...prev, visible: false }));
+              }, 5000);
+            } catch (error) {
+              console.error('Error adding new employee:', error);
+
+              // Show error notification
+              setExportNotification({
+                visible: true,
+                type: 'error',
+                message: 'Có lỗi xảy ra. Vui lòng thử lại sau!',
+                format: 'Hệ thống báo lỗi. Hãy thử lại'
+              });
+
+              // Reset processing state
+              setConfirmationProcessing(false);
+            }
+          }, 1500); // 1.5 second delay
+        }
+      });
+    }
+  }
+
+  // Functions for confirmation modal
+  const openConfirmationModal = ({ title, message, confirmText = "Quẹt để xác nhận", confirmDetails = null, type, onConfirm }) => {
+    setConfirmationModal({ isOpen: true, title, description: message, confirmText, confirmDetails, type, isProcessing: false, onConfirm });
+  };
+
+  const closeConfirmationModal = () => {
+    setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+  };
+
+  const setConfirmationProcessing = (isProcessing) => {
+    setConfirmationModal(prev => ({ ...prev, isProcessing }));
+  };
+
+  // Function to toggle mobile menu
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+
+  // Add state for export data modal
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
+  const [exportFormat, setExportFormat] = useState('pdf');
+  const [exportNotification, setExportNotification] = useState({
+    visible: false,
+    type: 'success',
+    message: '',
+    format: ''
+  });
+
+  // Handle export data
+  const handleExportData = (data, format) => {
+    console.log('Exporting data:', data);
+    console.log('Format:', format);
+
+    // In a real application, this would trigger an API call or use a library
+    // to generate and download the file
+
+    // For demonstration purposes, we'll randomly show success or error notification
+    setExportFormat(format);
+
+    // Simulate random success/error (80% success rate)
+    const isSuccess = Math.random() > 0.2;
+
+    if (isSuccess) {
+      // Show success notification
+      setExportNotification({
+        visible: true,
+        type: 'success',
+        message: 'Xuất dữ liệu thành công!',
+        format: format
+      });
+    } else {
+      // Show error notification
+      setExportNotification({
+        visible: true,
+        type: 'error',
+        message: 'Có lỗi khi xuất dữ liệu. Vui lòng thử lại!',
+        format: format
+      });
+    }
+
+    // Hide the notification after 5 seconds
+    setTimeout(() => {
+      setExportNotification(prev => ({ ...prev, visible: false }));
+    }, 5000);
+  };
+
+  // Render component UI
+  return (
+    <div className="container mx-auto -mx-1 sm:px-3 md:px-4 lg:px-6 xl:pl-2 xl:px-8">
+      <style jsx global>{`
           /* Animation classes */
           @keyframes fadeIn {
             from {
@@ -1299,212 +1311,212 @@ import { formatDate } from '@/utils/saving-account';
           }
         `}</style>
 
-        <div className="mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h2 className="text-xl font-semibold mb-1 bg-gradient-to-r from-indigo-700 to-blue-500 bg-clip-text text-transparent">
-                Quản lý nhân viên
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Quản lý thông tin và trạng thái của nhân viên
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="flex flex-wrap items-center gap-2"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <motion.button
-                onClick={toggleAddEmployeeModalOpen}
-                className="group flex items-center space-x-2 px-4 py-2.5 md:px-5 md:py-3 bg-gradient-to-r from-[#7226FF] to-[#F042FF] bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-500"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Plus
-                  size={16}
-                  className="text-white group-hover:scale-110 transition-transform duration-200"
-                />
-                <span className="font-medium text-sm md:font-semibold md:text-md">
-                  Thêm nhân viên
-                </span>
-              </motion.button>
-              <motion.button
-                onClick={() => setIsExportModalOpen(true)}
-                className="group flex items-center space-x-2 px-4 py-2.5 md:px-5 md:py-3 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-500"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Download
-                  size={16}
-                  className="text-white group-hover:scale-110 transition-transform duration-200"
-                />
-                <span className="font-medium text-sm md:font-semibold md:text-md">
-                  Xuất dữ liệu
-                </span>
-              </motion.button>
-            </motion.div>
-          </div>
-
-          {/* Search and filter section */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.5 }}
           >
-            {isLoading ? (
-              <SearchFilterBarShimmer />
-            ) : (
-              <SearchFilterBar
-                searchFields={searchFields}
-                handleSearchChange={handleSearchChange}
-                clearSearchFields={clearSearchFields}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                handleSort={handleSort}
+            <h2 className="text-xl font-semibold mb-1 bg-gradient-to-r from-indigo-700 to-blue-500 bg-clip-text text-transparent">
+              Quản lý nhân viên
+            </h2>
+            <p className="text-gray-500 text-sm">
+              Quản lý thông tin và trạng thái của nhân viên
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="flex flex-wrap items-center gap-2"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <motion.button
+              onClick={toggleAddEmployeeModalOpen}
+              className="group flex items-center space-x-2 px-4 py-2.5 md:px-5 md:py-3 bg-gradient-to-r from-[#7226FF] to-[#F042FF] bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-500"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Plus
+                size={16}
+                className="text-white group-hover:scale-110 transition-transform duration-200"
               />
-            )}
+              <span className="font-medium text-sm md:font-semibold md:text-md">
+                Thêm nhân viên
+              </span>
+            </motion.button>
+            <motion.button
+              onClick={() => setIsExportModalOpen(true)}
+              className="group flex items-center space-x-2 px-4 py-2.5 md:px-5 md:py-3 bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-500"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Download
+                size={16}
+                className="text-white group-hover:scale-110 transition-transform duration-200"
+              />
+              <span className="font-medium text-sm md:font-semibold md:text-md">
+                Xuất dữ liệu
+              </span>
+            </motion.button>
           </motion.div>
         </div>
 
-        {/* Employees table */}
+        {/* Search and filter section */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
           {isLoading ? (
-            <DataTableShimmer
-              showFilter={true}
-            />
+            <SearchFilterBarShimmer />
           ) : (
-            <DataTable
-              data={filteredEmployees}
-              columns={employeeColumns}
+            <SearchFilterBar
+              searchFields={searchFields}
+              handleSearchChange={handleSearchChange}
+              clearSearchFields={clearSearchFields}
               sortField={sortField}
               sortDirection={sortDirection}
               handleSort={handleSort}
-              onRowClick={openEmployeeDetail}
-              onEditClick={enableEditMode}
-              onDeleteClick={null} // Không sử dụng delete, dùng custom actions
-              keyField="employeeID"
-              className="mb-6"
-              // Custom header styling
-              headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
-              // Custom actions
-              renderActions={renderActions}
-              // Bộ lọc trạng thái
-              statusFilters={{
-                accountStatus: ['active', 'disabled']
-              }}
-              // Bộ lọc khoảng thời gian
-              dateRangeFilters={{
-                 recruitmentDate: { label: 'Ngày tuyển dụng' },
-                 dateOfBirth: { label: 'Ngày sinh' }
-               }}
-               changeTableData={setExporData}
-             />
-           )}
+            />
+          )}
         </motion.div>
+      </div>
+
+      {/* Employees table */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        {isLoading ? (
+          <DataTableShimmer
+            showFilter={true}
+          />
+        ) : (
+          <DataTable
+            data={filteredEmployees}
+            columns={employeeColumns}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            handleSort={handleSort}
+            onRowClick={openEmployeeDetail}
+            onEditClick={enableEditMode}
+            onDeleteClick={null} // Không sử dụng delete, dùng custom actions
+            keyField="employeeID"
+            className="mb-6"
+            // Custom header styling
+            headerClassName="bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
+            // Custom actions
+            renderActions={renderActions}
+            // Bộ lọc trạng thái
+            statusFilters={{
+              accountStatus: ['active', 'disabled']
+            }}
+            // Bộ lọc khoảng thời gian
+            dateRangeFilters={{
+              recruitmentDate: { label: 'Ngày tuyển dụng' },
+              dateOfBirth: { label: 'Ngày sinh' }
+            }}
+            changeTableData={setExporData}
+          />
+        )}
+      </motion.div>
 
 
 
-        {/* Employee Detail Modal */}
-        <AnimatePresence mode="wait">
-          {isModalOpen && selectedEmployee && (
+      {/* Employee Detail Modal */}
+      <AnimatePresence mode="wait">
+        {isModalOpen && selectedEmployee && (
+          <motion.div
+            key="employee-detail-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onAnimationComplete={(definition) => {
+              // Reset data when exit animation completes
+              if (definition === "exit") {
+                setSelectedEmployee(null);
+                setIsEditMode(false);
+                setActiveDetailTab("information");
+                setEditedEmployee(null);
+              }
+            }}
+          >
             <motion.div
-              key="employee-detail-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              onAnimationComplete={(definition) => {
-                // Reset data when exit animation completes
-                if (definition === "exit") {
-                  setSelectedEmployee(null);
-                  setIsEditMode(false);
-                  setActiveDetailTab("information");
-                  setEditedEmployee(null);
-                }
+              transition={{
+                duration: 0.5,
+                backdropFilter: { duration: 0.3 }
               }}
-            >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ 
-                  duration: 0.5,
-                  backdropFilter: { duration: 0.3 }
-                }}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-                onClick={closeModal}
-              ></motion.div>
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={closeModal}
+            ></motion.div>
 
-              <motion.div
-                layoutId={`row-${selectedEmployee.employeeID}`}
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 40 }}
-                transition={{
-                  type: "spring",
-                  damping: 25,
-                  stiffness: 300,
-                  duration: 0.6,
-                  layout: { type: "spring", damping: 30, stiffness: 200 },
-                  opacity: { duration: 0.3 },
-                  scale: { duration: 0.4 }
-                }}
-                className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[90vh] relative z-10"
-                style={{ scrollbarWidth: "none" }}
+            <motion.div
+              layoutId={`row-${selectedEmployee.employeeID}`}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 40 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 300,
+                duration: 0.6,
+                layout: { type: "spring", damping: 30, stiffness: 200 },
+                opacity: { duration: 0.3 },
+                scale: { duration: 0.4 }
+              }}
+              className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col h-[90vh] relative z-10"
+              style={{ scrollbarWidth: "none" }}
+            >
+              {/* Fixed Header */}
+              <ModalHeader
+                title="Thông tin chi tiết nhân viên"
+                editTitle="Chỉnh sửa thông tin nhân viên"
+                isEditMode={isEditMode}
+                onClose={closeModal}
+                variant={isEditMode ? "teal" : "cyan"}
+              />
+
+              {/* Scrollable Content */}
+              <div
+                className="overflow-y-auto flex-1 pt-0 p-6 space-y-6"
+                style={{ scrollbarWidth: "thin" }}
               >
-                {/* Fixed Header */}
-                <ModalHeader
-                  title="Thông tin chi tiết nhân viên"
-                  editTitle="Chỉnh sửa thông tin nhân viên"
-                  isEditMode={isEditMode}
-                  onClose={closeModal}
-                  variant={isEditMode ? "teal" : "cyan"}
+                {/* Tab Navigation */}
+                <AnimatedTabNavigation
+                  activeTab={activeDetailTab}
+                  onTabChange={setActiveDetailTab}
+                  tabs={[
+                    {
+                      id: 'information',
+                      label: 'Thông tin chi tiết',
+                      icon: User
+                    },
+                    {
+                      id: 'transaction-history',
+                      label: 'Lịch sử giao dịch',
+                      icon: FileText
+                    }
+                  ]}
+                  variant="cyan"
+                  className="mb-6"
                 />
 
-                {/* Scrollable Content */}
-                <div
-                  className="overflow-y-auto flex-1 pt-0 p-6 space-y-6"
-                  style={{ scrollbarWidth: "thin" }}
-                >
-                  {/* Tab Navigation */}
-                  <AnimatedTabNavigation
-                    activeTab={activeDetailTab}
-                    onTabChange={setActiveDetailTab}
-                    tabs={[
-                      {
-                        id: 'information',
-                        label: 'Thông tin chi tiết',
-                        icon: User
-                      },
-                      {
-                        id: 'transaction-history',
-                        label: 'Lịch sử giao dịch',
-                        icon: FileText
-                      }
-                    ]}
-                    variant="cyan"
-                    className="mb-6"
-                  />
-                  
-                  {/* Tab Content */}
-                  <AnimatePresence mode="wait" initial={false}>
-                    {activeDetailTab === "transaction-history" && (
-                      <EmployeeTransactionHistory employee={selectedEmployee} />
-                    )}
-                    
-                    {!isEditMode && activeDetailTab === "information" && (
-                      <motion.div
+                {/* Tab Content */}
+                <AnimatePresence mode="wait" initial={false}>
+                  {activeDetailTab === "transaction-history" && (
+                    <EmployeeTransactionHistory employee={selectedEmployee} />
+                  )}
+
+                  {!isEditMode && activeDetailTab === "information" && (
+                    <motion.div
                       key="information-tab"
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -1529,7 +1541,7 @@ import { formatDate } from '@/utils/saving-account';
                             </h4>
                             <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
                           </div>
-                    
+
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
@@ -1542,7 +1554,7 @@ import { formatDate } from '@/utils/saving-account';
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1554,7 +1566,7 @@ import { formatDate } from '@/utils/saving-account';
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1563,11 +1575,11 @@ import { formatDate } from '@/utils/saving-account';
                               <CalendarDatePicker
                                 label="Ngày sinh"
                                 value={selectedEmployee.dateOfBirth}
-                                onChange={() => {}}
+                                onChange={() => { }}
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1579,7 +1591,7 @@ import { formatDate } from '@/utils/saving-account';
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1591,7 +1603,7 @@ import { formatDate } from '@/utils/saving-account';
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1603,7 +1615,7 @@ import { formatDate } from '@/utils/saving-account';
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1615,7 +1627,7 @@ import { formatDate } from '@/utils/saving-account';
                                 disabled={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1636,7 +1648,7 @@ import { formatDate } from '@/utils/saving-account';
                           </div>
                         </div>
                       </motion.div>
-                    
+
                       {/* Nhóm: Địa chỉ thường trú */}
                       <motion.div
                         className="relative group"
@@ -1655,7 +1667,7 @@ import { formatDate } from '@/utils/saving-account';
                             </h4>
                             <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
                           </div>
-                    
+
                           <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -1664,13 +1676,13 @@ import { formatDate } from '@/utils/saving-account';
                             <AddressFields
                               prefix="permanentAddress"
                               values={selectedEmployee.permanentAddress}
-                              onChange={() => {}}
+                              onChange={() => { }}
                               disabled={true}
                             />
                           </motion.div>
                         </div>
                       </motion.div>
-                    
+
                       {/* Nhóm: Địa chỉ liên lạc */}
                       <motion.div
                         className="relative group"
@@ -1689,7 +1701,7 @@ import { formatDate } from '@/utils/saving-account';
                             </h4>
                             <div className="flex-1 h-px bg-gradient-to-r from-violet-200 to-transparent"></div>
                           </div>
-                    
+
                           <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -1698,13 +1710,13 @@ import { formatDate } from '@/utils/saving-account';
                             <AddressFields
                               prefix="contactAddress"
                               values={selectedEmployee.contactAddress}
-                              onChange={() => {}}
+                              onChange={() => { }}
                               disabled={true}
                             />
                           </motion.div>
                         </div>
                       </motion.div>
-                    
+
                       {/* Ngày đăng ký */}
                       <motion.div
                         className="relative group mt-6"
@@ -1722,22 +1734,22 @@ import { formatDate } from '@/utils/saving-account';
                               Thông tin đăng ký
                             </h5>
                           </div>
-                    
+
                           <CalendarDatePicker
                             label="Ngày đăng ký"
                             placeholder="DD/MM/YYYY"
                             value={selectedEmployee.recruitmentDate}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             disabled={true}
                           />
                         </div>
                       </motion.div>
                     </motion.div>
-                    )}
+                  )}
 
-                    {/* Edit Mode Content */}
-                    {isEditMode && activeDetailTab === "information" && (
-                      <motion.div
+                  {/* Edit Mode Content */}
+                  {isEditMode && activeDetailTab === "information" && (
+                    <motion.div
                       key="edit-mode"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -1762,7 +1774,7 @@ import { formatDate } from '@/utils/saving-account';
                             </h4>
                             <div className="flex-1 h-px bg-gradient-to-r from-indigo-200 to-transparent"></div>
                           </div>
-                    
+
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
@@ -1780,7 +1792,7 @@ import { formatDate } from '@/utils/saving-account';
                                 required={true}
                               />
                             </motion.div>
-                    
+
                             <motion.div
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -1807,7 +1819,7 @@ import { formatDate } from '@/utils/saving-account';
                             </motion.div>
                           </div>
                         </motion.div>
-                    
+
                         {/* Nhóm: Địa chỉ liên lạc */}
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
@@ -1827,7 +1839,7 @@ import { formatDate } from '@/utils/saving-account';
                                     Địa chỉ liên lạc
                                   </h4>
                                 </div>
-                    
+
                                 <motion.button
                                   type="button"
                                   whileHover={{ scale: 1.05, y: -2 }}
@@ -1864,7 +1876,7 @@ import { formatDate } from '@/utils/saving-account';
                                   </div>
                                 </motion.button>
                               </div>
-                    
+
                               <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -1880,7 +1892,7 @@ import { formatDate } from '@/utils/saving-account';
                                     validateAndUpdateField(
                                       field,
                                       editedEmployee.contactAddress[
-                                        field.split(".")[1]
+                                      field.split(".")[1]
                                       ]
                                     )
                                   }
@@ -1891,183 +1903,183 @@ import { formatDate } from '@/utils/saving-account';
                         </motion.div>
                       </div>
                     </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Fixed Footer */}
-                <AnimatePresence>
-                  {activeDetailTab === "information" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 10 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                    >
-                      <div className="p-6 border-t border-gray-100 flex justify-end space-x-4 sticky bottom-0 bg-white rounded-b-2xl z-10">
-                        <AnimatePresence mode="wait" initial={false}>
-                          {isEditMode ? (
-                            <motion.div
-                              key="edit-buttons"
-                              className="flex space-x-4"
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
-                              transition={{ duration: 0.3, ease: "easeInOut" }}
-                            >
-                              <motion.button
-                                whileHover={{
-                                  scale: 1.05,
-                                  backgroundColor: "#9ca3af",
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={cancelEdit}
-                                className="px-4 md:px-6 py-3 font-semibold bg-gray-300 text-gray-700 rounded-xl transition-all duration-300 shadow-md"
-                              >
-                                Hủy bỏ
-                              </motion.button>
-                              <motion.button
-                                whileHover={{
-                                  scale: 1.05,
-                                  boxShadow:
-                                    "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={saveEmployeeChanges}
-                                className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
-                              >
-                                <Save size={16} className="mr-2" />
-                                Lưu thay đổi
-                              </motion.button>
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              key="view-buttons"
-                              className="flex space-x-4"
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
-                              transition={{ duration: 0.3, ease: "easeInOut" }}
-                            >
-                              <motion.button
-                                whileHover={{
-                                  scale: 1.05,
-                                  backgroundColor: "#9ca3af",
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={closeModal}
-                                className="px-6 py-3 bg-gray-300 font-semibold text-gray-600 rounded-xl transition-all duration-300 shadow-md"
-                              >
-                                Đóng
-                              </motion.button>
-                              <motion.button
-                                whileHover={{
-                                  scale: 1.05,
-                                  boxShadow:
-                                    "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => enableEditMode(selectedEmployee)}
-                                className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
-                              >
-                                <Edit size={16} className="mr-2" />
-                                Chỉnh sửa
-                              </motion.button>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </div>
 
-        {/* Add Employee Modal */}
-        <AnimatePresence mode="sync">
-          {isAddEmployeeModalOpen && (
+              {/* Fixed Footer */}
+              <AnimatePresence>
+                {activeDetailTab === "information" && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <div className="p-6 border-t border-gray-100 flex justify-end space-x-4 sticky bottom-0 bg-white rounded-b-2xl z-10">
+                      <AnimatePresence mode="wait" initial={false}>
+                        {isEditMode ? (
+                          <motion.div
+                            key="edit-buttons"
+                            className="flex space-x-4"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                          >
+                            <motion.button
+                              whileHover={{
+                                scale: 1.05,
+                                backgroundColor: "#9ca3af",
+                              }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={cancelEdit}
+                              className="px-4 md:px-6 py-3 font-semibold bg-gray-300 text-gray-700 rounded-xl transition-all duration-300 shadow-md"
+                            >
+                              Hủy bỏ
+                            </motion.button>
+                            <motion.button
+                              whileHover={{
+                                scale: 1.05,
+                                boxShadow:
+                                  "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
+                              }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={saveEmployeeChanges}
+                              className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                            >
+                              <Save size={16} className="mr-2" />
+                              Lưu thay đổi
+                            </motion.button>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="view-buttons"
+                            className="flex space-x-4"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                          >
+                            <motion.button
+                              whileHover={{
+                                scale: 1.05,
+                                backgroundColor: "#9ca3af",
+                              }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={closeModal}
+                              className="px-6 py-3 bg-gray-300 font-semibold text-gray-600 rounded-xl transition-all duration-300 shadow-md"
+                            >
+                              Đóng
+                            </motion.button>
+                            <motion.button
+                              whileHover={{
+                                scale: 1.05,
+                                boxShadow:
+                                  "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
+                              }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => enableEditMode(selectedEmployee)}
+                              className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                            >
+                              <Edit size={16} className="mr-2" />
+                              Chỉnh sửa
+                            </motion.button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Add Employee Modal */}
+      <AnimatePresence mode="sync">
+        {isAddEmployeeModalOpen && (
+          <motion.div
+            key="add-employee-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            onAnimationComplete={(definition) => {
+              // Reset form data when exit animation completes
+              if (definition === "exit") {
+                setNewEmployee({
+                  fullName: "",
+                  dateOfBirth: "",
+                  idCardNumber: "",
+                  idIssueDate: "",
+                  idIssuePlace: "",
+                  email: "",
+                  phoneNumber: "",
+                  permanentAddress: {
+                    province: "",
+                    district: "",
+                    ward: "",
+                    streetName: "",
+                    houseNumber: "",
+                  },
+                  contactAddress: {
+                    province: "",
+                    district: "",
+                    ward: "",
+                    streetName: "",
+                    houseNumber: "",
+                  },
+                });
+                setErrors({});
+              }
+            }}
+          >
             <motion.div
-              key="add-employee-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              onAnimationComplete={(definition) => {
-                // Reset form data when exit animation completes
-                if (definition === "exit") {
-                  setNewEmployee({
-                    fullName: "",
-                    dateOfBirth: "",
-                    idCardNumber: "",
-                    idIssueDate: "",
-                    idIssuePlace: "",
-                    email: "",
-                    phoneNumber: "",
-                    permanentAddress: {
-                      province: "",
-                      district: "",
-                      ward: "",
-                      streetName: "",
-                      houseNumber: "",
-                    },
-                    contactAddress: {
-                      province: "",
-                      district: "",
-                      ward: "",
-                      streetName: "",
-                      houseNumber: "",
-                    },
-                  });
-                  setErrors({});
-                }
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={toggleAddEmployeeModalOpen}
+            ></motion.div>
+
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 40 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 300,
+                duration: 0.6,
               }}
+              className="bg-sky-50 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh] relative z-10"
+              style={{ scrollbarWidth: "none" }}
             >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
-                onClick={toggleAddEmployeeModalOpen}
-              ></motion.div>
+              {/* Fixed Header */}
+              <div className="">
+                <ModalHeader
+                  title="Thêm nhân viên mới"
+                  editTitle="NO DATA"
+                  isEditMode={false}
+                  onClose={toggleAddEmployeeModalOpen}
+                  variant="cyan"
+                  className="py-2"
+                />
+              </div>
 
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 40 }}
-                transition={{
-                  type: "spring",
-                  damping: 25,
-                  stiffness: 300,
-                  duration: 0.6,
-                }}
-                className="bg-sky-50 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[90vh] relative z-10"
-                style={{ scrollbarWidth: "none" }}
-              >
-                {/* Fixed Header */}
-                <div className="">
-                  <ModalHeader
-                    title="Thêm nhân viên mới"
-                    editTitle="NO DATA"
-                    isEditMode={false}
-                    onClose={toggleAddEmployeeModalOpen}
-                    variant="cyan"
-                    className="py-2"
-                  />
-                </div>
-
-                {/* Scrollable Content */}
-                {isLoadingForm ? (
-                  <FormShimmer />
-                ) : (
-                  <div
-                    className="overflow-y-auto flex-1 py-8 px-4 md:px-12"
-                    style={{ scrollbarWidth: "thin" }}
-                  >
-                    <form className="space-y-8">
+              {/* Scrollable Content */}
+              {isLoadingForm ? (
+                <FormShimmer />
+              ) : (
+                <div
+                  className="overflow-y-auto flex-1 py-8 px-4 md:px-12"
+                  style={{ scrollbarWidth: "thin" }}
+                >
+                  <form className="space-y-8">
                     {/* Thông tin cá nhân */}
                     <motion.div
                       layout
@@ -2107,22 +2119,22 @@ import { formatDate } from '@/utils/saving-account';
                             label="Ngày sinh"
                             placeholder="DD/MM/YYYY"
                             value={newEmployee.dateOfBirth}
-                              onChange={(val) =>
-                                handleNewEmployeeChange("dateOfBirth", val)
-                              }
-                              onBlur={() => handleFieldBlur("dateOfBirth")}
-                              error={errors.dateOfBirth}
+                            onChange={(val) =>
+                              handleNewEmployeeChange("dateOfBirth", val)
+                            }
+                            onBlur={() => handleFieldBlur("dateOfBirth")}
+                            error={errors.dateOfBirth}
                             required={true}
                           />
                           <InputField
                             label="Số CCCD/CMND"
                             placeholder="Nhập số CCCD/CMND..."
                             value={newEmployee.idCardNumber}
-                              onChange={(val) =>
-                                handleNewEmployeeChange("idCardNumber", val)
-                              }
-                              onBlur={() => handleFieldBlur("idCardNumber")}
-                              error={errors.idCardNumber}
+                            onChange={(val) =>
+                              handleNewEmployeeChange("idCardNumber", val)
+                            }
+                            onBlur={() => handleFieldBlur("idCardNumber")}
+                            error={errors.idCardNumber}
                             required={true}
                           />
                           <InputField
@@ -2141,11 +2153,11 @@ import { formatDate } from '@/utils/saving-account';
                             label="Số điện thoại"
                             placeholder="Nhập số điện thoại..."
                             value={newEmployee.phoneNumber}
-                              onChange={(val) =>
-                                handleNewEmployeeChange("phoneNumber", val)
-                              }
-                              onBlur={() => handleFieldBlur("phoneNumber")}
-                              error={errors.phoneNumber}
+                            onChange={(val) =>
+                              handleNewEmployeeChange("phoneNumber", val)
+                            }
+                            onBlur={() => handleFieldBlur("phoneNumber")}
+                            error={errors.phoneNumber}
                             required={true}
                           />
                         </motion.div>
@@ -2240,134 +2252,133 @@ import { formatDate } from '@/utils/saving-account';
                     </motion.div>
                   </form>
                 </div>
-                )}
+              )}
 
-                {/* Fixed Footer */}
-                <div className="p-6 border-t-2 border-gray-100 flex justify-end space-x-4 sticky bottom-0 bg-white rounded-b-2xl z-10">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key="add-customer-buttons"
-                      className="flex space-x-4"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
+              {/* Fixed Footer */}
+              <div className="p-6 border-t-2 border-gray-100 flex justify-end space-x-4 sticky bottom-0 bg-white rounded-b-2xl z-10">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key="add-customer-buttons"
+                    className="flex space-x-4"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.05, backgroundColor: "#9ca3af" }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={toggleAddEmployeeModalOpen}
+                      className="px-6 py-3 bg-gray-300 text-gray-500 rounded-xl transition-all duration-300 shadow-md"
                     >
-                      <motion.button
-                        type="button"
-                        whileHover={{ scale: 1.05, backgroundColor: "#9ca3af" }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={toggleAddEmployeeModalOpen}
-                        className="px-6 py-3 bg-gray-300 text-gray-500 rounded-xl transition-all duration-300 shadow-md"
-                      >
-                        Hủy bỏ
-                      </motion.button>
-                      <motion.button
-                        type="button"
-                        whileHover={!isLoadingForm ? {
-                          scale: 1.05,
-                          boxShadow: "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
-                        } : {}}
-                        whileTap={!isLoadingForm ? { scale: 0.95 } : {}}
-                        onClick={!isLoadingForm ? addNewEmployee : undefined}
-                        disabled={isLoadingForm}
-                        className={`px-4 md:px-6 py-3 font-semibold rounded-xl shadow-md transition-all duration-500 flex items-center ${
-                          isLoadingForm
-                            ? 'bg-gray-400 text-gray-300 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white'
+                      Hủy bỏ
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      whileHover={!isLoadingForm ? {
+                        scale: 1.05,
+                        boxShadow: "0 10px 15px -3px rgba(79, 70, 229, 0.4)",
+                      } : {}}
+                      whileTap={!isLoadingForm ? { scale: 0.95 } : {}}
+                      onClick={!isLoadingForm ? addNewEmployee : undefined}
+                      disabled={isLoadingForm}
+                      className={`px-4 md:px-6 py-3 font-semibold rounded-xl shadow-md transition-all duration-500 flex items-center ${isLoadingForm
+                          ? 'bg-gray-400 text-gray-300 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white'
                         }`}
-                      >
-                        <Plus size={16} className="mr-2 font-medium" />
-                        Thêm nhân viên
-                      </motion.button>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </motion.div>
+                    >
+                      <Plus size={16} className="mr-2 font-medium" />
+                      Thêm nhân viên
+                    </motion.button>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Confirmation modal for swipe actions */}
+      {/* Confirmation modal for swipe actions */}
 
-        <SwipeConfirmationModal
-          isOpen={confirmationModal.isOpen}
-          onClose={closeConfirmationModal}
-          onConfirm={confirmationModal.onConfirm}
-          title={confirmationModal.title}
-          description={confirmationModal.description}
-          confirmText={confirmationModal.confirmText}
-          confirmDetails={confirmationModal.confirmDetails}
-          isProcessing={confirmationModal.isProcessing}
-          type={confirmationModal.type}
-        />
+      <SwipeConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={closeConfirmationModal}
+        onConfirm={confirmationModal.onConfirm}
+        title={confirmationModal.title}
+        description={confirmationModal.description}
+        confirmText={confirmationModal.confirmText}
+        confirmDetails={confirmationModal.confirmDetails}
+        isProcessing={confirmationModal.isProcessing}
+        type={confirmationModal.type}
+      />
 
-        {/* Export Success Notification */}
-        <ExportNotification
-          isVisible={exportNotification.visible}
-          format={exportNotification.format}
-          onClose={() =>
-            setExportNotification((prev) => ({ ...prev, visible: false }))
+      {/* Export Success Notification */}
+      <ExportNotification
+        isVisible={exportNotification.visible}
+        format={exportNotification.format}
+        onClose={() =>
+          setExportNotification((prev) => ({ ...prev, visible: false }))
+        }
+        message={exportNotification.message}
+        type={exportNotification.type}
+        autoHideDuration={5000}
+        position="center"
+      />
+
+      {/* Export Data Modal */}
+      <ExportDataModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        data={exportData}
+        onExport={handleExportData}
+        title="Xuất dữ liệu nhân viên"
+        initialSelectedColumns={[
+          "employeeID",
+          "fullName",
+          "dateOfBirth",
+          "age",
+          "idCardNumber",
+          "email",
+          "phoneNumber",
+          "permanentAddress",
+          "contactAddress",
+          "recruitmentDate",
+          "accountStatus",
+        ]}
+        columnLabels={{
+          employeeID: "Mã nhân viên",
+          fullName: "Họ và tên",
+          dateOfBirth: "Ngày sinh",
+          age: "Tuổi",
+          idCardNumber: "Số CCCD/CMND",
+          email: "Email",
+          phoneNumber: "Số điện thoại",
+          permanentAddress: "Địa chỉ thường trú",
+          contactAddress: "Địa chỉ liên lạc",
+          recruitmentDate: "Ngày tuyển dụng",
+          accountStatus: "Trạng thái",
+        }}
+        formatData={(value, column) => {
+          if (column === "accountStatus")
+            return value === "active" ? "Hoạt động" : "Vô hiệu hóa";
+          if (column === "permanentAddress" || column === "contactAddress") {
+            if (!value) return "";
+            return `${value.houseNumber} ${value.streetName}, ${value.ward}, ${value.district}, ${value.province}`;
           }
-          message={exportNotification.message}
-          type={exportNotification.type}
-          autoHideDuration={5000}
-          position="center"
-        />
-
-        {/* Export Data Modal */}
-        <ExportDataModal
-          isOpen={isExportModalOpen}
-          onClose={() => setIsExportModalOpen(false)}
-          data={exportData}
-          onExport={handleExportData}
-          title="Xuất dữ liệu nhân viên"
-          initialSelectedColumns={[
-            "employeeID",
-            "fullName",
-            "dateOfBirth",
-            "age",
-            "idCardNumber",
-            "email",
-            "phoneNumber",
-            "permanentAddress",
-            "contactAddress",
-            "recruitmentDate",
-            "accountStatus",
-          ]}
-          columnLabels={{
-            employeeID: "Mã nhân viên",
-            fullName: "Họ và tên",
-            dateOfBirth: "Ngày sinh",
-            age: "Tuổi",
-            idCardNumber: "Số CCCD/CMND",
-            email: "Email",
-            phoneNumber: "Số điện thoại",
-            permanentAddress: "Địa chỉ thường trú",
-            contactAddress: "Địa chỉ liên lạc",
-            recruitmentDate: "Ngày tuyển dụng",
-            accountStatus: "Trạng thái",
-          }}
-          formatData={(value, column) => {
-            if (column === "accountStatus")
-              return value === "active" ? "Hoạt động" : "Vô hiệu hóa";
-            if (column === "permanentAddress" || column === "contactAddress") {
-              if (!value) return "";
-              return `${value.houseNumber} ${value.streetName}, ${value.ward}, ${value.district}, ${value.province}`;
-            }
-            if (column === "recruitmentDate" || column === "dateOfBirth") {
-              return formatDate(new Date(value));
-            }
-            return value;
-          }}
-          customColumnCategories={{
-            personal: ["employeeID", "fullName", "dateOfBirth", "age", "idCardNumber"],
-            contact: ["email", "phoneNumber"],
-            address: ["permanentAddress", "contactAddress"],
-            other: ["recruitmentDate", "accountStatus"],
-          }}
-          enableGrouping={true}
-        />
-      </div>
-    );
-  }
+          if (column === "recruitmentDate" || column === "dateOfBirth") {
+            return formatDate(new Date(value));
+          }
+          return value;
+        }}
+        customColumnCategories={{
+          personal: ["employeeID", "fullName", "dateOfBirth", "age", "idCardNumber"],
+          contact: ["email", "phoneNumber"],
+          address: ["permanentAddress", "contactAddress"],
+          other: ["recruitmentDate", "accountStatus"],
+        }}
+        enableGrouping={true}
+      />
+    </div>
+  );
+}

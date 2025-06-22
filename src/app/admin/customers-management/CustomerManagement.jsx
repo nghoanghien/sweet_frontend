@@ -930,7 +930,7 @@ export default function CustomerManagement() {
                   format: result.message
                 });
               }
-              createUser();
+              createUser(customerToAdd);
 
 
 

@@ -1,4 +1,5 @@
 import { IDiaChi } from "./address";
+import { IAddressFrontend } from "./customer";
 import { IVaiTro } from "./role";
 import { ITrangThai } from "./status";
 
@@ -28,8 +29,8 @@ export interface INhanVienReqDTO {
     diaChiThuongTru: IDiaChi;
     diaChiLienLac: IDiaChi;
     matKhau: string;
-    vaiTroId: string;
-    trangThaiTaiKhoanId: string;
+    vaiTroId?: string;
+    trangThaiTaiKhoanId?: string;
 }
 
 export interface INhanVienResDTO {
@@ -45,4 +46,19 @@ export interface INhanVienResDTO {
     ngayTuyenDung: string;
     vaiTro: IVaiTroDTO;
     trangThaiTaiKhoan: ITrangThaiDTO
+}
+
+export interface IEmployeeFrontend {
+    id?: string|number;
+    fullName: string;
+    dateOfBirth: Date;
+    age?: number;
+    idCardNumber: string;
+    email: string;
+    phoneNumber: string;
+    permanentAddress: IAddressFrontend;
+    contactAddress: IAddressFrontend;
+    recruitmentDate?:Date;
+    accountStatus?: string;
+    password: string
 }
