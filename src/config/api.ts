@@ -341,6 +341,10 @@ export const callGetQuyDinhLaiSuatByID = (id: number) => {
     return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/${id}`);
 }
 
+export const callGetQuyDinhLaiSuatHienTai = (id: number) => {
+    return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/current`);
+}
+
 export const callGetChiTietQuyDinhLaiSuatByID = (id: number) => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/chi-tiet/${id}`);
 }

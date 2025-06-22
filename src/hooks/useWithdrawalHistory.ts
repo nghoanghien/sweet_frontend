@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getWithdrawalHistoryBySavingsAccountId } from "@/services/withDrawalHistory";
+import { getWithdrawalHistoryBySavingsAccountId } from "@/services/withdrawalHistory";
 
 export const useWithdrawalHistoryBySavingsAccountId = (savingsAccountId: number) => {
   const [data, setData] = useState<any[]>([]);
