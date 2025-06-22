@@ -7,6 +7,14 @@ export const useAllTransactionBySavingsAccountId = (savingsAccountId: number) =>
   const [error, setError] = useState<any>(null);
 
   const fetchData = useCallback(async () => {
+    // Chỉ fetch data khi savingsAccountId hợp lệ
+    if (!savingsAccountId || savingsAccountId <= 0) {
+      setData([]);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const startTime = Date.now();

@@ -5,14 +5,15 @@ export const mapAPIToSavingsTransaction = (item: any): SavingsTransaction => {
     // Lấy các giá trị cần thiết
     const maLoaiTaiKhoan = item.giaoDich.loaiTaiKhoanNguon?.maLoaiTaiKhoan;
     const taiKhoanNguon = item.giaoDich.taiKhoanNguon;
-    const phieuGuiTienId = item.giaoDich.phieuGuiTienId;
+    const phieuGuiTienId = item.phieuGuiTienId;
+    console.log("PGtId: ", phieuGuiTienId);
+    console.log("nguon: ", taiKhoanNguon);
+    console.log('maloai: ', maLoaiTaiKhoan);
 
     // Logic xác định isDeposit
-    let IsDeposit = false;
-    if (maLoaiTaiKhoan === 0) {
-        IsDeposit = true;
-    } else if (maLoaiTaiKhoan === 1) {
-        IsDeposit = taiKhoanNguon !== phieuGuiTienId;
+    let IsDeposit = true;
+    if (maLoaiTaiKhoan === 1 && phieuGuiTienId === taiKhoanNguon ) {
+        IsDeposit = false;
     }
     return {
         id: item.lichSuPhieuGuiTienId,

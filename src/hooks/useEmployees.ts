@@ -24,7 +24,6 @@ export const useAllEmployees = () => {
   useEffect(() => {
     console.log("chuan bi lay du lieu nhan vien");
     fetchData();
-    console.log('lay xong du lieu nhan vien r ne');
   }, [fetchData]);
 
   const refreshEmployees = useCallback(() => {

@@ -437,8 +437,9 @@ const SavingsAccounts = ({ customerId }) => {
     
 
     const account = savingAccounts.find(acc => acc.id === accountId);
+    console.log("acount tìm thấy đc nè: ", account);
     if (!account) return;
-    
+    console.log("acount tìm thấy đc nè: ", account);
     setSelectedAccount(account);
     setIsDetailDrawerOpen(true);
 

@@ -1,3 +1,5 @@
+import { IDiaChi } from "@/types/address";
+import { INhanVienReqDTO } from "@/types/employee";
 import { Permission } from "@/types/interfaces/enums";
 import { Address, Role, User } from "@/types/interfaces/user";
 import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
@@ -46,6 +48,29 @@ export const mapApiToUser = (item: any): User => {
     //only for employee
     employeeID: item?.nhanVienID || null,
     recruitmentDate: new Date(item?.ngayTuyenDung) || null,
+    
+  };
+}
+
+export const mapAddressToIDiaChi = (item: Address): IDiaChi => {
+  return {
+    soNha: item.houseNumber,
+    tenDuong: item.streetName,
+    phuongXa: item.ward,
+    quanHuyen: item.district,
+    tinhTP: item.province,
+  };
+}
+
+export const mapUserToINhanVienReqDTO = (item: User): INhanVienReqDTO => {
+  return {
+    hoTen: item.fullName,
+    ngaySinh: item.dateOfBirth.toISOString(),
+    cccd: item.idCardNumber,
+    email: item.email,
+    soDienThoai: item.phoneNumber,
+    diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
+    diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
     
   };
 }

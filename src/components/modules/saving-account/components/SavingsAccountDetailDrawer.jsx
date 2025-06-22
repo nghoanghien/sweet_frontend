@@ -17,6 +17,8 @@ import { formatCurrency, formatDate } from '../../../../utils/accountUtils';
 import ExportNotification from '../../../common/ExportNotification';
 import DetailInfo from './DetailInfo';
 import SavingAccountDetail from './SavingAccountDetail';
+import { useAllTransactionBySavingsAccountId } from '../../../../hooks/useSavingsTransaction';
+import { Channel } from '../../../../types/interfaces/enums';
 
 // Import các component con
 import SavingsTransactionsTab from './SavingsTransactionsTab';
@@ -43,11 +45,16 @@ const tabAnimationStyles = {
   }
 };
 
+// Mapping cho Channel enum sang tiếng Việt
+const ChannelLabels = {
+  [Channel.OVER_THE_COUNTER]: 'Quầy giao dịch',
+  [Channel.ONLINE]: 'Trực tuyến'
+};
+
 const SavingsAccountDetailDrawer = ({ 
   isOpen, 
   onClose, 
   account,
-  transactions = [],
   interestHistory = [],
   withdrawalHistory = [],
   isHidden = true,
@@ -87,32 +94,40 @@ const SavingsAccountDetailDrawer = ({
   const [notificationVisible, setNotificationVisible] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   
+  // Sử dụng hook để lấy dữ liệu giao dịch
+  const { 
+    allTransactions, 
+    isLoading: transactionsLoading, 
+    error: transactionsError, 
+    refreshTransactions 
+  } = useAllTransactionBySavingsAccountId(account?.id);
+  
   // Lưu trữ dữ liệu tab để tránh mất khi chuyển tab
   const [tabData, setTabData] = useState({
-    transactions: transactions || [],
+    transactions: [],
     interest: interestHistory || [],
     withdrawals: withdrawalHistory || [],
     details: {} // Add an empty object for the details tab
   });
   
-  // Cập nhật dữ liệu tab khi props thay đổi
+  // Cập nhật dữ liệu tab khi props thay đổi hoặc khi có dữ liệu giao dịch mới
   useEffect(() => {
-    // Chỉ cập nhật khi có dữ liệu mới và khác rỗng
+    console.log(account);
     const newTabData = {
-      transactions: transactions || [], // Always update with the latest transactions
-      interest: interestHistory || [], // Always update with the latest interest history
-      withdrawals: withdrawalHistory || [], // Always update with the latest withdrawal history
-      details: tabData.details // Keep the details data
+      transactions: allTransactions || [],
+      interest: interestHistory || [],
+      withdrawals: withdrawalHistory || [],
+      details: tabData.details
     };
     
     setTabData(newTabData);
-  }, [transactions, interestHistory, withdrawalHistory]);
+  }, [allTransactions, interestHistory, withdrawalHistory]);
   
   // Reset tab data when account changes
   useEffect(() => {
     if (account) {
       setTabData({
-        transactions: transactions || [],
+        transactions: [],
         interest: interestHistory || [],
         withdrawals: withdrawalHistory || [],
         details: {}
@@ -122,7 +137,6 @@ const SavingsAccountDetailDrawer = ({
   
   // Lưu trữ dữ liệu gốc để tham chiếu khi cần
   const [originalData] = useState({
-    transactions: [],
     interest: [],
     withdrawals: [],
     details: {} // Add an empty object for the details tab
@@ -131,9 +145,6 @@ const SavingsAccountDetailDrawer = ({
   // Cập nhật dữ liệu gốc khi có dữ liệu mới
   useEffect(() => {
     if (isOpen) {
-      if (transactions && transactions.length > 0) {
-        originalData.transactions = [...transactions];
-      }
       if (interestHistory && interestHistory.length > 0) {
         originalData.interest = [...interestHistory];
       }
@@ -141,7 +152,7 @@ const SavingsAccountDetailDrawer = ({
         originalData.withdrawals = [...withdrawalHistory];
       }
     }
-  }, [isOpen, transactions, interestHistory, withdrawalHistory]);
+  }, [isOpen, interestHistory, withdrawalHistory]);
   
   // Control animations when opening/closing
   useEffect(() => {
@@ -155,13 +166,6 @@ const SavingsAccountDetailDrawer = ({
           setDrawerVisible(true);
           
           // Đảm bảo dữ liệu được hiển thị khi mở drawer
-          if (transactions && transactions.length > 0) {
-            setTabData(prevData => ({
-              ...prevData,
-              transactions: [...transactions]
-            }));
-          }
-          
           if (interestHistory && interestHistory.length > 0) {
             setTabData(prevData => ({
               ...prevData,
@@ -200,7 +204,7 @@ const SavingsAccountDetailDrawer = ({
         // Không reset tabData khi đóng drawer để giữ lại dữ liệu cho lần mở tiếp theo
       }, 300);
     }
-  }, [isOpen, transactions, interestHistory, withdrawalHistory]);
+  }, [isOpen, interestHistory, withdrawalHistory]);
   
   // Toggle visibility of sensitive information
   const toggleVisibility = (e) => {
@@ -225,9 +229,9 @@ const SavingsAccountDetailDrawer = ({
       setSelectedTab(tab);
       
       // Đảm bảo dữ liệu tab hiện tại được giữ nguyên
-      // Nếu dữ liệu tab mới trống, sử dụng dữ liệu gốc nếu có
-      // Only check length for array tabs (transactions, interest, withdrawals)
-      if (tab !== 'details' && 
+      // Nếu dữ liệu tab mới trống, sử dụng dữ liệu gốc nếu có (chỉ cho interest và withdrawals)
+      // transactions được lấy từ hook nên không cần fallback
+      if (tab !== 'details' && tab !== 'transactions' && 
           tabData[tab] && 
           originalData[tab] && 
           tabData[tab].length === 0 && 
@@ -485,10 +489,6 @@ const SavingsAccountDetailDrawer = ({
 
   // Render the appropriate tab content
   const renderTabContent = () => {
-    // Log để debug
-    console.log("Rendering tab content for:", selectedTab);
-    console.log("Tab data:", tabData);
-    console.log("Account ID:", account?.id);
     
     // Đảm bảo luôn có mảng dữ liệu, ngay cả khi rỗng
     const currentTabData = {
@@ -503,6 +503,8 @@ const SavingsAccountDetailDrawer = ({
           <SavingsTransactionsTab 
             transactions={currentTabData.transactions} 
             isHidden={isHidden}
+            isLoading={transactionsLoading}
+            channelLabels={ChannelLabels}
           />
         );
       case 'interest':
