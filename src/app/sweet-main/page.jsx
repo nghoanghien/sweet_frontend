@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Home,
   Settings,
@@ -205,7 +206,7 @@ const scrollbarStyles = `
 
 export default function Dashboard() {
   // User store hooks
-  const { user, isAuthenticated, isLoading: userLoading, error: userError } = useUser();
+  const { user, detailInfo, isAuthenticated, isLoading: userLoading, error: userError } = useUser();
   const { refreshUserInfo } = useUserActions();
   
   const [navHovered, setNavHovered] = useState(false);
@@ -215,6 +216,10 @@ export default function Dashboard() {
   const [isMobile, setIsMobile] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [profileModalAnimating, setProfileModalAnimating] = useState(false);
+
+  
+  // Router for navigation
+  const router = useRouter();
   
   // Loading states for different sections
   const [isLoadingPaymentAccounts, setIsLoadingPaymentAccounts] = useState(true);
@@ -222,8 +227,27 @@ export default function Dashboard() {
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   
+  // Hàm xử lý logout
+  const handleLogout = () => {
+    closeConfirmationModal();
+    // Clear user data and redirect to login
+    router.push('/login');
+  };
+  
   // Hàm xử lý chuyển đổi section
   const handleSectionChange = (newSection) => {
+    // Handle logout separately
+    if (newSection === "logout") {
+      openConfirmationModal({
+        title: "Xác nhận đăng xuất",
+        description: "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
+        confirmText: "Quẹt để đăng xuất",
+        type: "logout",
+        onConfirm: handleLogout,
+      });
+      return;
+    }
+    
     if (newSection !== activeSection) {
       // Reset loading states when switching to overview section
       if (newSection === "overview") {
@@ -301,10 +325,26 @@ export default function Dashboard() {
     };
   }, []);
   
+  // Set default active section based on user type
+  useEffect(() => {
+    if (isAuthenticated && user && detailInfo) {
+      const isEmployee = detailInfo.type === "NHANVIEN";
+      
+      // If user is employee, set default section to customers management
+      if (isEmployee) {
+        setActiveSection("customers");
+      } else {
+        // If user is customer, set default section to overview
+        setActiveSection("overview");
+      }
+    }
+  }, [isAuthenticated, user, detailInfo]);
+
   // Log user information when component mounts or user changes
   useEffect(() => {
     console.log('=== Sweet Main Page - User Information ===');
     console.log('User:', user);
+    console.log('Detail Info:', detailInfo);
     console.log('Is Authenticated:', isAuthenticated);
     console.log('User Loading:', userLoading);
     console.log('User Error:', userError);
@@ -313,7 +353,7 @@ export default function Dashboard() {
       console.log('localStorage access_token:', localStorage.getItem('access_token'));
     }
     console.log('=========================================');
-  }, [user, isAuthenticated, userLoading, userError]);
+  }, [user, detailInfo, isAuthenticated, userLoading, userError]);
 
   // State for notifications
   const [notificationVisible, setNotificationVisible] = useState(false);
