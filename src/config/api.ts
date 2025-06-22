@@ -321,6 +321,14 @@ export const callGetLSGD_PGTByPhieuGuiTienID = (id: number) => {
     return axios.get<IBackendRes<any[]>>(`/api/v1/giao-dich/pgt/lich-su/by/${id}`);
 }
 
+export const callGetTraLaiByPhieuGuiTienID = (id: number) => {
+    return axios.get<IBackendRes<any[]>>(`/api/v1/phieu-gui-tien/${id}/phieu-tra-lai`);
+}
+
+export const callGetRutTienByPhieuGuiTienID = (id: number) => {
+    return axios.get<IBackendRes<any[]>>(`/api/v1/phieu-gui-tien/${id}/phieu-rut-tien`);
+}
+
 export const callGetAllQuyDinhLaiSuat = () => {
     return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat`);
 }
