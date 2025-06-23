@@ -1,3 +1,6 @@
+// Hook để lấy thông tin người dùng
+
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { login, logout, getAccountInformation } from '@/services/auth';
