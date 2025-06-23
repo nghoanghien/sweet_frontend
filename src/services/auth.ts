@@ -7,8 +7,14 @@ export const login = async (loginCredentials: IReqLoginDTO): Promise<IBackendRes
     const response = await callLogin(loginCredentials);
     console.log(loginCredentials);
     console.log(response);
-    if (!response || !response.data) {
+    if (!response) {
       throw new Error('Không nhận được phản hồi từ server');
+    }
+    if(!response.data) {
+      if (response.error === 'Bad credentials') {
+        throw new Error('Tên đăng nhập hoặc mật khẩu chưa chính xác');
+      }
+      throw new Error(response?.error);
     }
     return response.data;
   } catch (error: any) {

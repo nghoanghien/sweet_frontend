@@ -60,11 +60,10 @@ const LiquidGlassNavigation = ({
   // Determine user permissions and filter menu items
   const { filteredCustomerItems, filteredAdminItems, shouldShowCustomerSection, shouldShowAdminSection } = useMemo(() => {
     if (!isAuthenticated || !user || !detailInfo) {
-      // When not authenticated or no user info, show only customer items
       return {
-        filteredCustomerItems: customerMenuItems,
+        filteredCustomerItems: [],
         filteredAdminItems: [],
-        shouldShowCustomerSection: true,
+        shouldShowCustomerSection: false,
         shouldShowAdminSection: false
       };
     }

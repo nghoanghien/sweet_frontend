@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Sparkles, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Sparkles, AlertCircle, Loader2, User } from 'lucide-react';
 import CustomDatePicker from './CustomDatePicker';
 import SingleSelect from './SingleSelect';
 import LoadingOverlay from '@/components/common/LoadingOverlay';
@@ -418,20 +418,23 @@ export default function LoginRegistrationForm() {
       try {
         const result = await loginUser(credentials);
         
-        // Always redirect regardless of success or failure
-        setIsLoading(true);
-        
-        setTimeout(() => {
-          // Redirect to sweet-main regardless of login result
-          router.push('/sweet-main');
-        }, 3000);
+        if (result.success) {
+          // Show loading overlay for 3 seconds before redirecting
+          setIsLoading(true);
+          
+          setTimeout(() => {
+            // Redirect to sweet-main on successful login
+            router.push('/sweet-main');
+          }, 3000);
+        } else {
+          // Show error notification
+          setNotificationMessage(result.error || 'Tên đăng nhập hoặc mật khẩu không chính xác');
+          setShowNotification(true);
+        }
       } catch (error) {
-        // Always redirect even on error
-        setIsLoading(true);
-        
-        setTimeout(() => {
-          router.push('/sweet-main');
-        }, 3000);
+        // Show error notification
+        setNotificationMessage('Tên đăng nhập hoặc mật khẩu không chính xác');
+        setShowNotification(true);
       }
     } else {
       // Add shake animation to invalid fields
@@ -518,7 +521,7 @@ export default function LoginRegistrationForm() {
   
   return (
     <div className="w-full min-h-screen bg-sky-50 flex items-center justify-center p-4 relative">
-      <LoadingOverlay isLoading={isLoading} message={isLoginLoading ? 'Đang đăng nhập...' : 'Đang xử lý thao tác...'} />
+      <LoadingOverlay isLoading={isLoading} message={isLoginLoading ? 'Đang đăng nhập...' : 'Đăng nhập thành công! Đang chuyển hướng...'} />
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-[#FFB2CF]/30 to-transparent"></div>
@@ -864,32 +867,81 @@ export default function LoginRegistrationForm() {
                   />
                 </div>
                 
-                <div className="space-y-1.5">
-                  <label className="block text-gray-500 font-medium text-sm">
-                    Bạn là:
+                <div className="space-y-3">
+                  <label className="block text-gray-600 font-semibold text-sm mb-3">
+                    Chọn loại tài khoản của bạn:
                   </label>
-                  <div className="flex space-x-6 mt-1">
-                    <label className="flex items-center">
+                  <div className="grid grid-cols-1 gap-3">
+                    <label className="relative cursor-pointer group">
                       <input
                         type="radio"
                         name="role"
                         value="customer"
                         checked={loginForm.role === "customer"}
                         onChange={handleLoginChange}
-                        className="w-4 h-4 text-[#FF4081] focus:ring-[#FF89B0] border-[#FFD6E0]"
+                        className="sr-only"
                       />
-                      <span className="ml-2 text-[#424242]">Khách Hàng</span>
+                      <div className={`flex items-center p-4 rounded-xl border-2 transition-all duration-300 ${
+                        loginForm.role === "customer" 
+                          ? 'border-[#FF4081] bg-gradient-to-r from-[#FFF5F8] to-[#FFE6EE] shadow-md' 
+                          : 'border-[#FFD6E0] bg-white hover:border-[#FF89B0] hover:bg-[#FFF5F8]'
+                      }`}>
+                        <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
+                          loginForm.role === "customer" 
+                            ? 'border-[#FF4081] bg-[#FF4081]' 
+                            : 'border-[#FFD6E0] bg-white'
+                        }`}>
+                          {loginForm.role === "customer" && (
+                            <div className="w-2 h-2 rounded-full bg-white"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className={`font-semibold ${
+                            loginForm.role === "customer" ? 'text-[#F06292]' : 'text-[#424242]'
+                          }`}>
+                            Khách Hàng
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Dành cho khách hàng cá nhân sử dụng dịch vụ
+                          </div>
+                        </div>
+                      </div>
                     </label>
-                    <label className="flex items-center">
+                    
+                    <label className="relative cursor-pointer group">
                       <input
                         type="radio"
                         name="role"
                         value="admin"
                         checked={loginForm.role === "admin"}
                         onChange={handleLoginChange}
-                        className="w-4 h-4 text-[#FF4081] focus:ring-[#FF89B0] border-[#FFD6E0]"
+                        className="sr-only"
                       />
-                      <span className="ml-2 text-[#424242]">Quản Trị Viên</span>
+                      <div className={`flex items-center p-4 rounded-xl border-2 transition-all duration-300 ${
+                        loginForm.role === "admin" 
+                          ? 'border-[#FF4081] bg-gradient-to-r from-[#FFF5F8] to-[#FFE6EE] shadow-md' 
+                          : 'border-[#FFD6E0] bg-white hover:border-[#FF89B0] hover:bg-[#FFF5F8]'
+                      }`}>
+                        <div className={`w-5 h-5 rounded-full border-2 mr-3 flex items-center justify-center ${
+                          loginForm.role === "admin" 
+                            ? 'border-[#FF4081] bg-[#FF4081]' 
+                            : 'border-[#FFD6E0] bg-white'
+                        }`}>
+                          {loginForm.role === "admin" && (
+                            <div className="w-2 h-2 rounded-full bg-white"></div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className={`font-semibold ${
+                            loginForm.role === "admin" ? 'text-[#F06292]' : 'text-[#424242]'
+                          }`}>
+                            Quản Trị Viên
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Dành cho nhân viên quản lý hệ thống
+                          </div>
+                        </div>
+                      </div>
                     </label>
                   </div>
                 </div>
@@ -899,7 +951,7 @@ export default function LoginRegistrationForm() {
                     
                   </label>
                   <a href="#" className="text-sm text-[#F06292] hover:text-[#9C27B0] transition-colors font-medium">
-                    Forgot password?
+                    Quên mật khẩu?
                   </a>
                 </div>
                 
@@ -915,47 +967,16 @@ export default function LoginRegistrationForm() {
                   )}
                   {isLoginLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </button>
-                
-                <div className="relative flex items-center justify-center mt-2">
-                  <div className="flex-grow border-t border-[#FFD6E0]"></div>
-                  <span className="flex-shrink mx-4 text-[#9C27B0]">hoặc</span>
-                  <div className="flex-grow border-t border-[#FFD6E0]"></div>
-                </div>
-                
-                <button
-                  type="button"
-                  className="w-full py-3 px-4 bg-white border-2 border-[#FFD6E0] rounded-full text-[#424242] flex items-center justify-center hover:bg-[#FFF5F8] transition-all duration-300 shadow-sm"
-                >
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                    <path
-                      fill="#4285F4"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="#34A853"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="#FBBC05"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="#EA4335"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                  Log in with Google
-                </button>
               </form>
               
               <div className="text-center mt-6">
                 <p className="text-sm text-[#757575]">
-                  Don't have an account?{" "}
+                  Chưa có tài khoản?{" "}
                   <button
                     onClick={toggleForm}
                     className="text-[#F06292] hover:text-[#9C27B0] transition-colors font-medium"
                   >
-                    Sign Up
+                    Đăng ký ngay
                   </button>
                 </p>
               </div>

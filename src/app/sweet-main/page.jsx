@@ -245,7 +245,7 @@ export default function Dashboard() {
         title: "Xác nhận đăng xuất",
         description: "Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?",
         confirmText: "Quẹt để đăng xuất",
-        type: "logout",
+        type: "warning",
         onConfirm: handleLogout,
       });
       return;
