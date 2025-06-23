@@ -59,6 +59,7 @@ import ProfileModal from "@/components/modals/ProfileModal/ProfileModal";
 import LiquidGlassNavigation from "./LiquidGlassNavigation";
 import LiquidGlassMobileNavigation from "./LiquidGlassMobileNavigation";
 import { useUser, useUserActions } from "@/store/useUserStore";
+import { callLogout } from "@/config/api";
 // Add custom scrollbar styles
 const scrollbarStyles = `
   /* Hide scrollbar by default */
@@ -230,6 +231,8 @@ export default function Dashboard() {
   // Hàm xử lý logout
   const handleLogout = () => {
     closeConfirmationModal();
+    localStorage.removeItem("access_token");
+    callLogout();
     // Clear user data and redirect to login
     router.push('/login');
   };
