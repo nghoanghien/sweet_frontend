@@ -6,9 +6,6 @@ export const mapAPIToSavingsTransaction = (item: any): SavingsTransaction => {
     const maLoaiTaiKhoan = item.giaoDich.loaiTaiKhoanNguon?.maLoaiTaiKhoan;
     const taiKhoanNguon = item.giaoDich.taiKhoanNguon;
     const phieuGuiTienId = item.phieuGuiTienId;
-    console.log("PGtId: ", phieuGuiTienId);
-    console.log("nguon: ", taiKhoanNguon);
-    console.log('maloai: ', maLoaiTaiKhoan);
 
     // Logic xác định isDeposit
     let IsDeposit = true;

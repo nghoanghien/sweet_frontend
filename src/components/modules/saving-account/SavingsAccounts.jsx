@@ -31,76 +31,6 @@ import SwipeConfirmationModal from '../../modals/ConfirmationModal/SwipeConfirma
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSavingAccountsByCustomerId } from '@/hooks/useSavingAccounts';
 
-// Dữ liệu mẫu cho tài khoản tiết kiệm
-const sampleSavingsAccounts = [
-  {
-    id: 1,
-    nickname: "Tiết kiệm mua nhà",
-    depositNumber: "TK2023050001",
-    term: "12 tháng",
-    termDays: 365,
-    amount: 200000000,
-    remainingAmount: 0,
-    interestRate: 6.8,
-    startDate: "15/05/2023",
-    endDate: "15/05/2024",
-    daysRemaining: 120,
-    accountNumber: "TK0987654321",
-    depositType: "Tiền gửi tiêu chuẩn",
-    interestFrequency: "Cuối kỳ",
-    maturityOption: "Tự động tái tục gốc",
-    receivedInterest: 2500000,
-    totalReceivable: 213600000,
-    color: "bg-gradient-to-r from-blue-400 to-indigo-500",
-    iconColor: 'text-blue-600',
-    status: "active",
-  },
-  {
-    id: 2,
-    nickname: "Tiết kiệm du học",
-    depositNumber: "TK2023060002",
-    term: "6 tháng",
-    termDays: 180,
-    amount: 150000000,
-    remainingAmount: 150000000,
-    interestRate: 5.5,
-    startDate: "10/06/2023",
-    endDate: "07/12/2023",
-    daysRemaining: 30,
-    accountNumber: "TK1234509876",
-    depositType: "Rút gốc linh hoạt",
-    interestFrequency: "Hàng tháng",
-    maturityOption: "Chuyển gốc và lãi sang TKTG",
-    receivedInterest: 3437500,
-    totalReceivable: 153437500,
-    color: "bg-gradient-to-r from-pink-400 to-purple-500",
-    iconColor: 'text-pink-600',
-    status: "active"
-  },
-  {
-    id: 3,
-    nickname: "Tiết kiệm tương lai",
-    depositNumber: "TK2023070003",
-    term: "24 tháng",
-    termDays: 730,
-    amount: 300000000,
-    remainingAmount: 300000000,
-    interestRate: 7.1,
-    startDate: "05/07/2023",
-    endDate: "05/07/2025",
-    daysRemaining: 540,
-    accountNumber: "TK5432167890",
-    depositType: "Tiền gửi tiêu chuẩn",
-    interestFrequency: "Hàng quý",
-    maturityOption: "Chuyển gốc và lãi sang TKTG",
-    receivedInterest: 5325000,
-    totalReceivable: 342600000,
-    color: "bg-gradient-to-r from-green-400 to-teal-500",
-    iconColor: 'text-green-600',
-    status: "active",
-  }
-];
-
 // Dữ liệu mẫu cho giao dịch tiết kiệm
 const sampleSavingsTransactions = {
   1: [
@@ -437,9 +367,8 @@ const SavingsAccounts = ({ customerId }) => {
     
 
     const account = savingAccounts.find(acc => acc.id === accountId);
-    console.log("acount tìm thấy đc nè: ", account);
     if (!account) return;
-    console.log("acount tìm thấy đc nè: ", account);
+
     setSelectedAccount(account);
     setIsDetailDrawerOpen(true);
 

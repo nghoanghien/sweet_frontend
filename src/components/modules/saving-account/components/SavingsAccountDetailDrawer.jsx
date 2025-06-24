@@ -18,6 +18,7 @@ import ExportNotification from '../../../common/ExportNotification';
 import DetailInfo from './DetailInfo';
 import SavingAccountDetail from './SavingAccountDetail';
 import { useAllTransactionBySavingsAccountId } from '../../../../hooks/useSavingsTransaction';
+import { useInterestHistoryBySavingsAccountId } from '../../../../hooks/useInterestHistory';
 import { Channel } from '../../../../types/interfaces/enums';
 
 // Import các component con
@@ -102,6 +103,14 @@ const SavingsAccountDetailDrawer = ({
     refreshTransactions 
   } = useAllTransactionBySavingsAccountId(account?.id);
   
+  // Sử dụng hook để lấy dữ liệu lịch sử trả lãi
+  const { 
+    interestHistory: hookInterestHistory, 
+    isLoading: interestLoading, 
+    error: interestError, 
+    refreshInterestHistory 
+  } = useInterestHistoryBySavingsAccountId(account?.id);
+  
   // Lưu trữ dữ liệu tab để tránh mất khi chuyển tab
   const [tabData, setTabData] = useState({
     transactions: [],
@@ -115,20 +124,20 @@ const SavingsAccountDetailDrawer = ({
     console.log(account);
     const newTabData = {
       transactions: allTransactions || [],
-      interest: interestHistory || [],
+      interest: hookInterestHistory || [],
       withdrawals: withdrawalHistory || [],
       details: tabData.details
     };
     
     setTabData(newTabData);
-  }, [allTransactions, interestHistory, withdrawalHistory]);
+  }, [allTransactions, hookInterestHistory, withdrawalHistory]);
   
   // Reset tab data when account changes
   useEffect(() => {
     if (account) {
       setTabData({
         transactions: [],
-        interest: interestHistory || [],
+        interest: hookInterestHistory || [],
         withdrawals: withdrawalHistory || [],
         details: {}
       });
@@ -145,14 +154,14 @@ const SavingsAccountDetailDrawer = ({
   // Cập nhật dữ liệu gốc khi có dữ liệu mới
   useEffect(() => {
     if (isOpen) {
-      if (interestHistory && interestHistory.length > 0) {
-        originalData.interest = [...interestHistory];
+      if (hookInterestHistory && hookInterestHistory.length > 0) {
+        originalData.interest = [...hookInterestHistory];
       }
       if (withdrawalHistory && withdrawalHistory.length > 0) {
         originalData.withdrawals = [...withdrawalHistory];
       }
     }
-  }, [isOpen, interestHistory, withdrawalHistory]);
+  }, [isOpen, hookInterestHistory, withdrawalHistory]);
   
   // Control animations when opening/closing
   useEffect(() => {
@@ -166,10 +175,10 @@ const SavingsAccountDetailDrawer = ({
           setDrawerVisible(true);
           
           // Đảm bảo dữ liệu được hiển thị khi mở drawer
-          if (interestHistory && interestHistory.length > 0) {
+          if (hookInterestHistory && hookInterestHistory.length > 0) {
             setTabData(prevData => ({
               ...prevData,
-              interest: [...interestHistory]
+              interest: [...hookInterestHistory]
             }));
           }
           
@@ -512,6 +521,7 @@ const SavingsAccountDetailDrawer = ({
           <SavingsInterestTab 
             interestHistory={currentTabData.interest} 
             isHidden={isHidden}
+            isLoading={interestLoading}
           />
         );
       case 'withdrawals':

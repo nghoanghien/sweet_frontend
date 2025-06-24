@@ -86,7 +86,7 @@ const FilterableInterestList = ({
         const searchTermLower = searchTerm.toLowerCase();
         const filtered = interestHistory.filter(item => {
           return (
-            (item.date && item.date.toLowerCase().includes(searchTermLower)) ||
+            (item.date && (item.date instanceof Date ? item.date.toLocaleString('vi-VN') : item.date).toLowerCase().includes(searchTermLower)) ||
             (item.period && item.period.toLowerCase().includes(searchTermLower)) ||
             (item.method && item.method.toLowerCase().includes(searchTermLower)) ||
             (item.status && item.status.toLowerCase().includes(searchTermLower))
@@ -195,11 +195,11 @@ const FilterableInterestList = ({
                       
                       <div className="ml-4 flex-1">
                         <h4 className="font-semibold text-gray-800 text-base mb-1">
-                          Trả lãi kỳ {highlightText(item.period || "", searchTerm)}
+                          Trả lãi kỳ {(index + 1).toString()}
                         </h4>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           <Calendar size={14} />
-                          <span>{highlightText(item.date || "", searchTerm)}</span>
+                          <span>{highlightText(item.date instanceof Date ? item.date.toLocaleString('vi-VN') : item.date, searchTerm)}</span>
                         </div>
                       </div>
                     </div>
