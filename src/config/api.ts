@@ -1,4 +1,4 @@
-import { IRegisterDTO, IReqLoginDTO, IResLoginDTO, IUserGetAccountDTO } from '@/types/auth';
+import { IForgotPasswordDTO, IRegisterDTO, IReqLoginDTO, IResetPasswordDTO, IResLoginDTO, IUserGetAccountDTO, IVerificationDTO } from '@/types/auth';
 import axios from './axios-customize';
 import { IBackendRes, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
@@ -10,6 +10,7 @@ import { ILoaiTrangThai, ITrangThaiDTO } from '@/types/status';
 import { IThamSo } from '@/types/thamSo';
 import { IQuyenHan } from '@/types/permission';
 import { IVaiTro, IVaiTroDTO } from '@/types/role';
+import { TypeUserEnum } from '@/types/enums/TypeUserEnum';
 
 /**
  * Module nhan vien 
@@ -67,7 +68,24 @@ export const callGetAccountInformation = () =>{
     return axios.get<IBackendRes<IUserGetAccountDTO>>('/api/v1/auth/account');
 }
 
+export const callSendVerification = (email: string, userType: TypeUserEnum) =>{
+    const params = new URLSearchParams();
+    params.append("email", email);
+    params.append("userType", userType);
+    return axios.post<IBackendRes<void>>(`/api/v1/auth/send-verification?${params.toString()}`);
+}
 
+export const callVerifyOtp = (verificationDTO: IVerificationDTO) => {
+    return axios.post<IBackendRes<void>>("/api/v1/auth/verify", verificationDTO);
+}
+
+export const callForgotPassword = (forgotPasswordDTO: IForgotPasswordDTO) =>{
+    return axios.post<IBackendRes<void>>("/api/v1/forgot-password", forgotPasswordDTO);
+}
+
+export const callResetPassword = (resetPassWordDTO: IResetPasswordDTO) => {
+    return axios.post<IBackendRes<void>>('/api/v1/auth/reset-password', resetPassWordDTO);
+}
 
 /**
  * Module dia chi
