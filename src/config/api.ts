@@ -67,6 +67,8 @@ export const callGetAccountInformation = () =>{
     return axios.get<IBackendRes<IUserGetAccountDTO>>('/api/v1/auth/account');
 }
 
+
+
 /**
  * Module dia chi
  */

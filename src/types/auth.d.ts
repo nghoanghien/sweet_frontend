@@ -42,3 +42,22 @@ export interface IUserGetAccountDTO {
     trangThaiTaiKhoan: ITrangThaiDTO
 
 }
+
+export interface IForgotPasswordDTO {
+    email: string;
+    userType: TypeUserEnum;
+}
+
+export interface IResetPasswordDTO {
+    email: string;
+    //validate otp có length 0-6
+    otp: string;
+    userType: TypeUserEnum;
+    newPassword: string;
+}
+
+export interface IVerificationDTO {
+    email: string;
+    otp: string;
+    userType: TypeUserEnum;
+}
