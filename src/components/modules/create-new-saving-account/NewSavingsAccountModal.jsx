@@ -7,12 +7,20 @@ import { formatCurrency } from '@/utils/accountUtils';
 import MobileBottomCard from './MobileBottomCard';
 import { DepositTypeShimmer, SourceAccountShimmer, AmountInputShimmer } from '@/components/ui/custom/shimmer-types/NewSavingsAccountModalShimmer';
 import TextShimmer from '@/components/ui/custom/shimmer-types/TextShimmer';
+import { callGetQuyDinhLaiSuatHienTai } from "@/config/api"; // Đảm bảo import đúng path
+import { useInterestRateData } from "@/hooks/interestRateHooks";
+import { useMinDepositAmount } from "@/hooks/useParameters";
+
+
 
 // Định nghĩa các loại tiết kiệm có sẵn
 const depositTypes = [
   'standard', // Tiêu chuẩn
   'flexible'  // Linh hoạt
 ];
+
+
+
 
 // Định nghĩa tên hiển thị cho các loại tiết kiệm
 const depositTypeDisplayNames = {
@@ -66,6 +74,7 @@ const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=fals
     interestPaymentType: 'end_of_term', // end_of_term, monthly, quarterly, yearly
     maturityOption: 'rollover_principal' // receive_all, rollover_principal, rollover_all
   });
+  const minDepositAmount = useMinDepositAmount();
 
   const [formErrors, setFormErrors] = useState({});
   const [previewData, setPreviewData] = useState(null);
@@ -86,86 +95,86 @@ const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=fals
 
   // Định nghĩa các kỳ hạn có sẵn theo loại trả lãi
 const availableTermsByInterestType = {
-  end_of_term: ["1_month", "3_months", "6_months", "9_months", "12_months", "18_months", "24_months", "36_months", "38_months"],
-  monthly: ["3_months", "6_months", "9_months", "12_months", "18_months", "24_months", "36_months"],
-  quarterly: ["6_months", "9_months", "12_months", "18_months", "24_months", "36_months"],
-  yearly: ["12_months", "18_months", "24_months", "36_months"]
-};
+  end_of_term: Array.from({ length: 36 }, (_, i) => i === 0 ? "1_month" : `${i + 1}_months`),
+  monthly: Array.from({ length: 36 }, (_, i) => i === 0 ? "1_month" : `${i + 1}_months`),
+  quarterly: Array.from({ length: 36 }, (_, i) => i === 0 ? "1_month" : `${i + 1}_months`),
+  yearly: Array.from({ length: 36 }, (_, i) => i === 0 ? "1_month" : `${i + 1}_months`)
+}
 
 // Lãi suất mặc định theo kỳ hạn và loại tiền gửi
-const interestRateData = {
-  standard: {
-    end_of_term: {
-      "1_month": 3.1,
-      "3_months": 3.4,
-      "6_months": 4.8,
-      "9_months": 5.0,
-      "12_months": 6.8,
-      "18_months": 6.9,
-      "24_months": 7.1,
-      "36_months": 18.2,
-      "38_months": 20.2,
-    },
-    monthly: {
-      "3_months": 3.3,
-      "6_months": 4.6,
-      "9_months": 4.8,
-      "12_months": 6.5,
-      "18_months": 6.6,
-      "24_months": 6.8,
-      "36_months": 6.9,
-    },
-    quarterly: {
-      "6_months": 4.7,
-      "9_months": 4.9,
-      "12_months": 6.6,
-      "18_months": 6.7,
-      "24_months": 6.9,
-      "36_months": 7.0,
-    },
-    yearly: {
-      "12_months": 6.7,
-      "18_months": 6.8,
-      "24_months": 7.0,
-      "36_months": 7.1,
-    },
-  },
-  flexible: {
-    end_of_term: {
-      "1_month": 2.9,
-      "3_months": 3.2,
-      "6_months": 4.5,
-      "9_months": 4.7,
-      "12_months": 6.3,
-      "18_months": 6.4,
-      "24_months": 6.6,
-      "36_months": 6.7,
-    },
-    monthly: {
-      "3_months": 3.1,
-      "6_months": 4.3,
-      "9_months": 4.5,
-      "12_months": 6.1,
-      "18_months": 6.2,
-      "24_months": 6.4,
-      "36_months": 6.5,
-    },
-    quarterly: {
-      "6_months": 4.4,
-      "9_months": 4.6,
-      "12_months": 6.2,
-      "18_months": 6.3,
-      "24_months": 6.5,
-      "36_months": 6.6,
-    },
-    yearly: {
-      "12_months": 6.2,
-      "18_months": 6.3,
-      "24_months": 6.5,
-      "36_months": 6.6,
-    },
-  },
-};
+// const interestRateData = {
+//   standard: {
+//     end_of_term: {
+//       "1_month": 3.1,
+//       "3_months": 3.4,
+//       "6_months": 4.8,
+//       "9_months": 5.0,
+//       "12_months": 6.8,
+//       "18_months": 6.9,
+//       "24_months": 7.1,
+//       "36_months": 18.2,
+//       "38_months": 20.2,
+//     },
+//     monthly: {
+//       "3_months": 3.3,
+//       "6_months": 4.6,
+//       "9_months": 4.8,
+//       "12_months": 6.5,
+//       "18_months": 6.6,
+//       "24_months": 6.8,
+//       "36_months": 6.9,
+//     },
+//     quarterly: {
+//       "6_months": 4.7,
+//       "9_months": 4.9,
+//       "12_months": 6.6,
+//       "18_months": 6.7,
+//       "24_months": 6.9,
+//       "36_months": 7.0,
+//     },
+//     yearly: {
+//       "12_months": 6.7,
+//       "18_months": 6.8,
+//       "24_months": 7.0,
+//       "36_months": 7.1,
+//     },
+//   },
+//   flexible: {
+//     end_of_term: {
+//       "1_month": 2.9,
+//       "3_months": 3.2,
+//       "6_months": 4.5,
+//       "9_months": 4.7,
+//       "12_months": 6.3,
+//       "18_months": 6.4,
+//       "24_months": 6.6,
+//       "36_months": 6.7,
+//     },
+//     monthly: {
+//       "3_months": 3.1,
+//       "6_months": 4.3,
+//       "9_months": 4.5,
+//       "12_months": 6.1,
+//       "18_months": 6.2,
+//       "24_months": 6.4,
+//       "36_months": 6.5,
+//     },
+//     quarterly: {
+//       "6_months": 4.4,
+//       "9_months": 4.6,
+//       "12_months": 6.2,
+//       "18_months": 6.3,
+//       "24_months": 6.5,
+//       "36_months": 6.6,
+//     },
+//     yearly: {
+//       "12_months": 6.2,
+//       "18_months": 6.3,
+//       "24_months": 6.5,
+//       "36_months": 6.6,
+//     },
+//   },
+// };
 
   // Term display names
   const termDisplayNames = {
@@ -182,7 +191,7 @@ const interestRateData = {
   
   // Interest payment type display names
   const interestPaymentTypeDisplayNames = {
-    "end_of_term": "Cuối kỳ",
+    "end_of_term": "Cuối kỳ hạn",
     "monthly": "Hàng tháng",
     "quarterly": "Hàng quý",
     "yearly": "Đầu kỳ hạn"
@@ -247,6 +256,8 @@ const interestRateData = {
   // Handle loading when source account changes (only for balance info, not minimum amount)
   useEffect(() => {
     if (isOpen && step === 2 && formData.sourceAccount) {
+      
+        console.log('Min deposit amount:', minDepositAmount);
       // Only show loading for balance info, not for minimum amount text
       setLoadingStates(prev => ({ ...prev, balanceInfo: true }));
       setTimeout(() => {
@@ -287,6 +298,7 @@ const interestRateData = {
   // Cập nhật useEffect để tính toán lãi suất khi thay đổi các thông số liên quan
   useEffect(() => {
     if (isOpen && step >= 3 && formData.amount && parseInt(formData.amount) >= 100000) {
+      console.log("formData.amount:", formData.amount);
       calculateInterest();
     }
   }, [formData.term, formData.depositType, formData.interestPaymentType, formData.amount, step, isOpen]);
@@ -360,8 +372,8 @@ const interestRateData = {
       
       if (!formData.amount || isNaN(formData.amount) || parseFloat(formData.amount) <= 0) {
         errors.amount = 'Vui lòng nhập số tiền hợp lệ';
-      } else if (parseFloat(formData.amount) < 100000) {
-        errors.amount = 'Số tiền tối thiểu là 100.000đ';
+      } else if (parseFloat(formData.amount) < minDepositAmount) {
+        errors.amount = `Số tiền tối thiểu là ${formatCurrency(minDepositAmount)}`;
       }
       
       // Kiểm tra số dư tài khoản nếu không phải là tiền mặt tại quầy
@@ -514,6 +526,10 @@ const interestRateData = {
     const lastFourDigits = accountNumber.slice(-4);
     return '•••• •••• •••• ' + lastFourDigits;
   };
+
+const interestRateData = useInterestRateData(isOpen);
+
+
 
   if (!isOpen) return null;
 
@@ -1139,7 +1155,7 @@ const interestRateData = {
                             <TextShimmer width={15} height={12} />
                           ) : (
                             <span className="text-slate-500 text-xs hidden sm:inline">
-                              (Tối thiểu 100.000đ)
+                              (Tối thiểu {formatCurrency(minDepositAmount)})
                             </span>
                           )}
                         </label>
@@ -1337,6 +1353,7 @@ const interestRateData = {
                     {/* Left Column */}
                     <div className="space-y-6">
                       {/* Interest Payment Type */}
+                      {formData.depositType !== "flexible" && (
                       <motion.div variants={itemVariants}>
                         <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
                           <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20">
@@ -1451,6 +1468,51 @@ const interestRateData = {
                           )}
                         </div>
                       </motion.div>
+                      )}
+                      {formData.depositType === "flexible" && (
+  <motion.div variants={itemVariants}>
+    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-4">
+      <div className="relative w-5 h-5 rounded-lg overflow-hidden backdrop-blur-md bg-gradient-to-br from-white/30 via-white/20 to-white/10 border border-white/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-pink-400/60 to-rose-500/60" />
+        <div className="relative flex items-center justify-center h-full">
+          <Sparkles size={12} className="text-white drop-shadow-sm" />
+        </div>
+        <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/40 to-transparent rounded-t-lg" />
+      </div>
+      Thời điểm nhận lãi
+    </label>
+    <div className="space-y-3">
+      <motion.div
+        key="end_of_term"
+        className={`group relative overflow-hidden rounded-2xl backdrop-blur-xl border transition-all duration-500 cursor-pointer bg-gradient-to-br from-pink-200/40 via-pink-600/30 to-pink-200/20 border-white/30 shadow-[0_0px_25px_5px_rgba(255,192,203,0.7)] shadow-pink-500/50`}
+        variants={itemVariants}
+      >
+        <div className="absolute inset-0 rounded-2xl">
+          <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-white/30 to-transparent rounded-t-2xl" />
+          <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-to-tl from-white/20 to-transparent rounded-br-2xl" />
+        </div>
+        <div className="flex items-start gap-4 relative z-10 p-4">
+          <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300 backdrop-blur-md border border-white/20 shadow-[0_8px_25px_0px_rgba(255,192,203,0.7)] bg-gradient-to-br from-pink-400/80 to-rose-500/80">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/30 to-transparent" />
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="relative z-10">
+              <Check size={14} className="text-white drop-shadow-sm" />
+            </motion.div>
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-semibold text-gray-800 drop-shadow-sm">
+                {interestPaymentTypeDisplayNames["end_of_term"]}
+              </span>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed drop-shadow-sm">
+              Nhận lãi vào cuối kỳ hạn - Tối ưu cho tích lũy dài hạn
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  </motion.div>
+)}
 
                       {/* Maturity Options */}
                       <motion.div variants={itemVariants} className="lg:block">
@@ -1551,6 +1613,7 @@ const interestRateData = {
                         </div>
                       </motion.div>
                     </div>
+                      
 
                     {/* Right Column */}
                     <div className="space-y-5">
@@ -1582,7 +1645,8 @@ const interestRateData = {
                                   formData.interestPaymentType
                                 ][term] || 0;
                               return { term, interestRate };
-                            });
+                            })
+                            .filter(item => item.interestRate > 0);
 
                             const sortedByRate = [...termRates].sort(
                               (a, b) => b.interestRate - a.interestRate
@@ -1703,7 +1767,7 @@ const interestRateData = {
 
                                     <div className="flex items-center justify-center gap-1">
                                       <span className="text-lg font-bold bg-gradient-to-r from-pink-400 to-rose-500 bg-clip-text text-transparent drop-shadow-sm">
-                                        {interestRate}%
+                                        {(parseFloat(interestRate) * 100).toLocaleString()}%
                                       </span>
                                       <span className="text-xs text-gray-500 drop-shadow-sm">
                                         /năm
@@ -2110,7 +2174,7 @@ const interestRateData = {
                                 className="ml-3 text-base sm:text-lg font-bold text-pink-600"
                                 style={{ fontFamily: "monospace" }}
                               >
-                                {calculatedInterest.rate}%/năm
+                               {(parseFloat(formData.interestRate) * 100).toLocaleString()}%
                               </span>
                             </div>
                             <div className="flex-1 text-right">

@@ -11,6 +11,8 @@ import { IThamSo } from '@/types/thamSo';
 import { IQuyenHan } from '@/types/permission';
 import { IVaiTro, IVaiTroDTO } from '@/types/role';
 import { TypeUserEnum } from '@/types/enums/TypeUserEnum';
+import {IPhieuGuiTienReqDTO} from '@/types/phieuGuiTien';
+
 
 /**
  * Module nhan vien 
@@ -329,6 +331,10 @@ export const callGetLSGD_TKTTByTaiKhoanID = (id: number) => {
     return axios.get<IBackendRes<ILSGD_TKTTResDTO[]>>(`/api/v1/giao-dich/tktt/lich-su/by/${id}`);
 }
 
+export const callCreatePhieuGuiTien = (data: IPhieuGuiTienReqDTO) => {
+    return axios.post<IBackendRes<any>>(`/api/v1/phieu-gui-tien`, data);
+}
+
 export const callGetAllLSGD_PGT = () => {
     return axios.get<IBackendRes<any[]>>(`/api/v1/giao-dich/pgt/lich-su`);
 }
@@ -361,7 +367,7 @@ export const callGetQuyDinhLaiSuatByID = (id: number) => {
     return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/${id}`);
 }
 
-export const callGetQuyDinhLaiSuatHienTai = (id: number) => {
+export const callGetQuyDinhLaiSuatHienTai = () => {
     return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/current`);
 }
 

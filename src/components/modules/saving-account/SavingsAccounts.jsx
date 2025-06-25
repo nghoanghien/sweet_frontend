@@ -410,6 +410,7 @@ const SavingsAccounts = ({ customerId }) => {
   
   // Chuẩn bị tài khoản mới và hiển thị modal xác nhận
   const prepareNewAccount = (formData, calculatedInterest) => {
+    
     // Tạo tài khoản mới với ID ngẫu nhiên
     const randomColor = accountColors[Math.floor(Math.random() * accountColors.length)];
     
@@ -505,6 +506,7 @@ const SavingsAccounts = ({ customerId }) => {
       totalReceivable: amount + expectedInterest,
       color: randomColor,
       status: 'active',
+      channel: channel, // Thêm kênh giao dịch
       icon: <PiggyBank size={24} className="text-white" />
     };
     
@@ -515,33 +517,42 @@ const SavingsAccounts = ({ customerId }) => {
   };
   
   // Xử lý tạo tài khoản mới sau khi xác nhận
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (!newAccountData) return;
     
     // Bắt đầu xử lý
     setIsProcessing(true);
     
-    // Giả lập thời gian xử lý API
-    setTimeout(() => {
-      try {
-        // Thêm tài khoản mới vào danh sách
-        setAccounts(prevAccounts => [...prevAccounts, newAccountData]);
-        
-        // Hiển thị thông báo thành công
-        setNotificationMessage(`Gửi tiết kiệm thành công`);
-        setNotificationFormat(`Sổ tiết kiệm "${newAccountData.nickname}" đã được mở thành công với số tiền ${formatCurrency(newAccountData.amount)}.`);
-        setNotificationVisible(true);
-        
-        // Đóng modal xác nhận
-        setIsCreateConfirmModalOpen(false);
-        setNewAccountData(null);
-      } catch (error) {
-        console.error("Lỗi khi tạo tài khoản:", error);
-      } finally {
-        // Kết thúc xử lý
-        setIsProcessing(false);
-      }
-    }, 1500); // Giả lập độ trễ 1.5 giây
+    try {
+      // Import service để tạo tài khoản tiết kiệm
+      const { createSavingAccount } = await import('@/services/savingAccountService');
+      
+      // Gọi service để tạo tài khoản tiết kiệm
+      // Service sẽ tự động lấy giaoDichVienId từ thông tin người dùng đăng nhập
+      const response = await createSavingAccount(
+        newAccountData,
+        customerId || 1
+      );
+      
+      console.log('Phiếu gửi tiền đã được tạo:', response);
+      
+      // Thêm tài khoản mới vào danh sách
+      setAccounts(prevAccounts => [...prevAccounts, newAccountData]);
+      
+      // Hiển thị thông báo thành công
+      setNotificationMessage(`Gửi tiết kiệm thành công`);
+      setNotificationFormat(`Sổ tiết kiệm "${newAccountData.nickname}" đã được mở thành công với số tiền ${formatCurrency(newAccountData.amount)}.`);
+      setNotificationVisible(true);
+      
+      // Đóng modal xác nhận
+      setIsCreateConfirmModalOpen(false);
+      setNewAccountData(null);
+    } catch (error) {
+      console.error("Lỗi khi tạo tài khoản:", error);
+    } finally {
+      // Kết thúc xử lý
+      setIsProcessing(false);
+    }
   };
   
   // Xử lý đóng thông báo
@@ -576,9 +587,9 @@ const SavingsAccounts = ({ customerId }) => {
           confirmDetails={
             newAccountData
               ? {
-                  "Số tiền gửi": formatCurrency(newAccountData.amount),
+                  "Số tiền gửi": newAccountData.amount,
                   "Kỳ hạn": newAccountData.term,
-                  "Lãi suất": `${newAccountData.interestRate}%/năm`,
+                  "Lãi suất": `${(parseFloat(newAccountData.interestRate) * 100).toLocaleString()}%/năm`,
                   "Ngày đáo hạn": newAccountData.endDate
                 }
               : {}
@@ -1148,9 +1159,9 @@ const SavingsAccounts = ({ customerId }) => {
         confirmDetails={
           newAccountData
             ? {
-                "Số tiền gửi": formatCurrency(newAccountData.remainingAmount),
+                "Số tiền gửi": formatCurrency(newAccountData.amount),
                 "Kỳ hạn": newAccountData.term,
-                "Lãi suất": `${newAccountData.interestRate}%/năm`,
+                "Lãi suất": `${(parseFloat(newAccountData.interestRate) * 100).toLocaleString()}%/năm`,
                 "Tổng tiền nhận dự kiến": formatCurrency(
                   newAccountData.totalReceivable
                 ),

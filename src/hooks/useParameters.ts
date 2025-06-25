@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react"
-import { getAllParameters, updateParameter } from "@/services/parameters";
+import { getAllParameters, getParameterById, updateParameter } from "@/services/parameters";
 import { IThamSo } from "@/types/thamSo";
 
 export const useAllParameters = () => {
@@ -83,4 +83,18 @@ export const useAllParameters = () => {
   }, [rawParameters, fetchData]);
 
   return { data: data, allParameters: rawParameters, isLoading, error, refreshParameters, updateAllParameters };
+}
+
+export function useMinDepositAmount() {
+  const [minAmount, setMinAmount] = useState(0);
+
+  useEffect(() => {
+    getParameterById().then((value) => {
+     const amount = Number(value);
+      console.log("MIN_DEPOSIT_AMOUNT:", amount); // Thêm dòng này để kiểm tra
+      setMinAmount(amount);
+    });
+  }, []);
+
+  return minAmount;
 }

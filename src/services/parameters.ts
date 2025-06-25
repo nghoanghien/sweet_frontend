@@ -1,4 +1,4 @@
-import { getAllThamSo, updateThamSo } from "@/config/api"
+import { getAllThamSo, getThamSoById, updateThamSo } from "@/config/api"
 import { IThamSo } from "@/types/thamSo";
 
 export const getAllParameters = async () => {
@@ -23,4 +23,10 @@ export const updateParameter = async (parameter_code: string, value: number, raw
   // Gọi API updateThamSo với id và parameter đã format
   const response = await updateThamSo(parameterToUpdate.thamSoID, updatedParameter);
   return response.data;
+  
 }
+export const getParameterById = async () => {
+  const res = await getThamSoById("3");
+  // Giả sử API trả về mảng, lấy phần tử đầu tiên
+  return res.data.giaTri;
+};
