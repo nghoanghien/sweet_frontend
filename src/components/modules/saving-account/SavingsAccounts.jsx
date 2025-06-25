@@ -506,7 +506,7 @@ const SavingsAccounts = ({ customerId }) => {
       totalReceivable: amount + expectedInterest,
       color: randomColor,
       status: 'active',
-      channel: channel, // Thêm kênh giao dịch
+      channel: formData.sourceAccount, // Thêm kênh giao dịch
       icon: <PiggyBank size={24} className="text-white" />
     };
     
