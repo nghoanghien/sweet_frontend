@@ -74,7 +74,6 @@ const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=fals
     interestPaymentType: 'end_of_term', // end_of_term, monthly, quarterly, yearly
     maturityOption: 'rollover_principal' // receive_all, rollover_principal, rollover_all
   });
-  const minDepositAmount = useMinDepositAmount();
 
   const [formErrors, setFormErrors] = useState({});
   const [previewData, setPreviewData] = useState(null);
@@ -182,7 +181,7 @@ const availableTermsByInterestType = {
   useEffect(() => {
     if (isOpen && step === 2 && formData.sourceAccount) {
       
-        console.log('Min deposit amount:', minDepositAmount);
+        console.log('Min deposit amount:', formData.sourceAccount);
       // Only show loading for balance info, not for minimum amount text
       setLoadingStates(prev => ({ ...prev, balanceInfo: true }));
       setTimeout(() => {
@@ -375,13 +374,13 @@ const availableTermsByInterestType = {
     
     // Tính lãi theo phương thức trả lãi
     if (interestPaymentType === "end_of_term") {
-      interestAmount = (amountValue * interestRate * termMonths / 12) / 100;
+      interestAmount = (amountValue * interestRate * termMonths / 12) ;
     } else {
       const periodsPerYear = interestPaymentType === "monthly" ? 12 : 
                             interestPaymentType === "quarterly" ? 4 : 1;
       
       const periodsTotal = periodsPerYear * termMonths / 12;
-      const ratePerPeriod = interestRate / periodsPerYear / 100;
+      const ratePerPeriod = interestRate / periodsPerYear ;
       
       interestAmount = 0;
       let remainingPrincipal = amountValue;
@@ -452,7 +451,7 @@ const availableTermsByInterestType = {
     return '•••• •••• •••• ' + lastFourDigits;
   };
 
-  const { data: interestRateData, isLoading: isLoadingInterestRate } = useInterestRateData(isOpen);
+  const { data: interestRateData, isLoading: isLoadingInterestRate, minDepositAmount } = useInterestRateData(isOpen);
 
   // Add useEffect to reset loading states when isLoadingInterestRate becomes false
   useEffect(() => {
