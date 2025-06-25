@@ -45,6 +45,7 @@ const ExportNotification = ({
 
   // Get format icon
   const getFormatIcon = () => {
+    console.log(format);
     switch (format.toLowerCase()) {
       case 'pdf':
         return <FileText size={20} className="text-red-500" />;

@@ -112,7 +112,7 @@ export const getActionCodes = (permission: Permission): number[] => {
         67. thêm quy định lãi suất
          */} 
     case Permission.SALE_REPORTS:
-      return [100000];
+      return [];
       {/*
          */} 
     case Permission.SETTINGS:
@@ -166,4 +166,21 @@ export const getPermissions = (actionObjects: any[]): Permission[] => {
   });
   
   return permissions;
+};
+
+/**
+ * Lấy danh sách action codes từ array permissions
+ * @param permissions - Array các Permission enum values
+ * @returns Array các action codes không trùng nhau
+ */
+export const getActionCodesFromPermissions = (permissions: Permission[]): number[] => {
+  const allActionCodes: number[] = [];
+  
+  permissions.forEach(permission => {
+    const actionCodes = getActionCodes(permission);
+    allActionCodes.push(...actionCodes);
+  });
+  
+  // Loại bỏ các số trùng nhau và sắp xếp theo thứ tự tăng dần
+  return Array.from(new Set(allActionCodes)).sort((a, b) => a - b);
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserCheck, Plus, Search, Filter, Users, Settings } from 'lucide-react';
 import RoleCard from '../ui/RoleCard';
@@ -6,7 +6,7 @@ import RoleFormModal from './RoleFormModal';
 import DeleteRoleModal from './DeleteRoleModal';
 import ExportNotification from '../../../common/ExportNotification';
 import RoleCardShimmer from '../../../ui/custom/shimmer-types/RoleCardShimmer';
-import { useAllRoles } from '@/hooks/useAllRoles';
+import { useAllRoles, useUpdateRole } from '@/hooks/useAllRoles';
 import { getPermissionLabel } from '@/utils/permissions';
 
 const RoleManagement = () => {
@@ -38,7 +38,14 @@ const RoleManagement = () => {
     format: '',
   });
 
-  const { allRoles, isLoading, error, refreshRoles } = useAllRoles();
+  const { allRoles, isLoading, error: fetchError, refreshRoles } = useAllRoles();
+  const { updateRoleData, isLoading: isUpdating, error: updateError } = useUpdateRole();
+  
+  // Theo dõi thay đổi của updateError
+  useEffect(() => {
+    if (updateError) {
+    }
+  }, [updateError]);
   
   // Transform API data to component format
   const transformRoleData = (apiRoles) => {
@@ -122,18 +129,49 @@ const RoleManagement = () => {
   };
 
   // Xử lý khi lưu vai trò (thêm hoặc sửa)
-  const handleSaveRole = (role, notificationInfo) => {
-    // TODO: Implement API calls for creating/updating roles
-    // For now, just refresh the data
-    refreshRoles();
-    setShowFormModal(false);
-    
-    // Hiển thị thông báo nếu có
-    if (notificationInfo) {
+  const handleSaveRole = async (role, notificationInfo) => {
+    try {
+      if (isEditing && role.id) {
+        // Cập nhật vai trò hiện có
+        const result = await updateRoleData(role);
+        
+        setShowFormModal(false);
+        
+        // Kiểm tra lỗi từ result thay vì state updateError
+        if (result && !result.error) {
+          showNotification(
+            notificationInfo.message,
+            notificationInfo.type,
+            notificationInfo.format || ''
+          );
+          // Refresh data sau khi cập nhật
+          refreshRoles();
+        } else {
+          showNotification(
+            'Có lỗi xảy ra khi lưu vai trò!',
+            'error',
+            result?.error ? String(result.error) : 'Lỗi không xác định',
+          );
+        }
+      } else {
+        // TODO: Implement API call for creating new role
+        setShowFormModal(false);
+        
+        if (notificationInfo) {
+          showNotification(
+            notificationInfo.message,
+            notificationInfo.type,
+            notificationInfo.format || ''
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Lỗi khi lưu vai trò:", error);
+      // Hiển thị thông báo lỗi
       showNotification(
-        notificationInfo.message,
-        notificationInfo.type,
-        notificationInfo.format || ''
+        'Có lỗi xảy ra khi lưu vai trò!',
+        'error',
+        error,
       );
     }
   };
@@ -191,7 +229,7 @@ const RoleManagement = () => {
   }
 
   // Hiển thị lỗi nếu có
-  if (error) {
+  if (fetchError) {
     return (
       <div className="text-center py-10">
         <p className="text-red-500 mb-4">Có lỗi xảy ra khi tải danh sách vai trò</p>
