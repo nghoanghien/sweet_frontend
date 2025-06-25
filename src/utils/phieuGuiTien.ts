@@ -20,7 +20,7 @@ interface SavingAccountData {
  */
 export const convertToPhieuGuiTienData = (
   accountData: SavingAccountData,
-  customerId: number = 1,
+  customerId: number,
   giaoDichVienId: number = 1
 ): IPhieuGuiTienReqDTO => {
   // Chuyển đổi term từ "12 tháng" sang số tháng

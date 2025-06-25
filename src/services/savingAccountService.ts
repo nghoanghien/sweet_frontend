@@ -37,7 +37,7 @@ const getGiaoDichVienId = (): number => {
  */
 export const createSavingAccount = async (
   accountData: SavingAccountData,
-  customerId: number = 1,
+  customerId: number ,
   giaoDichVienId?: number
 ) => {
   try {

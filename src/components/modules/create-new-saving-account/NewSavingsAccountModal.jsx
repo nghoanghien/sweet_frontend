@@ -101,81 +101,6 @@ const availableTermsByInterestType = {
   yearly: Array.from({ length: 36 }, (_, i) => i === 0 ? "1_month" : `${i + 1}_months`)
 }
 
-// Lãi suất mặc định theo kỳ hạn và loại tiền gửi
-// const interestRateData = {
-//   standard: {
-//     end_of_term: {
-//       "1_month": 3.1,
-//       "3_months": 3.4,
-//       "6_months": 4.8,
-//       "9_months": 5.0,
-//       "12_months": 6.8,
-//       "18_months": 6.9,
-//       "24_months": 7.1,
-//       "36_months": 18.2,
-//       "38_months": 20.2,
-//     },
-//     monthly: {
-//       "3_months": 3.3,
-//       "6_months": 4.6,
-//       "9_months": 4.8,
-//       "12_months": 6.5,
-//       "18_months": 6.6,
-//       "24_months": 6.8,
-//       "36_months": 6.9,
-//     },
-//     quarterly: {
-//       "6_months": 4.7,
-//       "9_months": 4.9,
-//       "12_months": 6.6,
-//       "18_months": 6.7,
-//       "24_months": 6.9,
-//       "36_months": 7.0,
-//     },
-//     yearly: {
-//       "12_months": 6.7,
-//       "18_months": 6.8,
-//       "24_months": 7.0,
-//       "36_months": 7.1,
-//     },
-//   },
-//   flexible: {
-//     end_of_term: {
-//       "1_month": 2.9,
-//       "3_months": 3.2,
-//       "6_months": 4.5,
-//       "9_months": 4.7,
-//       "12_months": 6.3,
-//       "18_months": 6.4,
-//       "24_months": 6.6,
-//       "36_months": 6.7,
-//     },
-//     monthly: {
-//       "3_months": 3.1,
-//       "6_months": 4.3,
-//       "9_months": 4.5,
-//       "12_months": 6.1,
-//       "18_months": 6.2,
-//       "24_months": 6.4,
-//       "36_months": 6.5,
-//     },
-//     quarterly: {
-//       "6_months": 4.4,
-//       "9_months": 4.6,
-//       "12_months": 6.2,
-//       "18_months": 6.3,
-//       "24_months": 6.5,
-//       "36_months": 6.6,
-//     },
-//     yearly: {
-//       "12_months": 6.2,
-//       "18_months": 6.3,
-//       "24_months": 6.5,
-//       "36_months": 6.6,
-//     },
-//   },
-// };
-
   // Term display names
   const termDisplayNames = {
     "1_month": "1 tháng",
@@ -527,9 +452,21 @@ const availableTermsByInterestType = {
     return '•••• •••• •••• ' + lastFourDigits;
   };
 
-const interestRateData = useInterestRateData(isOpen);
+  const { data: interestRateData, isLoading: isLoadingInterestRate } = useInterestRateData(isOpen);
 
-
+  // Add useEffect to reset loading states when isLoadingInterestRate becomes false
+  useEffect(() => {
+    if (!isLoadingInterestRate) {
+      setLoadingStates(prevStates => {
+        const resetStates = {};
+        // Set all loading states to false
+        Object.keys(prevStates).forEach(key => {
+          resetStates[key] = false;
+        });
+        return resetStates;
+      });
+    }
+  }, [isLoadingInterestRate]);
 
   if (!isOpen) return null;
 

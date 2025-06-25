@@ -531,7 +531,7 @@ const SavingsAccounts = ({ customerId }) => {
       // Service sẽ tự động lấy giaoDichVienId từ thông tin người dùng đăng nhập
       const response = await createSavingAccount(
         newAccountData,
-        customerId || 1
+        customerId 
       );
       
       console.log('Phiếu gửi tiền đã được tạo:', response);
