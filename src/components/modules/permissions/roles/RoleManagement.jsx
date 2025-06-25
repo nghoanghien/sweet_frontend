@@ -43,15 +43,12 @@ const RoleManagement = () => {
   // Transform API data to component format
   const transformRoleData = (apiRoles) => {
     return apiRoles.map(role => {
-      console.log('Role permissions:', role.permissions);
       return {
         id: role.roleID,
         name: role.roleName,
         type: role.customerRole ? 'customer' : 'staff',
         description: role.description,
         permissions: role.permissions.map(permission => {
-          console.log('Permission:', permission);
-          console.log('Permission label:', getPermissionLabel(permission));
           return {
             id: permission,
             name: getPermissionLabel(permission)
