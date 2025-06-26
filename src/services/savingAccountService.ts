@@ -1,6 +1,7 @@
 import { createPhieuGuiTien } from "./phieuGuiTienService";
 import { convertToPhieuGuiTienData } from "@/utils/phieuGuiTien";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useUserStore } from "@/store/useUserStore";
 
 interface SavingAccountData {
   amount: number;
@@ -17,38 +18,38 @@ interface SavingAccountData {
  * Lấy ID của giao dịch viên từ thông tin người dùng đăng nhập
  * @returns ID của giao dịch viên hoặc 1 nếu không tìm thấy
  */
-const getGiaoDichVienId = (): number => {
-  const user = useAuthStore.getState().user;
-  // Nếu có thông tin người dùng và có employeeID, sử dụng employeeID làm giaoDichVienId
-  // Giả sử employeeID là một chuỗi số, chuyển đổi thành số
-  if (user && user.employeeID) {
-    const employeeIdNumber = parseInt(user.employeeID);
-    return isNaN(employeeIdNumber) ? 1 : employeeIdNumber;
+const getGiaoDichVienId = (): number | undefined => {
+  const { user } = useUserStore.getState();
+  
+  // Kiểm tra nếu có user và id từ thông tin đăng nhập
+  if (user && user.id) {
+    return Number(user.id);
   }
-  return 1; // Giá trị mặc định nếu không có thông tin người dùng
+  
+  return undefined;
 };
 
 /**
  * Tạo phiếu gửi tiền từ dữ liệu tài khoản tiết kiệm
  * @param accountData Dữ liệu tài khoản tiết kiệm
  * @param customerId ID của khách hàng
- * @param giaoDichVienId ID của giao dịch viên (tùy chọn, mặc định sẽ lấy từ thông tin đăng nhập)
+ * @param _giaoDichVienId ID của giao dịch viên (tùy chọn, mặc định sẽ lấy từ thông tin đăng nhập)
  * @returns Kết quả từ API
  */
 export const createSavingAccount = async (
   accountData: SavingAccountData,
-  customerId: number ,
-  giaoDichVienId?: number
+  customerId: number,
+  _giaoDichVienId?: number // Đánh dấu tham số không sử dụng
 ) => {
   try {
-    // Nếu không cung cấp giaoDichVienId, lấy từ thông tin người dùng đăng nhập
-    const actualGiaoDichVienId = giaoDichVienId || getGiaoDichVienId();
+    // Luôn lấy giaoDichVienId từ thông tin đăng nhập
+    const giaoDichVienId = getGiaoDichVienId();
     
     // Chuyển đổi dữ liệu từ SavingAccountData sang IPhieuGuiTienReqDTO
     const phieuGuiTienData = convertToPhieuGuiTienData(
       accountData,
       customerId,
-      actualGiaoDichVienId
+      giaoDichVienId
     );
     
     // Gọi API để tạo phiếu gửi tiền

@@ -17,35 +17,47 @@ import {
 } from 'lucide-react';
 import SearchBar, { highlightText } from '../ui/SearchBar';
 import TransactionHistoryShimmer from '@/components/ui/custom/shimmer-types/TransactionHistoryShimmer';
+import { useAllTransactionByEmployeeId } from '@/hooks/useEmployeeTransaction';
 
 function EmployeeTransactionHistory({ employee }) {
   // State for expanded transaction items
   const [expandedTransactions, setExpandedTransactions] = useState({});
   // State for search functionality
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredTransactions, setFilteredTransactions] = useState(employee?.transactions || []);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   // Loading state - starts as true and turns off after 3 seconds
-  const [isLoading, setIsLoading] = useState(true);
+  const { 
+    transactions: employeeTransactions, 
+    isLoading: isLoadingTransactions, 
+    error: transactionError 
+  } = useAllTransactionByEmployeeId(employee?.employeeID);
   
-  // Auto turn off loading after 3 seconds
+  // Thêm console.log để kiểm tra
+  console.log('EmployeeTransactionHistory - Data:', {
+    employeeId: employee?.employeeID,
+    employeeTransactions: employeeTransactions,
+    isLoading: isLoadingTransactions,
+    error: transactionError
+  });
+
+  
+  // Thêm useEffect để cập nhật filteredTransactions khi employeeTransactions thay đổi
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
+    setFilteredTransactions(employeeTransactions || []);
+  }, [employeeTransactions]);
+
   // Filter transactions with animation effect
   useEffect(() => {
     setIsSearching(true);
     const timer = setTimeout(() => {
       if (!searchTerm.trim()) {
-        setFilteredTransactions(employee?.transactions || []);
+        // Sử dụng employeeTransactions thay vì employee?.transactions
+        setFilteredTransactions(employeeTransactions || []);
       } else {
         const searchTermLower = searchTerm.toLowerCase();
-        const filtered = (employee?.transactions || []).filter(transaction => {
+        // Sử dụng employeeTransactions thay vì employee?.transactions
+        const filtered = (employeeTransactions || []).filter(transaction => {
           // Search across multiple fields
           return (
             (transaction.type && transaction.type.toLowerCase().includes(searchTermLower)) ||
@@ -63,7 +75,12 @@ function EmployeeTransactionHistory({ employee }) {
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, employee?.transactions]);
+  }, [searchTerm, employeeTransactions]);
+
+  // Show shimmer loading state khi đang tải dữ liệu
+  if (isLoadingTransactions) {
+    return <TransactionHistoryShimmer dateCount={3} transactionsPerDate={2} />;
+  }
   
   // Toggle transaction expansion
   const toggleTransaction = (transactionId) => {
@@ -180,6 +197,7 @@ function EmployeeTransactionHistory({ employee }) {
   
   // Group transactions by date
   const groupTransactionsByDate = (transactions) => {
+    console.log("transactions: ", transactions);
     if (!transactions || transactions.length === 0) return {};
     
     const grouped = {};
@@ -191,12 +209,16 @@ function EmployeeTransactionHistory({ employee }) {
       }
       grouped[date].push(transaction);
     });
+
     
     return grouped;
   };
   
+
   // Get grouped transactions
   const groupedTransactions = groupTransactionsByDate(filteredTransactions);
+
+  
   
   // Sort dates in descending order (newest first)
   const sortedDates = Object.keys(groupedTransactions).sort((a, b) => {
@@ -210,10 +232,12 @@ function EmployeeTransactionHistory({ employee }) {
     return dateB - dateA; // Descending order
   });
   
-  // Show shimmer loading state
-  if (isLoading) {
-    return <TransactionHistoryShimmer dateCount={3} transactionsPerDate={2} />;
-  }
+  // Thêm console.log cho sortedDates
+  console.log('sortedDates:', {
+    originalTransactions: employeeTransactions,
+    uniqueDates: [...new Set(employeeTransactions?.map((t) => t.date) || [])],
+    sortedDates: sortedDates
+  });
   
   return (
     <motion.div

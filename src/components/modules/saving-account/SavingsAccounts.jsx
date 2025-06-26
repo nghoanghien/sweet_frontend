@@ -384,7 +384,7 @@ const SavingsAccounts = ({ customerId }) => {
 
   // Tính tổng số dư và số tài khoản
   const totalDeposit = savingAccounts.reduce((sum, account) => sum + account.remainingAmount, 0);
-  const totalInterest = savingAccounts.reduce((sum, account) => sum + (account.totalReceivable - account.remainingAmount), 0);
+  const totalInterest = savingAccounts.reduce((sum, account) => sum + (account.totalReceivable), 0);
   const activeAccountsCount = savingAccounts.length;
 
   // Toggle ẩn/hiện tất cả thông tin nhạy cảm
@@ -467,7 +467,7 @@ const SavingsAccounts = ({ customerId }) => {
     // Tính lãi dự kiến
     const amount = parseFloat(formData.amount);
     const interestRate = parseFloat(formData.interestRate);
-    const expectedInterest = (amount * interestRate * termDays / 365) / 100;
+    const expectedInterest = (amount * interestRate * termDays / 365);
     
     // Chuyển đổi depositType từ "standard" sang "Tiền gửi tiêu chuẩn"
     const depositTypeDisplay = formData.depositType === 'standard' ? 'Tiền gửi tiêu chuẩn' : 'Rút gốc linh hoạt';
@@ -475,7 +475,7 @@ const SavingsAccounts = ({ customerId }) => {
     // Chuyển đổi interestPaymentType từ "end_of_term" sang "Cuối kỳ"
     const interestFrequencyMap = {
       "end_of_term": "Cuối kỳ",
-      "monthly": "Hàng tháng",
+      "monthly": "Hàng remainingAmounttháng",
       "quarterly": "Hàng quý",
       "yearly": "Đầu kỳ"
     };
@@ -587,10 +587,11 @@ const SavingsAccounts = ({ customerId }) => {
           confirmDetails={
             newAccountData
               ? {
-                  "Số tiền gửi": newAccountData.amount,
-                  "Kỳ hạn": newAccountData.term,
-                  "Lãi suất": `${(parseFloat(newAccountData.interestRate) * 100).toLocaleString()}%/năm`,
-                  "Ngày đáo hạn": newAccountData.endDate
+                  "Số tiền gửi": formatCurrency(newAccountData.amount),
+                "Kỳ hạn": newAccountData.term,
+                "Lãi suất": `${(parseFloat(newAccountData.interestRate) * 100).toLocaleString()}%/năm`,
+                "Tổng tiền nhận dự kiến": formatCurrency(
+                  newAccountData.totalReceivable)
                 }
               : {}
           }

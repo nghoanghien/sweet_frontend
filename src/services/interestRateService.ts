@@ -37,3 +37,18 @@ export const getInterestRateData = async () => {
   });
   return mapped;
 };
+
+export const getMinDepositAmount = async () => {
+  try {
+    const response = await callGetQuyDinhLaiSuatHienTai();
+    if (response && response.data) {
+      return {
+        soTienGuiToiThieu: response.data.soTienGuiToiThieu
+      };
+    }
+    throw new Error("Không thể lấy dữ liệu lãi suất");
+  } catch (error) {
+    console.error("Lỗi khi gọi API lãi suất:", error);
+    throw error;
+  }
+};

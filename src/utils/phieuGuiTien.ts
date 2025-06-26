@@ -21,7 +21,7 @@ interface SavingAccountData {
 export const convertToPhieuGuiTienData = (
   accountData: SavingAccountData,
   customerId: number,
-  giaoDichVienId: number = 1
+  giaoDichVienId: number 
 ): IPhieuGuiTienReqDTO => {
   // Chuyển đổi term từ "12 tháng" sang số tháng
   const termMatch = accountData.term.match(/(\d+)\s*tháng/);
@@ -45,7 +45,7 @@ export const convertToPhieuGuiTienData = (
   let kenhGiaoDichId = 1; // Mặc định là 1 (quầy giao dịch)
   if (accountData.channel) {
     // Ánh xạ tên kênh giao dịch sang ID
-    if (accountData.channel === "Internet Banking") kenhGiaoDichId = 2;
+    if (accountData.channel !== "cash_at_counter") kenhGiaoDichId = 2;
   }
   
   // Tạo dữ liệu phiếu gửi tiền
