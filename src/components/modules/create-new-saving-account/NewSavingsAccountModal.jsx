@@ -8,6 +8,7 @@ import MobileBottomCard from './MobileBottomCard';
 import { DepositTypeShimmer, SourceAccountShimmer, AmountInputShimmer } from '@/components/ui/custom/shimmer-types/NewSavingsAccountModalShimmer';
 import TextShimmer from '@/components/ui/custom/shimmer-types/TextShimmer';
 import { useInterestRateData } from "@/hooks/interestRateHooks";
+import { usePaymentAccountByCustomerId } from '@/hooks/usePaymentAccount';
 
 
 
@@ -47,25 +48,15 @@ const availableMaturityOptionsByInterestPaymentType = {
   'yearly': ['receive_all', 'rollover_principal']
 };
 
-const paymentAccounts = [
-  {
-  id: 1,
-  accountNumber: "1234567890123456",
-  status: "active",
-  balance: 15000000,
-  creationDate: "20/04/2022",
-  color: "bg-gradient-to-r from-blue-400 to-indigo-500",
-  icon: <CreditCard size={24} className="text-white" />
-}
-];
+// paymentAccounts sẽ được lấy từ hook usePaymentAccountByCustomerId
 
-const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=false }) => {
+const NewSavingsAccountModal = ({ isOpen, onClose, onCreateAccount, isAdmin=false, customerId }) => {
   const [step, setStep] = useState(1); // 1: Loại tiền gửi, 2: Tài khoản & số tiền, 3: Kỳ hạn & lãi suất, 4: Xác nhận
   const [formData, setFormData] = useState({
     nickname: '',
     amount: '',
-    sourceAccount: paymentAccounts[0].id.toString(),
-    targetAccount: paymentAccounts[0].id.toString(),
+    sourceAccount: '',
+    targetAccount: '',
     term: '12_months', // Sử dụng định dạng giống như trong sweet-main
     interestRate: '6.8',
     depositType: 'standard', // standard hoặc flexible
@@ -119,6 +110,8 @@ const availableTermsByInterestType = {
     "yearly": "Đầu kỳ hạn"
   };
 
+
+
   // Reset form khi đóng modal
   useEffect(() => {
     setTimeout(() => {
@@ -138,7 +131,7 @@ const availableTermsByInterestType = {
         nickname: '',
         amount: '',
         sourceAccount: '',
-        targetAccount: paymentAccounts[0].id.toString(),
+        targetAccount: '',
         term: '12_months',
         interestRate: '6.8',
         depositType: 'standard',
@@ -151,29 +144,9 @@ const availableTermsByInterestType = {
     }
   }, [isOpen]);
 
-  // Handle loading when step changes
-  useEffect(() => {
-    if (isOpen && step > 1) {
-      if (step === 2) {
-        setLoadingStates(prev => ({ 
-          ...prev, 
-          sourceAccount: true, 
-          amountInfo: true,
-          amountInput: true,
-          balanceInfo: true 
-        }));
-        setTimeout(() => {
-          setLoadingStates(prev => ({ 
-            ...prev, 
-            sourceAccount: false, 
-            amountInfo: false,
-            amountInput: false,
-            balanceInfo: false 
-          }));
-        }, 1200);
-      }
-    }
-  }, [step, isOpen]);
+
+
+
 
   // Handle loading when source account changes (only for balance info, not minimum amount)
   useEffect(() => {
@@ -299,7 +272,7 @@ const availableTermsByInterestType = {
       }
       
       // Kiểm tra số dư tài khoản nếu không phải là tiền mặt tại quầy
-      if (formData.sourceAccount && formData.sourceAccount !== 'cash_at_counter' && formData.amount) {
+      if (formData.sourceAccount && formData.sourceAccount !== 'cash_at_counter' && formData.amount && paymentAccounts) {
         const selectedAccount = paymentAccounts.find(acc => acc.id === parseInt(formData.sourceAccount));
         if (selectedAccount && parseFloat(formData.amount) > selectedAccount.balance) {
           errors.amount = 'Số dư tài khoản không đủ để thực hiện giao dịch';
@@ -450,13 +423,67 @@ const availableTermsByInterestType = {
   };
 
   const { data: interestRateData, isLoading: isLoadingInterestRate, minDepositAmount } = useInterestRateData(isOpen);
+  const { paymentAccounts, isLoading: isLoadingPaymentAccounts, error: paymentAccountsError } = usePaymentAccountByCustomerId(customerId);
+
+  // Cập nhật formData khi paymentAccounts được load
+  useEffect(() => {
+    if (paymentAccounts && paymentAccounts.length > 0 && !formData.sourceAccount) {
+      setFormData(prev => ({
+        ...prev,
+        sourceAccount: paymentAccounts[0]?.id.toString(),
+        targetAccount: paymentAccounts[0]?.id.toString()
+      }));
+    }
+  }, [paymentAccounts, formData.sourceAccount]);
+
+  // Handle loading when step changes
+  useEffect(() => {
+    if (isOpen && step > 1) {
+      if (step === 2) {
+        setLoadingStates(prev => ({ 
+          ...prev, 
+          sourceAccount: true, 
+          amountInfo: true,
+          amountInput: true,
+          balanceInfo: true 
+        }));
+        // Chỉ tắt loading khi payment accounts đã load xong
+        if (!isLoadingPaymentAccounts) {
+          setTimeout(() => {
+            setLoadingStates(prev => ({ 
+              ...prev, 
+              sourceAccount: false, 
+              amountInfo: false,
+              amountInput: false,
+              balanceInfo: false 
+            }));
+          }, 1500);
+        }
+      }
+    }
+  }, [step, isOpen, isLoadingPaymentAccounts]);
+
+  // Tắt loading states khi payment accounts load xong
+  useEffect(() => {
+    if (!isLoadingPaymentAccounts && step === 2) {
+      setTimeout(() => {
+        setLoadingStates(prev => ({ 
+          ...prev, 
+          sourceAccount: false, 
+          amountInfo: false,
+          amountInput: false,
+          balanceInfo: false 
+        }));
+      }, 1500);
+    }
+  }, [isLoadingPaymentAccounts, step]);
 
   
 
   if (!isOpen) return null;
 
   // Check if any loading state is true
-  const isAnyLoading = Object.values(loadingStates).some(state => state === true);
+  const isAnyLoading = Object.values(loadingStates).some(state => state === true) || (step === 2 && isLoadingPaymentAccounts);
 
   // Animation variants for staggered children animations
   const containerVariants = {
@@ -937,9 +964,15 @@ const availableTermsByInterestType = {
                             </motion.div>
 
                             {/* Payment accounts - Mobile Optimized with Pink Theme */}
-                            {paymentAccounts
-                              .filter((account) => account.status === "active")
-                              .map((account) => (
+                            {isLoadingPaymentAccounts ? (
+                              <div className="text-center py-4">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto"></div>
+                                <p className="text-slate-600 mt-2">Đang tải tài khoản thanh toán...</p>
+                              </div>
+                            ) : paymentAccounts && paymentAccounts.length > 0 ? (
+                              paymentAccounts
+                                .filter((account) => account.paymentAccountStatus === "active")
+                                .map((account) => (
                                 <motion.div
                                   key={account.id}
                                   whileHover={{
@@ -1003,7 +1036,7 @@ const availableTermsByInterestType = {
                                     <div className="relative z-10">
                                       <div className="flex items-center justify-between mb-2">
                                         <div className="text-sm sm:text-base font-semibold text-slate-800 truncate pr-2">
-                                          {account.nickname}
+                                          Tài khoản thanh toán
                                         </div>
                                         {formData.sourceAccount ===
                                           account.id.toString() && (
@@ -1026,7 +1059,7 @@ const availableTermsByInterestType = {
                                       </div>
                                       <div className="text-xs sm:text-sm text-slate-600/80 mb-2 truncate">
                                         {maskAccountNumber(
-                                          account.accountNumber
+                                          account.id.toString()
                                         )}
                                       </div>
                                       <div className="text-base sm:text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
@@ -1038,7 +1071,16 @@ const availableTermsByInterestType = {
                                   {/* Glass reflection effect */}
                                   <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 to-transparent opacity-60 pointer-events-none"></div>
                                 </motion.div>
-                              ))}
+                              ))
+                            ) : (
+                              <div className="text-center py-8">
+                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                  <CreditCard size={24} className="text-slate-400" />
+                                </div>
+                                <p className="text-slate-600 font-medium">Không có tài khoản thanh toán nào</p>
+                                <p className="text-slate-500 text-sm mt-1">Vui lòng tạo tài khoản thanh toán trước</p>
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1168,7 +1210,7 @@ const availableTermsByInterestType = {
                                    Số dư khả dụng:{" "}
                                    <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
                                      {formatCurrency(
-                                       paymentAccounts.find(
+                                       paymentAccounts?.find(
                                          (acc) =>
                                            acc.id ===
                                            parseInt(formData.sourceAccount)
@@ -1193,7 +1235,7 @@ const availableTermsByInterestType = {
                                        Số dư khả dụng:{" "}
                                        <span className="font-semibold bg-gradient-to-r from-slate-700 to-slate-600 bg-clip-text text-transparent">
                                          {formatCurrency(
-                                           paymentAccounts.find(
+                                           paymentAccounts?.find(
                                              (acc) =>
                                                acc.id ===
                                                parseInt(formData.sourceAccount)

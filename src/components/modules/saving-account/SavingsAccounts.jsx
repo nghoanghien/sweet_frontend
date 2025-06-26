@@ -1121,6 +1121,7 @@ const SavingsAccounts = ({ customerId }) => {
         onClose={() => setIsNewAccountModalOpen(false)}
         onCreateAccount={prepareNewAccount}
         isAdmin={true}
+        customerId={customerId}
       />
 
       {/* Drawer chi tiết tài khoản */}
