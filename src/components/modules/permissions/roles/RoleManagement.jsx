@@ -6,7 +6,7 @@ import RoleFormModal from './RoleFormModal';
 import DeleteRoleModal from './DeleteRoleModal';
 import ExportNotification from '../../../common/ExportNotification';
 import RoleCardShimmer from '../../../ui/custom/shimmer-types/RoleCardShimmer';
-import { useAllRoles, useUpdateRole } from '@/hooks/useAllRoles';
+import { useAllRoles, useUpdateRole, useAddRole } from '@/hooks/useAllRoles';
 import { getPermissionLabel } from '@/utils/permissions';
 
 const RoleManagement = () => {
@@ -40,12 +40,18 @@ const RoleManagement = () => {
 
   const { allRoles, isLoading, error: fetchError, refreshRoles } = useAllRoles();
   const { updateRoleData, isLoading: isUpdating, error: updateError } = useUpdateRole();
+  const { addRoleData, isLoading: isAdding, error: addError } = useAddRole();
   
-  // Theo dõi thay đổi của updateError
+  // Theo dõi thay đổi của updateError và addError
   useEffect(() => {
     if (updateError) {
     }
   }, [updateError]);
+  
+  useEffect(() => {
+    if (addError) {
+    }
+  }, [addError]);
   
   // Transform API data to component format
   const transformRoleData = (apiRoles) => {
@@ -154,14 +160,25 @@ const RoleManagement = () => {
           );
         }
       } else {
-        // TODO: Implement API call for creating new role
+        // Thêm vai trò mới
+        const result = await addRoleData(role);
+        
         setShowFormModal(false);
         
-        if (notificationInfo) {
+        // Kiểm tra lỗi từ result thay vì state addError
+        if (result && !result.error) {
           showNotification(
             notificationInfo.message,
             notificationInfo.type,
             notificationInfo.format || ''
+          );
+          // Refresh data sau khi thêm
+          refreshRoles();
+        } else {
+          showNotification(
+            'Có lỗi xảy ra khi thêm vai trò!',
+            'error',
+            result?.error ? String(result.error) : 'Lỗi không xác định',
           );
         }
       }

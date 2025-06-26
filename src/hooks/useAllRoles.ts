@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react"
-import { getAllRoles, updateRole } from "@/services/permissions";
+import { getAllRoles, updateRole, addNewRole } from "@/services/permissions";
 import { Role } from "@/types/interfaces/user";
 import { Permission } from "@/types/interfaces/enums";
 
@@ -95,4 +95,57 @@ export const useUpdateRole = () => {
   }, []);
 
   return { updateRoleData, isLoading, error };
+}
+
+export const useAddRole = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  
+  // Theo dõi thay đổi của error state
+  useEffect(() => {
+    if (error) {
+    }
+  }, [error]);
+  
+  const addRoleData = useCallback(async (formData: any) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const startTime = Date.now();
+      
+      // Chuyển đổi formData thành Role object
+      const roleData: Role = {
+        roleID: 0, // ID sẽ được tạo tự động bởi backend
+        roleName: formData.name,
+        description: formData.description,
+        active: true,
+        customerRole: formData.type === 'customer',
+        permissions: formData.permissions.map((p: any) => p.id as Permission)
+      };
+      
+      console.log("Du lieu vai tro can them:", roleData);
+      
+      const result = await addNewRole(roleData);
+      
+      // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1500 - elapsedTime);
+      
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setError(null);
+      }
+      return result;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return { addRoleData, isLoading, error };
 }
