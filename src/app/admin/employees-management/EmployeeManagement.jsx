@@ -1429,6 +1429,7 @@ export default function EmployeeManagement() {
       {/* Employee Detail Modal */}
       <AnimatePresence mode="wait">
         {isModalOpen && selectedEmployee && (
+          console.log("Thong tin nhan vien", selectedEmployee),
           <motion.div
             key="employee-detail-modal"
             initial={{ opacity: 0 }}

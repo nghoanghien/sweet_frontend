@@ -21,3 +21,4 @@ export function getChannelByCode(code: number): Channel {
       return Channel.OVER_THE_COUNTER;
   }
 }
+
