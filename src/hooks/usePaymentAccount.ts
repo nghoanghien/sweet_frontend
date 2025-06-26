@@ -16,9 +16,19 @@ export const usePaymentAccountByCustomerId = (customerId: number) => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        const startTime = Date.now();
+        
         const paymentAccounts = await getPaymentAccountById(customerId);
         console.log("Dữ liệu tài khoản thanh toán đã lấy:", paymentAccounts);
         setData(paymentAccounts);
+        
+        // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 1500 - elapsedTime);
+        
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+        
+        setError(null);
       } catch (err) {
         setError(err);
         console.log(err);

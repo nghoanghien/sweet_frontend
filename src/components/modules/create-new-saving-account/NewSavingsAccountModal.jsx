@@ -7,9 +7,7 @@ import { formatCurrency } from '@/utils/accountUtils';
 import MobileBottomCard from './MobileBottomCard';
 import { DepositTypeShimmer, SourceAccountShimmer, AmountInputShimmer } from '@/components/ui/custom/shimmer-types/NewSavingsAccountModalShimmer';
 import TextShimmer from '@/components/ui/custom/shimmer-types/TextShimmer';
-import { callGetQuyDinhLaiSuatHienTai } from "@/config/api"; // Đảm bảo import đúng path
 import { useInterestRateData } from "@/hooks/interestRateHooks";
-import { useMinDepositAmount } from "@/hooks/useParameters";
 
 
 
@@ -453,19 +451,7 @@ const availableTermsByInterestType = {
 
   const { data: interestRateData, isLoading: isLoadingInterestRate, minDepositAmount } = useInterestRateData(isOpen);
 
-  // Add useEffect to reset loading states when isLoadingInterestRate becomes false
-  useEffect(() => {
-    if (!isLoadingInterestRate) {
-      setLoadingStates(prevStates => {
-        const resetStates = {};
-        // Set all loading states to false
-        Object.keys(prevStates).forEach(key => {
-          resetStates[key] = false;
-        });
-        return resetStates;
-      });
-    }
-  }, [isLoadingInterestRate]);
+  
 
   if (!isOpen) return null;
 
