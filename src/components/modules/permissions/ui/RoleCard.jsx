@@ -241,8 +241,17 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       {/* Footer */}
       <div className="flex items-center justify-between">
         <div className="flex items-center text-sm text-gray-600">
-          <Users size={16} className="mr-1" />
-          <span>{role.accountCount || 0} tài khoản</span>
+          {role.type === 'customer' ? (
+            <>
+              <Users size={16} className="mr-1" />
+              <span>Vai trò khách hàng</span>
+            </>
+          ) : (
+            <>
+              <UserCog size={16} className="mr-1" />
+              <span>Vai trò nhân viên</span>
+            </>
+          )}
         </div>
 
         {/* Action buttons */}

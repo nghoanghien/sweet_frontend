@@ -1,4 +1,4 @@
-import { createVaiTro, getAllVaiTro, updateVaiTro } from "@/config/api"
+import { createVaiTro, deleteVaiTro, getAllVaiTro, updateVaiTro } from "@/config/api"
 import { mapApiToRole, mapRoleToIVaiTroDTO } from "@/mappers/permissions.mapper";
 import { Role } from "@/types/interfaces/user";
 
@@ -19,6 +19,15 @@ export const updateRole = async (id: string, newRole: Role) => {
 export const addNewRole = async(newRole: Role) => {
   try {
     const response = await createVaiTro(mapRoleToIVaiTroDTO(newRole));
+    return response;
+  } catch (error) {
+    throw new Error(error as string);
+  }
+}
+
+export const deleteRole = async (id: number) => {
+  try {
+    const response = await deleteVaiTro(id.toString());
     return response;
   } catch (error) {
     throw new Error(error as string);

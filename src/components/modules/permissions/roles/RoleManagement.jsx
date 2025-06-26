@@ -6,7 +6,7 @@ import RoleFormModal from './RoleFormModal';
 import DeleteRoleModal from './DeleteRoleModal';
 import ExportNotification from '../../../common/ExportNotification';
 import RoleCardShimmer from '../../../ui/custom/shimmer-types/RoleCardShimmer';
-import { useAllRoles, useUpdateRole, useAddRole } from '@/hooks/useAllRoles';
+import { useAllRoles, useUpdateRole, useAddRole, useDeleteRole } from '@/hooks/useAllRoles';
 import { getPermissionLabel } from '@/utils/permissions';
 
 const RoleManagement = () => {
@@ -41,6 +41,7 @@ const RoleManagement = () => {
   const { allRoles, isLoading, error: fetchError, refreshRoles } = useAllRoles();
   const { updateRoleData, isLoading: isUpdating, error: updateError } = useUpdateRole();
   const { addRoleData, isLoading: isAdding, error: addError } = useAddRole();
+  const { deleteRoleData, isLoading: isDeleting, error: deleteError } = useDeleteRole();
   
   // Theo dõi thay đổi của updateError và addError
   useEffect(() => {
@@ -52,6 +53,11 @@ const RoleManagement = () => {
     if (addError) {
     }
   }, [addError]);
+  
+  useEffect(() => {
+    if (deleteError) {
+    }
+  }, [deleteError]);
   
   // Transform API data to component format
   const transformRoleData = (apiRoles) => {
@@ -74,8 +80,8 @@ const RoleManagement = () => {
     });
   };
   
-  // Use transformed data instead of mock data
-  const rolesList = allRoles ? transformRoleData(allRoles) : [];
+  // Use transformed data instead of mock data and filter only active roles
+  const rolesList = allRoles ? transformRoleData(allRoles).filter(role => role.active) : [];
 
   // Hàm hiển thị thông báo
   const showNotification = (message, type = 'success', format = '') => {
@@ -194,19 +200,39 @@ const RoleManagement = () => {
   };
 
   // Xử lý khi xác nhận xóa vai trò
-  const handleConfirmDelete = (notificationInfo) => {
+  const handleConfirmDelete = async (notificationInfo) => {
     if (selectedRole) {
-      // TODO: Implement API call for deleting role
-      // For now, just refresh the data
-      refreshRoles();
-      setShowDeleteModal(false);
-      
-      // Hiển thị thông báo nếu có
-      if (notificationInfo) {
+      try {
+        const result = await deleteRoleData(selectedRole.id);
+        
+        setShowDeleteModal(false);
+        
+        // Kiểm tra lỗi từ result thay vì state deleteError
+        if (result && !result.error) {
+          // Hiển thị thông báo nếu có
+          if (notificationInfo) {
+            showNotification(
+              notificationInfo.message,
+              notificationInfo.type,
+              notificationInfo.format || ''
+            );
+          }
+          // Refresh data sau khi xóa
+          refreshRoles();
+        } else {
+          showNotification(
+            'Có lỗi xảy ra khi xóa vai trò!',
+            'error',
+            result?.error ? String(result.error) : 'Lỗi không xác định',
+          );
+        }
+      } catch (error) {
+        console.error("Lỗi khi xóa vai trò:", error);
+        // Hiển thị thông báo lỗi
         showNotification(
-          notificationInfo.message,
-          notificationInfo.type,
-          notificationInfo.format || ''
+          'Có lỗi xảy ra khi xóa vai trò!',
+          'error',
+          error,
         );
       }
     }

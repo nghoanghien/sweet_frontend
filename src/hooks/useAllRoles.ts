@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react"
-import { getAllRoles, updateRole, addNewRole } from "@/services/permissions";
+import { getAllRoles, updateRole, addNewRole, deleteRole } from "@/services/permissions";
 import { Role } from "@/types/interfaces/user";
 import { Permission } from "@/types/interfaces/enums";
 
@@ -148,4 +148,47 @@ export const useAddRole = () => {
   }, []);
 
   return { addRoleData, isLoading, error };
+}
+
+export const useDeleteRole = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  
+  // Theo dõi thay đổi của error state
+  useEffect(() => {
+    if (error) {
+    }
+  }, [error]);
+  
+  const deleteRoleData = useCallback(async (roleId: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const startTime = Date.now();
+      
+      console.log("ID vai tro can xoa:", roleId);
+      
+      const result = await deleteRole(roleId);
+      
+      // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1500 - elapsedTime);
+      
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setError(null);
+      }
+      return result;
+    } catch (err) {
+      setError(err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return { deleteRoleData, isLoading, error };
 }

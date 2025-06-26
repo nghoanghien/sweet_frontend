@@ -3,8 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, Trash2, UserMinus } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import Skeleton from '@/components/ui/custom/Skeleton';
+import { useDeleteRole } from '@/hooks/useAllRoles';
 
 const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
+  // Hook để xóa vai trò
+  const { deleteRoleData, isLoading: isDeleting, error: deleteError } = useDeleteRole();
+  
   // State cho modal xác nhận
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -64,32 +68,53 @@ const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
       `Xác nhận xóa vai trò "${role.name}"?`,
       'danger',
       confirmDetails,
-      () => {
+      async () => {
         // Cập nhật trạng thái đang xử lý
         setConfirmationProcessing(true);
         
-        // Giả lập thời gian xử lý API
-        setTimeout(() => {
-          try {
+        try {
+          // Gọi API xóa vai trò
+          const result = await deleteRoleData(role.id);
+          
+          if (result && !result.error) {
             // Tạo thông tin thông báo
-        const notificationInfo = {
-          message: 'Xóa vai trò thành công!',
-          type: 'success',
-          format: `Đã xóa vai trò "${role.name}" thành công!`
-        };
-        
-        // Gọi hàm onConfirm từ props với thông tin thông báo
-        onConfirm(notificationInfo);
+            const notificationInfo = {
+              message: 'Xóa vai trò thành công!',
+              type: 'success',
+              format: `Đã xóa vai trò "${role.name}" thành công!`
+            };
             
+            // Gọi hàm onConfirm từ props với thông tin thông báo
+            onConfirm(notificationInfo);
+                
             // Đóng modal chính ngay lập tức
             onClose();
-          } finally {
-            // Đặt lại trạng thái xử lý
-            setConfirmationProcessing(false);
-            // Đóng modal xác nhận
-            closeConfirmModal();
+          } else {
+            // Xử lý lỗi từ API
+            const errorNotification = {
+              message: 'Có lỗi xảy ra khi xóa vai trò!',
+              type: 'error',
+              format: result?.error ? String(result.error) : 'Lỗi không xác định'
+            };
+            onConfirm(errorNotification);
+            onClose();
           }
-        }, 1500);
+        } catch (error) {
+          console.error("Lỗi khi xóa vai trò:", error);
+          // Xử lý lỗi exception
+          const errorNotification = {
+            message: 'Có lỗi xảy ra khi xóa vai trò!',
+            type: 'error',
+            format: String(error)
+          };
+          onConfirm(errorNotification);
+          onClose();
+        } finally {
+          // Đặt lại trạng thái xử lý
+          setConfirmationProcessing(false);
+          // Đóng modal xác nhận
+          closeConfirmModal();
+        }
       }
     );
   };
@@ -151,7 +176,6 @@ const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
                 Vai trò <span className="font-semibold text-red-600">{role.name}</span> sẽ bị xóa vĩnh viễn.
               </p>
               
-              {role.accountCount > 0 && (
                 <motion.div
                   className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-4 shadow-sm"
                   initial={{ opacity: 0, y: 10 }}
@@ -163,13 +187,12 @@ const DeleteRoleModal = ({ isOpen, onClose, onConfirm, role }) => {
                     <div>
                       <p className="text-amber-700 font-semibold">Cảnh báo quan trọng</p>
                       <p className="text-amber-600 text-sm mt-1">
-                        Hiện có <Skeleton isLoading={isLoading} width="w-16" height="h-4" className="inline-block"><span className="font-semibold">{role.accountCount} tài khoản</span></Skeleton> đang được gán vai trò này.
-                        Khi xóa, tất cả các tài khoản này sẽ được chuyển sang vai trò "Không có quyền" và sẽ không thể thực hiện bất kỳ thao tác nào.
+                        Khi xóa vai trò này, tất cả các tài khoản có vai trò này sẽ được chuyển sang vai trò "Không có quyền" và sẽ không thể thực hiện bất kỳ thao tác nào.
                       </p>
                     </div>
                   </div>
                 </motion.div>
-              )}
+              
             </div>
             
             {/* Footer */}
