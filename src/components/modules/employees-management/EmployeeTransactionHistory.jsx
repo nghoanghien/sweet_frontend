@@ -195,7 +195,7 @@ function EmployeeTransactionHistory({ employee }) {
     }
   };
   
-  // Group transactions by date
+  // Group transactions by date and sort by time within each date
   const groupTransactionsByDate = (transactions) => {
     console.log("transactions: ", transactions);
     if (!transactions || transactions.length === 0) return {};
@@ -210,6 +210,22 @@ function EmployeeTransactionHistory({ employee }) {
       grouped[date].push(transaction);
     });
 
+    // Sort transactions within each date by time (newest first)
+    Object.keys(grouped).forEach(date => {
+      grouped[date].sort((a, b) => {
+        // Assuming time format is HH:MM
+        const timeA = a.time || "00:00";
+        const timeB = b.time || "00:00";
+        
+        const [hoursA, minutesA] = timeA.split(':').map(Number);
+        const [hoursB, minutesB] = timeB.split(':').map(Number);
+        
+        const totalMinutesA = hoursA * 60 + minutesA;
+        const totalMinutesB = hoursB * 60 + minutesB;
+        
+        return totalMinutesB - totalMinutesA; // Descending order (newest first)
+      });
+    });
     
     return grouped;
   };
@@ -248,10 +264,9 @@ function EmployeeTransactionHistory({ employee }) {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="space-y-6"
     >
-      <div className="bg-white rounded-2xl md:border border-gray-200 shadow-sm md:p-6 space-y-6">
-
-        {/* Enhanced Search Section */}
-        <div className="relative mb-6">
+      {/* Sticky Enhanced Search Section */}
+      <div className="sticky top-0 z-50 bg-white rounded-2xl">
+        <div className="relative">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-2 border border-indigo-100/50 backdrop-blur-sm">
             <SearchBar
               searchTerm={searchTerm}
@@ -271,7 +286,7 @@ function EmployeeTransactionHistory({ employee }) {
 
           {/* Results count with animation */}
           {searchTerm && !isSearching && (
-            <div className="mt-3 text-xs text-gray-500 flex items-center gap-2 animate-fade-in">
+            <div className="mt-3 mb-3 mr-4 text-xs text-gray-500 flex items-center gap-2 animate-fade-in">
               <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
               <span>
                 Tìm thấy <strong>{filteredTransactions.length}</strong> kết quả
@@ -280,6 +295,9 @@ function EmployeeTransactionHistory({ employee }) {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="bg-white rounded-2xl md:border border-gray-200 shadow-sm md:p-6 space-y-6">
 
         {/* Timeline Transaction List */}
         <div className="relative">
@@ -296,7 +314,7 @@ function EmployeeTransactionHistory({ employee }) {
                       <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg z-20 translate-x-1 sm:translate-x-0 sticky-date-circle ">
                         <Calendar size={20} className="text-white" />
                       </div>
-                      <div className="ml-3 py-1 p-3 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl bg-white/70 backdrop-blur-sm sticky-date-info">
+                      <div className="ml-3 py-1 p-3 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-2xl bg-white/90 backdrop-blur-sm sticky-date-info border border-white/50">
                         <h4 className="font-semibold text-gray-800 text-base">
                           {date}
                         </h4>
@@ -583,8 +601,8 @@ function EmployeeTransactionHistory({ employee }) {
         /* Sticky date marker styles */
         .sticky-date-marker {
           position: sticky;
-          top: 20px;
-          z-index: 30;
+          top: 70px; /* Adjusted to account for sticky search section */
+          z-index: 40; /* Lower than search section but higher than content */
           padding: 8px 12px;
           margin: -8px -12px 0px -12px;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -681,10 +699,23 @@ function EmployeeTransactionHistory({ employee }) {
           box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
         }
 
+        /* Sticky search section styles */
+        .sticky.top-0 {
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Smooth transition for sticky elements */
+        .sticky {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
           .sticky-date-marker {
-            top: 10px;
+            top: 100px; /* Adjusted for mobile sticky search section */
             margin: -4px -8px 12px -8px;
             padding: 6px 8px;
           }
