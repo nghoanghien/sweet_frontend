@@ -91,8 +91,17 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
 
   const cardStyle = getCardStyle(role.type);
   const permissionStyle = getPermissionStyle(role.type);
-  const visiblePermissions = role.permissions.slice(0, 2);
-  const hiddenPermissions = role.permissions.slice(2);
+  
+  // Lọc bỏ PAYMENT_ACCOUNT và SAVING_ACCOUNTS cho role không phải customer
+  const filteredPermissions = role.type === 'customer' 
+    ? role.permissions 
+    : role.permissions.filter(permission => 
+        permission.id !== Permission.PAYMENT_ACCOUNT && 
+        permission.id !== Permission.SAVING_ACCOUNTS
+      );
+  
+  const visiblePermissions = filteredPermissions.slice(0, 2);
+  const hiddenPermissions = filteredPermissions.slice(2);
   const hasHiddenPermissions = hiddenPermissions.length > 0;
 
   return (
@@ -148,7 +157,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       <div className="mb-4">
         <p className="text-xs text-gray-500 mb-3 font-medium">Quyền hạn:</p>
         
-        {role.permissions.length === 0 ? (
+        {filteredPermissions.length === 0 ? (
           <span className="text-xs text-gray-400 italic">
             Không có quyền hạn
           </span>

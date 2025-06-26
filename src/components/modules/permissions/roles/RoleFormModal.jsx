@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, UserCheck, Shield, Users, Settings, Save, PlusCircle, CreditCard, PiggyBank, UserCog, Package, BarChart3, Crown, Sparkles, Zap, Plus, Minus, Check } from 'lucide-react';
 import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
+import { Permission, PermissionInfo } from '../../../../types/interfaces/enums';
 // Mock SwipeConfirmationModal component
 
 const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
@@ -33,145 +34,119 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
   // Memoize static data để tránh re-render không cần thiết
   const allPermissions = useMemo(() => [
     {
-      id: 'perm1',
-      name: 'Thanh toán',
-      type: 'customer',
-      description: 'Quyền thực hiện các giao dịch thanh toán'
-    },
-    {
-      id: 'perm2',
-      name: 'Tiết kiệm',
-      type: 'customer', 
-      description: 'Quyền sử dụng các tính năng tiết kiệm'
-    },
-    {
-      id: 'perm4',
-      name: 'Quản lý khách hàng & tiền gửi',
+      id: Permission.CUSTOMERS,
+      name: PermissionInfo[Permission.CUSTOMERS].label,
       type: 'staff',
-      description: 'Quyền quản lý thông tin khách hàng và tiền gửi'
+      description: PermissionInfo[Permission.CUSTOMERS].description
     },
     {
-      id: 'perm5',
-      name: 'Quản lý nhân viên',
+      id: Permission.EMPLOYEES,
+      name: PermissionInfo[Permission.EMPLOYEES].label,
       type: 'staff',
-      description: 'Quyền quản lý thông tin nhân viên'
+      description: PermissionInfo[Permission.EMPLOYEES].description
     },
     {
-      id: 'perm7',
-      name: 'Quản lý sản phẩm tiết kiệm',
+      id: Permission.SAVING_PRODUCTS,
+      name: PermissionInfo[Permission.SAVING_PRODUCTS].label,
       type: 'staff',
-      description: 'Quyền quản lý các sản phẩm tiết kiệm'
+      description: PermissionInfo[Permission.SAVING_PRODUCTS].description
     },
     {
-      id: 'perm8',
-      name: 'Báo cáo doanh số',
+      id: Permission.SALE_REPORTS,
+      name: PermissionInfo[Permission.SALE_REPORTS].label,
       type: 'staff',
-      description: 'Quyền xem và xuất báo cáo doanh số'
+      description: PermissionInfo[Permission.SALE_REPORTS].description
     },
     {
-      id: 'perm9',
-      name: 'Cài đặt hệ thống',
+      id: Permission.SETTINGS,
+      name: PermissionInfo[Permission.SETTINGS].label,
       type: 'staff',
-      description: 'Quyền cấu hình các thiết lập hệ thống'
+      description: PermissionInfo[Permission.SETTINGS].description
     },
     {
-      id: 'perm10',
-      name: 'Quản lý phân quyền',
+      id: Permission.PERMISSIONS,
+      name: PermissionInfo[Permission.PERMISSIONS].label,
       type: 'staff',
-      description: 'Quyền quản lý vai trò và phân quyền'
+      description: PermissionInfo[Permission.PERMISSIONS].description
     }
   ], []);
 
   // Memoize icon mapping
   const getPermissionIcon = useCallback((permissionId) => {
     const iconMap = {
-      'perm1': CreditCard,
-      'perm2': PiggyBank,
-      'perm4': Users,
-      'perm5': UserCog,
-      'perm6': Shield,
-      'perm7': Package,
-      'perm8': BarChart3,
-      'perm9': Settings,
-      'perm10': Shield
+      [Permission.PAYMENT_ACCOUNT]: CreditCard,
+      [Permission.SAVING_ACCOUNTS]: PiggyBank,
+      [Permission.CUSTOMERS]: Users,
+      [Permission.EMPLOYEES]: UserCog,
+      [Permission.SAVING_PRODUCTS]: Package,
+      [Permission.SALE_REPORTS]: BarChart3,
+      [Permission.SETTINGS]: Settings,
+      [Permission.PERMISSIONS]: Shield
     };
     return iconMap[permissionId] || Shield;
   }, []);
 
   // Memoize color mapping để tránh tính toán lại
   const getCardColors = useCallback((permissionId, type) => {
-    if (type === 'customer') {
-      const customerColors = {
-        'perm1': {
-          primary: '#10b981',
-          secondary: '#06d6a0',
-          dark: '#047857',
-          accent: '#6ee7b7',
-          light: '#d1fae5'
-        },
-        'perm2': {
-          primary: '#3b82f6',
-          secondary: '#8b5cf6',
-          dark: '#1e40af',
-          accent: '#93c5fd',
-          light: '#dbeafe'
-        }
-      };
-      return customerColors[permissionId] || customerColors['perm1'];
-    } else {
-      const staffColors = {
-        'perm4': {
-          primary: '#f59e0b',
-          secondary: '#ef4444',
-          dark: '#d97706',
-          accent: '#fbbf24',
-          light: '#fef3c7'
-        },
-        'perm5': {
-          primary: '#8b5cf6',
-          secondary: '#3b82f6',
-          dark: '#7c3aed',
-          accent: '#c4b5fd',
-          light: '#ede9fe'
-        },
-        'perm6': {
-          primary: '#06b6d4',
-          secondary: '#14b8a6',
-          dark: '#0891b2',
-          accent: '#67e8f9',
-          light: '#cffafe'
-        },
-        'perm7': {
-          primary: '#ec4899',
-          secondary: '#db2777',
-          dark: '#be185d',
-          accent: '#f472b6',
-          light: '#fce7f3'
-        },
-        'perm8': {
-          primary: '#14b8a6',
-          secondary: '#06b6d4',
-          dark: '#0f766e',
-          accent: '#7dd3fc',
-          light: '#ccfbf1'
-        },
-        'perm9': {
-          primary: '#6b7280',
-          secondary: '#64748b',
-          dark: '#4b5563',
-          accent: '#d1d5db',
-          light: '#f3f4f6'
-        },
-        'perm10': {
-          primary: '#ef4444',
-          secondary: '#ec4899',
-          dark: '#dc2626',
-          accent: '#fca5a5',
-          light: '#fee2e2'
-        }
-      };
-      return staffColors[permissionId] || staffColors['perm4'];
-    }
+    const staffColors = {
+      [Permission.PAYMENT_ACCOUNT]: {
+        primary: '#10b981',
+        secondary: '#06d6a0',
+        dark: '#047857',
+        accent: '#6ee7b7',
+        light: '#d1fae5'
+      },
+      [Permission.SAVING_ACCOUNTS]: {
+        primary: '#3b82f6',
+        secondary: '#8b5cf6',
+        dark: '#1e40af',
+        accent: '#93c5fd',
+        light: '#dbeafe'
+      },
+      [Permission.CUSTOMERS]: {
+        primary: '#f59e0b',
+        secondary: '#ef4444',
+        dark: '#d97706',
+        accent: '#fbbf24',
+        light: '#fef3c7'
+      },
+      [Permission.EMPLOYEES]: {
+        primary: '#8b5cf6',
+        secondary: '#3b82f6',
+        dark: '#7c3aed',
+        accent: '#c4b5fd',
+        light: '#ede9fe'
+      },
+      [Permission.SAVING_PRODUCTS]: {
+        primary: '#ec4899',
+        secondary: '#db2777',
+        dark: '#be185d',
+        accent: '#f472b6',
+        light: '#fce7f3'
+      },
+      [Permission.SALE_REPORTS]: {
+        primary: '#14b8a6',
+        secondary: '#06b6d4',
+        dark: '#0f766e',
+        accent: '#7dd3fc',
+        light: '#ccfbf1'
+      },
+      [Permission.SETTINGS]: {
+        primary: '#6b7280',
+        secondary: '#64748b',
+        dark: '#4b5563',
+        accent: '#d1d5db',
+        light: '#f3f4f6'
+      },
+      [Permission.PERMISSIONS]: {
+        primary: '#ef4444',
+        secondary: '#ec4899',
+        dark: '#dc2626',
+        accent: '#fca5a5',
+        light: '#fee2e2'
+      }
+    };
+    return staffColors[permissionId] || staffColors[Permission.CUSTOMERS];
   }, []);
 
   // Function để xác định trạng thái thay đổi của permission
@@ -313,7 +288,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
     const confirmDetails = {
       'Tên vai trò': formData.name,
       'Loại vai trò': formData.type === 'staff' ? 'Nhân viên' : 'Khách hàng',
-      'Số quyền hạn': formData.permissions.length
+      'Số quyền hạn': formData.permissions.length - 1
     };
     
     showConfirmModal(
@@ -326,7 +301,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
       () => {
         setConfirmationProcessing(true);
         
-        setTimeout(() => {
+        setTimeout(async () => {
           try {
             const notificationInfo = {
               message: isEditing 
@@ -338,7 +313,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
               : `Đã thêm vai trò "${formData.name}" thành công!`,
             };
             
-            onSave && onSave(formData, notificationInfo);
+            onSave && await onSave(formData, notificationInfo);
             onClose();
           } finally {
             setConfirmationProcessing(false);
@@ -825,7 +800,7 @@ const RoleFormModal = ({ isOpen, onClose, onSave, role, isEditing }) => {
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <div className="w-2 h-2 rounded-full bg-violet-400"></div>
                   <span className="font-medium">
-                    {formData.permissions.length} quyền hạn đã chọn
+                    {formData.permissions.length - 1} quyền hạn đã chọn
                   </span>
                 </div>
               </div>
