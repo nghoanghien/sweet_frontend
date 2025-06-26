@@ -24,7 +24,7 @@ function EmployeeTransactionHistory({ employee }) {
   const [expandedTransactions, setExpandedTransactions] = useState({});
   // State for search functionality
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredTransactions, setFilteredTransactions] = useState(employee?.transactions || []);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   // Loading state - starts as true and turns off after 3 seconds
   const { 
@@ -42,15 +42,22 @@ function EmployeeTransactionHistory({ employee }) {
   });
 
   
+  // Thêm useEffect để cập nhật filteredTransactions khi employeeTransactions thay đổi
+  useEffect(() => {
+    setFilteredTransactions(employeeTransactions || []);
+  }, [employeeTransactions]);
+
   // Filter transactions with animation effect
   useEffect(() => {
     setIsSearching(true);
     const timer = setTimeout(() => {
       if (!searchTerm.trim()) {
-        setFilteredTransactions(employee?.transactions || []);
+        // Sử dụng employeeTransactions thay vì employee?.transactions
+        setFilteredTransactions(employeeTransactions || []);
       } else {
         const searchTermLower = searchTerm.toLowerCase();
-        const filtered = (employee?.transactions || []).filter(transaction => {
+        // Sử dụng employeeTransactions thay vì employee?.transactions
+        const filtered = (employeeTransactions || []).filter(transaction => {
           // Search across multiple fields
           return (
             (transaction.type && transaction.type.toLowerCase().includes(searchTermLower)) ||
@@ -209,7 +216,7 @@ function EmployeeTransactionHistory({ employee }) {
   
 
   // Get grouped transactions
-  const groupedTransactions = groupTransactionsByDate(employeeTransactions);
+  const groupedTransactions = groupTransactionsByDate(filteredTransactions);
 
   
   
