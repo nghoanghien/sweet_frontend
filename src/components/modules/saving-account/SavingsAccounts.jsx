@@ -271,7 +271,6 @@ const SavingsAccounts = ({ customerId }) => {
 
   // Thêm event listeners cho việc rút tiền
   useEffect(() => {
-    console.log('useEffect cho event listeners được gọi lại, accounts:', savingAccounts);
     // Xử lý sự kiện rút toàn bộ tiền
     const handleFullWithdrawal = (event) => {
       console.log('Sự kiện rút toàn bộ tiền được kích hoạt:', event.detail);
@@ -563,6 +562,7 @@ const SavingsAccounts = ({ customerId }) => {
           onClose={() => setIsNewAccountModalOpen(false)}
           onCreateAccount={prepareNewAccount}
           isAdmin={true}
+          customerId={customerId}
         />
         
         {/* Modal xác nhận tạo tài khoản mới */}
