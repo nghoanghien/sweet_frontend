@@ -222,7 +222,16 @@ const availableTermsByInterestType = {
   // Cập nhật useEffect để tính toán lãi suất khi thay đổi các thông số liên quan
   useEffect(() => {
     if (isOpen && step >= 3 && formData.amount && parseInt(formData.amount) >= 100000) {
-      console.log("formData.amount:", formData.amount);
+      console.log("Step 3 - Current Interest Data:", {
+        step,
+        calculatedInterest,
+        formData: {
+          term: formData.term,
+          depositType: formData.depositType,
+          interestPaymentType: formData.interestPaymentType,
+          amount: formData.amount
+        }
+      });
       calculateInterest();
     }
   }, [formData.term, formData.depositType, formData.interestPaymentType, formData.amount, step, isOpen]);
@@ -352,9 +361,15 @@ const availableTermsByInterestType = {
     if (!finalData.nickname || finalData.nickname.trim() === '') {
       // Sử dụng tên mặc định là "Tiết kiệm [kỳ hạn]" hoặc "Tiết kiệm ngày [ngày hiện tại]"
       const today = new Date();
-      const dateStr = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+      const dateStr = `${today.getDate().toString().pad(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
       finalData.nickname = `Tiết kiệm ${termDisplayNames[finalData.term]} - ${dateStr}`;
     }
+    
+    // Log dữ liệu trước khi gửi
+    console.log('Calculated Interest Data:', {
+      calculatedInterest,
+      formData: finalData
+    });
     
     // Gọi callback với dữ liệu đã được chuẩn hóa
     onCreateAccount(finalData, calculatedInterest);
@@ -372,15 +387,24 @@ const availableTermsByInterestType = {
     let interestAmount = 0;
     const termMonths = parseInt(term.split('_')[0]) || (term === "1_month" ? 1 : 0);
     
+    console.log('Interest Calculation Input:', {
+      depositType,
+      interestPaymentType,
+      term,
+      amount: amountValue,
+      interestRate,
+      termMonths
+    });
+    
     // Tính lãi theo phương thức trả lãi
     if (interestPaymentType === "end_of_term") {
-      interestAmount = (amountValue * interestRate * termMonths / 12) ;
+      interestAmount = (amountValue * interestRate * termMonths / 12);
     } else {
       const periodsPerYear = interestPaymentType === "monthly" ? 12 : 
                             interestPaymentType === "quarterly" ? 4 : 1;
       
       const periodsTotal = periodsPerYear * termMonths / 12;
-      const ratePerPeriod = interestRate / periodsPerYear ;
+      const ratePerPeriod = interestRate / periodsPerYear;
       
       interestAmount = 0;
       let remainingPrincipal = amountValue;
@@ -390,6 +414,13 @@ const availableTermsByInterestType = {
         interestAmount += periodInterest;
       }
     }
+
+    console.log('Interest Calculation Results:', {
+      periodsPerYear: interestPaymentType === "monthly" ? 12 : 
+                     interestPaymentType === "quarterly" ? 4 : 1,
+      interestAmount,
+      totalAmount: amountValue + interestAmount
+    });
     
     // Cập nhật state
     setCalculatedInterest({

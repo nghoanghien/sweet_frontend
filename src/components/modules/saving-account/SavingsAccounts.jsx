@@ -435,16 +435,7 @@ const SavingsAccounts = ({ customerId }) => {
     let termDays = 0;
     
     // Xử lý term để lấy số tháng
-    let termMonths = 0;
-    if (formData.term === '1_month') {
-      termMonths = 1;
-    } else {
-      // Lấy số từ chuỗi như "12_months" -> 12
-      const match = formData.term.match(/^(\d+)_/);
-      if (match && match[1]) {
-        termMonths = parseInt(match[1]);
-      }
-    }
+    const termMonths = parseInt((formData.term).split('_')[0]) || (formData.term === "1_month" ? 1 : 0);
     
     // Tính ngày đáo hạn
     endDate.setMonth(endDate.getMonth() + termMonths);
@@ -467,17 +458,17 @@ const SavingsAccounts = ({ customerId }) => {
     // Tính lãi dự kiến
     const amount = parseFloat(formData.amount);
     const interestRate = parseFloat(formData.interestRate);
-    const expectedInterest = (amount * interestRate * termDays / 365);
+    const expectedInterest = parseFloat(amount * interestRate * termMonths / 12);
     
     // Chuyển đổi depositType từ "standard" sang "Tiền gửi tiêu chuẩn"
     const depositTypeDisplay = formData.depositType === 'standard' ? 'Tiền gửi tiêu chuẩn' : 'Rút gốc linh hoạt';
     
     // Chuyển đổi interestPaymentType từ "end_of_term" sang "Cuối kỳ"
     const interestFrequencyMap = {
-      "end_of_term": "Cuối kỳ",
-      "monthly": "Hàng remainingAmounttháng",
+      "end_of_term": "Cuối kỳ hạn",
+      "monthly": "Hàng tháng",
       "quarterly": "Hàng quý",
-      "yearly": "Đầu kỳ"
+      "yearly": "Đầu kỳ hạn"
     };
     
     // Chuyển đổi maturityOption
@@ -500,7 +491,7 @@ const SavingsAccounts = ({ customerId }) => {
       daysRemaining: termDays,
       accountNumber: `TK${Math.floor(1000000000 + Math.random() * 9000000000)}`,
       depositType: depositTypeDisplay,
-      interestFrequency: interestFrequencyMap[formData.interestPaymentType] || "Cuối kỳ",
+      interestFrequency: interestFrequencyMap[formData.interestPaymentType] || "Cuối kỳ hạn",
       maturityOption: maturityOptionMap[formData.maturityOption] || "Tự động tái tục gốc",
       receivedInterest: 0,
       totalReceivable: amount + expectedInterest,

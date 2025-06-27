@@ -10,6 +10,7 @@ import RegulationDetailModal from './RegulationDetailModal';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '@/components/common/ExportNotification';
 import RegulationCardShimmer from '@/components/ui/custom/shimmer-types/RegulationCardShimmer';
+import { useRegulationHistory } from '@/hooks/useRegulationHistoryHooks';
 
 const RegulationHistory = () => {
   // Component states
@@ -21,346 +22,347 @@ const RegulationHistory = () => {
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: 'success', message: '', details: null, format: '' });
   const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const { regulations, error, isLoading } = useRegulationHistory();
+  // const [isLoading, setIsLoading] = useState(true);
   
   // Mock data for regulations history
-  const [regulations, setRegulations] = useState([
-    {
-      id: 'reg999',
-      createdAt: '01/12/2024',
-      applicationDate: '30/12/2025',
-      description: 'Quy định lãi suất cho năm 2025 với mức tăng nhẹ để thích ứng với thị trường.',
-      creator: {
-        id: 'user789',
-        name: 'Lê Văn C'
-      },
-      minimumDeposit: 5000000,
-      noTermRate: 0.5,
-      savingsTypes: [
-        {
-          id: 'standard',
-          name: 'Tiết kiệm tiêu chuẩn',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 5.0 },
-            { termId: 't1', frequencyId: 'monthly', rate: 5.1 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 5.2 },
-            { termId: 't1', frequencyId: 'end', rate: 5.3 },
-            { termId: 't3', frequencyId: 'start', rate: 5.5 },
-            { termId: 't3', frequencyId: 'monthly', rate: 5.6 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 5.7 },
-            { termId: 't3', frequencyId: 'end', rate: 5.8 },
-            { termId: 't6', frequencyId: 'start', rate: 6.0 },
-            { termId: 't6', frequencyId: 'monthly', rate: 6.1 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 6.2 },
-            { termId: 't6', frequencyId: 'end', rate: 6.3 },
-            { termId: 't12', frequencyId: 'start', rate: 6.5 },
-            { termId: 't12', frequencyId: 'monthly', rate: 6.6 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 6.7 },
-            { termId: 't12', frequencyId: 'end', rate: 6.8 },
-          ]
-        }
-      ],
-      paymentFrequencies: [
-        { id: 'start', name: 'Đầu kỳ hạn' },
-        { id: 'monthly', name: 'Hàng tháng' },
-        { id: 'quarterly', name: 'Hàng quý' },
-        { id: 'end', name: 'Cuối kỳ hạn' }
-      ]
-    },
-    {
-      id: 'reg123',
-      createdAt: '16/06/2023',
-      applicationDate: null, // null means 'immediate'
-      description: 'Quy định lãi suất cơ bản áp dụng cho các sản phẩm tiết kiệm tiêu chuẩn và linh hoạt.',
-      creator: {
-        id: 'user456',
-        name: 'Trần Thị B'
-      },
-      minimumDeposit: 1000000,
-      noTermRate: 0.2,
-      savingsTypes: [
-        {
-          id: 'standard',
-          name: 'Tiết kiệm tiêu chuẩn',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 3.5 },
-            { termId: 't1', frequencyId: 'monthly', rate: 3.6 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 3.7 },
-            { termId: 't1', frequencyId: 'end', rate: 3.8 },
-            { termId: 't3', frequencyId: 'start', rate: 4.0 },
-            { termId: 't3', frequencyId: 'monthly', rate: 4.1 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 4.2 },
-            { termId: 't3', frequencyId: 'end', rate: 4.3 },
-            { termId: 't6', frequencyId: 'start', rate: 4.5 },
-            { termId: 't6', frequencyId: 'monthly', rate: 4.6 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 4.7 },
-            { termId: 't6', frequencyId: 'end', rate: 4.8 },
-            { termId: 't12', frequencyId: 'start', rate: 5.0 },
-            { termId: 't12', frequencyId: 'monthly', rate: 5.1 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 5.2 },
-            { termId: 't12', frequencyId: 'end', rate: 5.3 },
-          ]
-        },
-        {
-          id: 'flexible',
-          name: 'Tiết kiệm linh hoạt',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 4.0 },
-            { termId: 't1', frequencyId: 'monthly', rate: 4.1 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 4.2 },
-            { termId: 't1', frequencyId: 'end', rate: 4.3 },
-            { termId: 't3', frequencyId: 'start', rate: 4.5 },
-            { termId: 't3', frequencyId: 'monthly', rate: 4.6 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 4.7 },
-            { termId: 't3', frequencyId: 'end', rate: 4.8 },
-            { termId: 't6', frequencyId: 'start', rate: 5.0 },
-            { termId: 't6', frequencyId: 'monthly', rate: 5.1 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 5.2 },
-            { termId: 't6', frequencyId: 'end', rate: 5.3 },
-            { termId: 't12', frequencyId: 'start', rate: 5.5 },
-            { termId: 't12', frequencyId: 'monthly', rate: 5.6 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 5.7 },
-            { termId: 't12', frequencyId: 'end', rate: 5.8 },
-          ]
-        }
-      ],
-      paymentFrequencies: [
-        { id: 'start', name: 'Đầu kỳ hạn' },
-        { id: 'monthly', name: 'Hàng tháng' },
-        { id: 'quarterly', name: 'Hàng quý' },
-        { id: 'end', name: 'Cuối kỳ hạn' }
-      ]
-    },
-    {
-      id: 'reg456',
-      createdAt: '10/07/2023',
-      applicationDate: '15/07/2023',
-      description: 'Điều chỉnh lãi suất theo xu hướng thị trường, tăng nhẹ cho kỳ hạn dài.',
-      creator: {
-        id: 'user123',
-        name: 'Nguyễn Văn A'
-      },
-      minimumDeposit: 2000000,
-      noTermRate: 0.3,
-      savingsTypes: [
-        {
-          id: 'standard',
-          name: 'Tiết kiệm tiêu chuẩn',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 4.0 },
-            { termId: 't1', frequencyId: 'monthly', rate: 4.1 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 4.2 },
-            { termId: 't1', frequencyId: 'end', rate: 4.3 },
-            { termId: 't3', frequencyId: 'start', rate: 4.5 },
-            { termId: 't3', frequencyId: 'monthly', rate: 4.6 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 4.7 },
-            { termId: 't3', frequencyId: 'end', rate: 4.8 },
-            { termId: 't6', frequencyId: 'start', rate: 5.0 },
-            { termId: 't6', frequencyId: 'monthly', rate: 5.1 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 5.2 },
-            { termId: 't6', frequencyId: 'end', rate: 5.3 },
-            { termId: 't12', frequencyId: 'start', rate: 5.5 },
-            { termId: 't12', frequencyId: 'monthly', rate: 5.6 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 5.7 },
-            { termId: 't12', frequencyId: 'end', rate: 5.8 },
-          ]
-        },
-        {
-          id: 'flexible',
-          name: 'Tiết kiệm linh hoạt',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 4.5 },
-            { termId: 't1', frequencyId: 'monthly', rate: 4.6 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 4.7 },
-            { termId: 't1', frequencyId: 'end', rate: 4.8 },
-            { termId: 't3', frequencyId: 'start', rate: 5.0 },
-            { termId: 't3', frequencyId: 'monthly', rate: 5.1 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 5.2 },
-            { termId: 't3', frequencyId: 'end', rate: 5.3 },
-            { termId: 't6', frequencyId: 'start', rate: 5.5 },
-            { termId: 't6', frequencyId: 'monthly', rate: 5.6 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 5.7 },
-            { termId: 't6', frequencyId: 'end', rate: 5.8 },
-            { termId: 't12', frequencyId: 'start', rate: 6.0 },
-            { termId: 't12', frequencyId: 'monthly', rate: 6.1 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 6.2 },
-            { termId: 't12', frequencyId: 'end', rate: 6.3 },
-          ]
-        }
-      ],
-      paymentFrequencies: [
-        { id: 'start', name: 'Đầu kỳ hạn' },
-        { id: 'monthly', name: 'Hàng tháng' },
-        { id: 'quarterly', name: 'Hàng quý' },
-        { id: 'end', name: 'Cuối kỳ hạn' }
-      ]
-    },
-    {
-      id: 'reg789',
-      createdAt: '05/08/2023',
-      applicationDate: '01/09/2023',
-      description: 'Bổ sung kỳ hạn 24 tháng và điều chỉnh lãi suất cho phù hợp với chính sách mới.',
-      creator: {
-        id: 'user456',
-        name: 'Trần Thị B'
-      },
-      minimumDeposit: 3000000,
-      noTermRate: 0.4,
-      savingsTypes: [
-        {
-          id: 'standard',
-          name: 'Tiết kiệm tiêu chuẩn',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 },
-            { id: 't24', months: 24 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 4.2 },
-            { termId: 't1', frequencyId: 'monthly', rate: 4.3 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 4.4 },
-            { termId: 't1', frequencyId: 'end', rate: 4.5 },
-            { termId: 't3', frequencyId: 'start', rate: 4.7 },
-            { termId: 't3', frequencyId: 'monthly', rate: 4.8 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 4.9 },
-            { termId: 't3', frequencyId: 'end', rate: 5.0 },
-            { termId: 't6', frequencyId: 'start', rate: 5.2 },
-            { termId: 't6', frequencyId: 'monthly', rate: 5.3 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 5.4 },
-            { termId: 't6', frequencyId: 'end', rate: 5.5 },
-            { termId: 't12', frequencyId: 'start', rate: 5.7 },
-            { termId: 't12', frequencyId: 'monthly', rate: 5.8 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 5.9 },
-            { termId: 't12', frequencyId: 'end', rate: 6.0 },
-            { termId: 't24', frequencyId: 'start', rate: 6.2 },
-            { termId: 't24', frequencyId: 'monthly', rate: 6.3 },
-            { termId: 't24', frequencyId: 'quarterly', rate: 6.4 },
-            { termId: 't24', frequencyId: 'end', rate: 6.5 },
-          ]
-        },
-        {
-          id: 'flexible',
-          name: 'Tiết kiệm linh hoạt',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 },
-            { id: 't24', months: 24 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 4.7 },
-            { termId: 't1', frequencyId: 'monthly', rate: 4.8 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 4.9 },
-            { termId: 't1', frequencyId: 'end', rate: 5.0 },
-            { termId: 't3', frequencyId: 'start', rate: 5.2 },
-            { termId: 't3', frequencyId: 'monthly', rate: 5.3 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 5.4 },
-            { termId: 't3', frequencyId: 'end', rate: 5.5 },
-            { termId: 't6', frequencyId: 'start', rate: 5.7 },
-            { termId: 't6', frequencyId: 'monthly', rate: 5.8 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 5.9 },
-            { termId: 't6', frequencyId: 'end', rate: 6.0 },
-            { termId: 't12', frequencyId: 'start', rate: 6.2 },
-            { termId: 't12', frequencyId: 'monthly', rate: 6.3 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 6.4 },
-            { termId: 't12', frequencyId: 'end', rate: 6.5 },
-            { termId: 't24', frequencyId: 'start', rate: 6.7 },
-            { termId: 't24', frequencyId: 'monthly', rate: 6.8 },
-            { termId: 't24', frequencyId: 'quarterly', rate: 6.9 },
-            { termId: 't24', frequencyId: 'end', rate: 7.0 },
-          ]
-        }
-      ],
-      paymentFrequencies: [
-        { id: 'start', name: 'Đầu kỳ hạn' },
-        { id: 'monthly', name: 'Hàng tháng' },
-        { id: 'quarterly', name: 'Hàng quý' },
-        { id: 'end', name: 'Cuối kỳ hạn' }
-      ]
-    },
-    {
-      id: 'reg101',
-      createdAt: '15/08/2023',
-      applicationDate: '20/08/2023',
-      description: 'Điều chỉnh tạm thời cho đợt khuyến mãi mùa hè, đã hủy do thay đổi chính sách.',
-      isCancelled: true,
-      creator: {
-        id: 'user123',
-        name: 'Nguyễn Văn A'
-      },
-      minimumDeposit: 2500000,
-      noTermRate: 0.3,
-      savingsTypes: [
-        {
-          id: 'standard',
-          name: 'Tiết kiệm tiêu chuẩn',
-          terms: [
-            { id: 't1', months: 1 },
-            { id: 't3', months: 3 },
-            { id: 't6', months: 6 },
-            { id: 't12', months: 12 }
-          ],
-          interestRates: [
-            { termId: 't1', frequencyId: 'start', rate: 4.1 },
-            { termId: 't1', frequencyId: 'monthly', rate: 4.2 },
-            { termId: 't1', frequencyId: 'quarterly', rate: 4.3 },
-            { termId: 't1', frequencyId: 'end', rate: 4.4 },
-            { termId: 't3', frequencyId: 'start', rate: 4.6 },
-            { termId: 't3', frequencyId: 'monthly', rate: 4.7 },
-            { termId: 't3', frequencyId: 'quarterly', rate: 4.8 },
-            { termId: 't3', frequencyId: 'end', rate: 4.9 },
-            { termId: 't6', frequencyId: 'start', rate: 5.1 },
-            { termId: 't6', frequencyId: 'monthly', rate: 5.2 },
-            { termId: 't6', frequencyId: 'quarterly', rate: 5.3 },
-            { termId: 't6', frequencyId: 'end', rate: 5.4 },
-            { termId: 't12', frequencyId: 'start', rate: 5.6 },
-            { termId: 't12', frequencyId: 'monthly', rate: 5.7 },
-            { termId: 't12', frequencyId: 'quarterly', rate: 5.8 },
-            { termId: 't12', frequencyId: 'end', rate: 5.9 }
-          ]
-        }
-      ],
-      paymentFrequencies: [
-        { id: 'start', name: 'Đầu kỳ hạn' },
-        { id: 'monthly', name: 'Hàng tháng' },
-        { id: 'quarterly', name: 'Hàng quý' },
-        { id: 'end', name: 'Cuối kỳ hạn' }
-      ]
-    }
-  ]);
+  // const [regulations, setRegulations] = useState([
+  //   {
+  //     id: 'reg999',
+  //     createdAt: '01/12/2024',
+  //     applicationDate: '30/12/2025',
+  //     description: 'Quy định lãi suất cho năm 2025 với mức tăng nhẹ để thích ứng với thị trường.',
+  //     creator: {
+  //       id: 'user789',
+  //       name: 'Lê Văn C'
+  //     },
+  //     minimumDeposit: 5000000,
+  //     noTermRate: 0.5,
+  //     savingsTypes: [
+  //       {
+  //         id: 'standard',
+  //         name: 'Tiết kiệm tiêu chuẩn',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 5.0 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 5.1 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 5.2 },
+  //           { termId: 't1', frequencyId: 'end', rate: 5.3 },
+  //           { termId: 't3', frequencyId: 'start', rate: 5.5 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 5.6 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 5.7 },
+  //           { termId: 't3', frequencyId: 'end', rate: 5.8 },
+  //           { termId: 't6', frequencyId: 'start', rate: 6.0 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 6.1 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 6.2 },
+  //           { termId: 't6', frequencyId: 'end', rate: 6.3 },
+  //           { termId: 't12', frequencyId: 'start', rate: 6.5 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 6.6 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 6.7 },
+  //           { termId: 't12', frequencyId: 'end', rate: 6.8 },
+  //         ]
+  //       }
+  //     ],
+  //     paymentFrequencies: [
+  //       { id: 'start', name: 'Đầu kỳ hạn' },
+  //       { id: 'monthly', name: 'Hàng tháng' },
+  //       { id: 'quarterly', name: 'Hàng quý' },
+  //       { id: 'end', name: 'Cuối kỳ hạn' }
+  //     ]
+  //   },
+  //   {
+  //     id: 'reg123',
+  //     createdAt: '16/06/2023',
+  //     applicationDate: null, // null means 'immediate'
+  //     description: 'Quy định lãi suất cơ bản áp dụng cho các sản phẩm tiết kiệm tiêu chuẩn và linh hoạt.',
+  //     creator: {
+  //       id: 'user456',
+  //       name: 'Trần Thị B'
+  //     },
+  //     minimumDeposit: 1000000,
+  //     noTermRate: 0.2,
+  //     savingsTypes: [
+  //       {
+  //         id: 'standard',
+  //         name: 'Tiết kiệm tiêu chuẩn',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 3.5 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 3.6 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 3.7 },
+  //           { termId: 't1', frequencyId: 'end', rate: 3.8 },
+  //           { termId: 't3', frequencyId: 'start', rate: 4.0 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 4.1 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 4.2 },
+  //           { termId: 't3', frequencyId: 'end', rate: 4.3 },
+  //           { termId: 't6', frequencyId: 'start', rate: 4.5 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 4.6 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 4.7 },
+  //           { termId: 't6', frequencyId: 'end', rate: 4.8 },
+  //           { termId: 't12', frequencyId: 'start', rate: 5.0 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 5.1 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 5.2 },
+  //           { termId: 't12', frequencyId: 'end', rate: 5.3 },
+  //         ]
+  //       },
+  //       {
+  //         id: 'flexible',
+  //         name: 'Tiết kiệm linh hoạt',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 4.0 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 4.1 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 4.2 },
+  //           { termId: 't1', frequencyId: 'end', rate: 4.3 },
+  //           { termId: 't3', frequencyId: 'start', rate: 4.5 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 4.6 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 4.7 },
+  //           { termId: 't3', frequencyId: 'end', rate: 4.8 },
+  //           { termId: 't6', frequencyId: 'start', rate: 5.0 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 5.1 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 5.2 },
+  //           { termId: 't6', frequencyId: 'end', rate: 5.3 },
+  //           { termId: 't12', frequencyId: 'start', rate: 5.5 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 5.6 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 5.7 },
+  //           { termId: 't12', frequencyId: 'end', rate: 5.8 },
+  //         ]
+  //       }
+  //     ],
+  //     paymentFrequencies: [
+  //       { id: 'start', name: 'Đầu kỳ hạn' },
+  //       { id: 'monthly', name: 'Hàng tháng' },
+  //       { id: 'quarterly', name: 'Hàng quý' },
+  //       { id: 'end', name: 'Cuối kỳ hạn' }
+  //     ]
+  //   },
+  //   {
+  //     id: 'reg456',
+  //     createdAt: '10/07/2023',
+  //     applicationDate: '15/07/2023',
+  //     description: 'Điều chỉnh lãi suất theo xu hướng thị trường, tăng nhẹ cho kỳ hạn dài.',
+  //     creator: {
+  //       id: 'user123',
+  //       name: 'Nguyễn Văn A'
+  //     },
+  //     minimumDeposit: 2000000,
+  //     noTermRate: 0.3,
+  //     savingsTypes: [
+  //       {
+  //         id: 'standard',
+  //         name: 'Tiết kiệm tiêu chuẩn',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 4.0 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 4.1 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 4.2 },
+  //           { termId: 't1', frequencyId: 'end', rate: 4.3 },
+  //           { termId: 't3', frequencyId: 'start', rate: 4.5 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 4.6 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 4.7 },
+  //           { termId: 't3', frequencyId: 'end', rate: 4.8 },
+  //           { termId: 't6', frequencyId: 'start', rate: 5.0 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 5.1 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 5.2 },
+  //           { termId: 't6', frequencyId: 'end', rate: 5.3 },
+  //           { termId: 't12', frequencyId: 'start', rate: 5.5 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 5.6 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 5.7 },
+  //           { termId: 't12', frequencyId: 'end', rate: 5.8 },
+  //         ]
+  //       },
+  //       {
+  //         id: 'flexible',
+  //         name: 'Tiết kiệm linh hoạt',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 4.5 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 4.6 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 4.7 },
+  //           { termId: 't1', frequencyId: 'end', rate: 4.8 },
+  //           { termId: 't3', frequencyId: 'start', rate: 5.0 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 5.1 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 5.2 },
+  //           { termId: 't3', frequencyId: 'end', rate: 5.3 },
+  //           { termId: 't6', frequencyId: 'start', rate: 5.5 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 5.6 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 5.7 },
+  //           { termId: 't6', frequencyId: 'end', rate: 5.8 },
+  //           { termId: 't12', frequencyId: 'start', rate: 6.0 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 6.1 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 6.2 },
+  //           { termId: 't12', frequencyId: 'end', rate: 6.3 },
+  //         ]
+  //       }
+  //     ],
+  //     paymentFrequencies: [
+  //       { id: 'start', name: 'Đầu kỳ hạn' },
+  //       { id: 'monthly', name: 'Hàng tháng' },
+  //       { id: 'quarterly', name: 'Hàng quý' },
+  //       { id: 'end', name: 'Cuối kỳ hạn' }
+  //     ]
+  //   },
+  //   {
+  //     id: 'reg789',
+  //     createdAt: '05/08/2023',
+  //     applicationDate: '01/09/2023',
+  //     description: 'Bổ sung kỳ hạn 24 tháng và điều chỉnh lãi suất cho phù hợp với chính sách mới.',
+  //     creator: {
+  //       id: 'user456',
+  //       name: 'Trần Thị B'
+  //     },
+  //     minimumDeposit: 3000000,
+  //     noTermRate: 0.4,
+  //     savingsTypes: [
+  //       {
+  //         id: 'standard',
+  //         name: 'Tiết kiệm tiêu chuẩn',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 },
+  //           { id: 't24', months: 24 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 4.2 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 4.3 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 4.4 },
+  //           { termId: 't1', frequencyId: 'end', rate: 4.5 },
+  //           { termId: 't3', frequencyId: 'start', rate: 4.7 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 4.8 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 4.9 },
+  //           { termId: 't3', frequencyId: 'end', rate: 5.0 },
+  //           { termId: 't6', frequencyId: 'start', rate: 5.2 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 5.3 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 5.4 },
+  //           { termId: 't6', frequencyId: 'end', rate: 5.5 },
+  //           { termId: 't12', frequencyId: 'start', rate: 5.7 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 5.8 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 5.9 },
+  //           { termId: 't12', frequencyId: 'end', rate: 6.0 },
+  //           { termId: 't24', frequencyId: 'start', rate: 6.2 },
+  //           { termId: 't24', frequencyId: 'monthly', rate: 6.3 },
+  //           { termId: 't24', frequencyId: 'quarterly', rate: 6.4 },
+  //           { termId: 't24', frequencyId: 'end', rate: 6.5 },
+  //         ]
+  //       },
+  //       {
+  //         id: 'flexible',
+  //         name: 'Tiết kiệm linh hoạt',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 },
+  //           { id: 't24', months: 24 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 4.7 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 4.8 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 4.9 },
+  //           { termId: 't1', frequencyId: 'end', rate: 5.0 },
+  //           { termId: 't3', frequencyId: 'start', rate: 5.2 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 5.3 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 5.4 },
+  //           { termId: 't3', frequencyId: 'end', rate: 5.5 },
+  //           { termId: 't6', frequencyId: 'start', rate: 5.7 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 5.8 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 5.9 },
+  //           { termId: 't6', frequencyId: 'end', rate: 6.0 },
+  //           { termId: 't12', frequencyId: 'start', rate: 6.2 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 6.3 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 6.4 },
+  //           { termId: 't12', frequencyId: 'end', rate: 6.5 },
+  //           { termId: 't24', frequencyId: 'start', rate: 6.7 },
+  //           { termId: 't24', frequencyId: 'monthly', rate: 6.8 },
+  //           { termId: 't24', frequencyId: 'quarterly', rate: 6.9 },
+  //           { termId: 't24', frequencyId: 'end', rate: 7.0 },
+  //         ]
+  //       }
+  //     ],
+  //     paymentFrequencies: [
+  //       { id: 'start', name: 'Đầu kỳ hạn' },
+  //       { id: 'monthly', name: 'Hàng tháng' },
+  //       { id: 'quarterly', name: 'Hàng quý' },
+  //       { id: 'end', name: 'Cuối kỳ hạn' }
+  //     ]
+  //   },
+  //   {
+  //     id: 'reg101',
+  //     createdAt: '15/08/2023',
+  //     applicationDate: '20/08/2023',
+  //     description: 'Điều chỉnh tạm thời cho đợt khuyến mãi mùa hè, đã hủy do thay đổi chính sách.',
+  //     isCancelled: true,
+  //     creator: {
+  //       id: 'user123',
+  //       name: 'Nguyễn Văn A'
+  //     },
+  //     minimumDeposit: 2500000,
+  //     noTermRate: 0.3,
+  //     savingsTypes: [
+  //       {
+  //         id: 'standard',
+  //         name: 'Tiết kiệm tiêu chuẩn',
+  //         terms: [
+  //           { id: 't1', months: 1 },
+  //           { id: 't3', months: 3 },
+  //           { id: 't6', months: 6 },
+  //           { id: 't12', months: 12 }
+  //         ],
+  //         interestRates: [
+  //           { termId: 't1', frequencyId: 'start', rate: 4.1 },
+  //           { termId: 't1', frequencyId: 'monthly', rate: 4.2 },
+  //           { termId: 't1', frequencyId: 'quarterly', rate: 4.3 },
+  //           { termId: 't1', frequencyId: 'end', rate: 4.4 },
+  //           { termId: 't3', frequencyId: 'start', rate: 4.6 },
+  //           { termId: 't3', frequencyId: 'monthly', rate: 4.7 },
+  //           { termId: 't3', frequencyId: 'quarterly', rate: 4.8 },
+  //           { termId: 't3', frequencyId: 'end', rate: 4.9 },
+  //           { termId: 't6', frequencyId: 'start', rate: 5.1 },
+  //           { termId: 't6', frequencyId: 'monthly', rate: 5.2 },
+  //           { termId: 't6', frequencyId: 'quarterly', rate: 5.3 },
+  //           { termId: 't6', frequencyId: 'end', rate: 5.4 },
+  //           { termId: 't12', frequencyId: 'start', rate: 5.6 },
+  //           { termId: 't12', frequencyId: 'monthly', rate: 5.7 },
+  //           { termId: 't12', frequencyId: 'quarterly', rate: 5.8 },
+  //           { termId: 't12', frequencyId: 'end', rate: 5.9 }
+  //         ]
+  //       }
+  //     ],
+  //     paymentFrequencies: [
+  //       { id: 'start', name: 'Đầu kỳ hạn' },
+  //       { id: 'monthly', name: 'Hàng tháng' },
+  //       { id: 'quarterly', name: 'Hàng quý' },
+  //       { id: 'end', name: 'Cuối kỳ hạn' }
+  //     ]
+  //   }
+  // ]);
 
   // Filter regulations
   const filteredRegulations = regulations.filter(regulation => {
@@ -547,13 +549,13 @@ const RegulationHistory = () => {
   };
 
   // useEffect to turn off loading after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <div className="container mx-auto p-3 max-w-7xl">

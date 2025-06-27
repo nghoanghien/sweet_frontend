@@ -34,7 +34,7 @@ export const convertToPhieuGuiTienData = (
   let tanSuatNhanLaiId = 3; // Mặc định là cuối kỳ
   if (accountData.interestFrequency === "Hàng tháng") tanSuatNhanLaiId = 1;
   else if (accountData.interestFrequency === "Hàng quý") tanSuatNhanLaiId = 2;
-  else if (accountData.interestFrequency === "Đầu kỳ") tanSuatNhanLaiId = 4;
+  else if (accountData.interestFrequency === "Đầu kỳ hạn") tanSuatNhanLaiId = 4;
   
   // Chuyển đổi maturityOption sang hinhThucDaoHanId
   let hinhThucDaoHanId = 1; // Mặc định là tất toán

@@ -686,7 +686,7 @@ const SavingsAccountDetailDrawer = ({
                       <div className="text-right">
                         <p className="text-white/80 text-sm">Lãi suất</p>
                         <p className="text-xl font-semibold text-white mt-1">
-                          {account.interestRate * 100}%/năm
+                        {parseFloat((account.interestRate * 100).toFixed(2))}%/năm
                         </p>
                       </div>
                     </div>

@@ -81,12 +81,13 @@ const InterestRateTable = ({
     }
   }, [terms, interestRates, paymentFrequencies, disabledFrequencies, isEditing, readOnly, newTermIds, deletedTerms, onRateChange]);
 
-  // Format interest rate for display (e.g., 4.5 -> "4.5%")
+  // Format interest rate for display (e.g., 0.045 -> "4.5%", 0.44 -> "44%")
   const formatInterestRate = (rate) => {
     if (rate === null || rate === undefined || rate === '') {
       return '-';
     }
-    return `${parseFloat(rate).toFixed(1)}%`;
+    // Convert to percentage with 2 decimal places, then remove trailing zeros
+    return `${parseFloat((rate * 100).toFixed(2))}%`;
   };
   
   // Check if a term is divisible by 3 (for quarterly frequency)

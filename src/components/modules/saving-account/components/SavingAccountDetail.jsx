@@ -36,7 +36,7 @@ const SavingAccountDetail = ({ account, isHidden, formatCurrency }) => {
           <div>
             <p className="text-sm text-gray-500 mb-1">Lãi suất</p>
             <p className="text-base font-semibold text-gray-800">
-              {account.interestRate * 100}%/năm
+              {parseFloat((account.interestRate * 100).toFixed(2))}%/năm
             </p>
           </div>
           <div>

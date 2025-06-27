@@ -1373,10 +1373,10 @@ export default function Dashboard() {
 
   // Interest payment type display names
   const interestPaymentTypeDisplayNames = {
-    end_of_term: "Cuối kỳ",
+    end_of_term: "Cuối kỳ hạn",
     monthly: "Hàng tháng",
     quarterly: "Hàng quý",
-    yearly: "Đầu kỳ",
+    yearly: "Đầu kỳ hạn",
   };
 
   // Toggle savings account creation modal
