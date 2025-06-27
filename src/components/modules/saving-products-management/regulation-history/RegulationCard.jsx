@@ -63,8 +63,8 @@ const RegulationCard = ({ regulation, onClick, isActive, onCancelClick, canCance
   // Get tag color for a savings type
   const getSavingsTypeColor = (typeId) => {
     const colors = {
-      standard: { bg: 'bg-blue-100', text: 'text-blue-700' },
-      flexible: { bg: 'bg-purple-100', text: 'text-purple-700' },
+      1: { bg: 'bg-blue-100', text: 'text-blue-700' },     // standard - có kỳ hạn
+      2: { bg: 'bg-purple-100', text: 'text-purple-700' },  // flexible - không kỳ hạn
       default: { bg: 'bg-gray-100', text: 'text-gray-700' }
     };
     
