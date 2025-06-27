@@ -68,14 +68,6 @@ export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
       frequencyId: mapFrequencyId(detail.tanSuatNhanLai.maTanSoNhanLai),
       rate: detail.laiSuat
     });
-
-    // Log chi tiết của mỗi lãi suất được thêm vào
-    console.log('Added Interest Rate:', {
-      termId: detail.loaiKyHan.loaiKyHanID?.toString() || '',
-      frequencyId: mapFrequencyId(detail.tanSuatNhanLai.maTanSoNhanLai),
-      originalFrequencyId: detail.tanSuatNhanLai.maTanSoNhanLai,
-      rate: detail.laiSuat
-    });
   });
 
   // Chuyển Map thành array
