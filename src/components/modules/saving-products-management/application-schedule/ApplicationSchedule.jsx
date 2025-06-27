@@ -7,6 +7,8 @@ import { useApplicationSchedule } from '@/hooks/useApplicationSchedule';
 
 const ApplicationSchedule = () => {
   const { regulations, isLoading, error } = useApplicationSchedule();
+  // Internal loading state for initial page load
+  const [isInternalLoading, setIsInternalLoading] = useState(true);
   // State for current date and view month/year
   const [today] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -25,6 +27,15 @@ const ApplicationSchedule = () => {
   const [targetMonth, setTargetMonth] = useState(null);
   const [targetYear, setTargetYear] = useState(null);
   const animatingRef = useRef(false);
+
+  // Effect to handle internal loading timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInternalLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Color mappings for Tailwind
   const colorMappings = {
@@ -541,7 +552,7 @@ const ApplicationSchedule = () => {
     : [];
 
   // Hiển thị trạng thái loading
-  if (isLoading) {
+  if (isLoading || isInternalLoading) {
     return <ApplicationScheduleShimmer />;
   }
 
