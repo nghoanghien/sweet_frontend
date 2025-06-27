@@ -69,8 +69,8 @@ const RegulationListItem = ({
   // Get tag color for savings type
   const getSavingsTypeColor = (typeId) => {
     const colors = {
-      standard: { bg: 'bg-blue-100', text: 'text-blue-700' },
-      flexible: { bg: 'bg-purple-100', text: 'text-purple-700' },
+      1: { bg: 'bg-blue-100', text: 'text-blue-700' },
+      2: { bg: 'bg-purple-100', text: 'text-purple-700' },
       default: { bg: 'bg-gray-100', text: 'text-gray-700' }
     };
     
