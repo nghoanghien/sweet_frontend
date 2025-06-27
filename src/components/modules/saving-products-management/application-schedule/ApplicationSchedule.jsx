@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Calendar, Info, ArrowRight, Search, DollarSign, TrendingUp, ChevronDown, User } from 'lucide-react';
 import RegulationTooltip from './RegulationTooltip';
 import ApplicationScheduleShimmer from '@/components/ui/custom/shimmer-types/ApplicationScheduleShimmer';
+import { useApplicationSchedule } from '@/hooks/useApplicationSchedule';
 
 const ApplicationSchedule = () => {
+  const { regulations, isLoading, error } = useApplicationSchedule();
   // State for current date and view month/year
   const [today] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -16,16 +18,7 @@ const ApplicationSchedule = () => {
   const [highlightedRegulation, setHighlightedRegulation] = useState(null);
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [showYearDropdown, setShowYearDropdown] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const monthDropdownRef = useRef(null);
-
-  // Turn off loading after 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
   const yearDropdownRef = useRef(null);
   // Animation state for sliding calendar
   const [slideDirection, setSlideDirection] = useState(null); // 'left' | 'right' | null
@@ -90,61 +83,6 @@ const ApplicationSchedule = () => {
       dot: 'bg-purple-500',
     },
   };
-
-  // Mock data for regulations with application dates
-  // In a real app, this would come from an API or context
-  const [regulations, setRegulations] = useState([
-    {
-      id: 'reg123',
-      name: 'Quy định lãi suất cơ bản',
-      applicationDate: '2023-06-16',
-      color: 'indigo',
-      creator: 'Trần Thị B',
-      minimumDeposit: 1000000,
-      noTermRate: 0.2,
-      description: 'Quy định lãi suất cơ bản áp dụng cho mọi sản phẩm tiết kiệm',
-    },
-    {
-      id: 'reg456',
-      name: 'Quy định lãi suất mùa hè',
-      applicationDate: '2023-07-15',
-      color: 'emerald',
-      creator: 'Nguyễn Văn A',
-      minimumDeposit: 2000000,
-      noTermRate: 0.3,
-      description: 'Quy định lãi suất ưu đãi cho mùa hè với nhiều khuyến mãi đặc biệt',
-    },
-    {
-      id: 'reg789',
-      name: 'Quy định lãi suất mùa thu',
-      applicationDate: '2023-09-01',
-      color: 'amber',
-      creator: 'Trần Thị B',
-      minimumDeposit: 3000000,
-      noTermRate: 0.4,
-      description: 'Quy định lãi suất mới cho mùa thu với ưu đãi đặc biệt cho khách hàng VIP',
-    },
-    {
-      id: 'reg101',
-      name: 'Quy định lãi suất cuối năm',
-      applicationDate: '2023-12-01',
-      color: 'rose',
-      creator: 'Lê Văn C',
-      minimumDeposit: 3500000,
-      noTermRate: 0.5,
-      description: 'Quy định lãi suất đặc biệt cho dịp cuối năm và Tết Nguyên Đán',
-    },
-    {
-      id: 'reg102',
-      name: 'Quy định lãi suất đầu năm',
-      applicationDate: '2024-02-10',
-      color: 'blue',
-      creator: 'Nguyễn Văn A',
-      minimumDeposit: 2500000,
-      noTermRate: 0.45,
-      description: 'Quy định lãi suất mới cho đầu năm 2024',
-    },
-  ]);
 
   // Filter regulations based on search term
   const filteredRegulations = searchTerm 
@@ -602,8 +540,14 @@ const ApplicationSchedule = () => {
       )
     : [];
 
+  // Hiển thị trạng thái loading
   if (isLoading) {
     return <ApplicationScheduleShimmer />;
+  }
+
+  // Hiển thị lỗi nếu có
+  if (error) {
+    return <div>Error: {error.message}</div>;
   }
 
   return (
