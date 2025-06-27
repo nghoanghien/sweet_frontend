@@ -128,11 +128,14 @@ const FilterableAccountTransactionList = ({
   useEffect(() => {
     setIsSearching(true);
     const timer = setTimeout(() => {
+      // Reverse transactions array để hiển thị giao dịch mới nhất trước
+      const reversedTransactions = [...transactions].reverse();
+      
       if (!searchTerm.trim()) {
-        setFilteredTransactions(transactions);
+        setFilteredTransactions(reversedTransactions);
       } else {
         const searchTermLower = searchTerm.toLowerCase();
-        const filtered = transactions.filter(transaction => {
+        const filtered = reversedTransactions.filter(transaction => {
           const formattedTime = formatDate(transaction.time);
           const channelInfo = getChannelInfo(transaction.channel);
           

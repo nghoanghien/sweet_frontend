@@ -12,9 +12,9 @@ export interface ITKTTResDTO {
 
 export interface IGiaoDichReqDTO {
   giaoDichID?: number | null;
-  taiKhoanNguon: number;
+  taiKhoanNguon: number | null;
   loaiTaiKhoanNguonID: number;
-  taiKhoanDich: number;
+  taiKhoanDich: number | null;
   loaiTaiKhoanDichID: number;
   loaiGiaoDichID: number;
   kenhGiaoDichID: number;

@@ -18,6 +18,7 @@ import FilterableAccountTransactionList from './FilterableAccountTransactionList
 import ExportNotification from '../../../common/ExportNotification';
 import AnimatedTabNavigation from '../../../ui/custom/AnimatedTabNavigation';
 import { useAllTransactionByPaymentAccountId } from '@/hooks/usePaymentTransaction';
+import { useWithdrawTransaction, useDepositTransaction } from '@/hooks/usePaymentAccount';
 
 const AccountDetailDrawer = ({ 
   isOpen, 
@@ -43,8 +44,15 @@ const AccountDetailDrawer = ({
   
   // State for mobile action bar
   const [mobileActionBarVisible, setMobileActionBarVisible] = useState(true);
+  
+  // State for local balance management
+  const [localBalance, setLocalBalance] = useState(account?.balance || 0);
 
   const { allTransactions, isLoading, error, refreshTransactions } = useAllTransactionByPaymentAccountId(account?.id || 0);
+  
+  // Transaction hooks
+  const { withdrawMoney, isLoading: isWithdrawing, error: withdrawError, success: withdrawSuccess, resetState: resetWithdrawState } = useWithdrawTransaction();
+  const { depositMoney, isLoading: isDepositing, error: depositError, success: depositSuccess, resetState: resetDepositState } = useDepositTransaction();
   
   // Cập nhật state nội bộ khi props thay đổi
   useEffect(() => {
@@ -52,6 +60,32 @@ const AccountDetailDrawer = ({
       setIsHidden(isDataHidden);
     }
   }, [isDataHidden]);
+  
+  // Đồng bộ localBalance với account.balance
+  useEffect(() => {
+    if (account?.balance !== undefined) {
+      setLocalBalance(account.balance);
+    }
+  }, [account?.balance]);
+  
+  // Đóng modal khi giao dịch hoàn thành thành công
+  useEffect(() => {
+    if (withdrawSuccess) {
+      // Reset to transactions panel
+      setActivePanel('transactions');
+      // Show mobile action bar
+      setMobileActionBarVisible(true);
+    }
+  }, [withdrawSuccess]);
+  
+  useEffect(() => {
+    if (depositSuccess) {
+      // Reset to transactions panel
+      setActivePanel('transactions');
+      // Show mobile action bar
+      setMobileActionBarVisible(true);
+    }
+  }, [depositSuccess]);
   
   // Control animations when opening/closing
   useEffect(() => {
@@ -95,95 +129,123 @@ const AccountDetailDrawer = ({
   };
   
   // Handle withdrawal confirmation
-  const handleWithdrawalConfirm = (amount) => {
+  const handleWithdrawalConfirm = async (amount) => {
     if (!account) return;
     
-    // Create a new transaction for the withdrawal
-    const newTransaction = {
-      id: Date.now(),
-      type: 'Rút tiền',
-      time: new Date().toLocaleString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).replace(',', ' -'),
-      amount: amount,
-      isIncoming: false,
-      channel: 'counter',
-      balanceAfter: account.balance - amount,
-      content: 'Rút tiền tại quầy giao dịch'
-    };
-    
-    // Refresh transactions after withdrawal
-    refreshTransactions();
-    
-    // Update the account balance
-    const updatedAccount = {
-      ...account,
-      balance: account.balance - amount
-    };
-    
-    // Call the update function from parent component
-    if (onUpdateAccount) {
-      onUpdateAccount(updatedAccount);
+    try {
+      // Reset previous states
+      resetWithdrawState();
+      
+      // Cập nhật balance ngay lập tức để UX mượt mà
+      const newBalance = localBalance - amount;
+      setLocalBalance(newBalance);
+      
+      // Prepare withdrawal data
+      const withdrawData = {
+        taiKhoanNguon: account.id,
+        loaiTaiKhoanNguonID: 1, // Assuming payment account type ID is 1
+        loaiGiaoDichID: 2, // Assuming withdrawal transaction type ID is 2
+        kenhGiaoDichID: 1, // Assuming counter channel ID is 1
+        nhanVienGiaoDichID: 1, // This should be the current employee ID
+        soTienGiaoDich: amount,
+        noiDung: 'Rút tiền tại quầy giao dịch',
+        thoiGianGiaoDich: new Date().toISOString()
+      };
+      
+      // Call withdrawal API
+      await withdrawMoney(withdrawData);
+      
+      // Refresh transactions after successful withdrawal
+      refreshTransactions();
+      
+      // Update the account balance in parent component
+      const updatedAccount = {
+        ...account,
+        balance: newBalance
+      };
+      
+      // Call the update function from parent component
+      if (onUpdateAccount) {
+        onUpdateAccount(updatedAccount);
+      }
+      
+      // Reset to transactions panel
+      setActivePanel('transactions');
+      // Show mobile action bar
+      setMobileActionBarVisible(true);
+      
+      // Show success notification
+      setNotificationMessage(`Rút tiền thành công: ${formatCurrency(amount)}`);
+      setNotificationVisible(true);
+      
+    } catch (error) {
+      console.error('Lỗi khi rút tiền:', error);
+      // Khôi phục balance nếu có lỗi
+      setLocalBalance(account.balance);
+      // Show error notification
+      setNotificationMessage(`Lỗi khi rút tiền: ${error.message || 'Vui lòng thử lại'}`);
+      setNotificationVisible(true);
     }
-    
-    // Reset to transactions panel
-    setActivePanel('transactions');
-    // Show mobile action bar
-    setMobileActionBarVisible(true);
-    
-    // Show success notification
-    setNotificationMessage(`Rút tiền thành công: ${formatCurrency(amount)}`);
-    setNotificationVisible(true);
   };
   
   // Handle deposit confirmation
-  const handleDepositConfirm = (amount) => {
+  const handleDepositConfirm = async (amount) => {
     if (!account) return;
     
-    // Create a new transaction for the deposit
-    const newTransaction = {
-      id: Date.now(),
-      type: 'Nạp tiền',
-      time: new Date().toLocaleString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).replace(',', ' -'),
-      amount: amount,
-      isIncoming: true,
-      channel: 'counter',
-      balanceAfter: account.balance + amount,
-      content: 'Nạp tiền tại quầy giao dịch'
-    };
-    
-    // Refresh transactions after deposit
-    refreshTransactions();
-    
-    // Update the account balance
-    const updatedAccount = {
-      ...account,
-      balance: account.balance + amount
-    };
-    
-    // Call the update function from parent component
-    if (onUpdateAccount) {
-      onUpdateAccount(updatedAccount);
+    try {
+      // Reset previous states
+      resetDepositState();
+      
+      // Cập nhật balance ngay lập tức để UX mượt mà
+      const newBalance = localBalance + amount;
+      setLocalBalance(newBalance);
+      
+      // Prepare deposit data
+      const depositData = {
+        taiKhoanDich: account.id,
+        loaiTaiKhoanDichID: 1, // Assuming payment account type ID is 1
+        loaiGiaoDichID: 1, // Assuming deposit transaction type ID is 1
+        kenhGiaoDichID: 1, // Assuming counter channel ID is 1
+        nhanVienGiaoDichID: 1, // This should be the current employee ID
+        soTienGiaoDich: amount,
+        noiDung: 'Nạp tiền tại quầy giao dịch',
+        thoiGianGiaoDich: new Date().toISOString()
+      };
+      
+      // Call deposit API
+      await depositMoney(depositData);
+      
+      // Refresh transactions after successful deposit
+      refreshTransactions();
+      
+      // Update the account balance in parent component
+      const updatedAccount = {
+        ...account,
+        balance: newBalance
+      };
+      
+      // Call the update function from parent component
+      if (onUpdateAccount) {
+        onUpdateAccount(updatedAccount);
+      }
+      
+      // Reset to transactions panel
+      setActivePanel('transactions');
+      // Show mobile action bar
+      setMobileActionBarVisible(true);
+      
+      // Show success notification
+      setNotificationMessage(`Nạp tiền thành công: ${formatCurrency(amount)}`);
+      setNotificationVisible(true);
+      
+    } catch (error) {
+      console.error('Lỗi khi nạp tiền:', error);
+      // Khôi phục balance nếu có lỗi
+      setLocalBalance(account.balance);
+      // Show error notification
+      setNotificationMessage(`Lỗi khi nạp tiền: ${error.message || 'Vui lòng thử lại'}`);
+      setNotificationVisible(true);
     }
-    
-    // Reset to transactions panel
-    setActivePanel('transactions');
-    // Show mobile action bar
-    setMobileActionBarVisible(true);
-    
-    // Show success notification
-    setNotificationMessage(`Nạp tiền thành công: ${formatCurrency(amount)}`);
-    setNotificationVisible(true);
   };
   
   // Handle notification close
@@ -290,7 +352,7 @@ const AccountDetailDrawer = ({
                         {isHidden ? (
                           <span className="text-white/60">••••••••</span>
                         ) : (
-                          formatCurrency(account.balance)
+                          formatCurrency(localBalance)
                         )}
                       </h3>
                     </div>
@@ -594,7 +656,7 @@ const AccountDetailDrawer = ({
                             <span className="text-sm font-medium text-indigo-700">
                               {isHidden
                                 ? "••••••••"
-                                : formatCurrency(account.balance)}
+                                : formatCurrency(localBalance)}
                             </span>
                           </div>
                         </div>
@@ -608,18 +670,22 @@ const AccountDetailDrawer = ({
             {/* Withdrawal Panel */}
             {activePanel === "withdrawal" && (
               <WithdrawalPanel
-                account={account}
+                account={{...account, balance: localBalance}}
                 onCancel={() => changePanel("transactions")}
                 onConfirm={handleWithdrawalConfirm}
+                isLoading={isWithdrawing}
+                error={withdrawError}
               />
             )}
 
             {/* Deposit Panel */}
             {activePanel === "deposit" && (
               <DepositPanel
-                account={account}
+                account={{...account, balance: localBalance}}
                 onCancel={() => changePanel("transactions")}
                 onConfirm={handleDepositConfirm}
+                isLoading={isDepositing}
+                error={depositError}
               />
             )}
 

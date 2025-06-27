@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Check, ArrowUpRight, CreditCard, Wallet, Banknote, BanknoteIcon, Sparkles, TrendingDown, Shield, Clock, Zap, Minus } from 'lucide-react';
+import { useAllParameters } from '../../../../hooks/useParameters';
 import { formatCurrency } from '../../../../utils/accountUtils';
 import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,8 +9,17 @@ import WithdrawalPanelShimmer from '../../../ui/custom/shimmer-types/WithdrawalP
 const WithdrawalPanel = ({
   account,
   onCancel,
-  onConfirm
+  onConfirm,
+  isLoading: externalLoading = false,
+  error: externalError = null
 }) => {
+  // Get parameters from hook
+  const { data: parameters, isLoading: parametersLoading } = useAllParameters();
+  
+  // Extract transaction limits with fallback to hardcoded values
+  const minTransactionAmount = parameters?.MIN_TRANSACTION_PAYMENT || 100000;
+  const maxTransactionAmount = parameters?.MAX_TRANSACTION_PAYMENT || 100000000;
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
@@ -39,7 +49,7 @@ const WithdrawalPanel = ({
       
       multipliers.forEach(multiplier => {
         const suggestion = parseInt(baseNum) * multiplier;
-        if (suggestion >= 100000 && suggestion <= account.balance) { // Within valid range and balance
+        if (suggestion >= minTransactionAmount && suggestion <= account.balance) { // Within valid range and balance
           suggestions.push(suggestion);
         }
       });
@@ -49,7 +59,7 @@ const WithdrawalPanel = ({
         Math.floor(account.balance * 0.25), // 25% of balance
         Math.floor(account.balance * 0.5),  // 50% of balance
         Math.floor(account.balance * 0.75), // 75% of balance
-      ].filter(amount => amount >= 100000 && amount <= account.balance);
+      ].filter(amount => amount >= minTransactionAmount && amount <= account.balance);
 
       suggestions.push(...balanceBasedSuggestions);
 
@@ -80,8 +90,8 @@ const WithdrawalPanel = ({
     if (!withdrawalAmount || withdrawalAmount.trim() === '') {
       setInputError('Vui lòng nhập số tiền');
       setIsValidAmount(false);
-    } else if (numValue < 100000) {
-      setInputError('Số tiền tối thiểu là 100.000đ');
+    } else if (numValue < minTransactionAmount) {
+      setInputError(`Số tiền tối thiểu là ${formatCurrency(minTransactionAmount)}`);
       setIsValidAmount(false);
     } else if (numValue > account.balance) {
       setInputError(`Số tiền không được vượt quá số dư khả dụng: ${formatCurrency(account.balance)}`);
@@ -96,18 +106,20 @@ const WithdrawalPanel = ({
     setDynamicSuggestions(suggestions);
 
     return () => clearTimeout(timer);
-  }, [withdrawalAmount, isFullAmount, account.balance]);
+  }, [withdrawalAmount, isFullAmount, account.balance, minTransactionAmount, maxTransactionAmount]);
 
   // Loading state effect
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false);
+      if (!parametersLoading) {
+        setIsLoading(false);
+      }
     }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [parametersLoading]);
 
   // Show shimmer while loading
-  if (isLoading) {
+  if (isLoading || parametersLoading) {
     return <WithdrawalPanelShimmer />;
   }
 
@@ -128,22 +140,16 @@ const WithdrawalPanel = ({
     // Đặt trạng thái đang xử lý
     setIsProcessing(true);
     
-    // Giả lập thời gian xử lý API
-    setTimeout(() => {
-      try {
-        // Gọi callback từ parent component
-        onConfirm(parseFloat(withdrawalAmount));
-        
-        // Đóng modal xác nhận
-        closeConfirmModal();
-      } catch (error) {
-        // Hiển thị thông báo lỗi nếu có
-        console.error('Error processing withdrawal:', error);
-      } finally {
-        // Đặt lại trạng thái xử lý
-        setIsProcessing(false);
-      }
-    }, 1500);
+    try {
+      // Gọi callback từ parent component
+      onConfirm(parseFloat(withdrawalAmount));
+      
+      // Không đóng modal ở đây, để parent component đóng sau khi hoàn thành
+    } catch (error) {
+      // Hiển thị thông báo lỗi nếu có
+      console.error('Error processing withdrawal:', error);
+      setIsProcessing(false);
+    }
   };
 
   // Handle input change with validation
@@ -612,7 +618,7 @@ const WithdrawalPanel = ({
         confirmText="Vuốt để xác nhận rút tiền"
         type="withdrawal"
         icon={<CreditCard className="h-6 w-6 text-blue-500" />}
-        isProcessing={isProcessing}
+        isProcessing={isProcessing || externalLoading}
         confirmDetails={{
           "Số tiền rút": formatCurrency(parseFloat(withdrawalAmount)),
           "Phí giao dịch": "0đ",

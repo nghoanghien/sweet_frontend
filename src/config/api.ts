@@ -311,8 +311,8 @@ export const callCreateRutTienGiaoDich = (data: IRutTienReqDTO) => {
     return callCreateGiaoDich({
         taiKhoanNguon: data.taiKhoanNguon,
         loaiTaiKhoanNguonID: data.loaiTaiKhoanNguonID,
-        taiKhoanDich: 0, 
-        loaiTaiKhoanDichID: 0,
+        taiKhoanDich: null, 
+        loaiTaiKhoanDichID: 3,
         loaiGiaoDichID: data.loaiGiaoDichID,
         kenhGiaoDichID: data.kenhGiaoDichID,
         nhanVienGiaoDichID: data.nhanVienGiaoDichID,
@@ -323,8 +323,8 @@ export const callCreateRutTienGiaoDich = (data: IRutTienReqDTO) => {
 }
 export const callCreateNapTienGiaoDich = (data: INapTienReqDTO) => {
     return callCreateGiaoDich({
-        taiKhoanNguon: 0, 
-        loaiTaiKhoanNguonID: 0,
+        taiKhoanNguon: null, 
+        loaiTaiKhoanNguonID: 3,
         taiKhoanDich: data.taiKhoanDich,
         loaiTaiKhoanDichID: data.loaiTaiKhoanDichID,
         loaiGiaoDichID: data.loaiGiaoDichID,

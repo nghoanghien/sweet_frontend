@@ -4,11 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatCurrency } from '../../../../utils/accountUtils';
 import SwipeConfirmationModal from '../../../modals/ConfirmationModal/SwipeConfirmationModal';
 import DepositPanelShimmer from '../../../ui/custom/shimmer-types/DepositPanelShimmer';
+import { useAllParameters } from '../../../../hooks/useParameters';
 
 const DepositPanel = ({
   account,
   onCancel,
-  onConfirm
+  onConfirm,
+  isLoading: externalLoading = false,
+  error: externalError = null
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -18,6 +21,11 @@ const DepositPanel = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
+
+  // Get system parameters for transaction limits
+  const { data: parameters, isLoading: parametersLoading } = useAllParameters();
+  const minTransactionAmount = parameters.MIN_TRANSACTION_PAYMENT || 100000;
+  const maxTransactionAmount = parameters.MAX_TRANSACTION_PAYMENT || 100000000;
 
   // Generate dynamic suggestions based on input
   const generateSuggestions = (input) => {
@@ -38,7 +46,7 @@ const DepositPanel = ({
       
       multipliers.forEach(multiplier => {
         const suggestion = parseInt(baseNum) * multiplier;
-        if (suggestion >= 100000 && suggestion <= 100000000) { // Within valid range
+        if (suggestion >= minTransactionAmount && suggestion <= maxTransactionAmount) { // Within valid range
           suggestions.push(suggestion);
         }
       });
@@ -63,11 +71,11 @@ const DepositPanel = ({
     if (!depositAmount || depositAmount.trim() === '') {
       setInputError('Vui lòng nhập số tiền');
       setIsValidAmount(false);
-    } else if (numValue < 100000) {
-      setInputError('Số tiền tối thiểu là 100.000đ');
+    } else if (numValue < minTransactionAmount) {
+      setInputError(`Số tiền tối thiểu là ${formatCurrency(minTransactionAmount)}`);
       setIsValidAmount(false);
-    } else if (numValue > 100000000) {
-      setInputError('Số tiền tối đa cho mỗi lần nạp là 100.000.000đ');
+    } else if (numValue > maxTransactionAmount) {
+      setInputError(`Số tiền tối đa cho mỗi lần nạp là ${formatCurrency(maxTransactionAmount)}`);
       setIsValidAmount(false);
     } else {
       setInputError(null);
@@ -79,18 +87,20 @@ const DepositPanel = ({
     setDynamicSuggestions(suggestions);
 
     return () => clearTimeout(timer);
-  }, [depositAmount]);
+  }, [depositAmount, minTransactionAmount, maxTransactionAmount]);
 
   // Loading state effect
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!parametersLoading) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [parametersLoading]);
 
   // Show shimmer while loading
-  if (isLoading) {
+  if (isLoading || parametersLoading) {
     return <DepositPanelShimmer />;
   }
 
@@ -107,16 +117,13 @@ const DepositPanel = ({
   const handleConfirmDeposit = () => {
     setIsProcessing(true);
     
-    setTimeout(() => {
-      try {
-        onConfirm(parseFloat(depositAmount));
-        setIsProcessing(false);
-        closeConfirmModal();
-      } catch (error) {
-        console.error('Error processing deposit:', error);
-        setIsProcessing(false);
-      }
-    }, 1500);
+    try {
+      onConfirm(parseFloat(depositAmount));
+      // Không đóng modal ở đây, để parent component đóng sau khi hoàn thành
+    } catch (error) {
+      console.error('Error processing deposit:', error);
+      setIsProcessing(false);
+    }
   };
 
   const handleAmountChange = (e) => {
@@ -540,7 +547,7 @@ const DepositPanel = ({
         confirmText="Vuốt để xác nhận nạp tiền"
         type="success"
         icon={<ArrowDownLeft className="h-6 w-6 text-green-500" />}
-        isProcessing={isProcessing}
+        isProcessing={isProcessing || externalLoading}
         confirmDetails={{
           "Số tiền nạp": formatCurrency(parseFloat(depositAmount)),
           "Phí giao dịch": "0đ",
