@@ -2,7 +2,7 @@ import { IForgotPasswordDTO, IRegisterDTO, IReqLoginDTO, IResetPasswordDTO, IRes
 import axios from './axios-customize';
 import { IBackendRes, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
-import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
+import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, INapTienReqDTO, IRutTienReqDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
 import { INhanVienReqDTO, INhanVienResDTO } from '@/types/employee';
 import { IDiaChi } from '@/types/address';
@@ -305,6 +305,35 @@ export const callGetGiaoDichByNhanVienID = (id: number) => {
 
 export const callCreateGiaoDich = (data: IGiaoDichReqDTO) => {
     return axios.post<IBackendRes<IGiaoDichResDTO>>(`/api/v1/giao-dich`, data);
+}
+
+export const callCreateRutTienGiaoDich = (data: IRutTienReqDTO) => {
+    return callCreateGiaoDich({
+        taiKhoanNguon: data.taiKhoanNguon,
+        loaiTaiKhoanNguonID: data.loaiTaiKhoanNguonID,
+        taiKhoanDich: 0, 
+        loaiTaiKhoanDichID: 0,
+        loaiGiaoDichID: data.loaiGiaoDichID,
+        kenhGiaoDichID: data.kenhGiaoDichID,
+        nhanVienGiaoDichID: data.nhanVienGiaoDichID,
+        soTienGiaoDich: data.soTienGiaoDich,
+        noiDung: data.noiDung,
+        thoiGianGiaoDich: data.thoiGianGiaoDich
+    });
+}
+export const callCreateNapTienGiaoDich = (data: INapTienReqDTO) => {
+    return callCreateGiaoDich({
+        taiKhoanNguon: 0, 
+        loaiTaiKhoanNguonID: 0,
+        taiKhoanDich: data.taiKhoanDich,
+        loaiTaiKhoanDichID: data.loaiTaiKhoanDichID,
+        loaiGiaoDichID: data.loaiGiaoDichID,
+        kenhGiaoDichID: data.kenhGiaoDichID,
+        nhanVienGiaoDichID: data.nhanVienGiaoDichID,
+        soTienGiaoDich: data.soTienGiaoDich,
+        noiDung: data.noiDung,
+        thoiGianGiaoDich: data.thoiGianGiaoDich
+    });
 }
 
 export const callGetAllTaiKhoanThanhToan = () => {

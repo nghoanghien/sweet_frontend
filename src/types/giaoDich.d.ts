@@ -11,9 +11,31 @@ export interface ITKTTResDTO {
 }
 
 export interface IGiaoDichReqDTO {
-  giaoDichID: number;
+  giaoDichID?: number | null;
   taiKhoanNguon: number;
   loaiTaiKhoanNguonID: number;
+  taiKhoanDich: number;
+  loaiTaiKhoanDichID: number;
+  loaiGiaoDichID: number;
+  kenhGiaoDichID: number;
+  nhanVienGiaoDichID: number;
+  soTienGiaoDich: number;
+  noiDung: string;
+  thoiGianGiaoDich: string;
+}
+
+export interface IRutTienReqDTO {
+  taiKhoanNguon: number;
+  loaiTaiKhoanNguonID: number;
+  loaiGiaoDichID: number;
+  kenhGiaoDichID: number;
+  nhanVienGiaoDichID: number;
+  soTienGiaoDich: number;
+  noiDung: string;
+  thoiGianGiaoDich: string;
+}
+
+export interface INapTienReqDTO {
   taiKhoanDich: number;
   loaiTaiKhoanDichID: number;
   loaiGiaoDichID: number;
