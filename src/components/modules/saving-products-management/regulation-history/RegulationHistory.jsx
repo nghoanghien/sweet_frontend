@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { History, X, AlertCircle } from 'lucide-react';
+import { FiGrid, FiList, FiSearch, FiFilter, FiX, FiCalendar, FiClock, FiUser, FiFileText } from 'react-icons/fi';
+import { toast } from 'react-hot-toast';
 
 // Import sub-components
 import RegulationCard from './RegulationCard';
@@ -518,15 +520,128 @@ const RegulationHistory = () => {
   
   // Empty state
   const renderEmptyState = () => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-      <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-        <History size={24} className="text-gray-400" />
-      </div>
-      <h3 className="text-lg font-medium text-gray-800 mb-2">Không tìm thấy quy định</h3>
-      <p className="text-gray-500 max-w-md mx-auto">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+        duration: 0.5
+      }}
+      className="bg-white rounded-3xl shadow-[0_8px_40px_rgba(0,170,255,0.13)] border-2 border-blue-100 p-12 text-center"
+    >
+      <motion.div 
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ 
+          scale: 1, 
+          rotate: 0,
+          transition: {
+            type: "spring",
+            stiffness: 200,
+            damping: 20,
+            delay: 0.2
+          }
+        }}
+        exit={{
+          scale: 0,
+          rotate: 180,
+          transition: {
+            type: "spring",
+            stiffness: 300,
+            damping: 25
+          }
+        }}
+        whileHover={{ 
+          scale: 1.1,
+          rotate: [0, -10, 10, 0],
+          transition: {
+            rotate: {
+              duration: 0.5,
+              ease: "easeInOut"
+            },
+            scale: {
+              type: "spring",
+              stiffness: 300,
+              damping: 20
+            }
+          }
+        }}
+        className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mb-6 shadow-lg border-2 border-blue-200"
+      >
+        <History size={32} className="text-blue-500" />
+      </motion.div>
+      
+      <motion.h3 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ 
+          opacity: 1, 
+          y: 0,
+          transition: {
+            delay: 0.4,
+            type: "spring",
+            stiffness: 100,
+            damping: 15
+          }
+        }}
+        exit={{ opacity: 0, y: -10 }}
+        className="text-xl font-bold text-blue-900 mb-3"
+      >
+        Không tìm thấy quy định
+      </motion.h3>
+      
+      <motion.p 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ 
+          opacity: 1, 
+          y: 0,
+          transition: {
+            delay: 0.6,
+            type: "spring",
+            stiffness: 100,
+            damping: 15
+          }
+        }}
+        exit={{ opacity: 0, y: -10 }}
+        className="text-blue-600 max-w-md mx-auto text-base leading-relaxed"
+      >
         Không có quy định lãi suất nào phù hợp với bộ lọc hiện tại. Vui lòng thay đổi bộ lọc và thử lại.
-      </p>
-    </div>
+      </motion.p>
+      
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ 
+          opacity: 1, 
+          scale: 1,
+          transition: {
+            delay: 0.8,
+            type: "spring",
+            stiffness: 150,
+            damping: 20
+          }
+        }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        className="mt-6 flex justify-center space-x-2"
+      >
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 1, 0.3]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              delay: i * 0.2,
+              ease: "easeInOut"
+            }}
+            className="w-2 h-2 bg-blue-400 rounded-full"
+          />
+        ))}
+      </motion.div>
+    </motion.div>
   );
 
   // Get cancel confirmation details
@@ -587,36 +702,116 @@ const RegulationHistory = () => {
       ) : sortedRegulations.length > 0 ? (
         <div>
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {sortedRegulations.map((regulation) => (
-                <RegulationCard
-                  key={regulation.id}
-                  regulation={regulation}
-                  onClick={() => handleRegulationClick(regulation)}
-                  isActive={selectedRegulation?.id === regulation.id}
-                  onCancelClick={handleCancelClick}
-                  canCancel={canCancelRegulation(regulation)}
-                />
-              ))}
-            </div>
+            <motion.div 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {sortedRegulations.map((regulation, index) => (
+                  <motion.div
+                    key={regulation.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: 1, 
+                      y: 0,
+                      transition: {
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15,
+                        delay: index * 0.1
+                      }
+                    }}
+                    exit={{ 
+                      opacity: 0, 
+                      scale: 0.8, 
+                      y: -20,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20
+                      }
+                    }}
+                    transition={{
+                      layout: {
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15
+                      }
+                    }}
+                  >
+                    <RegulationCard
+                      regulation={regulation}
+                      onClick={() => handleRegulationClick(regulation)}
+                      isActive={selectedRegulation?.id === regulation.id}
+                      onCancelClick={handleCancelClick}
+                      canCancel={canCancelRegulation(regulation)}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           ) : (
-            <div className="space-y-6">
-              {sortedRegulations.map((regulation) => (
-                <RegulationListItem
-                  key={regulation.id}
-                  regulation={regulation}
-                  onClick={() => handleRegulationClick(regulation)}
-                  isActive={selectedRegulation?.id === regulation.id}
-                  onCancelClick={handleCancelClick}
-                  canCancel={canCancelRegulation(regulation)}
-                />
-              ))}
-            </div>
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {sortedRegulations.map((regulation, index) => (
+                  <motion.div
+                    key={regulation.id}
+                    layout
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ 
+                      opacity: 1, 
+                      x: 0,
+                      transition: {
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15,
+                        delay: index * 0.05
+                      }
+                    }}
+                    exit={{ 
+                      opacity: 0, 
+                      x: 20,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20
+                      }
+                    }}
+                    transition={{
+                      layout: {
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15
+                      }
+                    }}
+                  >
+                    <RegulationListItem
+                      regulation={regulation}
+                      onClick={() => handleRegulationClick(regulation)}
+                      isActive={selectedRegulation?.id === regulation.id}
+                      onCancelClick={handleCancelClick}
+                      canCancel={canCancelRegulation(regulation)}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           )}
         </div>
       ) : (
         <div className="flex justify-center items-center min-h-[300px]">
-          {renderEmptyState()}
+          <AnimatePresence mode="wait">
+            {renderEmptyState()}
+          </AnimatePresence>
         </div>
       )}
       
