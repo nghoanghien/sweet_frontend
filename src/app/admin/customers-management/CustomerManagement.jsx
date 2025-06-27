@@ -921,6 +921,8 @@ export default function CustomerManagement() {
               // For now, just show success notification
               const createUser = async (customerToAdd) => {
                 const result = await createNewCustomer(customerToAdd);
+                // Refresh customer list
+                refreshCustomers();
                 setExportNotification({
                   visible: true,
                   type: result.success ? 'success' : 'error',
@@ -932,11 +934,6 @@ export default function CustomerManagement() {
               }
               createUser(customerToAdd);
 
-
-
-              // Refresh customer list
-              refreshCustomers();
-
               // Reset form states
               setIsContactAddressSameAsPermanent(false);
               setShowContactAddressForm(true);
@@ -944,9 +941,6 @@ export default function CustomerManagement() {
               // Close modals
               closeConfirmationModal();
               toggleAddCustomerModal();
-
-
-
 
               // Tự động ẩn thông báo sau 5 giây
               setTimeout(() => {
@@ -972,70 +966,6 @@ export default function CustomerManagement() {
     }
   };
 
-  // Format currency as VND
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-  };
-
-  // Mask account number for display
-  const maskAccountNumber = (accountNumber) => {
-    if (!accountNumber) return "";
-    if (accountNumber.length <= 8) return accountNumber;
-
-    const firstFour = accountNumber.substring(0, 4);
-    const lastFour = accountNumber.substring(accountNumber.length - 4);
-    const masked = "*".repeat(accountNumber.length - 8);
-
-    return `${firstFour}${masked}${lastFour}`;
-  };
-
-  // Get status information for payment accounts
-  const getAccountStatusInfo = (status) => {
-    switch (status) {
-      case 'active':
-        return {
-          label: "Hoạt động",
-          color: "text-green-600",
-          bgColor: "bg-green-100",
-          icon: <CheckCircle size={16} />
-        };
-      case 'locked':
-        return {
-          label: "Tạm khóa",
-          color: "text-amber-600",
-          bgColor: "bg-amber-100",
-          icon: <Lock size={16} />
-        };
-      case 'permanent_locked':
-        return {
-          label: "Đã khóa vĩnh viễn",
-          color: "text-red-600",
-          bgColor: "bg-red-100",
-          icon: <XCircle size={16} />
-        };
-      default:
-        return {
-          label: "Không xác định",
-          color: "text-gray-600",
-          bgColor: "bg-gray-100",
-          icon: <HelpCircle size={16} />
-        };
-    }
-  };
-
-  // Calculate term progress for savings account
-  const calculateTermProgress = (daysRemaining, termDays) => {
-    const progress = ((termDays - daysRemaining) / termDays) * 100;
-    return Math.min(Math.max(progress, 0), 100); // Ensure progress is between 0-100
-  };
-
-  // Open savings account detail
-  const openSavingsDetail = (customerId, savingsId) => {
-    setSelectedCustomer(allCustomers.find(c => c.customerID === customerId));
-    setSelectedSavingsId(savingsId);
-    setSavingsDetailVisible(true);
-  };
-
   // Functions for confirmation modal
   const openConfirmationModal = ({ title, message, confirmText = "Quẹt để xác nhận", confirmDetails = null, type, onConfirm }) => {
     setConfirmationModal({ isOpen: true, title, description: message, confirmText, confirmDetails, type, isProcessing: false, onConfirm });
@@ -1047,14 +977,6 @@ export default function CustomerManagement() {
 
   const setConfirmationProcessing = (isProcessing) => {
     setConfirmationModal(prev => ({ ...prev, isProcessing }));
-  };
-
-  // Function to toggle account visibility
-  const toggleAccountVisibility = (accountId) => {
-    setHiddenAccountInfo(prev => ({
-      ...prev,
-      [accountId]: !prev[accountId]
-    }));
   };
 
   // Add state for export data modal

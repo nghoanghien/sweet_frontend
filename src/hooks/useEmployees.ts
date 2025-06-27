@@ -26,8 +26,8 @@ export const useAllEmployees = () => {
     fetchData();
   }, [fetchData]);
 
-  const refreshEmployees = useCallback(() => {
-    fetchData();
+  const refreshEmployees = useCallback(async () => {
+    await fetchData();
   }, [fetchData]);
 
   return { data: data, allEmployees: data, isLoading, error, refreshEmployees };

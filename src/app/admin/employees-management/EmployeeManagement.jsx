@@ -30,84 +30,8 @@ import { useAllEmployees } from '@/hooks/useEmployees';
 import { formatDate } from '@/utils/saving-account';
 import { createNewEmployee } from '@/utils/functionalUtil';
 export default function EmployeeManagement() {
-  // Remove mock data - now using real data from API
+  // Using real data from API
   const { allEmployees, isLoading, error, refreshEmployees } = useAllEmployees();
-
-  // State for employee data (keeping for backward compatibility)
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      fullName: 'Nguyễn Văn A',
-      dateOfBirth: '12/05/1985',
-      age: 38,
-      idCardNumber: '036085123456',
-      email: 'nguyenvana@email.com',
-      phoneNumber: '0901234567',
-      permanentAddress: {
-        province: 'Hà Nội',
-        district: 'Cầu Giấy',
-        ward: 'Dịch Vọng',
-        streetName: 'Trần Thái Tông',
-        houseNumber: '125'
-      },
-      transactions: [
-        {
-          id: 1,
-          type: 'incoming',
-          description: 'Lương tháng 5/2023',
-          date: '25/05/2023',
-          amount: 15000000,
-          channel: 'bank',
-          note: 'Chuyển khoản lương tháng 5/2023'
-        },
-        {
-          id: 2,
-          type: 'incoming',
-          description: 'Thưởng dự án ABC',
-          date: '30/05/2023',
-          amount: 5000000,
-          channel: 'bank',
-          note: 'Thưởng hoàn thành dự án ABC'
-        },
-        {
-          id: 3,
-          type: 'outgoing',
-          description: 'Ứng lương',
-          date: '10/06/2023',
-          amount: 3000000,
-          channel: 'cash',
-          note: 'Ứng lương tháng 6/2023'
-        },
-        {
-          id: 4,
-          type: 'incoming',
-          description: 'Lương tháng 6/2023',
-          date: '25/06/2023',
-          amount: 15000000,
-          channel: 'bank',
-          note: 'Chuyển khoản lương tháng 6/2023'
-        },
-        {
-          id: 4,
-          type: 'incoming',
-          description: 'Lương tháng 6/2023',
-          date: '25/06/2023',
-          amount: 15000000,
-          channel: 'bank',
-          note: 'Chuyển khoản lương tháng 6/2023'
-        }
-      ],
-      contactAddress: {
-        province: 'Hà Nội',
-        district: 'Cầu Giấy',
-        ward: 'Dịch Vọng',
-        streetName: 'Trần Thái Tông',
-        houseNumber: '125'
-      },
-      recruitmentDate: '15/06/2022',
-      accountStatus: 'active'
-    },
-  ]);
 
   // State for employee detail modal
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -536,7 +460,7 @@ export default function EmployeeManagement() {
   };
 
   // Save edited employee with validation
-  const saveEmployeeChanges = () => {
+  const saveEmployeeChanges = async () => {
     // Validate all fields before saving
     const fieldsToValidate = ['phoneNumber'];
     const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
@@ -566,19 +490,8 @@ export default function EmployeeManagement() {
     setErrors(newErrors);
 
     if (isValid) {
-      setEmployees(prevEmployees =>
-        prevEmployees.map(employee => {
-          if (employee.id === editedEmployee.id) {
-            return {
-              ...employee,
-              contactAddress: editedEmployee.contactAddress,
-              phoneNumber: editedEmployee.phoneNumber,
-              accountStatus: editedEmployee.accountStatus
-            };
-          }
-          return employee;
-        })
-      );
+      // Note: In a real application, you would call an API to update the employee
+      // For now, we just update the selected employee for display purposes
       setIsEditMode(false);
       setSelectedEmployee(prev => ({
         ...prev,
@@ -586,6 +499,9 @@ export default function EmployeeManagement() {
         phoneNumber: editedEmployee.phoneNumber,
         accountStatus: editedEmployee.accountStatus
       }));
+      
+      // Refresh data from API to get the latest updates
+      await refreshEmployees();
 
       // Hiển thị thông báo thành công
       setExportNotification({
@@ -836,7 +752,7 @@ export default function EmployeeManagement() {
   const addNewEmployee = () => {
     if (validateAllFields()) {
       // Generate ID and code
-      const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 1;
+      const newId = allEmployees.length > 0 ? Math.max(...allEmployees.map(e => e.employeeID)) + 1 : 1;
 
       // Calculate age from dateOfBirth
       const birthDateParts = newEmployee.dateOfBirth.split('/');
@@ -881,37 +797,45 @@ export default function EmployeeManagement() {
           setConfirmationProcessing(true);
 
           // Simulate API call with a delay
-          setTimeout(() => {
+          setTimeout(async () => {
             try {
               // Add new employee
-              const createEmployee = async (employeeToAdd) => {
-                const result = await createNewEmployee(employeeToAdd);
+              const result = await createNewEmployee(employeeToAdd);
+              
+              if (result.success) {
+                // Close modals
+                closeConfirmationModal();
+                toggleAddEmployeeModalOpen();
+
+                // Refresh employee data after a short delay to ensure backend processing is complete
+                setTimeout(async () => {
+                  await refreshEmployees();
+                }, 500);
+
+                // Hiển thị thông báo thành công
                 setExportNotification({
                   visible: true,
-                  type: result.success ? 'success' : 'error',
-                  message: result.success
-                    ? 'Thêm Nhân viên thành công!'
-                    : 'Thêm Nhân viên thất bại!',
-                  format: result.message
+                  type: 'success',
+                  message: 'Thêm nhân viên mới thành công!',
+                  format: 'Hệ thống đã ghi nhận hồ sơ nhân viên mới!'
                 });
+
+                // Tự động ẩn thông báo sau 5 giây
+                setTimeout(() => {
+                  setExportNotification(prev => ({ ...prev, visible: false }));
+                }, 5000);
+              } else {
+                // Show error notification
+                setExportNotification({
+                  visible: true,
+                  type: 'error',
+                  message: 'Thêm Nhân viên thất bại!',
+                  format: result.message || 'Có lỗi xảy ra khi thêm nhân viên'
+                });
+                
+                // Reset processing state
+                setConfirmationProcessing(false);
               }
-              createEmployee(employeeToAdd);
-              // Close modals
-              closeConfirmationModal();
-              toggleAddEmployeeModalOpen();
-
-              // Hiển thị thông báo thành công
-              setExportNotification({
-                visible: true,
-                type: 'success',
-                message: 'Thêm nhân viên mới thành công!',
-                format: 'Hệ thống đã ghi nhận hồ sơ nhân viên mới!'
-              });
-
-              // Tự động ẩn thông báo sau 5 giây
-              setTimeout(() => {
-                setExportNotification(prev => ({ ...prev, visible: false }));
-              }, 5000);
             } catch (error) {
               console.error('Error adding new employee:', error);
 
