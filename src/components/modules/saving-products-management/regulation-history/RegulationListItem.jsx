@@ -109,7 +109,6 @@ const RegulationListItem = ({
 
   return (
     <motion.div
-      layoutId={`regulation-list-${regulation.id}`}
       variants={listItemVariants}
       initial="hidden"
       animate="visible"
@@ -130,7 +129,6 @@ const RegulationListItem = ({
           <div className="flex-1 flex items-center space-x-4">
             {/* ID Circle - inspired by card design */}
             <motion.div 
-              layoutId={`regulation-list-id-circle-${regulation.id}`}
               className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0"
             >
               <span className="text-white font-bold text-sm sm:text-base">
@@ -143,7 +141,6 @@ const RegulationListItem = ({
               {/* Top row: Application date and creator */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
                 <motion.div 
-                  layoutId={`regulation-list-date-${regulation.id}`}
                   className="flex items-center text-sm sm:text-base font-semibold text-blue-800"
                 >
                   <Calendar size={16} className="mr-2 text-indigo-600" />
@@ -154,7 +151,6 @@ const RegulationListItem = ({
                 
                 {/* Creator info */}
                 <motion.div 
-                  layoutId={`regulation-list-creator-${regulation.id}`}
                   className="flex items-center mt-1 sm:mt-0 text-sm text-blue-700"
                 >
                   <div className="w-5 h-5 bg-indigo-100 rounded-full mr-2 flex items-center justify-center">
@@ -169,7 +165,6 @@ const RegulationListItem = ({
               {/* Middle row: Key metrics */}
               <div className="flex flex-wrap items-center gap-4 mb-2">
                 <motion.div 
-                  layoutId={`regulation-list-deposit-${regulation.id}`}
                   className="flex items-center text-sm"
                 >
                   <DollarSign size={14} className="mr-1 text-indigo-600" />
@@ -178,7 +173,6 @@ const RegulationListItem = ({
                 </motion.div>
                 
                 <motion.div 
-                  layoutId={`regulation-list-rate-${regulation.id}`}
                   className="flex items-center text-sm"
                 >
                   <TrendingUp size={14} className="mr-1 text-indigo-600" />
@@ -189,7 +183,6 @@ const RegulationListItem = ({
 
               {/* Bottom row: Savings types */}
               <motion.div 
-                layoutId={`regulation-list-savings-types-${regulation.id}`}
                 className="flex flex-wrap gap-1.5"
               >
                 {regulation.savingsTypes.map(type => {
@@ -208,7 +201,6 @@ const RegulationListItem = ({
               {/* Description if exists */}
               {regulation.description && (
                 <motion.div 
-                  layoutId={`regulation-list-description-${regulation.id}`}
                   className="mt-2 text-sm text-blue-600 italic line-clamp-1" 
                   title={regulation.description}
                 >
@@ -222,7 +214,6 @@ const RegulationListItem = ({
           <div className="flex items-center space-x-2 ml-4">
             {/* Status badge */}
             <motion.div 
-              layoutId={`regulation-list-status-${regulation.id}`}
               className={`px-3 py-1 rounded-full text-xs font-bold shadow-md border-2 border-white ${status.color} ${status.textColor} drop-shadow`}
             >
               {status.label}
@@ -275,7 +266,6 @@ const RegulationListItem = ({
       {/* Hover effect overlay */}
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-        layoutId={`regulation-list-overlay-${regulation.id}`}
       />
     </motion.div>
   );
