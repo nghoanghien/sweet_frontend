@@ -256,7 +256,7 @@ const SavingsAccounts = ({ customerId }) => {
   const [accountWithdrawalHistory, setAccountWithdrawalHistory] = useState({});
 
   // Hook lấy dữ liệu từ db
-  const { savingAccounts, isLoading, error } = useSavingAccountsByCustomerId(customerId);
+  const { savingAccounts, isLoading, error, refreshSavingAccounts } = useSavingAccountsByCustomerId(customerId);
   
   // Khởi tạo trạng thái ẩn cho tất cả tài khoản
   useEffect(() => {
@@ -527,8 +527,8 @@ const SavingsAccounts = ({ customerId }) => {
       
       console.log('Phiếu gửi tiền đã được tạo:', response);
       
-      // Thêm tài khoản mới vào danh sách
-      setAccounts(prevAccounts => [...prevAccounts, newAccountData]);
+      // Làm mới dữ liệu từ server
+      refreshSavingAccounts();
       
       // Hiển thị thông báo thành công
       setNotificationMessage(`Gửi tiết kiệm thành công`);
@@ -1112,6 +1112,7 @@ const SavingsAccounts = ({ customerId }) => {
         onClose={() => setIsNewAccountModalOpen(false)}
         onCreateAccount={prepareNewAccount}
         isAdmin={true}
+        customerId={customerId}
       />
 
       {/* Drawer chi tiết tài khoản */}
