@@ -141,7 +141,7 @@ const ResetPasswordModal = ({ isOpen, onClose, onConfirm, account }) => {
         >
           <motion.div
             className="bg-white rounded-3xl shadow-xl w-full max-w-md max-h-[95vh] flex flex-col overflow-hidden"
-            layoutId={`resetPassword-account-${account.id}`}
+            layoutId={`resetPassword-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}`}
             transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }} 
             onClick={(e) => e.stopPropagation()}         
           >

@@ -4,6 +4,7 @@ import { Permission } from "@/types/interfaces/enums";
 import { Address, Role, User } from "@/types/interfaces/user";
 import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
 import { getPermissions } from "@/utils/permissions";
+import { mapApiToRole } from "./permissions.mapper";
 
 export const mapApiToAddress = (item: any): Address => {
   return {
@@ -16,19 +17,9 @@ export const mapApiToAddress = (item: any): Address => {
   };
 }
 
-export const mapApiToRole = (item: any): Role => {
-  return {
-    roleID: item.id,
-    roleName: item.name,
-    description: item.description,
-    active: item.active,
-    customerRole: item.customerRole,
-    permissions: item.quyenHanIds ? getPermissions(item.quyenHanIds) : getPermissions(item.quyenHans),
-  }
-}
-
 //Còn thiếu nhân viên chưa mapping được
 export const mapApiToUser = (item: any): User => {
+  console.log("Đang mapping nè: ", item);
   return {
     fullName: item.hoTen,
     dateOfBirth: new Date(item.ngaySinh),
