@@ -1,6 +1,7 @@
-  import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, User, Save, DollarSign, TrendingUp } from 'lucide-react';
+import { useRegulationHistory } from '@/hooks/InterestRateRegulation';
 
 // Import sub-components
 import SavingsTypeToggle from './SavingsTypeToggle';
@@ -93,6 +94,9 @@ const CurrentRegulationSummary = ({ regulation, isLoading }) => {
 };
 
 const InterestRateRegulations = () => {
+  // Use the existing hook
+  const { regulations, isLoading: isLoadingRegulation, error: regulationError  } = useRegulationHistory();
+
   // Mock data for all available options
   const allSavingsTypes = [
     { id: 'standard', name: 'Tiết kiệm tiêu chuẩn' },
@@ -122,16 +126,15 @@ const InterestRateRegulations = () => {
   };
 
   // Component states
-  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: 'success', message: '', details: null, format: '' });
   
-  // Current regulation state (mock data for current regulation)
+  // Current regulation state
   const [currentRegulation, setCurrentRegulation] = useState({
     id: 'reg123',
     createdAt: '16/06/2023',
-    applicationDate: null, // null means 'immediate'
+    applicationDate: null,
     description: 'Quy định lãi suất cơ bản cho các sản phẩm tiết kiệm, áp dụng từ tháng 6/2023.',
     creator: {
       id: 'user456',
@@ -211,14 +214,24 @@ const InterestRateRegulations = () => {
   // New state to track deleted terms per savings type
   const [deletedTerms, setDeletedTerms] = useState({});
   
-  // Loading state management
+  // Update currentRegulation when regulations changes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+    if (regulations && regulations.length > 0) {
+      setCurrentRegulation(regulations[0]); // Get the first regulation
+    }
+  }, [regulations]);
+
+  // Show error notification if there's an error fetching regulation
+  useEffect(() => {
+    if (regulationError) {
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Không thể tải quy định lãi suất',
+        format: 'Đã xảy ra lỗi khi tải quy định lãi suất. Vui lòng thử lại sau.'
+      });
+    }
+  }, [regulationError]);
   
   // Reset edited regulation when switching to edit mode
   useEffect(() => {
@@ -810,8 +823,6 @@ const InterestRateRegulations = () => {
   
   // Confirm changes
   const handleConfirmChanges = () => {
-    // In a real app, this would submit changes to the backend
-    
     // Apply the comparison regulation to the current regulation
     setCurrentRegulation({ ...comparisonRegulation });
     // Also update the edited regulation to match
@@ -835,7 +846,7 @@ const InterestRateRegulations = () => {
       });
     }
     
-    // Show success notification using ExportNotification
+    // Show success notification
     setNotification({
       show: true,
       type: 'success',
@@ -848,6 +859,7 @@ const InterestRateRegulations = () => {
     
     // Close comparison modal
     setShowComparisonModal(false);
+
   };
 
   // Get disabled frequencies for the active savings type
@@ -877,9 +889,9 @@ const InterestRateRegulations = () => {
               <h2 className="text-xl font-bold text-gray-800">Quy định lãi suất hiện hành</h2>
               <p className="text-sm text-gray-600 flex items-center mt-1">
                 <User size={14} className="mr-1 flex-shrink-0" />
-                Người tạo: <Skeleton isLoading={isLoading} width="w-24" height="h-4" className="inline-block mx-1">
+                Người tạo: <Skeleton isLoading={isLoadingRegulation} width="w-24" height="h-4" className="inline-block mx-1">
                   {currentRegulation.creator?.name || 'Không xác định'}
-                </Skeleton> (<Skeleton isLoading={isLoading} width="w-20" height="h-4" className="inline-block">
+                </Skeleton> (<Skeleton isLoading={isLoadingRegulation} width="w-20" height="h-4" className="inline-block">
                   {currentRegulation.createdAt || 'Không xác định'}
                 </Skeleton>)
               </p>
@@ -890,7 +902,7 @@ const InterestRateRegulations = () => {
           )}
           {/* Display the current regulations summary */}
           {!isEditing && (
-            <CurrentRegulationSummary regulation={currentRegulation} isLoading={isLoading} />
+            <CurrentRegulationSummary regulation={currentRegulation} isLoading={isLoadingRegulation} />
           )}
         </div>
         
@@ -909,7 +921,7 @@ const InterestRateRegulations = () => {
               >
                 <Edit2 size={18} />
               </motion.span>
-              <Skeleton isLoading={isLoading} width="w-16" height="h-5" className="inline-block">
+              <Skeleton isLoading={isLoadingRegulation} width="w-16" height="h-5" className="inline-block">
                 Chỉnh sửa
               </Skeleton>
             </motion.button>
@@ -1017,7 +1029,7 @@ const InterestRateRegulations = () => {
       {((currentRegulation.savingsTypes.length > 1 && !isEditing) || 
         (editedRegulation.savingsTypes.filter(t => !disabledSavingsTypes.includes(t.id)).length > 1 && isEditing)) && (
         <div className="mb-6 flex justify-center">
-          {isLoading ? (
+          {isLoadingRegulation ? (
             <SavingsTypeToggleShimmer />
           ) : (
             <SavingsTypeToggle
@@ -1036,7 +1048,7 @@ const InterestRateRegulations = () => {
       {activeSavingsTypeDetails && (
         <div className="relative">
                    
-          {isLoading ? (
+          {isLoadingRegulation ? (
             <InterestRateTableShimmer />
           ) : (
             <InterestRateTable

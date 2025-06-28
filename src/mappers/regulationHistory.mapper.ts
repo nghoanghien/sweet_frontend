@@ -24,6 +24,16 @@ const mapFrequencyId = (maTanSoNhanLai: number): string => {
   }
 };
 
+// Định nghĩa các tần suất bị vô hiệu hóa cho từng loại tiết kiệm
+const getDisabledFrequencies = (maLoaiTietKiem: number) => {
+  // Nếu là tiết kiệm không kỳ hạn (flexible - mã 2)
+  if (maLoaiTietKiem === 2) {
+    return ['start', 'monthly', 'quarterly']; // Vô hiệu hóa đầu kỳ hạn, hàng tháng, hàng quý
+  }
+  // Nếu là tiết kiệm có kỳ hạn (standard - mã 1)
+  return []; // Không vô hiệu hóa tần suất nào
+};
+
 interface ITerm {
   id: string;
   months: number;
@@ -43,7 +53,8 @@ export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
         id: savingsTypeId,
         name: detail.loaiTietKiem.tenLoaiTietKiem,
         terms: [],
-        interestRates: []
+        interestRates: [],
+        disabledFrequencies: getDisabledFrequencies(detail.loaiTietKiem.maLoaiTietKiem)
       });
     }
 
@@ -65,8 +76,8 @@ export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
     // Thêm lãi suất
     savingsType.interestRates.push({
       termId: detail.loaiKyHan.loaiKyHanID?.toString() || '',
-      frequencyId: mapFrequencyId(detail.tanSuatNhanLai.maTanSoNhanLai),
-      rate: detail.laiSuat
+      frequencyId: mapFrequencyId(detail.tanSuatNhanLai?.maTanSoNhanLai), // Default to 'end' if null
+      rate: detail.laiSuat || 0
     });
   });
 
@@ -78,7 +89,8 @@ export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
     savingsTypes: savingsTypes.map(type => ({
       name: type.name,
       terms: type.terms,
-      interestRates: type.interestRates
+      interestRates: type.interestRates,
+      disabledFrequencies: type.disabledFrequencies
     })),
     paymentFrequencies: DEFAULT_PAYMENT_FREQUENCIES
   });
@@ -96,6 +108,6 @@ export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
     noTermRate: item.laiSuatKhongKyHan,
     savingsTypes: savingsTypes,
     paymentFrequencies: DEFAULT_PAYMENT_FREQUENCIES,
-    isCancelled: false // Since daHuy is not in the DTO, we'll default to false
+    isActive: item.active // Since daHuy is not in the DTO, we'll default to false
   };
 };

@@ -350,7 +350,7 @@ const ApplicationSchedule = () => {
           {regulation && (
             <div className="mt-1 space-y-0.5">
               <div className={`text-xs font-bold ${textClass} truncate`}>{regulation.name}</div>
-              <div className={`text-xs ${textClass} opacity-80`}>#{regulation.id.substring(3)}</div>
+              {/* <div className={`text-xs ${textClass} opacity-80`}>#{regulation.id.substring(3)}</div> */}
             </div>
           )}
           {isToday && (
@@ -375,9 +375,9 @@ const ApplicationSchedule = () => {
 
   // Generate timeline view
   const generateTimelineView = () => {
-    // Sort regulations by application date in descending order (newest first)
+    // Sort regulations by application date in ascending order
     const sortedRegulations = [...regulations].sort((a, b) => 
-      new Date(b.applicationDate) - new Date(a.applicationDate)
+      new Date(a.applicationDate) - new Date(b.applicationDate)
     );
     const todayString = formatDateForComparison(today);
     const currentRegulation = getRegulationForDate(todayString);
@@ -402,7 +402,7 @@ const ApplicationSchedule = () => {
             const [year, month, day] = reg.applicationDate.split('-');
             const shortDate = `${day}/${month}`;
             return (
-              <motion.div key={reg.id} className="relative pl-10" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06, duration: 0.5 }}>
+              <motion.div key={reg.id} className="relative pl-10" initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06, duration: 0.5 }}>
                 {/* Timeline dot */}
                 <motion.div
                   className={`absolute left-0 top-4 h-12 w-12 rounded-full border-4 border-white shadow-lg z-10 flex flex-col items-center justify-center ${colorSet.bgHighlight}`}
@@ -433,7 +433,7 @@ const ApplicationSchedule = () => {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <h3 className={`text-xl font-extrabold ${colorSet.text}`}>{reg.name}</h3>
-                      <span className="text-xs text-indigo-400 font-bold">#{reg.id.substring(3)}</span>
+                      {/* <span className="text-xs text-indigo-400 font-bold">#{reg.id.substring(3)}</span> */}
                     </div>
                     <span className="text-base font-semibold text-gray-600 bg-white/70 px-3 py-1 rounded-xl border border-indigo-100 shadow-sm">
                       {formatDateForDisplay(reg.applicationDate)}
@@ -492,40 +492,46 @@ const ApplicationSchedule = () => {
     const firstDayString = formatDateForComparison(firstDayOfMonth);
     const lastDayString = formatDateForComparison(lastDayOfMonth);
     
-    // Get regulations that start in this month
-    const regulationsStartingThisMonth = regulations.filter(reg => {
+    // Sort all regulations by application date
+    const sortedRegulations = [...regulations].sort((a, b) => 
+      new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime()
+    );
+    
+    // Find regulations in this month
+    const monthRegulations = sortedRegulations.filter(reg => {
       const regDate = reg.applicationDate;
       return regDate >= firstDayString && regDate <= lastDayString;
     });
     
-    // Get regulations that are active during this month
-    const activeRegulations = regulations.filter(reg => {
-      const regDate = new Date(reg.applicationDate);
-      
-      // If regulation starts before or during this month
-      if (regDate <= lastDayOfMonth) {
-        // Find the next regulation after this one
-        const nextReg = getNextRegulation(reg);
-        
-        // If there's no next regulation or it starts after this month, this regulation is active
-        if (!nextReg || new Date(nextReg.applicationDate) > firstDayOfMonth) {
-          return true;
-        }
-      }
-      
-      return false;
-    });
+    // Find one regulation before this month
+    const beforeMonthRegulation = sortedRegulations.reverse().find(reg => 
+      reg.applicationDate < firstDayString
+    );
     
-    // Combine and deduplicate
-    const combinedRegulations = [...new Map(
-      [...regulationsStartingThisMonth, ...activeRegulations].map(reg => [reg.id, reg])
-    ).values()];
+    // Find one regulation after this month
+    const afterMonthRegulation = sortedRegulations.reverse().find(reg => 
+      reg.applicationDate > lastDayString
+    );
     
-    // Assign random colors if not already assigned
-    return combinedRegulations.map(reg => {
+    // Combine all regulations
+    const combinedRegulations = [
+      ...(beforeMonthRegulation ? [beforeMonthRegulation] : []),
+      ...monthRegulations,
+      ...(afterMonthRegulation ? [afterMonthRegulation] : [])
+    ];
+    
+    // Deduplicate and sort by application date
+    const uniqueRegulations = [...new Map(
+      combinedRegulations.map(reg => [reg.id, reg])
+    ).values()].sort((a, b) => 
+      new Date(a.applicationDate).getTime() - new Date(b.applicationDate).getTime()
+    );
+    
+    // Assign colors if not already assigned
+    return uniqueRegulations.map(reg => {
       if (!reg.color) {
         const availableColors = ['indigo', 'emerald', 'amber', 'rose', 'blue', 'purple'];
-        const usedColors = combinedRegulations
+        const usedColors = uniqueRegulations
           .filter(r => r.color)
           .map(r => r.color);
         
@@ -755,7 +761,7 @@ const ApplicationSchedule = () => {
                   transition={{ repeat: Infinity, duration: 2.2, repeatType: 'loop' }}
                 />
                 <span className="text-base font-bold text-gray-600 group-hover:text-indigo-900 transition-all">{reg.name}</span>
-                <span className="text-xs text-indigo-400 font-semibold">#{reg.id.substring(3)}</span>
+                {/* <span className="text-xs text-indigo-400 font-semibold">#{reg.id.substring(3)}</span> */}
               </motion.div>
             );
           })}
