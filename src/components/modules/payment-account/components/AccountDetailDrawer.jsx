@@ -19,6 +19,7 @@ import ExportNotification from '../../../common/ExportNotification';
 import AnimatedTabNavigation from '../../../ui/custom/AnimatedTabNavigation';
 import { useAllTransactionByPaymentAccountId } from '@/hooks/usePaymentTransaction';
 import { useWithdrawTransaction, useDepositTransaction } from '@/hooks/usePaymentAccount';
+import { useUser } from '@/store/useUserStore';
 
 const AccountDetailDrawer = ({ 
   isOpen, 
@@ -53,6 +54,9 @@ const AccountDetailDrawer = ({
   // Transaction hooks
   const { withdrawMoney, isLoading: isWithdrawing, error: withdrawError, success: withdrawSuccess, resetState: resetWithdrawState } = useWithdrawTransaction();
   const { depositMoney, isLoading: isDepositing, error: depositError, success: depositSuccess, resetState: resetDepositState } = useDepositTransaction();
+  
+  // User store hook to get employee ID
+  const { detailInfo } = useUser();
   
   // Cập nhật state nội bộ khi props thay đổi
   useEffect(() => {
@@ -146,7 +150,7 @@ const AccountDetailDrawer = ({
         loaiTaiKhoanNguonID: 1, // Assuming payment account type ID is 1
         loaiGiaoDichID: 2, // Assuming withdrawal transaction type ID is 2
         kenhGiaoDichID: 1, // Assuming counter channel ID is 1
-        nhanVienGiaoDichID: 1, // This should be the current employee ID
+        nhanVienGiaoDichID: detailInfo.id || 1, // Get current employee ID from user store
         soTienGiaoDich: amount,
         noiDung: 'Rút tiền tại quầy giao dịch',
         thoiGianGiaoDich: new Date().toISOString()
@@ -206,7 +210,7 @@ const AccountDetailDrawer = ({
         loaiTaiKhoanDichID: 1, // Assuming payment account type ID is 1
         loaiGiaoDichID: 1, // Assuming deposit transaction type ID is 1
         kenhGiaoDichID: 1, // Assuming counter channel ID is 1
-        nhanVienGiaoDichID: 1, // This should be the current employee ID
+        nhanVienGiaoDichID: detailInfo.id || 1, // Get current employee ID from user store
         soTienGiaoDich: amount,
         noiDung: 'Nạp tiền tại quầy giao dịch',
         thoiGianGiaoDich: new Date().toISOString()
