@@ -24,7 +24,7 @@ const RegulationHistory = () => {
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: 'success', message: '', details: null, format: '' });
   const [searchTerm, setSearchTerm] = useState("");
-  const { regulations, error, isLoading } = useRegulationHistory();
+  const { regulations, error, isLoading, cancelRegulation } = useRegulationHistory();
   // const [isLoading, setIsLoading] = useState(true);
   
   // Mock data for regulations history
@@ -382,8 +382,8 @@ const RegulationHistory = () => {
       
       if (statusFilter === 'applied') {
         // Check if already applied
-        if (regulation.isCancelled) {
-          return false; // Cancelled regulations are not applied
+        if (!regulation.isActive) {
+          return false; // Inactive regulations are not applied
         }
         
         if (!regulation.applicationDate) {
@@ -400,8 +400,8 @@ const RegulationHistory = () => {
         return true;
       } else if (statusFilter === 'pending') {
         // Check if pending
-        if (regulation.isCancelled) {
-          return false; // Cancelled regulations are not pending
+        if (!regulation.isActive) {
+          return false; // Inactive regulations are not pending
         }
         
         if (!regulation.applicationDate) {
@@ -418,7 +418,7 @@ const RegulationHistory = () => {
         return true;
       } else if (statusFilter === 'cancelled') {
         // Check if cancelled
-        return regulation.isCancelled === true;
+        return regulation.isActive === false;
       }
     }
     
@@ -461,54 +461,44 @@ const RegulationHistory = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Confirm regulation cancellation
-  const handleConfirmCancellation = () => {
+  const handleConfirmCancellation = async () => {
     if (!selectedRegulation) return;
     
     // Set processing state to true
     setIsProcessing(true);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      try {
-        // In a real app, make an API call to cancel the regulation
-        // For now, simulate a backend update
-        const updatedRegulations = regulations.map(reg => {
-          if (reg.id === selectedRegulation.id) {
-            return { ...reg, isCancelled: true };
-          }
-          return reg;
-        });
-        
-        setRegulations(updatedRegulations);
-        
-        // Show success notification
-        setNotification({
-          show: true,
-          type: 'success',
-          message: 'Hủy quy định thành công',
-          format: `Quy định #${selectedRegulation.id.replace('reg', '')} đã được hủy`
-        });
-        
-        // Close confirmation modal
-        setShowCancelConfirmation(false);
-      } catch (error) {
-        // Show error notification
-        setNotification({
-          show: true,
-          type: 'error',
-          message: 'Không thể hủy quy định',
-          format: 'Đã xảy ra lỗi khi hủy quy định. Vui lòng thử lại sau.'
-        });
-      } finally {
-        // Reset processing state
-        setIsProcessing(false);
-      }
-    }, 1500); // 1.5 second delay to simulate API call
+    try {
+      // Convert string ID "regXXX" to number by removing "reg" prefix
+      const numericId = parseInt(selectedRegulation.id.replace('reg', ''));
+      await cancelRegulation(numericId);
+      
+      // Show success notification
+      setNotification({
+        show: true,
+        type: 'success',
+        message: 'Hủy quy định thành công',
+        format: `Quy định #${selectedRegulation.id.replace('reg', '')} đã được hủy`
+      });
+      
+      // Close confirmation modal
+      setShowCancelConfirmation(false);
+    } catch (error) {
+      // Show error notification
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Không thể hủy quy định',
+        format: 'Đã xảy ra lỗi khi hủy quy định. Vui lòng thử lại sau.'
+      });
+    } finally {
+      // Reset processing state
+      setIsProcessing(false);
+    }
   };
   
   // Hàm kiểm tra có thể hủy quy định không
   const canCancelRegulation = (regulation) => {
-    if (regulation.isCancelled) return false;
+    if (!regulation.isActive) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (!regulation.applicationDate) return false; // Áp dụng ngay thì không được hủy

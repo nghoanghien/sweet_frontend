@@ -63,7 +63,7 @@ const RegulationDetailModal = ({
   
   // Get status info
   const getStatusInfo = () => {
-    if (regulation.isCancelled) {
+    if (!regulation.isActive) {
       return {
         label: 'Đã hủy',
         color: 'bg-red-100 text-red-800'
@@ -134,14 +134,14 @@ const RegulationDetailModal = ({
                 </motion.span>
               </motion.div>
               <div className="flex items-center gap-2">
-                {canCancel && !regulation.isCancelled && (
+                {canCancel && regulation.isActive && (
                   <motion.button
                     layoutId={`regulation-cancel-button-${regulation.id}`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onCancel();
+                      if (onCancel) onCancel(regulation);
                     }}
                     className="px-4 py-2 bg-white/50 text-gray-600 rounded-xl shadow-[0_4px_20px_rgba(239,68,68,0.13)] font-semibold tracking-wide flex items-center gap-2"
                   >
@@ -281,6 +281,7 @@ const RegulationDetailModal = ({
                       interestRates={activeSavingsTypeDetails.interestRates}
                       paymentFrequencies={regulation.paymentFrequencies}
                       terms={activeSavingsTypeDetails.terms}
+                      disabledFrequencies={activeSavingsTypeDetails.disabledFrequencies || []}
                       isEditing={false}
                       onRateChange={() => {}}
                       onAddTerm={() => {}}

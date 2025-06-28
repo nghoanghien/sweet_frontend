@@ -24,7 +24,7 @@ const RegulationCard = ({ regulation, onClick, isActive, onCancelClick, canCance
   
   // Get status info
   const getStatusInfo = () => {
-    if (regulation.isCancelled) {
+    if (!regulation.isActive) {
       return {
         label: 'Đã hủy',
         color: 'bg-red-500',

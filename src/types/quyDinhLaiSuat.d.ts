@@ -19,4 +19,5 @@ export interface IQuyDinhLaiSuatResDTO {
   laiSuatKhongKyHan: number;
   soTienGuiToiThieu: number;
   chiTietQuyDinhLaiSuats: IChiTietQuyDinhLaiSuatResDTO[];
+  active: boolean;
 }

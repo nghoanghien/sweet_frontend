@@ -388,6 +388,8 @@ export const callGetAllQuyDinhLaiSuat = () => {
     return axios.get<IBackendRes<IQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat`);
 }
 
+
+
 export const callGetAllChiTietQuyDinhLaiSuat = () => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat/chi-tiet`);
 }
@@ -402,4 +404,8 @@ export const callGetQuyDinhLaiSuatHienTai = () => {
 
 export const callGetChiTietQuyDinhLaiSuatByID = (id: number) => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/chi-tiet/${id}`);
+}
+
+export const callDeleteQuyDinhLaiSuat = (id: number) => {
+    return axios.delete<IBackendRes<void>>(`/api/v1/quy-dinh-lai-suat/${id}`);
 }

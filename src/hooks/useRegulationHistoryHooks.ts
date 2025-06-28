@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getAllRegulationHistory } from '@/services/RegulationHistoryService';
+import { getAllRegulationHistory, cancelRegulation as cancelRegulationService } from '@/services/RegulationHistoryService';
 
 export const useRegulationHistory = () => {
   const [regulations, setRegulations] = useState([]);
@@ -31,23 +31,19 @@ export const useRegulationHistory = () => {
     }
   }, []);
 
-//   const cancelRegulation = async (regulationId: number) => {
-//     try {
-//       await cancelQuyDinhLaiSuat(regulationId);
-//       await fetchRegulations();
-//       return { success: true };
-//     } catch (err) {
-//       console.error('Error cancelling regulation:', err);
-//       throw err;
-//     }
-//   };
+  const cancelRegulation = async (regulationId: number) => {
+    try {
+      await cancelRegulationService(regulationId);
+      // Refresh the regulations list after successful cancellation
+      await fetchRegulations();
+    } catch (err) {
+      console.error('Error cancelling regulation:', err);
+      throw err;
+    }
+  };
 
   useEffect(() => {
     console.log("Fetching regulations...");
-    fetchRegulations();
-  }, [fetchRegulations]);
-
-  const refreshRegulations = useCallback(() => {
     fetchRegulations();
   }, [fetchRegulations]);
 
@@ -55,6 +51,6 @@ export const useRegulationHistory = () => {
     regulations, 
     isLoading, 
     error,
-    refreshRegulations,
+    cancelRegulation // Export the cancelRegulation function
   };
 };

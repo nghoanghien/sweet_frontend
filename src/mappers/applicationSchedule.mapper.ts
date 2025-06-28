@@ -20,7 +20,8 @@ export const mapApiToApplicationSchedule = (regulation: IQuyDinhLaiSuatResDTO, i
     creator: regulation.nguoiLapQuyDinh?.hoTen || 'Unknown',
     minimumDeposit: regulation.soTienGuiToiThieu,
     noTermRate: regulation.laiSuatKhongKyHan,
-    description: regulation.moTa || 'Không có mô tả'
+    description: regulation.moTa || 'Không có mô tả',
+    active: regulation.active
   };
 };
 
@@ -28,5 +29,8 @@ export const mapMultipleApiToApplicationSchedule = (regulations: IQuyDinhLaiSuat
   if (!Array.isArray(regulations)) {
     return [];
   }
-  return regulations.map((regulation, index) => mapApiToApplicationSchedule(regulation, index));
+  // Filter active regulations first, then map them
+  return regulations
+    .filter(regulation => regulation.active) // Only get active regulations
+    .map((regulation, index) => mapApiToApplicationSchedule(regulation, index));
 };
