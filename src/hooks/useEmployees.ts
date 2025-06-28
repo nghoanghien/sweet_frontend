@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react"
 import { getAllEmployees } from "@/services/employees";
+import { callActivateNhanVien, callDeactivateNhanVien } from "@/config/api";
 
 export const useAllEmployees = () => {
   const [data, setData] = useState<any[]>([]);
@@ -32,3 +33,107 @@ export const useAllEmployees = () => {
 
   return { data: data, allEmployees: data, isLoading, error, refreshEmployees };
 }
+
+// Hook for deactivating employee
+export const useDeactivateEmployee = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [success, setSuccess] = useState(false);
+
+  const deactivateEmployee = useCallback(async (employeeId: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setSuccess(false);
+      
+      const startTime = Date.now();
+      
+      console.log("Đang vô hiệu hóa nhân viên:", employeeId);
+      const response = await callDeactivateNhanVien(employeeId);
+      console.log('RESPONSE VÔ HIỆU HÓA NHÂN VIÊN: ', response);
+      
+      // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1500 - elapsedTime);
+      
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      console.log("Vô hiệu hóa nhân viên thành công:", response.data);
+      setSuccess(true);
+      
+      return response.data;
+    } catch (err) {
+      console.error("Lỗi khi vô hiệu hóa nhân viên:", err);
+      setError(err);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const resetState = useCallback(() => {
+    setError(null);
+    setSuccess(false);
+  }, []);
+
+  return {
+    deactivateEmployee,
+    isLoading,
+    error,
+    success,
+    resetState
+  };
+};
+
+// Hook for activating employee
+export const useActivateEmployee = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [success, setSuccess] = useState(false);
+
+  const activateEmployee = useCallback(async (employeeId: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setSuccess(false);
+      
+      const startTime = Date.now();
+      
+      console.log("Đang kích hoạt nhân viên:", employeeId);
+      const response = await callActivateNhanVien(employeeId);
+      console.log('RESPONSE KÍCH HOẠT NHÂN VIÊN: ', response);
+      
+      // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1500 - elapsedTime);
+      
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      console.log("Kích hoạt nhân viên thành công:", response.data);
+      setSuccess(true);
+      
+      return response.data;
+    } catch (err) {
+      console.error("Lỗi khi kích hoạt nhân viên:", err);
+      setError(err);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const resetState = useCallback(() => {
+    setError(null);
+    setSuccess(false);
+  }, []);
+
+  return {
+    activateEmployee,
+    isLoading,
+    error,
+    success,
+    resetState
+  };
+};

@@ -1,8 +1,28 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Edit2, Eye, Lock, XCircle, CheckCircle, User, Users, Settings, Unlock } from 'lucide-react';
+import { useUser } from '@/store/useUserStore';
 
 const AccountListItem = React.forwardRef(({ account, onView, onEdit, onDisable, onResetPassword, delay = 0 }, ref) => {
+  const { detailInfo } = useUser();
+  
+  // Kiểm tra xem có phải tài khoản hiện tại đang thao tác không
+  const isCurrentUserAccount = () => {
+    if (!detailInfo) return false;
+    
+    // Nếu account là nhân viên và có employeeID trùng với detailInfo.employeeID
+    if (account.employeeID) {
+      return account.employeeID === detailInfo.id;
+    }
+    
+    return false;
+  };
+  
+  // Kiểm tra có nên ẩn nút sửa và khóa không
+  const shouldHideEditAndLockButtons = () => {
+    return isCurrentUserAccount() && getAccountType(account) === 'staff';
+  };
+
   // Hàm tạo avatar từ tên người dùng
   const getInitials = (name) => {
     return name
@@ -133,27 +153,29 @@ const AccountListItem = React.forwardRef(({ account, onView, onEdit, onDisable, 
           <AnimatePresence>
             {!isDisabled(account) && (
               <>
-                <motion.button
-                  onClick={() => onEdit(
-                    account?.employeeID ? account.employeeID : account?.customerID,
-                    account?.employeeID ? 'employee' : 'customer'
-                  )}
-                  className="p-2 rounded-xl bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm"
-                  whileHover={{ scale: 1.12 }}
-                  whileTap={{ scale: 0.92 }}
-                  layoutId={`edit-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{
-                    duration: 0.2,
-                    type: "spring",
-                    stiffness: 150,
-                    damping: 20,
-                  }}
-                >
-                  <Edit2 size={18} />
-                </motion.button>
+                {!shouldHideEditAndLockButtons() && (
+                  <motion.button
+                    onClick={() => onEdit(
+                      account?.employeeID ? account.employeeID : account?.customerID,
+                      account?.employeeID ? 'employee' : 'customer'
+                    )}
+                    className="p-2 rounded-xl bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-sm"
+                    whileHover={{ scale: 1.12 }}
+                    whileTap={{ scale: 0.92 }}
+                    layoutId={`edit-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}`}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{
+                      duration: 0.2,
+                      type: "spring",
+                      stiffness: 150,
+                      damping: 20,
+                    }}
+                  >
+                    <Edit2 size={18} />
+                  </motion.button>
+                )}
 
                 <motion.button
                   onClick={() => onResetPassword(
@@ -177,26 +199,28 @@ const AccountListItem = React.forwardRef(({ account, onView, onEdit, onDisable, 
                   <Lock size={18} />
                 </motion.button>
 
-                <motion.button
-                  onClick={() => onDisable(
-                    account?.employeeID ? account.employeeID : account?.customerID,
-                    account?.employeeID ? 'employee' : 'customer'
-                  )}
-                  className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 shadow-sm"
-                  whileHover={{ scale: 1.12 }}
-                  whileTap={{ scale: 0.92 }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{
-                    duration: 0.2,
-                    type: "spring",
-                    stiffness: 150,
-                    damping: 20,
-                  }}
-                >
-                  <XCircle size={18} />
-                </motion.button>
+                {!shouldHideEditAndLockButtons() && (
+                  <motion.button
+                    onClick={() => onDisable(
+                      account?.employeeID ? account.employeeID : account?.customerID,
+                      account?.employeeID ? 'employee' : 'customer'
+                    )}
+                    className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 shadow-sm"
+                    whileHover={{ scale: 1.12 }}
+                    whileTap={{ scale: 0.92 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{
+                      duration: 0.2,
+                      type: "spring",
+                      stiffness: 150,
+                      damping: 20,
+                    }}
+                  >
+                    <XCircle size={18} />
+                  </motion.button>
+                )}
               </>
             )}
           </AnimatePresence>

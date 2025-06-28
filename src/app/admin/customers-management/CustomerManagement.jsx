@@ -4,14 +4,9 @@ import {
   Edit,
   User,
   MapPin,
-  CheckCircle,
-  XCircle,
   Plus,
   Download,
-  Lock,
-  Unlock,
   Save,
-  HelpCircle,
   Calendar
 } from 'lucide-react';
 import SearchFilterBar from '@/components/common/SearchFilterBar';
@@ -26,7 +21,6 @@ import CalendarDatePicker from '../../../components/ui/CalendarDatePicker';
 import ExportDataModal from '../../../components/common/ExportDataModal';
 import ExportNotification from '../../../components/common/ExportNotification';
 import InputField from '../../../components/ui/custom/Inputfield';
-import CustomSelect from '../../../components/ui/custom/CustomSelect';
 import AddressFields from '../../../components/ui/custom/AddressFields';
 import StatusBadge from '../../../components/ui/custom/StatusBadge';
 import ModalHeader from '../../../components/ui/custom/ModalHeader';
@@ -76,7 +70,7 @@ export default function CustomerManagement() {
       className: 'hidden sm:table-cell' // Ẩn trên mobile
     },
     {
-      key: 'customerStatus',
+      key: 'accountStatus',
       label: 'Trạng thái',
       sortable: true,
       type: 'status' // Sử dụng StatusBadge component
@@ -95,14 +89,6 @@ export default function CustomerManagement() {
         >
           <Edit size={18} />
         </motion.button>
-        <motion.button
-          onClick={() => toggleCustomerStatus(customer.customerID)}
-          whileHover={{ scale: 1.15, rotate: -5 }}
-          whileTap={{ scale: 0.95 }}
-          className={`p-1.5 rounded-full ${customer.customerStatus === 'active' ? 'text-red-600 hover:text-red-800 hover:bg-red-50' : 'text-green-600 hover:text-green-800 hover:bg-green-50'}`}
-        >
-          {customer.customerStatus === 'active' ? <Lock size={18} /> : <Unlock size={18} />}
-        </motion.button>
       </>
     );
   };
@@ -110,114 +96,6 @@ export default function CustomerManagement() {
   // Remove mock data - now using real data from API
 
   const { allCustomers, isLoading, error, refreshCustomers } = useAllCustomers();
-
-  // State for savings accounts
-  const [savingsAccounts, setSavingsAccounts] = useState({
-    1: [
-      {
-        id: 1,
-        nickname: "Tiết kiệm mua nhà",
-        depositNumber: "TK2023050001",
-        term: "12 tháng",
-        termDays: 365,
-        amount: 200000000,
-        interestRate: 6.8,
-        startDate: "15/05/2023",
-        endDate: "15/05/2024",
-        daysRemaining: 120,
-        accountNumber: "TK0987654321",
-        depositType: "Tiền gửi tiêu chuẩn",
-        interestFrequency: "Cuối kỳ",
-        maturityOption: "Tự động tái tục gốc",
-        receivedInterest: 2500000,
-        totalReceivable: 213600000,
-        color: "bg-gradient-to-r from-blue-400 to-indigo-500",
-        tooltip: "Lãi suất ưu đãi +0.3%"
-      }
-    ],
-    2: [
-      {
-        id: 2,
-        nickname: "Tiết kiệm du học",
-        depositNumber: "TK2023060002",
-        term: "6 tháng",
-        termDays: 180,
-        amount: 150000000,
-        interestRate: 5.5,
-        startDate: "10/06/2023",
-        endDate: "07/12/2023",
-        daysRemaining: 30,
-        accountNumber: "TK1234509876",
-        depositType: "Rút gốc linh hoạt",
-        interestFrequency: "Hàng tháng",
-        maturityOption: "Chuyển gốc và lãi sang TKTG",
-        receivedInterest: 3437500,
-        totalReceivable: 153437500,
-        color: "bg-gradient-to-r from-pink-400 to-purple-500"
-      }
-    ],
-    3: [],
-    4: [],
-    5: []
-  });
-
-  // State for savings transaction history
-  const [savingsTransactionHistory, setSavingsTransactionHistory] = useState({
-    1: [
-      {
-        id: 1,
-        time: "15:30 - 15/05/2023",
-        type: "Gửi tiền",
-        channel: "Internet Banking",
-        amount: 200000000,
-        content: "Gửi tiền tiết kiệm kỳ hạn 12 tháng",
-        isDeposit: true,
-        interestAmount: 0,
-        balanceAfter: 200000000
-      },
-      {
-        id: 2,
-        time: "16:45 - 15/05/2023",
-        type: "Xác nhận mở sổ",
-        channel: "Hệ thống",
-        amount: 0,
-        content: "Xác nhận mở sổ tiết kiệm thành công",
-        isSystem: true,
-        interestAmount: 0,
-        balanceAfter: 200000000
-      }
-    ],
-    2: [
-      {
-        id: 1,
-        time: "10:15 - 10/06/2023",
-        type: "Gửi tiền",
-        channel: "Quầy giao dịch",
-        amount: 150000000,
-        content: "Gửi tiền tiết kiệm kỳ hạn 6 tháng",
-        isDeposit: true,
-        interestAmount: 0,
-        balanceAfter: 150000000
-      },
-      {
-        id: 2,
-        time: "11:20 - 10/06/2023",
-        type: "Xác nhận mở sổ",
-        channel: "Hệ thống",
-        amount: 0,
-        content: "Xác nhận mở sổ tiết kiệm thành công",
-        isSystem: true,
-        interestAmount: 0,
-        balanceAfter: 150000000
-      }
-    ]
-  });
-
-  // State for selected account/savings details
-  const [selectedAccountId, setSelectedAccountId] = useState(null);
-  const [selectedSavingsId, setSelectedSavingsId] = useState(null);
-  const [accountDetailVisible, setAccountDetailVisible] = useState(false);
-  const [savingsDetailVisible, setSavingsDetailVisible] = useState(false);
 
   // State for customer detail modal
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -273,19 +151,6 @@ export default function CustomerManagement() {
 
   // Add state for active tab in customer details modal
   const [activeDetailTab, setActiveDetailTab] = useState('information');
-
-  // State for hiding account information
-  const [hiddenAccountInfo, setHiddenAccountInfo] = useState({});
-
-  // State for new account modal
-  const [newAccountModalOpen, setNewAccountModalOpen] = useState(false);
-  const [newAccountModalAnimating, setNewAccountModalAnimating] = useState(false);
-
-  // State for account action menu
-  const [accountActionMenuOpen, setAccountActionMenuOpen] = useState(null);
-  const [drawerVisible, setDrawerVisible] = useState(false);
-  const [cardDetailVisible, setCardDetailVisible] = useState(false);
-  const [selectedCardDetail, setSelectedCardDetail] = useState(null);
 
   // State for confirmation modal
   const [confirmationModal, setConfirmationModal] = useState({
@@ -470,52 +335,6 @@ export default function CustomerManagement() {
 
     // Reset form data after animation completes in onExitComplete callback
     // The actual state reset happens in the AnimatePresence onExitComplete
-  };
-
-  // Toggle customer status (active/disabled)
-  const toggleCustomerStatus = (customerId) => {
-    const customer = allCustomers.find(c => c.customerID === customerId);
-    if (!customer) return;
-
-    const newStatus = customer.customerStatus === 'active' ? 'disabled' : 'active';
-    const actionText = newStatus === 'active' ? 'kích hoạt' : 'vô hiệu hóa';
-
-    openConfirmationModal({
-      title: `Xác nhận ${actionText} tài khoản`,
-      description: `Bạn có chắc chắn muốn ${actionText} tài khoản của khách hàng "${customer.fullName}" không?`,
-      confirmText: `Quẹt để ${actionText}`,
-      confirmDetails: {
-        'Mã khách hàng': customer.customerID,
-        'Họ tên': customer.fullName,
-        'Trạng thái hiện tại': customer.customerStatus === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
-        'Trạng thái mới': newStatus === 'active' ? 'Hoạt động' : 'Vô hiệu hóa',
-      },
-      type: `${newStatus === 'active' ? 'unlock' : 'warning'}`,
-      onConfirm: () => {
-        setConfirmationProcessing(true);
-
-        setTimeout(() => {
-          // TODO: Call API to update customer status
-          // For now, just show success notification
-
-          // Hiển thị thông báo thành công
-          setExportNotification({
-            visible: true,
-            type: 'success',
-            message: `${newStatus === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa'} khách hàng thành công!`,
-            format: `${newStatus === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa'} khách hàng thành công!`
-          });
-
-          // Tự động ẩn thông báo sau 5 giây
-          setTimeout(() => {
-            setExportNotification(prev => ({ ...prev, visible: false }));
-          }, 5000);
-
-          setConfirmationProcessing(false);
-          closeConfirmationModal();
-        }, 2000)
-      }
-    });
   };
 
   // Enable edit mode
@@ -893,7 +712,7 @@ export default function CustomerManagement() {
         permanentAddress: { ...newCustomer.permanentAddress },
         contactAddress: { ...newCustomer.contactAddress },
         registrationDate: new Date(),
-        customerStatus: 'active',
+        accountStatus: 'active',
         password: 123456,
       };
 
@@ -1385,7 +1204,7 @@ export default function CustomerManagement() {
             emptyMessage="Không tìm thấy khách hàng nào phù hợp với điều kiện tìm kiếm"
             // Bộ lọc trạng thái
             statusFilters={{
-              customerStatus: ['active', 'disabled']
+              accountStatus: ['active', 'disabled']
             }}
             changeTableData={setExporData}
             // Bộ lọc khoảng thời gian
@@ -1464,32 +1283,6 @@ export default function CustomerManagement() {
                   />
                 </div>
               )}
-
-              {/* Disabled Customer Warning */}
-              <AnimatePresence>
-                {selectedCustomer && selectedCustomer.status === 'disabled' && !isEditMode && (activeDetailTab !== "information") && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.5, type: "spring" }}
-                    className="mx-auto max-w-4xl w-full text-sm md:text-base mt-0 px-4 md:px-6 py-4 rounded-3xl backdrop-blur-md bg-amber-500/50 shadow-lg"
-                    style={{
-                      boxShadow: "0 10px 25px -5px rgba(245, 158, 11, 0.3)",
-                      backdropFilter: "blur(8px)"
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-amber-600/30 rounded-full flex items-center justify-center">
-                        <XCircle size={20} className="text-amber-100" />
-                      </div>
-                      <div className="flex-1 text-amber-50 font-medium">
-                        Khách hàng này đang trong diện bị "Vô hiệu hóa", các thao tác nạp/rút tiền đều không thể thực hiện.
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               {/* Scrollable Content */}
               <div
@@ -1624,7 +1417,7 @@ export default function CustomerManagement() {
                                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/50 to-green-100/50 rounded-2xl blur-sm"></div>
                                   <div className="relative bg-white/80 backdrop-blur-sm p-3 rounded-2xl border border-emerald-200/50">
                                     <StatusBadge
-                                      status={selectedCustomer.customerStatus}
+                                      status={selectedCustomer.accountStatus}
                                     />
                                   </div>
                                 </div>
@@ -1805,31 +1598,6 @@ export default function CustomerManagement() {
                                 required={true}
                               />
                             </motion.div>
-
-                            <motion.div
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.2 }}
-                            >
-                              <CustomSelect
-                                label="Trạng thái"
-                                value={
-                                  editedCustomer.status === "active"
-                                    ? "Hoạt động"
-                                    : "Vô hiệu hóa"
-                                }
-                                onChange={(value) =>
-                                  handleEditChange(
-                                    "status",
-                                    value === "Hoạt động"
-                                      ? "active"
-                                      : "disabled"
-                                  )
-                                }
-                                options={["Hoạt động", "Vô hiệu hóa"]}
-                                required={true}
-                              />
-                            </motion.div>
                           </div>
                         </motion.div>
 
@@ -1944,7 +1712,7 @@ export default function CustomerManagement() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={cancelEdit}
-                              className="px-6 py-3 font-medium bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-all duration-300"
+                              className="px-6 py-3 font-semibold bg-gray-300 text-gray-600 rounded-xl hover:bg-gray-400 transition-all duration-300"
                             >
                               Hủy bỏ
                             </motion.button>
@@ -1971,7 +1739,7 @@ export default function CustomerManagement() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={closeModal}
-                              className="px-6 py-3 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-all duration-300"
+                              className="px-6 py-3 bg-gray-300 font-semibold text-gray-600 rounded-xl hover:bg-gray-400 transition-all duration-300"
                             >
                               Đóng
                             </motion.button>
@@ -1979,7 +1747,7 @@ export default function CustomerManagement() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => enableEditMode(selectedCustomer)}
-                              className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
+                              className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-500 font-semibold text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
                             >
                               <Edit size={16} className="mr-2" />
                               Chỉnh sửa
@@ -2406,7 +2174,7 @@ export default function CustomerManagement() {
           "permanentAddress",
           "contactAddress",
           "registrationDate",
-          "customerStatus",
+          "accountStatus",
         ]}
         columnLabels={{
           customerID: "Mã khách hàng",
@@ -2419,10 +2187,10 @@ export default function CustomerManagement() {
           permanentAddress: "Địa chỉ thường trú",
           contactAddress: "Địa chỉ liên lạc",
           registrationDate: "Ngày đăng ký",
-          customerStatus: "Trạng thái",
+          accountStatus: "Trạng thái",
         }}
         formatData={(value, column) => {
-          if (column === "customerStatus")
+          if (column === "accountStatus")
             return value === "active" ? "Hoạt động" : "Vô hiệu hóa";
           if (column === "permanentAddress" || column === "contactAddress") {
             if (!value) return "";
@@ -2435,7 +2203,7 @@ export default function CustomerManagement() {
           personal: ["customerID", "fullName", "dateOfBirth", "age", "idCardNumber"],
           contact: ["email", "phoneNumber"],
           address: ["permanentAddress", "contactAddress"],
-          other: ["registrationDate", "customerStatus"],
+          other: ["registrationDate", "accountStatus"],
         }}
         enableGrouping={true}
       />

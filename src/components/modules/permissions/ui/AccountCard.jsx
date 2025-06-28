@@ -1,8 +1,28 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { User, UserCheck, Shield, Edit2, Lock, Eye, XCircle, Users, Unlock } from 'lucide-react';
+import { useUser } from '@/store/useUserStore';
 
 const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) => {
+  const { detailInfo } = useUser();
+  
+  // Kiểm tra xem có phải tài khoản hiện tại đang thao tác không
+  const isCurrentUserAccount = () => {
+    if (!detailInfo) return false;
+    
+    // Nếu account là nhân viên và có employeeID trùng với detailInfo.employeeID
+    if (account.employeeID) {
+      return account.employeeID === detailInfo.id;
+    }
+    
+    return false;
+  };
+  
+  // Kiểm tra có nên ẩn nút sửa và khóa không
+  const shouldHideEditAndLockButtons = () => {
+    return isCurrentUserAccount() && getAccountType(account) === 'staff';
+  };
+
   // Hàm tạo avatar từ tên người dùng
   const getInitials = (name) => {
     return name
@@ -215,24 +235,26 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
                 <span className="font-semibold">Xem</span>
               </motion.button>
 
-              <motion.button
-                onClick={() => onEdit(
-                  account?.employeeID ? account.employeeID : account?.customerID,
-                  account?.employeeID ? 'employee' : 'customer'
-                )}
-                className={`flex items-center px-3 py-1.5 rounded-xl text-sm shadow-sm transition-colors duration-200 ${
-                  getAccountType(account) === "customer"
-                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                    : "bg-violet-100 text-violet-700 hover:bg-violet-200"
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.92 }}
-                layoutId={`edit-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}`}
-                transition={{ duration: 0.2, type: "spring", stiffness: 100, damping: 16 }}
-              >
-                <Edit2 size={14} className="mr-1" />
-                <span className="font-semibold">Sửa</span>
-              </motion.button>
+              {!shouldHideEditAndLockButtons() && (
+                <motion.button
+                  onClick={() => onEdit(
+                    account?.employeeID ? account.employeeID : account?.customerID,
+                    account?.employeeID ? 'employee' : 'customer'
+                  )}
+                  className={`flex items-center px-3 py-1.5 rounded-xl text-sm shadow-sm transition-colors duration-200 ${
+                    getAccountType(account) === "customer"
+                      ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                      : "bg-violet-100 text-violet-700 hover:bg-violet-200"
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.92 }}
+                  layoutId={`edit-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}`}
+                  transition={{ duration: 0.2, type: "spring", stiffness: 100, damping: 16 }}
+                >
+                  <Edit2 size={14} className="mr-1" />
+                  <span className="font-semibold">Sửa</span>
+                </motion.button>
+              )}
 
               <motion.button
                 onClick={() => onResetPassword(
@@ -249,18 +271,20 @@ const AccountCard = ({ account, onView, onEdit, onDisable, onResetPassword }) =>
                 <span className="font-semibold">Đổi MK</span>
               </motion.button>
 
-              <motion.button
-                onClick={() => onDisable(
-                  account?.employeeID ? account.employeeID : account?.customerID,
-                  account?.employeeID ? 'employee' : 'customer'
-                )}
-                className="flex items-center px-3 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 text-sm shadow-sm transition-colors duration-200"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.92 }}
-              >
-                <XCircle size={14} className="mr-1" />
-                <span className="font-semibold">Khóa</span>
-              </motion.button>
+              {!shouldHideEditAndLockButtons() && (
+                <motion.button
+                  onClick={() => onDisable(
+                    account?.employeeID ? account.employeeID : account?.customerID,
+                    account?.employeeID ? 'employee' : 'customer'
+                  )}
+                  className="flex items-center px-3 py-1.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 text-sm shadow-sm transition-colors duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.92 }}
+                >
+                  <XCircle size={14} className="mr-1" />
+                  <span className="font-semibold">Khóa</span>
+                </motion.button>
+              )}
             </motion.div>
           )}
         </motion.div>

@@ -12,10 +12,46 @@ import AccountCardShimmer from '@/components/ui/custom/shimmer-types/AccountCard
 import AccountListItemShimmer from '@/components/ui/custom/shimmer-types/AccountListItemShimmer';
 import FilterDropdown from '@/components/ui/FilterDropdown';
 import { useLoginAccounts } from '@/hooks/useLoginAccounts';
+import { useDeactivateCustomer, useActivateCustomer } from '@/hooks/useCustomers';
+import { useDeactivateEmployee, useActivateEmployee } from '@/hooks/useEmployees';
 
 const AccountManagement = () => {
   // Sử dụng hook để lấy dữ liệu tài khoản
   const { accounts, isLoading, error } = useLoginAccounts();
+  
+  // Hooks cho vô hiệu hóa/kích hoạt khách hàng
+  const { 
+    deactivateCustomer, 
+    isLoading: isDeactivatingCustomer, 
+    success: deactivateCustomerSuccess,
+    error: deactivateCustomerError,
+    resetState: resetDeactivateCustomerState 
+  } = useDeactivateCustomer();
+  
+  const { 
+    activateCustomer, 
+    isLoading: isActivatingCustomer, 
+    success: activateCustomerSuccess,
+    error: activateCustomerError,
+    resetState: resetActivateCustomerState 
+  } = useActivateCustomer();
+  
+  // Hooks cho vô hiệu hóa/kích hoạt nhân viên
+  const { 
+    deactivateEmployee, 
+    isLoading: isDeactivatingEmployee, 
+    success: deactivateEmployeeSuccess,
+    error: deactivateEmployeeError,
+    resetState: resetDeactivateEmployeeState 
+  } = useDeactivateEmployee();
+  
+  const { 
+    activateEmployee, 
+    isLoading: isActivatingEmployee, 
+    success: activateEmployeeSuccess,
+    error: activateEmployeeError,
+    resetState: resetActivateEmployeeState 
+  } = useActivateEmployee();
   
   // State cho pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,6 +96,10 @@ const AccountManagement = () => {
     type: 'success',
     format: '',
   });
+  
+  // Tính toán trạng thái loading tổng thể cho các thao tác vô hiệu hóa/kích hoạt
+  const isToggleActionLoading = isDeactivatingCustomer || isActivatingCustomer || 
+                               isDeactivatingEmployee || isActivatingEmployee;
   
 
 
@@ -212,11 +252,6 @@ const AccountManagement = () => {
     });
   };
   
-  // Hàm cập nhật trạng thái xử lý
-  const setConfirmationProcessing = (isProcessing) => {
-    setConfirmModal(prev => ({ ...prev, isProcessing }));
-  };
-
   // Hàm đóng modal xác nhận
   const closeConfirmModal = () => {
     setConfirmModal(prev => ({ ...prev, isOpen: false }));
@@ -493,34 +528,76 @@ const AccountManagement = () => {
       `Xác nhận ${actionText} tài khoản "${account.email}"?`,
       newStatus ? 'danger' : 'success',
       confirmDetails,
-      () => {
-        // Cập nhật trạng thái đang xử lý
-        setConfirmationProcessing(true);
-        
-        // Giả lập thời gian xử lý API
-        setTimeout(() => {
-          try {
-            // Cập nhật trạng thái tài khoản
-            setAccountsList(accountsList.map(a => {
-              if (a.id === accountId) {
-                return { ...a, disabled: newStatus };
-              }
-              return a;
-            }));
-            
-            // Hiển thị thông báo thành công
-            showNotification(
-              `Đã ${actionText} tài khoản thành công!`,
-              'success',
-              `Tài khoản "${account.email}" đã ${actionText} thành công!`
-            );
-          } finally {
-            // Đặt lại trạng thái xử lý
-            setConfirmationProcessing(false);
-            // Đóng modal xác nhận
-            closeConfirmModal();
+      async () => {
+        try {
+          let response;
+          
+          // Gọi API tương ứng dựa trên loại tài khoản và hành động
+          if (accountType === 'customer') {
+            if (newStatus) {
+              // Vô hiệu hóa khách hàng
+              response = await deactivateCustomer(account.customerID.toString());
+            } else {
+              // Kích hoạt khách hàng
+              response = await activateCustomer(account.customerID.toString());
+            }
+          } else if (accountType === 'employee') {
+            if (newStatus) {
+              // Vô hiệu hóa nhân viên
+              response = await deactivateEmployee(account.employeeID.toString());
+            } else {
+              // Kích hoạt nhân viên
+              response = await activateEmployee(account.employeeID.toString());
+            }
           }
-        }, 1500);
+          
+          // Cập nhật trạng thái tài khoản trong danh sách
+          setAccountsList(accountsList.map(a => {
+            if ((accountType === 'employee' && a.employeeID === accountId) || 
+                (accountType === 'customer' && a.customerID === accountId)) {
+              return { ...a, accountStatus: newStatus ? 'disabled' : 'active' };
+            }
+            return a;
+          }));
+          
+          // Hiển thị thông báo thành công
+          showNotification(
+            `Đã ${actionText} tài khoản thành công!`,
+            'success',
+            `Tài khoản "${account.email}" đã ${actionText} thành công!`
+          );
+          
+          // Reset state của hooks
+          if (accountType === 'customer') {
+            if (newStatus) {
+              resetDeactivateCustomerState();
+            } else {
+              resetActivateCustomerState();
+            }
+          } else {
+            if (newStatus) {
+              resetDeactivateEmployeeState();
+            } else {
+              resetActivateEmployeeState();
+            }
+          }
+          
+          // Đóng modal xác nhận
+          closeConfirmModal();
+          
+        } catch (error) {
+          console.error(`Lỗi khi ${actionText} tài khoản:`, error);
+          
+          // Hiển thị thông báo lỗi
+          showNotification(
+            `Lỗi khi ${actionText} tài khoản!`,
+            'error',
+            `Không thể ${actionText} tài khoản "${account.email}". Vui lòng thử lại.`
+          );
+          
+          // Đóng modal xác nhận ngay cả khi có lỗi
+          closeConfirmModal();
+        }
       }
     );
   };
@@ -949,7 +1026,7 @@ const AccountManagement = () => {
         description={confirmModal.description}
         type={confirmModal.type}
         confirmDetails={confirmModal.confirmDetails}
-        isProcessing={confirmModal.isProcessing}
+        isProcessing={confirmModal.isProcessing || isToggleActionLoading}
       />
 
       {/* ExportNotification */}

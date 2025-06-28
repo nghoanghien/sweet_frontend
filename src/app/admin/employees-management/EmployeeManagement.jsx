@@ -15,7 +15,6 @@ import CalendarDatePicker from '../../../components/ui/CalendarDatePicker';
 import ExportDataModal from '../../../components/common/ExportDataModal';
 import ExportNotification from '../../../components/common/ExportNotification';
 import InputField from '../../../components/ui/custom/Inputfield';
-import CustomSelect from '../../../components/ui/custom/CustomSelect';
 import AddressFields from '../../../components/ui/custom/AddressFields';
 import StatusBadge from '../../../components/ui/custom/StatusBadge';
 import SearchFilterBar from '../../../components/common/SearchFilterBar';
@@ -148,75 +147,6 @@ export default function EmployeeManagement() {
       label: 'Trạng thái',
       sortable: true,
       type: 'status' // Sử dụng StatusBadge component
-    }
-  ];
-
-  const addEmployeeFormFields = [
-    {
-      name: 'fullName',
-      type: 'text',
-      label: 'Họ và tên',
-      placeholder: 'Nhập họ và tên...',
-      required: true,
-      getValue: (data) => data.fullName || ''
-    },
-    {
-      name: 'dateOfBirth',
-      type: 'date',
-      label: 'Ngày sinh',
-      placeholder: 'DD/MM/YYYY',
-      required: true,
-      getValue: (data) => data.dateOfBirth || ''
-    },
-    {
-      name: 'idCardNumber',
-      type: 'text',
-      label: 'Số CCCD/CMND',
-      placeholder: 'Nhập số CCCD/CMND...',
-      required: true,
-      getValue: (data) => data.idCardNumber || ''
-    },
-    {
-      name: 'email',
-      type: 'email',
-      label: 'Email',
-      placeholder: 'example@email.com',
-      required: true,
-      getValue: (data) => data.email || ''
-    },
-    {
-      name: 'phoneNumber',
-      type: 'tel',
-      label: 'Số điện thoại',
-      placeholder: 'Nhập số điện thoại...',
-      required: true,
-      getValue: (data) => data.phoneNumber || ''
-    },
-    {
-      name: 'permanentAddress',
-      type: 'address',
-      label: 'Địa chỉ thường trú',
-      required: true,
-      getValue: (data) => data.permanentAddress || {
-        province: '',
-        district: '',
-        ward: '',
-        streetName: '',
-        houseNumber: ''
-      }
-    },
-    {
-      name: 'contactAddress',
-      type: 'address',
-      label: 'Địa chỉ liên lạc',
-      required: true,
-      getValue: (data) => data.contactAddress || {
-        province: '',
-        district: '',
-        ward: '',
-        streetName: '',
-        houseNumber: ''
-      }
     }
   ];
 
@@ -1714,31 +1644,6 @@ export default function EmployeeManagement() {
                                 }
                                 placeholder="Nhập số điện thoại..."
                                 error={errors.phoneNumber}
-                                required={true}
-                              />
-                            </motion.div>
-
-                            <motion.div
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.2 }}
-                            >
-                              <CustomSelect
-                                label="Trạng thái"
-                                value={
-                                  editedEmployee.accountStatus === "active"
-                                    ? "Hoạt động"
-                                    : "Vô hiệu hóa"
-                                }
-                                onChange={(value) =>
-                                  handleFormChange(
-                                    "accountStatus",
-                                    value === "Hoạt động"
-                                      ? "active"
-                                      : "disabled"
-                                  )
-                                }
-                                options={["Hoạt động", "Vô hiệu hóa"]}
                                 required={true}
                               />
                             </motion.div>

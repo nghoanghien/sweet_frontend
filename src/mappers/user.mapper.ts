@@ -30,7 +30,7 @@ export const mapApiToUser = (item: any): User => {
     permanentAddress: mapApiToAddress(item.diaChiThuongTru),
     contactAddress: mapApiToAddress(item.diaChiLienLac),
     role: mapApiToRole(item.vaiTro),
-    accountStatus: getAccountStatusByCode(item.trangThaiTaiKhoan.trangThaiID),
+    accountStatus: getAccountStatusByCode(item.trangThaiTaiKhoan.maTrangThai),
 
     //only for customer
     customerID: item?.khachHangID || null,
