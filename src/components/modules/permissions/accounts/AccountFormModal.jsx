@@ -411,23 +411,6 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                             }`}></div>
                             {account.customerID ? 'Khách hàng' : 'Nhân viên'}
                           </motion.div>
-                          
-                          {/* Trạng thái tài khoản */}
-                          <motion.div
-                            className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium mt-2 ${
-                              account.accountStatus === 'disabled'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-green-100 text-green-700'
-                            }`}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.3 }}
-                          >
-                            <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                              account.accountStatus === 'disabled' ? 'bg-red-500' : 'bg-green-500'
-                            }`}></div>
-                            {account.accountStatus === 'disabled' ? 'Đã khóa' : 'Hoạt động'}
-                          </motion.div>
                         </div>
                       </div>
                       

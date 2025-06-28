@@ -44,7 +44,7 @@ const AccountCardShimmer = ({ cardCount = 9 }) => {
 
     return (
       <motion.div
-        className={`relative bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} px-4 p-6 border-2 ${cardStyle.border} overflow-hidden`}
+        className={`relative bg-gradient-to-br ${cardStyle.gradient} rounded-3xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} overflow-hidden`}
         variants={cardVariants}
         initial="initial"
         animate="animate"
@@ -56,66 +56,37 @@ const AccountCardShimmer = ({ cardCount = 9 }) => {
           stiffness: 100,
         }}
       >
-        {/* Main content */}
-        <div className="flex items-center mb-4">
-          {/* Avatar shimmer */}
-          <motion.div
-            className={`mr-5 w-14 h-14 rounded-2xl ${cardStyle.avatarBg} shadow-lg relative overflow-hidden`}
-            variants={shimmerVariants}
-            initial="initial"
-            animate="animate"
-            style={{
-              background: `linear-gradient(90deg, ${cardStyle.avatarBg} 25%, rgba(255,255,255,0.4) 50%, ${cardStyle.avatarBg} 75%)`,
-              backgroundSize: '200% 100%',
-            }}
-          />
-          
-          <div className="flex-1">
-            {/* Name shimmer */}
-            <motion.div
-              className="h-5 bg-gray-200 rounded-lg mb-2 max-w-[180px]"
-              variants={shimmerVariants}
-              initial="initial"
-              animate="animate"
-              style={{
-                background: 'linear-gradient(90deg, #e5e7eb 25%, rgba(255,255,255,0.8) 50%, #e5e7eb 75%)',
-                backgroundSize: '200% 100%',
-              }}
-            />
-            
-            {/* Email shimmer */}
-            <motion.div
-              className="h-4 bg-gray-200 rounded-lg max-w-[220px]"
-              variants={shimmerVariants}
-              initial="initial"
-              animate="animate"
-              style={{
-                background: 'linear-gradient(90deg, #e5e7eb 25%, rgba(255,255,255,0.8) 50%, #e5e7eb 75%)',
-                backgroundSize: '200% 100%',
-              }}
-            />
-          </div>
-        </div>
+        {/* View button shimmer ở góc trên phải */}
+        <motion.div
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 border border-gray-200 shadow-sm"
+          variants={shimmerVariants}
+          initial="initial"
+          animate="animate"
+          style={{
+            background: 'linear-gradient(90deg, #f3f4f6 25%, rgba(255,255,255,0.8) 50%, #f3f4f6 75%)',
+            backgroundSize: '200% 100%',
+          }}
+        />
 
-        {/* Role info shimmer */}
-        <div className="mb-4">
-          <div className={`flex items-center px-3 py-2 rounded-xl ${cardStyle.roleBg} border border-opacity-30 ${isCustomer ? 'border-emerald-200' : 'border-violet-200'}`}>
-            {/* Role icon shimmer */}
+        {/* Header với avatar và thông tin cơ bản */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center space-x-4">
+            {/* Avatar shimmer - tăng kích thước và bo tròn hơn */}
             <motion.div
-              className={`mr-3 p-1.5 rounded-lg ${cardStyle.iconBg} w-8 h-8`}
+              className={`w-16 h-16 rounded-3xl ${cardStyle.avatarBg} shadow-lg relative overflow-hidden`}
               variants={shimmerVariants}
               initial="initial"
               animate="animate"
               style={{
-                background: `linear-gradient(90deg, ${cardStyle.iconBg} 25%, rgba(255,255,255,0.6) 50%, ${cardStyle.iconBg} 75%)`,
+                background: `linear-gradient(90deg, ${cardStyle.avatarBg} 25%, rgba(255,255,255,0.4) 50%, ${cardStyle.avatarBg} 75%)`,
                 backgroundSize: '200% 100%',
               }}
             />
             
             <div className="flex-1">
-              {/* Role name shimmer */}
+              {/* Name shimmer - tăng kích thước */}
               <motion.div
-                className="h-4 bg-gray-200 rounded mb-1 w-24"
+                className="h-6 bg-gray-200 rounded-lg mb-2 max-w-[180px]"
                 variants={shimmerVariants}
                 initial="initial"
                 animate="animate"
@@ -125,9 +96,9 @@ const AccountCardShimmer = ({ cardCount = 9 }) => {
                 }}
               />
               
-              {/* Account type shimmer */}
+              {/* Email shimmer */}
               <motion.div
-                className="h-3 bg-gray-200 rounded w-16"
+                className="h-4 bg-gray-200 rounded-lg max-w-[220px]"
                 variants={shimmerVariants}
                 initial="initial"
                 animate="animate"
@@ -140,23 +111,54 @@ const AccountCardShimmer = ({ cardCount = 9 }) => {
           </div>
         </div>
 
-        {/* Action buttons shimmer */}
-        <div className="flex flex-wrap gap-2">
-          {/* View button */}
-          <motion.div
-            className="h-8 bg-gray-100 rounded-xl w-16"
-            variants={shimmerVariants}
-            initial="initial"
-            animate="animate"
-            style={{
-              background: 'linear-gradient(90deg, #e5e7eb 25%, rgba(255,255,255,0.8) 50%, #e5e7eb 75%)',
-              backgroundSize: '200% 100%',
-            }}
-          />
-          
+        {/* Role info shimmer */}
+        <div className="mb-4">
+          <div className={`flex items-center px-4 py-3 rounded-xl ${cardStyle.roleBg} border border-opacity-50 ${isCustomer ? 'border-emerald-200' : 'border-violet-200'}`}>
+            {/* Role icon shimmer với background trắng */}
+            <motion.div
+              className="mr-3 p-2 rounded-lg bg-white shadow-sm w-10 h-10"
+              variants={shimmerVariants}
+              initial="initial"
+              animate="animate"
+              style={{
+                background: 'linear-gradient(90deg, #ffffff 25%, rgba(255,255,255,0.6) 50%, #ffffff 75%)',
+                backgroundSize: '200% 100%',
+              }}
+            />
+            
+            <div className="flex-1">
+              {/* Role name shimmer */}
+              <motion.div
+                className="h-4 bg-gray-200 rounded mb-1 w-28"
+                variants={shimmerVariants}
+                initial="initial"
+                animate="animate"
+                style={{
+                  background: 'linear-gradient(90deg, #e5e7eb 25%, rgba(255,255,255,0.8) 50%, #e5e7eb 75%)',
+                  backgroundSize: '200% 100%',
+                }}
+              />
+              
+              {/* Account type shimmer */}
+              <motion.div
+                className="h-3 bg-gray-200 rounded w-20"
+                variants={shimmerVariants}
+                initial="initial"
+                animate="animate"
+                style={{
+                  background: 'linear-gradient(90deg, #e5e7eb 25%, rgba(255,255,255,0.8) 50%, #e5e7eb 75%)',
+                  backgroundSize: '200% 100%',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Action buttons shimmer - căn giữa và tăng padding */}
+        <div className="flex flex-wrap justify-center gap-2">
           {/* Edit button */}
           <motion.div
-            className={`h-8 rounded-xl w-14 ${isCustomer ? 'bg-emerald-100' : 'bg-violet-100'}`}
+            className={`h-10 rounded-xl w-16 ${isCustomer ? 'bg-emerald-100' : 'bg-violet-100'} border`}
             variants={shimmerVariants}
             initial="initial"
             animate="animate"
@@ -168,7 +170,7 @@ const AccountCardShimmer = ({ cardCount = 9 }) => {
           
           {/* Reset password button */}
           <motion.div
-            className="h-8 bg-amber-100 rounded-xl w-20"
+            className="h-10 bg-amber-100 rounded-xl w-24 border border-amber-200"
             variants={shimmerVariants}
             initial="initial"
             animate="animate"
@@ -180,7 +182,7 @@ const AccountCardShimmer = ({ cardCount = 9 }) => {
           
           {/* Disable button */}
           <motion.div
-            className="h-8 bg-red-100 rounded-xl w-16"
+            className="h-10 bg-red-100 rounded-xl w-16 border border-red-200"
             variants={shimmerVariants}
             initial="initial"
             animate="animate"
