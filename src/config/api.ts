@@ -37,7 +37,7 @@ export const callGetAllNhanVien = (filter?: string) =>{
 
 //update nhan vien
 export const callUpdateNhanVien = (NhanVien: INhanVienReqDTO, id: string) => {
-    return axios.put<IBackendRes<INhanVienResDTO>>(`/ap1/v1/nhan-vien/${id}`, NhanVien);
+    return axios.put<IBackendRes<INhanVienResDTO>>(`/api/v1/nhan-vien/${id}`, NhanVien);
 }
 
 //deactivate tai khoan nhan vien
@@ -246,7 +246,7 @@ export const callGetAllKhachHang = (filter?: string) =>{
 
 //update khach hang
 export const callUpdateKhachHang = (khachHang: IKhachHangReqDTO, id: string) => {
-    return axios.put<IBackendRes<IKhachHangResDTO>>(`/ap1/v1/khach-hang/${id}`, khachHang);
+    return axios.put<IBackendRes<IKhachHangResDTO>>(`/api/v1/khach-hang/${id}`, khachHang);
 }
 
 //deactivate tai khoan khach hang

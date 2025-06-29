@@ -5,6 +5,7 @@ import { Address, Role, User } from "@/types/interfaces/user";
 import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
 import { getPermissions } from "@/utils/permissions";
 import { mapApiToRole } from "./permissions.mapper";
+import { IKhachHangReqDTO } from "@/types/customer";
 
 export const mapApiToAddress = (item: any): Address => {
   return {
@@ -17,9 +18,7 @@ export const mapApiToAddress = (item: any): Address => {
   };
 }
 
-//Còn thiếu nhân viên chưa mapping được
 export const mapApiToUser = (item: any): User => {
-  console.log("Đang mapping nè: ", item);
   return {
     fullName: item.hoTen,
     dateOfBirth: new Date(item.ngaySinh),
@@ -63,6 +62,19 @@ export const mapUserToINhanVienReqDTO = (item: User): INhanVienReqDTO => {
     soDienThoai: item.phoneNumber,
     diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
     diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
-    
+    vaiTroId: item.role.roleID
   };
+}
+
+export const mapUserToIKhachHangReqDTO = (item: User): IKhachHangReqDTO => {
+  return {
+    hoTen: item.fullName,
+    ngaySinh: item.dateOfBirth.toISOString(),
+    cccd: item.idCardNumber,
+    email: item.email,
+    soDienThoai: item.phoneNumber,
+    diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
+    diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
+    vaiTroId: item.role.roleID.toString()
+  }
 }

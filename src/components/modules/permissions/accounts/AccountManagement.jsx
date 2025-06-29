@@ -12,8 +12,8 @@ import AccountCardShimmer from '@/components/ui/custom/shimmer-types/AccountCard
 import AccountListItemShimmer from '@/components/ui/custom/shimmer-types/AccountListItemShimmer';
 import FilterDropdown from '@/components/ui/FilterDropdown';
 import { useLoginAccounts } from '@/hooks/useLoginAccounts';
-import { useDeactivateCustomer, useActivateCustomer } from '@/hooks/useCustomers';
-import { useDeactivateEmployee, useActivateEmployee } from '@/hooks/useEmployees';
+import { useDeactivateCustomer, useActivateCustomer, useUpdateCustomer } from '@/hooks/useCustomers';
+import { useDeactivateEmployee, useActivateEmployee, useUpdateEmployee } from '@/hooks/useEmployees';
 
 const AccountManagement = () => {
   // Sử dụng hook để lấy dữ liệu tài khoản
@@ -52,6 +52,24 @@ const AccountManagement = () => {
     error: activateEmployeeError,
     resetState: resetActivateEmployeeState 
   } = useActivateEmployee();
+  
+  // Hooks cho cập nhật khách hàng
+  const { 
+    updateCustomerData, 
+    isLoading: isUpdatingCustomer, 
+    success: updateCustomerSuccess,
+    error: updateCustomerError,
+    resetState: resetUpdateCustomerState 
+  } = useUpdateCustomer();
+  
+  // Hooks cho cập nhật nhân viên
+  const { 
+    updateEmployeeData, 
+    isLoading: isUpdatingEmployee, 
+    success: updateEmployeeSuccess,
+    error: updateEmployeeError,
+    resetState: resetUpdateEmployeeState 
+  } = useUpdateEmployee();
   
   // State cho pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -97,9 +115,10 @@ const AccountManagement = () => {
     format: '',
   });
   
-  // Tính toán trạng thái loading tổng thể cho các thao tác vô hiệu hóa/kích hoạt
+  // Tính toán trạng thái loading tổng thể cho các thao tác vô hiệu hóa/kích hoạt/cập nhật
   const isToggleActionLoading = isDeactivatingCustomer || isActivatingCustomer || 
-                               isDeactivatingEmployee || isActivatingEmployee;
+                               isDeactivatingEmployee || isActivatingEmployee ||
+                               isUpdatingCustomer || isUpdatingEmployee;
   
 
 
@@ -603,20 +622,57 @@ const AccountManagement = () => {
   };
 
   // Xử lý khi lưu tài khoản (thêm hoặc sửa)
-  const handleSaveAccount = (account, notificationInfo) => {
-    // Cập nhật tài khoản hiện có
-    setAccountsList(accountsList.map(a => a.id === account.id ? account : a));
-    setShowFormModal(false);
-    
-    // Hiển thị thông báo nếu có
-    if (notificationInfo) {
+  const handleSaveAccount = async (formData, notificationInfo, originalAccount) => {
+    try {
+      // Tạo đối tượng User từ formData và originalAccount
+      const updatedUser = {
+        ...originalAccount,
+        role: formData.role,
+      };
+      
+      // Xác định loại tài khoản và gọi API tương ứng
+      if (originalAccount.customerID) {
+        // Cập nhật khách hàng
+        await updateCustomerData(updatedUser, parseInt(originalAccount.customerID));
+        
+        // Cập nhật danh sách tài khoản local
+        setAccountsList(accountsList.map(a => 
+          a.customerID === originalAccount.customerID 
+            ? { ...a, role: formData.role, accountStatus: formData.disabled ? 'disabled' : 'active' }
+            : a
+        ));
+      } else if (originalAccount.employeeID) {
+        // Cập nhật nhân viên
+        await updateEmployeeData(updatedUser, parseInt(originalAccount.employeeID));
+        
+        // Cập nhật danh sách tài khoản local
+        setAccountsList(accountsList.map(a => 
+          a.employeeID === originalAccount.employeeID 
+            ? { ...a, role: formData.role, accountStatus: formData.disabled ? 'disabled' : 'active' }
+            : a
+        ));
+      }
+      
+      setShowFormModal(false);
+      
+      // Hiển thị thông báo thành công
       showNotification(
-        notificationInfo.message,
-        notificationInfo.type,
-        notificationInfo.format || ''
+        'Cập nhật tài khoản thành công!',
+        'success',
+        `Đã cập nhật tài khoản "${originalAccount.email}" thành công!`
+      );
+      
+    } catch (error) {
+      console.error('Lỗi khi cập nhật tài khoản:', error);
+      
+      // Hiển thị thông báo lỗi
+      showNotification(
+        'Cập nhật tài khoản thất bại!',
+        'error',
+        `Không thể cập nhật tài khoản "${originalAccount.email}". Vui lòng thử lại.`
       );
     }
-  };
+   };
 
   // Xử lý khi xác nhận đặt lại mật khẩu
   const handleConfirmResetPassword = (password, notificationInfo) => {
