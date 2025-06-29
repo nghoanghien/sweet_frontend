@@ -125,7 +125,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
       {/* System role badge */}
       {finalIsSystemRole && (
         <motion.span 
-          className="absolute top-3 right-3 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-2xl text-xs font-semibold shadow-sm border border-amber-200"
+          className="absolute top-4 right-4 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-xl text-xs font-semibold shadow-sm border border-amber-200"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
@@ -259,7 +259,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
           <div className="flex gap-3">
             <motion.button
               onClick={() => onEdit(role.id)}
-              className={`p-3 rounded-xl ${role.type === 'customer' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 'bg-violet-100 text-violet-600 hover:bg-violet-200'} shadow-sm transition-colors duration-200`}
+              className={`p-4 rounded-full ${role.type === 'customer' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 'bg-violet-100 text-violet-600 hover:bg-violet-200'} shadow-sm transition-colors duration-200`}
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
             >
@@ -267,7 +267,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
             </motion.button>
             <motion.button
               onClick={() => onDelete(role.id)}
-              className="p-3 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 shadow-sm transition-colors duration-200"
+              className="p-4 rounded-full bg-red-100 text-red-600 hover:bg-red-200 shadow-sm transition-colors duration-200"
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
               layoutId={`delete-role-${role.id}`}

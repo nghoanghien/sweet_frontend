@@ -14,15 +14,6 @@ const PermissionHeader = ({ currentUser, title, description }) => {
         >
           {title}
         </motion.h2>
-        <motion.p 
-          className="text-sm text-gray-600 flex items-center mt-1"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <User size={14} className="mr-1 flex-shrink-0" />
-          {currentUser.name} ({currentUser.role})
-        </motion.p>
         {description && (
           <motion.p 
             className="text-sm text-gray-500 mt-2"
