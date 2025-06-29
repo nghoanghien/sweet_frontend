@@ -1,3 +1,4 @@
+import { TypeUserEnum } from "./enums/TypeUserEnum";
 import { ILoaiKyHan, ILoaiTietKiem } from "./loai";
 
 //write all type backend here (entity or responseDTO which backend throw back)
@@ -29,4 +30,10 @@ export interface IChiTietBaoCaoDoanhSo {
   tongThu: number;
   tongChi: number;
   chenhLech: number;
+}
+
+export interface IChangePasswordDTO {
+  oldPassword: string;
+  newPassword: string;
+  userType: TypeUserEnum;
 }
