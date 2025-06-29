@@ -962,7 +962,7 @@ export default function LoginRegistrationForm() {
                   <label className="flex items-center">
                     
                   </label>
-                  <a href="#" className="text-sm text-[#F06292] hover:text-[#9C27B0] transition-colors font-medium">
+                  <a href="/forgot-password" className="text-sm text-[#F06292] hover:text-[#9C27B0] transition-colors font-medium">
                     Quên mật khẩu?
                   </a>
                 </div>

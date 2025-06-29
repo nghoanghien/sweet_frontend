@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { FaArrowLeft, FaEye, FaEyeSlash, FaTimes, FaCheckCircle, FaEnvelope } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { CloudSun, Sparkles, Heart, Star, ArrowRight, Loader2 } from 'lucide-react';
+import { callForgotPassword } from "@/config/api";
+import { forgotPasswordUtil } from "@/utils/authUtils";
+import { TypeUserEnum } from "@/types/enums/TypeUserEnum";
 
 const SuccessPage = ({ onGoToLogin }) => {
   return (
@@ -483,6 +486,10 @@ const ForgotPassword = () => {
     
     // Simulate email sending with 2s loading
     setTimeout(() => {
+      const sendOtp = async (email, userType) =>{
+        const res = forgotPasswordUtil(email, userType);
+      } 
+      sendOtp(email, TypeUserEnum.KHACHHANG);
       setIsLoadingEmail(false);
       setShowOTPInput(true);
       setCurrentStep('otp');

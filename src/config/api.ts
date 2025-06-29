@@ -82,7 +82,7 @@ export const callVerifyOtp = (verificationDTO: IVerificationDTO) => {
 }
 
 export const callForgotPassword = (forgotPasswordDTO: IForgotPasswordDTO) =>{
-    return axios.post<IBackendRes<void>>("/api/v1/forgot-password", forgotPasswordDTO);
+    return axios.post<IBackendRes<void>>("/api/v1/auth/forgot-password", forgotPasswordDTO);
 }
 
 export const callResetPassword = (resetPassWordDTO: IResetPasswordDTO) => {

@@ -1,5 +1,5 @@
-import { callRegister, callVerifyOtp } from "@/config/api";
-import { IRegisterDTO, IVerificationDTO } from "@/types/auth";
+import { callForgotPassword, callRegister, callVerifyOtp } from "@/config/api";
+import { IForgotPasswordDTO, IRegisterDTO, IVerificationDTO } from "@/types/auth";
 import { IBackendRes } from "@/types/backend";
 import { IKhachHangReqDTO, IKhachHangResDTO, IRegisterReqFrontend } from "@/types/customer";
 import { TypeUserEnum } from "@/types/enums/TypeUserEnum";
@@ -67,4 +67,11 @@ export const verifyUtil = async (email: string, otp: string, userType: TypeUserE
     return await callVerifyOtp(verificationDTO);
 }
 
+export const forgotPasswordUtil = async (email: string, userType: TypeUserEnum) =>{
+    const forgotPasswordDTO : IForgotPasswordDTO = {
+        email: email,
+        userType: userType
+    }
+    return await callForgotPassword(forgotPasswordDTO);
+}
 
