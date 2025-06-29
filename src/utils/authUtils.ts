@@ -1,8 +1,9 @@
-import { callForgotPassword, callRegister, callVerifyOtp } from "@/config/api";
-import { IForgotPasswordDTO, IRegisterDTO, IVerificationDTO } from "@/types/auth";
+import { callForgotPassword, callRegister, callResetPassword, callVerifyOtp } from "@/config/api";
+import { IForgotPasswordDTO, IRegisterDTO, IResetPasswordDTO, IVerificationDTO } from "@/types/auth";
 import { IBackendRes } from "@/types/backend";
 import { IKhachHangReqDTO, IKhachHangResDTO, IRegisterReqFrontend } from "@/types/customer";
 import { TypeUserEnum } from "@/types/enums/TypeUserEnum";
+import axios from "axios";
 
 export const registerUtil = async (
   data: IRegisterReqFrontend
@@ -73,5 +74,15 @@ export const forgotPasswordUtil = async (email: string, userType: TypeUserEnum) 
         userType: userType
     }
     return await callForgotPassword(forgotPasswordDTO);
+}
+
+export const resetPasswordUtil = async (email: string, otp: string, userType: TypeUserEnum, newPassword: string ) => {
+    const resetPassWordDTO : IResetPasswordDTO ={
+        otp: otp,
+        newPassword: newPassword,
+        email: email,
+        userType: userType,
+    }
+    return await callResetPassword(resetPassWordDTO);
 }
 

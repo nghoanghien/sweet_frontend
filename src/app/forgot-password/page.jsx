@@ -6,7 +6,7 @@ import { FaArrowLeft, FaEye, FaEyeSlash, FaTimes, FaCheckCircle, FaEnvelope } fr
 import { motion, AnimatePresence } from "framer-motion";
 import { CloudSun, Sparkles, Heart, Star, ArrowRight, Loader2 } from 'lucide-react';
 import { callForgotPassword } from "@/config/api";
-import { forgotPasswordUtil } from "@/utils/authUtils";
+import { forgotPasswordUtil, resetPasswordUtil } from "@/utils/authUtils";
 import { TypeUserEnum } from "@/types/enums/TypeUserEnum";
 
 const SuccessPage = ({ onGoToLogin }) => {
@@ -514,44 +514,56 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleSubmitOTPAndPassword = () => {
-    const enteredOTP = otp.join("");
-    
-    // Validate OTP
-    if (enteredOTP.length !== 6) {
-      setError("Vui lòng nhập đủ 6 số OTP");
-      return;
+  const handleSubmitOTPAndPassword = async () => {
+  const enteredOTP = otp.join("");
+
+  // Validate OTP
+  if (enteredOTP.length !== 6) {
+    setError("Vui lòng nhập đủ 6 số OTP");
+    return;
+  }
+
+  // Validate passwords
+  if (!newPassword || !confirmPassword) {
+    setError("Vui lòng nhập đầy đủ thông tin mật khẩu");
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    setError("Mật khẩu xác nhận không khớp");
+    return;
+  }
+
+  if (newPassword.length < 6) {
+    setError("Mật khẩu phải có ít nhất 6 ký tự");
+    return;
+  }
+
+  setError("");
+  setCurrentStep("loading");
+
+  // ✅ Giả lập loading delay
+  setTimeout(() => {
+    submitResetPassword(enteredOTP, email, confirmPassword);
+  }, 3000);
+};
+
+const submitResetPassword = async (otp, email, newPassword) => {
+  try {
+    const res = await resetPasswordUtil(email, otp, TypeUserEnum.KHACHHANG, newPassword);
+    if (res.statusCode === 200) {
+      setShowSuccessPage(true);
+    } else {
+      setCurrentStep("otp-password");
+      setError("Mã OTP không đúng, vui lòng thử lại");
     }
-    
-    // Validate passwords
-    if (!newPassword || !confirmPassword) {
-      setError("Vui lòng nhập đầy đủ thông tin mật khẩu");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự");
-      return;
-    }
-    
-    setError("");
-    setCurrentStep('loading');
-    
-    // Simulate API call with 3s loading
-    setTimeout(() => {
-      if (enteredOTP === "123456") {
-        // Success - go directly to success page
-        setShowSuccessPage(true);
-      } else {
-        // Error - go back to form
-        setCurrentStep('otp-password');
-        setError("Mã OTP không đúng, vui lòng thử lại");
-      }
-    }, 3000);
-  };
+  } catch (err) {
+    console.error("Lỗi reset mật khẩu:", err);
+    setCurrentStep("otp-password");
+    setError("Đã xảy ra lỗi khi đặt lại mật khẩu");
+  }
+};
+
 
   const handleResendOTP = () => {
     setTimer(60);
