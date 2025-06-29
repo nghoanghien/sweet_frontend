@@ -7,9 +7,10 @@ import AddressFields from '../../../components/ui/custom/AddressFields';
 import SwipeConfirmationModal from '../ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '../../common/ExportNotification';
 import { useUser } from '@/store/useUserStore';
-
+import { mapUserToProfile } from '@/mappers/profile.mapper';
 
 const ProfileModal = ({ isOpen = false, onClose  }) => {
+  const { detailInfo } = useUser();
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -17,30 +18,37 @@ const ProfileModal = ({ isOpen = false, onClose  }) => {
   const [showNotification, setShowNotification] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
 
-  // Sample data
-  const [profileData, setProfileData] = useState({
-    fullName: 'Nguyễn Hoàng Hiến',
-    dateOfBirth: '15/03/1990',
-    idNumber: '123456789012',
-    email: 'hoanghien@email.com',
-    phone: '0987654321',
-    accountCreated: '01/01/2023',
-    accountType: 'Premium',
+  // Map user data to profile data
+  const [profileData, setProfileData] = useState(detailInfo ? mapUserToProfile(detailInfo) : {
+    fullName: '',
+    dateOfBirth: '',
+    idNumber: '',
+    email: '',
+    phone: '',
+    accountCreated: '',
+    accountType: '',
     permanentAddress: {
-      province: 'Hồ Chí Minh',
-      district: 'Quận 1',
-      ward: 'Phường Bến Nghé',
-      street: 'Nguyễn Huệ',
-      houseNumber: '123'
+      province: '',
+      district: '',
+      ward: '',
+      street: '',
+      houseNumber: ''
     },
     contactAddress: {
-      province: 'Hà Nội',
-      district: 'Quận Ba Đình',
-      ward: 'Phường Điện Biên',
-      street: 'Hoàng Diệu',
-      houseNumber: '456'
+      province: '',
+      district: '',
+      ward: '',
+      street: '',
+      houseNumber: ''
     }
   });
+
+  // Update profile data when detailInfo changes
+  useEffect(() => {
+    if (detailInfo) {
+      setProfileData(mapUserToProfile(detailInfo));
+    }
+  }, [detailInfo]);
 
   const [editData, setEditData] = useState({
     phone: profileData.phone,
@@ -49,7 +57,6 @@ const ProfileModal = ({ isOpen = false, onClose  }) => {
   
   // Reset edit data when modal opens
   useEffect(() => {
-
     if (isOpen) {
       setEditData({
         phone: profileData.phone,

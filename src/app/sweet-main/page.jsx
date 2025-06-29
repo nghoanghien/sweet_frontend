@@ -60,6 +60,7 @@ import LiquidGlassNavigation from "./LiquidGlassNavigation";
 import LiquidGlassMobileNavigation from "./LiquidGlassMobileNavigation";
 import { useUser, useUserActions } from "@/store/useUserStore";
 import { callLogout } from "@/config/api";
+import { mapUserToProfile } from '@/mappers/profile.mapper';
 // Add custom scrollbar styles
 const scrollbarStyles = `
   /* Hide scrollbar by default */
@@ -871,29 +872,38 @@ export default function Dashboard() {
   };
 
 
-  const [profileData, setProfileData] = useState({
-    fullName: "Nguyễn Hoàng Hiến",
-    dateOfBirth: "15/08/1990",
-    idNumber: "038090123456",
-    email: "hoanghien@gmail.com",
-    phone: "0912345678",
-    permanentAddress: {
-      province: "Hà Nội",
-      district: "Cầu Giấy",
-      ward: "Dịch Vọng Hậu",
-      street: "Trần Thái Tông",
-      houseNumber: "108",
-    },
-    contactAddress: {
-      province: "Hà Nội",
-      district: "Cầu Giấy",
-      ward: "Dịch Vọng Hậu",
-      street: "Trần Thái Tông",
-      houseNumber: "108",
-    },
-    accountCreated: "05/02/2022",
-    accountType: "Premium",
-  });
+  const [profileData, setProfileData] = useState(
+    detailInfo ? mapUserToProfile(detailInfo) : {
+      fullName: '',
+      dateOfBirth: '',
+      idNumber: '',
+      email: '',
+      phone: '',
+      permanentAddress: {
+        province: '',
+        district: '',
+        ward: '',
+        street: '',
+        houseNumber: '',
+      },
+      contactAddress: {
+        province: '',
+        district: '',
+        ward: '',
+        street: '',
+        houseNumber: '',
+      },
+      accountCreated: '',
+      accountType: '',
+    }
+  );
+
+  // Update profile data when detailInfo changes
+  useEffect(() => {
+    if (detailInfo) {
+      setProfileData(mapUserToProfile(detailInfo));
+    }
+  }, [detailInfo]);
 
   // Check if viewing on mobile device
   useEffect(() => {
@@ -1035,26 +1045,6 @@ export default function Dashboard() {
         balanceAfter: 17350000,
         content: "Lương tháng 4/2023",
         isIncoming: true,
-      },
-      {
-        id: 1,
-        time: "15:30 - 12/05/2023",
-        type: "Nhận tiền chuyển khoản",
-        channel: "Internet Banking",
-        amount: 5000000,
-        balanceAfter: 20000000,
-        content: "Chuyển tiền thanh toán dự án website",
-        isIncoming: true,
-      },
-      {
-        id: 2,
-        time: "09:15 - 10/05/2023",
-        type: "Chuyển tiền",
-        channel: "ATM",
-        amount: 1500000,
-        balanceAfter: 15000000,
-        content: "Chuyển tiền học phí",
-        isIncoming: false,
       },
       {
         id: 1,
