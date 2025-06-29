@@ -422,15 +422,11 @@ const ForgotPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isOTPValid, setIsOTPValid] = useState(null);
-  const [otpValidationState, setOtpValidationState] = useState(''); // 'success', 'error', or ''
   const [showSuccessPage, setShowSuccessPage] = useState(false);
   const [pageLoaded, setPageLoaded] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const [isLoadingEmail, setIsLoadingEmail] = useState(false);
-  const [isLoadingOTP, setIsLoadingOTP] = useState(false);
-  const [isLoadingPassword, setIsLoadingPassword] = useState(false);
-  const [currentStep, setCurrentStep] = useState('email'); // 'email', 'otp', 'password'
+  const [currentStep, setCurrentStep] = useState('email'); // 'email', 'otp-password', 'loading', 'success'
 
   const validateEmail = (email) => {
     return String(email)
@@ -492,7 +488,7 @@ const ForgotPassword = () => {
       sendOtp(email, TypeUserEnum.KHACHHANG);
       setIsLoadingEmail(false);
       setShowOTPInput(true);
-      setCurrentStep('otp');
+      setCurrentStep('otp-password');
       setIsTimerRunning(true);
     }, 2000);
   };
@@ -518,59 +514,18 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleVerifyOTP = () => {
+  const handleSubmitOTPAndPassword = () => {
     const enteredOTP = otp.join("");
+    
+    // Validate OTP
     if (enteredOTP.length !== 6) {
-      setError("Vui lòng nhập đủ 6 số");
-      setIsOTPValid(false);
+      setError("Vui lòng nhập đủ 6 số OTP");
       return;
     }
     
-    setIsLoadingOTP(true);
-    setError("");
-    
-    // Simulate OTP verification with 1.5s loading
-    setTimeout(() => {
-      if (enteredOTP === "123456") {
-        setOtpValidationState('success');
-        setIsOTPValid(true);
-        // Show success animation for longer duration
-        setTimeout(() => {
-          setCurrentStep('transitioning');
-          // Then transition to password step
-          setTimeout(() => {
-            setIsLoadingOTP(false);
-            setShowOTPInput(false);
-            setShowPasswordFields(true);
-            setCurrentStep('password');
-            setOtpValidationState('');
-          }, 600);
-        }, 1500);
-      } else {
-        setOtpValidationState('error');
-        setIsLoadingOTP(false);
-        setError("Mã OTP không đúng");
-        setIsOTPValid(false);
-        // Clear error state after showing animation
-        setTimeout(() => {
-          setOtpValidationState('');
-          setIsOTPValid(null);
-        }, 2000);
-      }
-    }, 1500);
-  };
-
-  const handleResendOTP = () => {
-    setTimer(60);
-    setIsTimerRunning(true);
-    setOtp(["", "", "", "", "", ""]);
-    setError("");
-    setIsOTPValid(null);
-  };
-
-  const handleResetPassword = () => {
+    // Validate passwords
     if (!newPassword || !confirmPassword) {
-      setError("Vui lòng nhập đầy đủ thông tin");
+      setError("Vui lòng nhập đầy đủ thông tin mật khẩu");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -582,35 +537,43 @@ const ForgotPassword = () => {
       return;
     }
     
-    setIsLoadingPassword(true);
     setError("");
+    setCurrentStep('loading');
     
-    // Simulate password reset with 2s loading
+    // Simulate API call with 3s loading
     setTimeout(() => {
-      setIsLoadingPassword(false);
-      setShowSuccessPage(true);
-    }, 2000);
+      if (enteredOTP === "123456") {
+        // Success - go directly to success page
+        setShowSuccessPage(true);
+      } else {
+        // Error - go back to form
+        setCurrentStep('otp-password');
+        setError("Mã OTP không đúng, vui lòng thử lại");
+      }
+    }, 3000);
   };
+
+  const handleResendOTP = () => {
+    setTimer(60);
+    setIsTimerRunning(true);
+    setOtp(["", "", "", "", "", ""]);
+    setError("");
+  };
+
+  // Remove this function as it's replaced by handleSubmitOTPAndPassword
 
   const handleGoToLogin = () => {
     router.push('/login');
   };
 
   const handleGoBack = () => {
-    if (currentStep === 'password') {
-      setShowPasswordFields(false);
-      setShowOTPInput(true);
-      setCurrentStep('otp');
-      setNewPassword("");
-      setConfirmPassword("");
-      setOtpValidationState('');
-      setError("");
-    } else if (currentStep === 'otp' || currentStep === 'transitioning') {
+    if (currentStep === 'otp-password') {
       setShowOTPInput(false);
+      setShowPasswordFields(false);
       setCurrentStep('email');
       setOtp(["", "", "", "", "", ""]);
-      setIsOTPValid(null);
-      setOtpValidationState('');
+      setNewPassword("");
+      setConfirmPassword("");
       setIsTimerRunning(false);
       setTimer(60);
       setError("");
@@ -618,6 +581,9 @@ const ForgotPassword = () => {
       // If loading email, go back to email input
       setCurrentStep('email');
       setIsLoadingEmail(false);
+    } else if (currentStep === 'loading') {
+      // If loading, go back to otp-password step
+      setCurrentStep('otp-password');
     } else {
       router.push('/');
     }
@@ -633,17 +599,7 @@ const ForgotPassword = () => {
     exit: { opacity: 0, y: -30 }
   };
 
-  const getOTPInputStyle = (index) => {
-    let style = "w-full h-full text-center border-2 rounded-xl focus:outline-none transition-all duration-300 font-bold text-lg bg-white/80 backdrop-blur-sm ";
-    if (isOTPValid === true) {
-      style += "border-green-400 focus:ring-2 focus:ring-green-400 text-green-600 shadow-lg";
-    } else if (isOTPValid === false) {
-      style += "border-red-400 focus:ring-2 focus:ring-red-400 text-red-600 shadow-lg";
-    } else {
-      style += "border-gray-300 focus:ring-2 focus:ring-pink-400 focus:border-pink-400 hover:border-pink-300 shadow-md";
-    }
-    return style;
-  };
+
 
   // If success page should be shown, render it instead
   if (showSuccessPage) {
@@ -780,8 +736,8 @@ const ForgotPassword = () => {
                   <h2 className="text-2xl font-bold text-gray-800">Quên mật khẩu</h2>
                   <p className="text-gray-500 text-sm mt-1">
                     {currentStep === 'email' && 'Khôi phục tài khoản của bạn'}
-                    {currentStep === 'otp' && 'Xác thực mã OTP'}
-                    {currentStep === 'password' && 'Đặt lại mật khẩu mới'}
+                    {currentStep === 'otp-password' && 'Xác thực OTP và đặt mật khẩu mới'}
+                    {currentStep === 'loading' && 'Đang xử lý yêu cầu...'}
                   </p>
                 </div>
               </div>
@@ -872,8 +828,8 @@ const ForgotPassword = () => {
                     </motion.div>
                   )}
 
-                  {/* OTP Step */}
-                  {currentStep === 'otp' && (
+                  {/* OTP and Password Step */}
+                  {currentStep === 'otp-password' && (
                     <motion.div
                       initial="initial"
                       animate="animate"
@@ -882,155 +838,90 @@ const ForgotPassword = () => {
                       transition={{ duration: 0.5 }}
                       className="space-y-6"
                     >
-                      {isLoadingOTP ? (
-                        <div className="space-y-6">
-                          {/* Show OTP inputs with success animation if valid */}
-                          {isOTPValid === true ? (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-3">
-                                Nhập mã xác nhận (6 số)
-                              </label>
-                              <div className="grid grid-cols-6 gap-3">
-                                {otp.map((digit, index) => (
-                                  <div key={index} className="aspect-square">
-                                    <motion.input
-                                      animate={{
-                                        scale: [1, 1.1, 1],
-                                        borderColor: ['#10b981', '#34d399', '#10b981']
-                                      }}
-                                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                                      id={`otp-${index}`}
-                                      type="text"
-                                      maxLength="1"
-                                      value={digit}
-                                      disabled
-                                      className="w-full h-full text-center border-2 border-green-400 rounded-xl font-bold text-lg bg-green-50 text-green-600 shadow-lg"
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-3">
-                                Nhập mã xác nhận (6 số)
-                              </label>
-                              <div className="grid grid-cols-6 gap-3">
-                                {otp.map((digit, index) => (
-                                  <div key={index} className="aspect-square">
-                                    <input
-                                      id={`otp-${index}`}
-                                      type="text"
-                                      maxLength="1"
-                                      value={digit}
-                                      disabled
-                                      className={getOTPInputStyle(index)}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          <LoadingSpinner message="Đang xác thực mã OTP..." type="otp" />
-                        </div>
-                      ) : (
-                        <>
-                          {/* OTP Input */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">
-                              Nhập mã xác nhận (6 số)
-                            </label>
-                            <div className="grid grid-cols-6 gap-3">
-                              {otp.map((digit, index) => {
-                                let inputStyle = "w-full h-full text-center border-2 rounded-xl focus:outline-none transition-all duration-300 font-bold text-lg bg-white/80 backdrop-blur-sm ";
-                                
-                                if (otpValidationState === 'success') {
-                                  inputStyle += "border-green-400 text-green-600 bg-green-50 shadow-lg";
-                                } else if (otpValidationState === 'error') {
-                                  inputStyle += "border-red-400 text-red-600 bg-red-50 shadow-lg";
-                                } else {
-                                  inputStyle += "border-gray-300 focus:ring-2 focus:ring-pink-400 focus:border-pink-400 hover:border-pink-300 shadow-md";
-                                }
-                                
-                                return (
-                                  <div key={index} className="aspect-square">
-                                    <motion.input
-                                      initial={{ opacity: 0, scale: 0.8 }}
-                                      animate={{ 
-                                        opacity: 1, 
-                                        scale: otpValidationState === 'success' ? [1, 1.1, 1] : 
-                                               otpValidationState === 'error' ? [1, 1.05, 0.95, 1] : 1,
-                                        rotate: otpValidationState === 'error' ? [0, -2, 2, 0] : 0
-                                      }}
-                                      transition={{ 
-                                        duration: otpValidationState === 'success' ? 0.6 : 0.4,
-                                        delay: index * 0.1,
-                                        repeat: otpValidationState === 'error' ? 2 : 0
-                                      }}
-                                      id={`otp-${index}`}
-                                      type="text"
-                                      maxLength="1"
-                                      value={digit}
-                                      onChange={(e) => handleOTPChange(index, e.target.value)}
-                                      onKeyDown={(e) => handleKeyDown(index, e)}
-                                      disabled={otpValidationState !== ''}
-                                      className={inputStyle}
-                                    />
-                                  </div>
-                                );
-                              })}
-                            </div>
-                            
-                            {/* Success/Error Message */}
-                            {otpValidationState === 'success' && (
-                              <motion.div
+                      {/* OTP Input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Nhập mã xác nhận (6 số)
+                        </label>
+                        <div className="grid grid-cols-6 gap-3">
+                          {otp.map((digit, index) => (
+                            <div key={index} className="aspect-square">
+                              <motion.input
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="flex items-center justify-center gap-2 text-green-600 font-medium mt-4"
-                              >
-                                <motion.div
-                                  animate={{ rotate: 360 }}
-                                  transition={{ duration: 0.5 }}
-                                  className="w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full"
-                                />
-                                <span>Mã xác nhận chính xác!</span>
-                              </motion.div>
-                            )}
-                            
-                            {otpValidationState === 'error' && (
-                              <motion.div
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="flex items-center justify-center gap-2 text-red-600 font-medium mt-4"
-                              >
-                                <motion.span
-                                  animate={{ scale: [1, 1.2, 1] }}
-                                  transition={{ duration: 0.3, repeat: 2 }}
-                                >
-                                  ❌
-                                </motion.span>
-                                <span>Mã OTP không đúng, vui lòng thử lại!</span>
-                              </motion.div>
-                            )}
-                          </div>
+                                transition={{ delay: index * 0.1 }}
+                                id={`otp-${index}`}
+                                type="text"
+                                maxLength="1"
+                                value={digit}
+                                onChange={(e) => handleOTPChange(index, e.target.value)}
+                                onKeyDown={(e) => handleKeyDown(index, e)}
+                                className="w-full h-full text-center border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-300 font-bold text-lg bg-white/80 backdrop-blur-sm hover:border-pink-300 shadow-md"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
-                          {otpValidationState === '' && (
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={handleVerifyOTP}
-                              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                            >
-                              Xác nhận mã
-                            </motion.button>
-                          )}
-                        </>
-                      )}
+                      {/* New Password */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Mật khẩu mới
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Nhập mật khẩu mới"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-300 font-medium bg-white/80 backdrop-blur-sm hover:border-pink-300 pr-12"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                          >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Confirm Password */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Xác nhận mật khẩu
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Nhập lại mật khẩu mới"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-300 font-medium bg-white/80 backdrop-blur-sm hover:border-pink-300 pr-12"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                          >
+                            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                          </button>
+                        </div>
+                      </div>
+
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleSubmitOTPAndPassword}
+                        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                      >
+                        Xác nhận và đặt lại mật khẩu
+                      </motion.button>
                     </motion.div>
                   )}
 
-                  {/* Transitioning State */}
-                  {currentStep === 'transitioning' && (
+                  {/* Loading State */}
+                  {currentStep === 'loading' && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -1038,106 +929,30 @@ const ForgotPassword = () => {
                       transition={{ duration: 0.6, ease: "easeInOut" }}
                       className="flex flex-col items-center justify-center py-16 space-y-6"
                     >
-                      <motion.div
-                        animate={{ 
-                          scale: [1, 1.2, 1],
-                          rotate: [0, 180, 360]
-                        }}
-                        transition={{ duration: 0.8, ease: "easeInOut" }}
-                        className="w-16 h-16 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center"
-                      >
-                        <motion.span
-                          animate={{ scale: [0.8, 1.2, 1] }}
-                          transition={{ duration: 0.4, delay: 0.2 }}
-                          className="text-white text-2xl font-bold"
-                        >
-                          ✓
-                        </motion.span>
-                      </motion.div>
-                      <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-gray-700 font-medium text-lg"
-                      >
-                        Đang chuyển đến bước tiếp theo...
-                      </motion.p>
+                      <LoadingSpinner message="Đang xử lý yêu cầu khôi phục mật khẩu..." type="password" />
                     </motion.div>
                   )}
 
-                  {/* Password Step */}
-                  {currentStep === 'password' && (
-                    <motion.div
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      variants={fadeInUpVariants}
-                      transition={{ duration: 0.5 }}
-                      className="space-y-6"
-                    >
-                      {isLoadingPassword ? (
-                        <LoadingSpinner message="Đang đặt lại mật khẩu..." type="password" />
-                      ) : (
-                        <>
-                          {/* New Password */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Mật khẩu mới
-                            </label>
-                            <div className="relative">
-                              <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Nhập mật khẩu mới"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-300 font-medium bg-white/80 backdrop-blur-sm hover:border-pink-300 pr-12"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                              >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                              </button>
-                            </div>
-                          </div>
 
-                          {/* Confirm Password */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Xác nhận mật khẩu
-                            </label>
-                            <div className="relative">
-                              <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Nhập lại mật khẩu mới"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition-all duration-300 font-medium bg-white/80 backdrop-blur-sm hover:border-pink-300 pr-12"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                              >
-                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                              </button>
-                            </div>
-                          </div>
-
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={handleResetPassword}
-                            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                          >
-                            Đặt lại mật khẩu
-                          </motion.button>
-                        </>
-                      )}
-                    </motion.div>
-                  )}
                 </AnimatePresence>
+
+                {/* Back Button */}
+                {(currentStep === 'otp-password' || currentStep === 'loading') && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleGoBack}
+                    disabled={currentStep === 'loading'}
+                    className={`w-full py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                      currentStep === 'loading' 
+                        ? 'bg-gray-50 text-gray-400 cursor-not-allowed' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <FaArrowLeft className="text-sm" />
+                    Quay lại
+                  </motion.button>
+                )}
               </div>
 
               {/* Footer */}
