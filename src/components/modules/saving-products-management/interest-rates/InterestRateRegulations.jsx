@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Edit2, User, Save, DollarSign, TrendingUp } from 'lucide-react';
-import { useRegulationHistory } from '@/hooks/InterestRateRegulation';
+import { useRegulationCurrent } from '@/hooks/InterestRateRegulation';
 
 // Import sub-components
 import SavingsTypeToggle from './SavingsTypeToggle';
@@ -94,13 +94,10 @@ const CurrentRegulationSummary = ({ regulation, isLoading }) => {
 };
 
 const InterestRateRegulations = () => {
-  // Use the existing hook
-  const { regulations, isLoading: isLoadingRegulation, error: regulationError  } = useRegulationHistory();
-
   // Mock data for all available options
   const allSavingsTypes = [
-    { id: 'standard', name: 'Tiết kiệm tiêu chuẩn' },
-    { id: 'flexible', name: 'Tiết kiệm linh hoạt' }
+    { id: '1', name: 'Tiết kiệm tiêu chuẩn' },
+    { id: '2', name: 'Tiết kiệm linh hoạt' }
   ];
   
   const allPaymentFrequencies = [
@@ -111,11 +108,7 @@ const InterestRateRegulations = () => {
   ];
   
   const defaultTerms = [
-    { id: 't1', months: 1 },
-    { id: 't3', months: 3 },
-    { id: 't6', months: 6 },
-    { id: 't12', months: 12 },
-    { id: 't24', months: 24 },
+    { id: 't1', months: 1 }
   ];
 
   // User info (mock)
@@ -126,75 +119,52 @@ const InterestRateRegulations = () => {
   };
 
   // Component states
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showComparisonModal, setShowComparisonModal] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: 'success', message: '', details: null, format: '' });
   
+  // Get regulations from hook
+  const { regulations } = useRegulationCurrent();
+  
   // Current regulation state
   const [currentRegulation, setCurrentRegulation] = useState({
-    id: 'reg123',
-    createdAt: '16/06/2023',
+    id: '',
+    createdAt: '',
     applicationDate: null,
-    description: 'Quy định lãi suất cơ bản cho các sản phẩm tiết kiệm, áp dụng từ tháng 6/2023.',
+    description: '',
     creator: {
-      id: 'user456',
-      name: 'Trần Thị B'
+      id: '',
+      name: ''
     },
-    minimumDeposit: 1000000,
-    noTermRate: 0.2,
-    savingsTypes: [
-      {
-        id: 'standard',
-        name: 'Tiết kiệm tiêu chuẩn',
-        terms: [...defaultTerms],
-        interestRates: [
-          { termId: 't1', frequencyId: 'start', rate: 3.5 },
-          { termId: 't1', frequencyId: 'monthly', rate: 3.6 },
-          { termId: 't1', frequencyId: 'quarterly', rate: 3.7 },
-          { termId: 't1', frequencyId: 'end', rate: 3.8 },
-          { termId: 't3', frequencyId: 'start', rate: 4.0 },
-          { termId: 't3', frequencyId: 'monthly', rate: 4.1 },
-          { termId: 't3', frequencyId: 'quarterly', rate: 4.2 },
-          { termId: 't3', frequencyId: 'end', rate: 4.3 },
-          { termId: 't6', frequencyId: 'start', rate: 4.5 },
-          { termId: 't6', frequencyId: 'monthly', rate: 4.6 },
-          { termId: 't6', frequencyId: 'quarterly', rate: 4.7 },
-          { termId: 't6', frequencyId: 'end', rate: 4.8 },
-          { termId: 't12', frequencyId: 'start', rate: 5.0 },
-          { termId: 't12', frequencyId: 'monthly', rate: 5.1 },
-          { termId: 't12', frequencyId: 'quarterly', rate: 5.2 },
-          { termId: 't12', frequencyId: 'end', rate: 5.3 },
-          { termId: 't24', frequencyId: 'start', rate: 5.5 },
-          { termId: 't24', frequencyId: 'monthly', rate: 5.6 },
-          { termId: 't24', frequencyId: 'quarterly', rate: 5.7 },
-          { termId: 't24', frequencyId: 'end', rate: 5.8 },
-        ],
-        disabledFrequencies: [] // Add this field to track disabled frequencies per savings type
-      },
-      {
-        id: 'flexible',
-        name: 'Tiết kiệm linh hoạt',
-        terms: [...defaultTerms],
-        interestRates: [
-          { termId: 't1', frequencyId: 'end', rate: 4.3 },
-          { termId: 't3', frequencyId: 'end', rate: 4.8 },
-          { termId: 't6', frequencyId: 'end', rate: 5.3 },
-          { termId: 't12', frequencyId: 'end', rate: 5.8 },
-          { termId: 't24', frequencyId: 'end', rate: 6.3 },
-        ],
-        disabledFrequencies: ['start', 'monthly', 'quarterly'] // Flexible savings only supports end frequency
-      }
-    ],
+    minimumDeposit: 0,
+    noTermRate: 0,
+    savingsTypes: [],
     paymentFrequencies: [...allPaymentFrequencies]
   });
+
+  // Update currentRegulation when regulations change
+  useEffect(() => {
+    if (regulations && regulations.length > 0) {
+      // Get the latest regulation
+      const latestRegulation = regulations[0];
+      setCurrentRegulation(prev => ({
+        ...latestRegulation,
+        paymentFrequencies: [...allPaymentFrequencies]
+      }));
+      
+      // Set active savings type to the first available type
+      if (latestRegulation.savingsTypes && latestRegulation.savingsTypes.length > 0) {
+        setActiveSavingsType(latestRegulation.savingsTypes[0].id);
+      }
+    }
+  }, [regulations]);
   
   // New edited regulation for tracking changes
   const [editedRegulation, setEditedRegulation] = useState({ ...currentRegulation });
   
   // Active savings type for displaying table
-  const [activeSavingsType, setActiveSavingsType] = useState(
-    currentRegulation.savingsTypes?.[0]?.id || null
-  );
+  const [activeSavingsType, setActiveSavingsType] = useState(null);
 
   // Track changes to highlight differences
   const [changedFields, setChangedFields] = useState({});
@@ -214,24 +184,18 @@ const InterestRateRegulations = () => {
   // New state to track deleted terms per savings type
   const [deletedTerms, setDeletedTerms] = useState({});
   
-  // Update currentRegulation when regulations changes
+  // Add state for loading specific savings type
+  const [loadingAddedType, setLoadingAddedType] = useState(null);
+  const [loadingTable, setLoadingTable] = useState(false);
+  
+  // Loading state management
   useEffect(() => {
-    if (regulations && regulations.length > 0) {
-      setCurrentRegulation(regulations[0]); // Get the first regulation
-    }
-  }, [regulations]);
-
-  // Show error notification if there's an error fetching regulation
-  useEffect(() => {
-    if (regulationError) {
-      setNotification({
-        show: true,
-        type: 'error',
-        message: 'Không thể tải quy định lãi suất',
-        format: 'Đã xảy ra lỗi khi tải quy định lãi suất. Vui lòng thử lại sau.'
-      });
-    }
-  }, [regulationError]);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Reset edited regulation when switching to edit mode
   useEffect(() => {
@@ -253,7 +217,7 @@ const InterestRateRegulations = () => {
       // Ensure each savings type has disabledFrequencies field
       reg.savingsTypes.forEach(type => {
         if (!type.disabledFrequencies) {
-          type.disabledFrequencies = type.id === 'flexible' ? 
+          type.disabledFrequencies = type.id === '2' ? 
             ['start', 'monthly', 'quarterly'] : [];
         }
       });
@@ -391,58 +355,88 @@ const InterestRateRegulations = () => {
   };
   
   // Add a removed savings type back to the regulation
-  const handleAddRemovedSavingsType = (typeId) => {
-    // Find the savings type in removedSavingsTypes
-    const typeToAdd = removedSavingsTypes.find(type => type.id === typeId);
-    if (!typeToAdd) return;
-    
-    // Create a new savings type with default terms and rates
-    const newSavingsType = {
-      id: typeToAdd.id,
-      name: typeToAdd.name,
-      terms: [...defaultTerms],
-      interestRates: [],
-      disabledFrequencies: typeToAdd.id === 'flexible' ? ['start', 'monthly', 'quarterly'] : []
-    };
-    
-    // Add interest rates for all terms and frequencies
-    defaultTerms.forEach(term => {
-      // For flexible savings, only add end frequency
-      if (typeToAdd.id === 'flexible') {
-        newSavingsType.interestRates.push({
-          termId: term.id,
-          frequencyId: 'end',
-          rate: 0.0 // Default rate
-        });
-      } else {
-        // For standard savings, add all frequencies
-        editedRegulation.paymentFrequencies.forEach(freq => {
+  const handleAddRemovedSavingsType = async (typeId) => {
+    try {
+      // Set loading states
+      setLoadingAddedType(typeId);
+      setLoadingTable(true);
+      
+      // Find the savings type in removedSavingsTypes
+      const typeToAdd = removedSavingsTypes.find(type => type.id === typeId);
+      if (!typeToAdd) return;
+      
+      // Create a new savings type with default terms and rates
+      const newSavingsType = {
+        id: typeToAdd.id,
+        name: typeToAdd.name,
+        terms: [...defaultTerms],
+        interestRates: [],
+        disabledFrequencies: typeToAdd.id === '2' ? ['start', 'monthly', 'quarterly'] : []
+      };
+
+      // Add interest rates for all terms and frequencies based on type
+      defaultTerms.forEach(term => {
+        if (typeToAdd.id === '2') {
+          // For flexible savings (ID 2), only add end frequency with default rate 0.1%
           newSavingsType.interestRates.push({
             termId: term.id,
-            frequencyId: freq.id,
-            rate: 0.0 // Default rate
+            frequencyId: 'end',
+            rate: 0.1 // Default rate for flexible savings
           });
-        });
-      }
-    });
-    
-    // Add the new savings type to editedRegulation
-    const updatedRegulation = { ...editedRegulation };
-    updatedRegulation.savingsTypes = [...updatedRegulation.savingsTypes, newSavingsType];
-    setEditedRegulation(updatedRegulation);
-    
-    // Remove from removedSavingsTypes
-    setRemovedSavingsTypes(removedSavingsTypes.filter(type => type.id !== typeId));
-    
-    // Set as active savings type
-    setActiveSavingsType(typeToAdd.id);
-    
-    // Track changes
-    setChangedFields(prev => ({
-      ...prev,
-      savingsTypes: true,
-      [`savingsType-${typeToAdd.id}`]: true
-    }));
+        } else {
+          // For standard savings (ID 1), add all frequencies with default rate 0.2%
+          editedRegulation.paymentFrequencies.forEach(freq => {
+            newSavingsType.interestRates.push({
+              termId: term.id,
+              frequencyId: freq.id,
+              rate: 0.2 // Default rate for standard savings
+            });
+          });
+        }
+      });
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Add the new savings type to editedRegulation
+      const updatedRegulation = { ...editedRegulation };
+      updatedRegulation.savingsTypes = [...updatedRegulation.savingsTypes, newSavingsType];
+      setEditedRegulation(updatedRegulation);
+      
+      // Remove from removedSavingsTypes
+      setRemovedSavingsTypes(removedSavingsTypes.filter(type => type.id !== typeId));
+      
+      // Set as active savings type
+      setActiveSavingsType(typeToAdd.id);
+      
+      // Track changes
+      setChangedFields(prev => ({
+        ...prev,
+        savingsTypes: true,
+        [`savingsType-${typeToAdd.id}`]: true
+      }));
+
+      // Show success notification
+      setNotification({
+        show: true,
+        type: 'success',
+        message: `Đã thêm ${typeToAdd.name} thành công`,
+        format: 'Loại tiết kiệm đã được thêm vào danh sách.'
+      });
+
+    } catch (error) {
+      // Show error notification
+      setNotification({
+        show: true,
+        type: 'error',
+        message: 'Không thể thêm loại tiết kiệm',
+        format: 'Đã xảy ra lỗi khi thêm loại tiết kiệm. Vui lòng thử lại.'
+      });
+    } finally {
+      // Clear loading states
+      setLoadingAddedType(null);
+      setLoadingTable(false);
+    }
   };
   
   // Change interest rate
@@ -522,7 +516,7 @@ const InterestRateRegulations = () => {
     savingsType.terms.push(newTerm);
     
     // Add interest rates for this term
-    if (savingsType.id === 'flexible') {
+    if (savingsType.id === '2') {
       // For flexible, only add end frequency
       savingsType.interestRates.push({
         termId: newTermId,
@@ -778,6 +772,8 @@ const InterestRateRegulations = () => {
     // Create a copy for the comparison modal without modifying editedRegulation
     const comparisonRegulation = JSON.parse(JSON.stringify(editedRegulation));
     
+    console.log('New Regulation:', comparisonRegulation);
+    
     // Remove disabled savings types from the comparison regulation
     if (disabledSavingsTypes.length > 0) {
       comparisonRegulation.savingsTypes = comparisonRegulation.savingsTypes.filter(
@@ -823,6 +819,8 @@ const InterestRateRegulations = () => {
   
   // Confirm changes
   const handleConfirmChanges = () => {
+    // In a real app, this would submit changes to the backend
+    
     // Apply the comparison regulation to the current regulation
     setCurrentRegulation({ ...comparisonRegulation });
     // Also update the edited regulation to match
@@ -846,7 +844,7 @@ const InterestRateRegulations = () => {
       });
     }
     
-    // Show success notification
+    // Show success notification using ExportNotification
     setNotification({
       show: true,
       type: 'success',
@@ -859,7 +857,6 @@ const InterestRateRegulations = () => {
     
     // Close comparison modal
     setShowComparisonModal(false);
-
   };
 
   // Get disabled frequencies for the active savings type
@@ -874,7 +871,51 @@ const InterestRateRegulations = () => {
   
   // Check if the active savings type is flexible
   const isActiveTypeFlexible = () => {
-    return activeSavingsType === 'flexible';
+    return activeSavingsType === '2';
+  };
+
+  // Reset all changes when canceling edit mode
+  const handleCancelEdit = () => {
+    // Reset edited regulation to current regulation
+    setEditedRegulation(JSON.parse(JSON.stringify(currentRegulation)));
+    
+    // Reset all states related to editing
+    setIsEditing(false);
+    setDisabledSavingsTypes([]);
+    setDeletedTerms({});
+    setChangedFields({});
+    setValidationErrors({});
+    setIsDescriptionManuallyChanged(false);
+    
+    // Reset active savings type to first available type in current regulation
+    if (currentRegulation.savingsTypes && currentRegulation.savingsTypes.length > 0) {
+      setActiveSavingsType(currentRegulation.savingsTypes[0].id);
+    }
+
+    // Find savings types that are in allSavingsTypes but not in currentRegulation
+    const currentTypeIds = currentRegulation.savingsTypes.map(type => type.id);
+    const missingTypes = allSavingsTypes.filter(type => !currentTypeIds.includes(type.id));
+    
+    // Reset removedSavingsTypes to only include missing types
+    setRemovedSavingsTypes(missingTypes);
+
+    // Show notification
+    setNotification({
+      show: true,
+      type: 'success',
+      message: 'Đã hủy thay đổi',
+      format: 'Tất cả các thay đổi đã được hoàn tác.'
+    });
+  };
+
+  // Helper function to sort savings types by ID
+  const sortSavingsTypes = (types) => {
+    return [...types].sort((a, b) => {
+      // Convert IDs to numbers for comparison
+      const idA = parseInt(a.id);
+      const idB = parseInt(b.id);
+      return idA - idB;
+    });
   };
 
   return (
@@ -889,9 +930,9 @@ const InterestRateRegulations = () => {
               <h2 className="text-xl font-bold text-gray-800">Quy định lãi suất hiện hành</h2>
               <p className="text-sm text-gray-600 flex items-center mt-1">
                 <User size={14} className="mr-1 flex-shrink-0" />
-                Người tạo: <Skeleton isLoading={isLoadingRegulation} width="w-24" height="h-4" className="inline-block mx-1">
+                Người tạo: <Skeleton isLoading={isLoading} width="w-24" height="h-4" className="inline-block mx-1">
                   {currentRegulation.creator?.name || 'Không xác định'}
-                </Skeleton> (<Skeleton isLoading={isLoadingRegulation} width="w-20" height="h-4" className="inline-block">
+                </Skeleton> (<Skeleton isLoading={isLoading} width="w-20" height="h-4" className="inline-block">
                   {currentRegulation.createdAt || 'Không xác định'}
                 </Skeleton>)
               </p>
@@ -902,7 +943,7 @@ const InterestRateRegulations = () => {
           )}
           {/* Display the current regulations summary */}
           {!isEditing && (
-            <CurrentRegulationSummary regulation={currentRegulation} isLoading={isLoadingRegulation} />
+            <CurrentRegulationSummary regulation={currentRegulation} isLoading={isLoading} />
           )}
         </div>
         
@@ -921,7 +962,7 @@ const InterestRateRegulations = () => {
               >
                 <Edit2 size={18} />
               </motion.span>
-              <Skeleton isLoading={isLoadingRegulation} width="w-16" height="h-5" className="inline-block">
+              <Skeleton isLoading={isLoading} width="w-16" height="h-5" className="inline-block">
                 Chỉnh sửa
               </Skeleton>
             </motion.button>
@@ -930,13 +971,7 @@ const InterestRateRegulations = () => {
               <motion.button
                 whileHover={{ scale: 1.06, boxShadow: '0 0 12px rgba(0,0,0,0.08)' }}
                 whileTap={{ scale: 0.96 }}
-                onClick={() => {
-                  setIsEditing(false);
-                  setDisabledSavingsTypes([]);
-                  setDeletedTerms({});
-                  setChangedFields({});
-                  setEditedRegulation(JSON.parse(JSON.stringify(currentRegulation)));
-                }}
+                onClick={handleCancelEdit}
                 className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl shadow-sm hover:bg-gray-200 font-semibold tracking-wide"
               >
                 Hủy
@@ -993,6 +1028,7 @@ const InterestRateRegulations = () => {
             error={validationErrors.savingsTypes}
             removedSavingsTypes={removedSavingsTypes}
             onAddRemovedSavingsType={handleAddRemovedSavingsType}
+            loadingAddedType={loadingAddedType}
           />
           
           {/* Description input */}
@@ -1029,14 +1065,14 @@ const InterestRateRegulations = () => {
       {((currentRegulation.savingsTypes.length > 1 && !isEditing) || 
         (editedRegulation.savingsTypes.filter(t => !disabledSavingsTypes.includes(t.id)).length > 1 && isEditing)) && (
         <div className="mb-6 flex justify-center">
-          {isLoadingRegulation ? (
+          {isLoading ? (
             <SavingsTypeToggleShimmer />
           ) : (
             <SavingsTypeToggle
-              savingsTypes={isEditing 
+              savingsTypes={sortSavingsTypes(isEditing 
                 ? editedRegulation.savingsTypes.filter(t => !disabledSavingsTypes.includes(t.id))
                 : currentRegulation.savingsTypes
-              }
+              )}
               activeSavingsType={activeSavingsType}
               onToggle={setActiveSavingsType}
             />
@@ -1047,8 +1083,7 @@ const InterestRateRegulations = () => {
       {/* Interest rate table */}
       {activeSavingsTypeDetails && (
         <div className="relative">
-                   
-          {isLoadingRegulation ? (
+          {isLoading ? (
             <InterestRateTableShimmer />
           ) : (
             <InterestRateTable
@@ -1071,6 +1106,7 @@ const InterestRateRegulations = () => {
               deletedTerms={deletedTerms[activeSavingsType] || []}
               onRestoreTerm={handleRestoreTerm}
               isFlexibleType={isActiveTypeFlexible()}
+              isLoading={loadingTable}
             />
           )}
         </div>
@@ -1100,13 +1136,7 @@ const InterestRateRegulations = () => {
               <motion.button
                 whileHover={{ scale: 1.06, boxShadow: '0 0 12px rgba(0,0,0,0.08)' }}
                 whileTap={{ scale: 0.96 }}
-                onClick={() => {
-                  setIsEditing(false);
-                  setDisabledSavingsTypes([]);
-                  setDeletedTerms({});
-                  setChangedFields({});
-                  setEditedRegulation(JSON.parse(JSON.stringify(currentRegulation)));
-                }}
+                onClick={handleCancelEdit}
                 className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl shadow-sm hover:bg-gray-200 flex-1 font-semibold tracking-wide"
               >
                 Hủy

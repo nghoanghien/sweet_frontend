@@ -23,21 +23,25 @@ export interface IQuyDinhLaiSuatResDTO {
 }
 
 export interface IChiTietQuyDinhLaiSuatReqDTO {
-  chiTietQuyDinhID: number | null;
+  chiTietQuyDinhID?: number;
+  quyDinhLaiSuatID?: number;
   loaiTietKiemID: number;
   tanSuatNhanLaiID: number;
-  loaiKyHan: ILoaiKyHan;
+  loaiKyHan: {
+    loaiKyHanID: number | null;
+    tenLoaiKyHan: string;
+    soThang: number;
+  };
   laiSuat: number;
 }
 
 export interface IQuyDinhLaiSuatReqDTO {
-  quyDinhLaiSuatID: number | null;
-  ngayBatDau: string; 
-  ngayKetThuc: string; 
+  quyDinhLaiSuatID?: number;
+  ngayBatDau: string;
+  ngayKetThuc?: string;
   moTa: string;
   nguoiLapQuyDinhID: number;
   laiSuatKhongKyHan: number;
   soTienGuiToiThieu: number;
   chiTietQuyDinhLaiSuats: IChiTietQuyDinhLaiSuatReqDTO[];
-  active: boolean;
 }
