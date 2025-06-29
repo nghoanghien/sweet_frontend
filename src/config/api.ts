@@ -1,6 +1,6 @@
 import { IForgotPasswordDTO, IRegisterDTO, IReqLoginDTO, IResetPasswordDTO, IResLoginDTO, IUserGetAccountDTO, IVerificationDTO } from '@/types/auth';
 import axios from './axios-customize';
-import { IBackendRes, IModuleDTO } from '@/types/backend.d';
+import { IBackendRes, IBaoCaoDoanhSo, IChiTietBaoCaoDoanhSo, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, INapTienReqDTO, IRutTienReqDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatReqDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
@@ -411,4 +411,15 @@ export const callCreateQuyDinhLaiSuat = (quyDinhLaiSuat: IQuyDinhLaiSuatReqDTO) 
 
 export const callDeleteQuyDinhLaiSuat = (id: number) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/quy-dinh-lai-suat/${id}`);
+}
+
+/**
+ * Báo cáo doanh số
+ */
+export const callGetAllBaoCaoDoanhSo = () => {
+    return axios.get<IBackendRes<IBaoCaoDoanhSo[]>>("/api/v1/bao-cao-doanh-so");
+}
+
+export const callGetAllChiTietBaoCaoByDoanhSoID = (doanhSoId: string) => {
+    return axios.get<IBackendRes<IChiTietBaoCaoDoanhSo[]>>(`/api/v1/bao-cao-doanh-so/${doanhSoId}/chi-tiet`);
 }
