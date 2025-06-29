@@ -3,7 +3,7 @@ import axios from './axios-customize';
 import { IBackendRes, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, INapTienReqDTO, IRutTienReqDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
-import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
+import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatReqDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
 import { INhanVienReqDTO, INhanVienResDTO } from '@/types/employee';
 import { IDiaChi } from '@/types/address';
 import { ILoaiTrangThai, ITrangThaiDTO } from '@/types/status';
@@ -389,7 +389,6 @@ export const callGetAllQuyDinhLaiSuat = () => {
 }
 
 
-
 export const callGetAllChiTietQuyDinhLaiSuat = () => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat/chi-tiet`);
 }
@@ -404,6 +403,10 @@ export const callGetQuyDinhLaiSuatHienTai = () => {
 
 export const callGetChiTietQuyDinhLaiSuatByID = (id: number) => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/chi-tiet/${id}`);
+}
+
+export const callCreateQuyDinhLaiSuat = (quyDinhLaiSuat: IQuyDinhLaiSuatReqDTO) => {
+    return axios.post<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat`, quyDinhLaiSuat);
 }
 
 export const callDeleteQuyDinhLaiSuat = (id: number) => {
