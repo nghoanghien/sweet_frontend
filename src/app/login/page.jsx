@@ -9,6 +9,8 @@ import LoadingOverlay from '@/components/common/LoadingOverlay';
 import ExportNotification from '@/components/common/ExportNotification';
 import { useUserActions, useUser } from '@/store/useUserStore';
 import { TypeUserEnum } from '@/types/enums/TypeUserEnum';
+import { registerUtil } from '@/utils/authUtils';
+import { callSendVerification } from '@/config/api';
 // Placeholder data for dropdowns
 const provinces = ["Hà Nội", "TP Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ"];
 const districts = {
@@ -474,6 +476,16 @@ export default function LoginRegistrationForm() {
     if (!hasErrors) {
       console.log('Registration form submitted:', registerForm);
       // Implement actual registration logic here
+      const register = async (data) => {
+        const {success, message, resBody} = await registerUtil(data);
+        if(resBody!=null){
+          const result = await callSendVerification(resBody.data.email,TypeUserEnum.KHACHHANG);
+          const searchParams = new URLSearchParams();
+          searchParams.append('email', resBody.data.email);
+          router.push(`/verify-account?${searchParams}`);
+        }
+      }
+      register(registerForm);
     } else {
       // Add shake animation to invalid fields
       const invalidInputs = document.querySelectorAll('.border-red-500');

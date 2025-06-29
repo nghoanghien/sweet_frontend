@@ -62,7 +62,7 @@ export const callLogout = () =>{
     return axios.post<IBackendRes<void>>('/api/v1/auth/logout');
 }
 
-export const callRegister = (data: IRegisterDTO<IKhachHangReqDTO>) =>{
+export const callRegister = (data: IKhachHangReqDTO) =>{
     return axios.post<IBackendRes<IRegisterDTO<IKhachHangResDTO>>>('/api/v1/auth/register', data);
 }
 

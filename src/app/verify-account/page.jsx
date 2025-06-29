@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { FaArrowLeft, FaEnvelope, FaCheckCircle } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { CloudSun, Sparkles, Heart, Star, ArrowRight, Loader2 } from 'lucide-react';
+import { verifyUtil } from "@/utils/authUtils";
+import { TypeUserEnum } from "@/types/enums/TypeUserEnum";
 
 const SuccessPage = ({ onGoToLogin }) => {
   return (
@@ -14,13 +17,13 @@ const SuccessPage = ({ onGoToLogin }) => {
         {/* Floating elements */}
         <div className="absolute top-1/4 left-1/4 w-32 h-32 md:w-48 md:h-48 bg-pink-300/30 rounded-full blur-xl animate-float-moon"></div>
         <div className="absolute bottom-1/4 right-1/4 w-40 h-40 md:w-60 md:h-60 bg-rose-300/20 rounded-full blur-xl animate-float-random-1"></div>
-        
+
         {/* Clouds */}
         <div className="absolute left-[10%] top-[20%] w-64 h-32 bg-white/60 rounded-full blur-md animate-float-random-2"></div>
         <div className="absolute right-[15%] top-[30%] w-72 h-40 bg-white/50 rounded-full blur-md animate-float-random-3"></div>
         <div className="absolute left-[20%] bottom-[25%] w-56 h-28 bg-pink-200/40 rounded-full blur-md animate-float-random-4"></div>
         <div className="absolute right-[25%] bottom-[35%] w-48 h-24 bg-rose-200/30 rounded-full blur-md animate-float-random-5"></div>
-        
+
         {/* Sparkles */}
         <div className="absolute top-[15%] right-[20%] text-pink-400 animate-pulse">
           <Sparkles size={24} />
@@ -56,7 +59,7 @@ const SuccessPage = ({ onGoToLogin }) => {
                   <div className="text-4xl">✅</div>
                 </div>
               </motion.div>
-              
+
               {/* Floating icons around the main circle */}
               <motion.div
                 animate={{ y: [-10, 10, -10] }}
@@ -65,7 +68,7 @@ const SuccessPage = ({ onGoToLogin }) => {
               >
                 <span className="text-white text-xl">✨</span>
               </motion.div>
-              
+
               <motion.div
                 animate={{ y: [10, -10, 10] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
@@ -74,7 +77,7 @@ const SuccessPage = ({ onGoToLogin }) => {
                 <span className="text-white text-xl">🎉</span>
               </motion.div>
             </div>
-            
+
             <div className="space-y-4">
               <h2 className="text-4xl font-bold text-gray-800 leading-tight">
                 Chào mừng!
@@ -87,7 +90,7 @@ const SuccessPage = ({ onGoToLogin }) => {
                 Tài khoản của bạn đã được xác thực và tạo thành công. Bây giờ bạn có thể đăng nhập và sử dụng dịch vụ.
               </p>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-pink-400 rounded-full"></div>
@@ -141,7 +144,7 @@ const SuccessPage = ({ onGoToLogin }) => {
                   >
                     Tài khoản đã được xác thực!
                   </motion.h1>
-                  
+
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -214,13 +217,13 @@ const LoadingSpinner = ({ message, type = 'default' }) => {
             {[0, 1, 2, 3, 4].map((i) => (
               <motion.div
                 key={i}
-                animate={{ 
+                animate={{
                   scale: [1, 1.5, 1],
                   backgroundColor: ['#3B82F6', '#60A5FA', '#3B82F6']
                 }}
-                transition={{ 
-                  duration: 1.2, 
-                  repeat: Infinity, 
+                transition={{
+                  duration: 1.2,
+                  repeat: Infinity,
                   delay: i * 0.15,
                   ease: "easeInOut"
                 }}
@@ -284,8 +287,9 @@ const LoadingSpinner = ({ message, type = 'default' }) => {
 };
 
 const VerifyAccount = () => {
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const [email, setEmail] = useState("user@example.com"); // Email from registration
+  const [email, setEmail] = useState(""); // Email from registration
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [isTimerRunning, setIsTimerRunning] = useState(true);
@@ -304,7 +308,11 @@ const VerifyAccount = () => {
       setPageLoaded(true);
     }, 100);
 
+
     return () => {
+
+      const emailParam = searchParams.get('email');
+      setEmail(emailParam);
       clearTimeout(pageLoadTimer);
     };
   }, []);
@@ -324,11 +332,11 @@ const VerifyAccount = () => {
 
   const handleOTPChange = (index, value) => {
     if (value.length > 1) return;
-    
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    
+
     // Auto focus next input
     if (value && index < 5) {
       otpRefs.current[index + 1]?.focus();
@@ -341,54 +349,71 @@ const VerifyAccount = () => {
     }
   };
 
-  const handleVerifyOTP = async () => {
+ const handleVerifyOTP = async () => {
     const otpString = otp.join('');
+
     if (otpString.length !== 6) {
       setError('Vui lòng nhập đầy đủ 6 số');
       return;
     }
-    
+
     setError('');
     setIsLoadingOTP(true);
-    
-    // Simulate OTP verification
-    setTimeout(() => {
-      setIsLoadingOTP(false);
-      if (otpString === '123456') {
+
+    try {
+      // Gọi API verify OTP
+      const res = await verifyUtil(email, otpString, TypeUserEnum.KHACHHANG);
+
+      if (res.statusCode === 200) {
         setOtpValidationState('success');
         setIsOTPValid(true);
-        // Show success animation for longer duration
+
+        // Giả lập animation thành công (delay hiển thị)
         setTimeout(() => {
           setCurrentStep('transitioning');
-          // Then transition to success page
           setTimeout(() => {
             setShowSuccessPage(true);
             setOtpValidationState('');
-          }, 600);
+          }, 600); // transition xong mới hiển thị success page
         }, 1500);
       } else {
+        // Xác thực thất bại
         setOtpValidationState('error');
         setIsOTPValid(false);
         setError('Mã OTP không đúng');
-        // Clear error state after showing animation
+
+        // Reset sau 2s
         setTimeout(() => {
           setOtpValidationState('');
           setIsOTPValid(null);
         }, 2000);
       }
-    }, 1500);
+    } catch (err) {
+      console.error('Lỗi xác thực OTP:', err);
+      setError('Đã xảy ra lỗi khi xác thực OTP');
+      setOtpValidationState('error');
+      setIsOTPValid(false);
+
+      setTimeout(() => {
+        setOtpValidationState('');
+        setIsOTPValid(null);
+      }, 2000);
+    } finally {
+      setIsLoadingOTP(false);
+      
+    }
   };
 
   const handleResendOTP = () => {
     if (isTimerRunning) return;
-    
+
     setIsTimerRunning(true);
     setTimer(60);
     setOtp(["", "", "", "", "", ""]);
     setError("");
     setOtpValidationState('');
     setIsOTPValid(null);
-    
+
     // Focus first input
     setTimeout(() => {
       otpRefs.current[0]?.focus();
@@ -420,13 +445,13 @@ const VerifyAccount = () => {
         {/* Floating elements */}
         <div className="absolute top-1/4 left-1/4 w-32 h-32 md:w-48 md:h-48 bg-blue-300/20 rounded-full blur-xl animate-float-moon"></div>
         <div className="absolute bottom-1/4 right-1/4 w-40 h-40 md:w-60 md:h-60 bg-indigo-300/15 rounded-full blur-xl animate-float-random-1"></div>
-        
+
         {/* Clouds */}
         <div className="absolute left-[10%] top-[20%] w-64 h-32 bg-white/40 rounded-full blur-md animate-float-random-2"></div>
         <div className="absolute right-[15%] top-[30%] w-72 h-40 bg-white/30 rounded-full blur-md animate-float-random-3"></div>
         <div className="absolute left-[20%] bottom-[25%] w-56 h-28 bg-blue-200/30 rounded-full blur-md animate-float-random-4"></div>
         <div className="absolute right-[25%] bottom-[35%] w-48 h-24 bg-indigo-200/25 rounded-full blur-md animate-float-random-5"></div>
-        
+
         {/* Sparkles */}
         <div className="absolute top-[15%] right-[20%] text-blue-400 animate-pulse">
           <Sparkles size={24} />
@@ -462,7 +487,7 @@ const VerifyAccount = () => {
                   <div className="text-4xl">📧</div>
                 </div>
               </motion.div>
-              
+
               {/* Floating icons around the main circle */}
               <motion.div
                 animate={{ y: [-10, 10, -10] }}
@@ -471,7 +496,7 @@ const VerifyAccount = () => {
               >
                 <span className="text-white text-xl">🔐</span>
               </motion.div>
-              
+
               <motion.div
                 animate={{ y: [10, -10, 10] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
@@ -480,7 +505,7 @@ const VerifyAccount = () => {
                 <span className="text-white text-xl">✅</span>
               </motion.div>
             </div>
-            
+
             <div className="space-y-4">
               <h2 className="text-4xl font-bold text-gray-800 leading-tight">
                 Xác thực
@@ -493,7 +518,7 @@ const VerifyAccount = () => {
                 Chúng tôi đã gửi mã xác nhận đến email của bạn. Vui lòng nhập mã để hoàn tất quá trình đăng ký.
               </p>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
@@ -514,258 +539,257 @@ const VerifyAccount = () => {
             className="w-full max-w-md mx-auto lg:mx-0"
           >
             <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 md:p-10 border border-white/20 relative overflow-hidden">
-          {/* Background decorations */}
-          <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-10 animate-pulse"></div>
-            <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-gradient-to-br from-rose-300 to-pink-300 rounded-full opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
-          </div>
-
-          <div className="relative z-10">
-            {/* Header */}
-            <motion.div
-              initial="initial"
-              animate="animate"
-              variants={fadeInUpVariants}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-8"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <button
-                  onClick={handleBackToHome}
-                  className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200 group"
-                >
-                  <FaArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-800 transition-colors" />
-                </button>
-                
-                <div className="text-center flex-1">
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-                    Xác thực tài khoản
-                  </h1>
-                  <p className="text-gray-600">
-                    Nhập mã xác nhận để hoàn tất đăng ký
-                  </p>
-                </div>
-                
-                <div className="w-11"></div> {/* Spacer for centering */}
-              </div>
-            </motion.div>
-
-            {/* Email notification */}
-            <motion.div
-              initial="initial"
-              animate="animate"
-              variants={fadeInUpVariants}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-2xl p-6 mb-6 relative overflow-hidden"
-            >
               {/* Background decorations */}
-              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-20 transform translate-x-8 -translate-y-8"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-indigo-300 to-blue-300 rounded-full opacity-20 transform -translate-x-6 translate-y-6"></div>
-              
-              <div className="flex items-start gap-4 relative z-10">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg"
-                >
-                  <FaEnvelope className="w-6 h-6 text-white" />
-                </motion.div>
-                
-                <div className="flex-1">
-                  <motion.h4
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="font-bold text-gray-800 mb-2"
-                  >
-                    Sweet đã gửi mã xác nhận!
-                  </motion.h4>
-                  
-                  <motion.p
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-gray-600 text-sm mb-3"
-                  >
-                    Chúng tôi đã gửi mã OTP 6 số đến email <span className="font-semibold text-blue-600">{email}</span>. Vui lòng kiểm tra hộp thư và nhập mã để hoàn tất đăng ký.
-                  </motion.p>
-                  
-                  <motion.button
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                    onClick={handleResendOTP}
-                    disabled={isTimerRunning}
-                    className={`text-sm font-medium transition-all duration-200 ${
-                      isTimerRunning 
-                        ? "text-gray-400 cursor-not-allowed" 
-                        : "text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
-                    }`}
-                  >
-                    {isTimerRunning ? `Gửi lại mã sau ${timer}s` : "Gửi lại mã"}
-                  </motion.button>
-                </div>
+              <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full opacity-10 animate-pulse"></div>
+                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-gradient-to-br from-rose-300 to-pink-300 rounded-full opacity-10 animate-pulse" style={{ animationDelay: '1s' }}></div>
               </div>
-            </motion.div>
 
-            {/* Error Message */}
-            <AnimatePresence>
-              {error && (
+              <div className="relative z-10">
+                {/* Header */}
                 <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-center font-medium"
+                  initial="initial"
+                  animate="animate"
+                  variants={fadeInUpVariants}
+                  transition={{ duration: 0.6 }}
+                  className="text-center mb-8"
                 >
-                  {error}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* OTP Input Section */}
-            {currentStep === 'otp' && (
-              <motion.div
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={fadeInUpVariants}
-                transition={{ duration: 0.5 }}
-                className="space-y-6"
-              >
-                <div className="space-y-4">
-                  <label className="block text-gray-700 font-medium text-lg">
-                    Nhập mã xác nhận (6 số)
-                  </label>
-                  
-                  {isLoadingOTP ? (
-                    <LoadingSpinner message="Đang xác thực mã..." type="otp" />
-                  ) : (
-                    <div className="grid grid-cols-6 gap-3 max-w-sm mx-3">
-                      {otp.map((digit, index) => {
-                        let inputStyle = "w-12 h-14 aspect-square text-center text-xl font-bold border-2 rounded-xl focus:outline-none transition-all duration-300 shadow-sm";
-                        
-                        if (otpValidationState === 'success') {
-                          inputStyle += " border-green-500 bg-green-50 text-green-700 shadow-green-200";
-                        } else if (otpValidationState === 'error') {
-                          inputStyle += " border-red-500 bg-red-50 text-red-700 shadow-red-200";
-                        } else {
-                          inputStyle += " border-gray-300 bg-white focus:border-blue-500 focus:shadow-blue-200 hover:border-gray-400";
-                        }
-                        
-                        return (
-                          <div key={index} className="aspect-square">
-                            <motion.input
-                              ref={el => otpRefs.current[index] = el}
-                              type="text"
-                              value={digit}
-                              onChange={(e) => handleOTPChange(index, e.target.value)}
-                              onKeyDown={(e) => handleKeyDown(index, e)}
-                              maxLength={1}
-                              disabled={otpValidationState !== ''}
-                              className={inputStyle}
-                              animate={{
-                                scale: otpValidationState === 'success' ? [1, 1.1, 1] : 
-                                       otpValidationState === 'error' ? [1, 1.05, 0.95, 1] : 1,
-                                rotate: otpValidationState === 'error' ? [0, -2, 2, 0] : 0
-                              }}
-                              transition={{ 
-                                duration: otpValidationState === 'success' ? 0.6 : 0.4,
-                                delay: index * 0.1,
-                                repeat: otpValidationState === 'error' ? 2 : 0
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                  
-                  {/* Success/Error Message */}
-                  {otpValidationState === 'success' && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="flex items-center justify-center gap-2 text-green-600 font-medium"
+                  <div className="flex items-center justify-between mb-6">
+                    <button
+                      onClick={handleBackToHome}
+                      className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200 group"
                     >
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 0.5 }}
-                        className="w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full"
-                      />
-                      <span>Mã xác nhận chính xác!</span>
+                      <FaArrowLeft className="w-5 h-5 text-gray-600 group-hover:text-gray-800 transition-colors" />
+                    </button>
+
+                    <div className="text-center flex-1">
+                      <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                        Xác thực tài khoản
+                      </h1>
+                      <p className="text-gray-600">
+                        Nhập mã xác nhận để hoàn tất đăng ký
+                      </p>
+                    </div>
+
+                    <div className="w-11"></div> {/* Spacer for centering */}
+                  </div>
+                </motion.div>
+
+                {/* Email notification */}
+                <motion.div
+                  initial="initial"
+                  animate="animate"
+                  variants={fadeInUpVariants}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-2xl p-6 mb-6 relative overflow-hidden"
+                >
+                  {/* Background decorations */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-300 to-indigo-400 rounded-full opacity-20 transform translate-x-8 -translate-y-8"></div>
+                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-br from-indigo-300 to-blue-300 rounded-full opacity-20 transform -translate-x-6 translate-y-6"></div>
+
+                  <div className="flex items-start gap-4 relative z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                      className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg"
+                    >
+                      <FaEnvelope className="w-6 h-6 text-white" />
+                    </motion.div>
+
+                    <div className="flex-1">
+                      <motion.h4
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="font-bold text-gray-800 mb-2"
+                      >
+                        Sweet đã gửi mã xác nhận!
+                      </motion.h4>
+
+                      <motion.p
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-gray-600 text-sm mb-3"
+                      >
+                        Chúng tôi đã gửi mã OTP 6 số đến email <span className="font-semibold text-blue-600">{email}</span>. Vui lòng kiểm tra hộp thư và nhập mã để hoàn tất đăng ký.
+                      </motion.p>
+
+                      <motion.button
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5 }}
+                        onClick={handleResendOTP}
+                        disabled={isTimerRunning}
+                        className={`text-sm font-medium transition-all duration-200 ${isTimerRunning
+                          ? "text-gray-400 cursor-not-allowed"
+                          : "text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                          }`}
+                      >
+                        {isTimerRunning ? `Gửi lại mã sau ${timer}s` : "Gửi lại mã"}
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Error Message */}
+                <AnimatePresence>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-center font-medium"
+                    >
+                      {error}
                     </motion.div>
                   )}
-                  
-                  {otpValidationState === 'error' && (
+                </AnimatePresence>
+
+                {/* OTP Input Section */}
+                {currentStep === 'otp' && (
+                  <motion.div
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={fadeInUpVariants}
+                    transition={{ duration: 0.5 }}
+                    className="space-y-6"
+                  >
+                    <div className="space-y-4">
+                      <label className="block text-gray-700 font-medium text-lg">
+                        Nhập mã xác nhận (6 số)
+                      </label>
+
+                      {isLoadingOTP ? (
+                        <LoadingSpinner message="Đang xác thực mã..." type="otp" />
+                      ) : (
+                        <div className="grid grid-cols-6 gap-3 max-w-sm mx-3">
+                          {otp.map((digit, index) => {
+                            let inputStyle = "w-12 h-14 aspect-square text-center text-xl font-bold border-2 rounded-xl focus:outline-none transition-all duration-300 shadow-sm";
+
+                            if (otpValidationState === 'success') {
+                              inputStyle += " border-green-500 bg-green-50 text-green-700 shadow-green-200";
+                            } else if (otpValidationState === 'error') {
+                              inputStyle += " border-red-500 bg-red-50 text-red-700 shadow-red-200";
+                            } else {
+                              inputStyle += " border-gray-300 bg-white focus:border-blue-500 focus:shadow-blue-200 hover:border-gray-400";
+                            }
+
+                            return (
+                              <div key={index} className="aspect-square">
+                                <motion.input
+                                  ref={el => otpRefs.current[index] = el}
+                                  type="text"
+                                  value={digit}
+                                  onChange={(e) => handleOTPChange(index, e.target.value)}
+                                  onKeyDown={(e) => handleKeyDown(index, e)}
+                                  maxLength={1}
+                                  disabled={otpValidationState !== ''}
+                                  className={inputStyle}
+                                  animate={{
+                                    scale: otpValidationState === 'success' ? [1, 1.1, 1] :
+                                      otpValidationState === 'error' ? [1, 1.05, 0.95, 1] : 1,
+                                    rotate: otpValidationState === 'error' ? [0, -2, 2, 0] : 0
+                                  }}
+                                  transition={{
+                                    duration: otpValidationState === 'success' ? 0.6 : 0.4,
+                                    delay: index * 0.1,
+                                    repeat: otpValidationState === 'error' ? 2 : 0
+                                  }}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Success/Error Message */}
+                      {otpValidationState === 'success' && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex items-center justify-center gap-2 text-green-600 font-medium"
+                        >
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 0.5 }}
+                            className="w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full"
+                          />
+                          <span>Mã xác nhận chính xác!</span>
+                        </motion.div>
+                      )}
+
+                      {otpValidationState === 'error' && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center justify-center gap-2 text-red-600 font-medium"
+                        >
+                          <motion.span
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ duration: 0.3, repeat: 2 }}
+                          >
+                            ❌
+                          </motion.span>
+                          <span>Mã OTP không đúng, vui lòng thử lại!</span>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {!isLoadingOTP && otpValidationState === '' && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleVerifyOTP}
+                        className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300"
+                      >
+                        Xác nhận mã
+                      </motion.button>
+                    )}
+                  </motion.div>
+                )}
+
+                {/* Transitioning State */}
+                {currentStep === 'transitioning' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.1 }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    className="flex flex-col items-center justify-center py-16 space-y-6"
+                  >
                     <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center justify-center gap-2 text-red-600 font-medium"
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 180, 360]
+                      }}
+                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                      className="w-16 h-16 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center"
                     >
                       <motion.span
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.3, repeat: 2 }}
+                        animate={{ scale: [0.8, 1.2, 1] }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
+                        className="text-white text-2xl font-bold"
                       >
-                        ❌
+                        ✓
                       </motion.span>
-                      <span>Mã OTP không đúng, vui lòng thử lại!</span>
                     </motion.div>
-                  )}
-                </div>
-                
-                {!isLoadingOTP && otpValidationState === '' && (
-                  <motion.button
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleVerifyOTP}
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300"
-                  >
-                    Xác nhận mã
-                  </motion.button>
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-gray-700 font-medium text-lg"
+                    >
+                      Đang tạo tài khoản...
+                    </motion.p>
+                  </motion.div>
                 )}
-              </motion.div>
-            )}
-            
-            {/* Transitioning State */}
-            {currentStep === 'transitioning' && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ duration: 0.6, ease: "easeInOut" }}
-                className="flex flex-col items-center justify-center py-16 space-y-6"
-              >
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.2, 1],
-                    rotate: [0, 180, 360]
-                  }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className="w-16 h-16 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center"
-                >
-                  <motion.span
-                    animate={{ scale: [0.8, 1.2, 1] }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                    className="text-white text-2xl font-bold"
-                  >
-                    ✓
-                  </motion.span>
-                </motion.div>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-gray-700 font-medium text-lg"
-                >
-                  Đang tạo tài khoản...
-                </motion.p>
-              </motion.div>
-            )}
-          </div>
+              </div>
             </div>
           </motion.div>
         </div>
