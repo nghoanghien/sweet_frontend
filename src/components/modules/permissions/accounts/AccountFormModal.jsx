@@ -179,8 +179,8 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
               format: `Đã cập nhật tài khoản "${formData.email}" thành công!`
             };
             
-            // Gọi hàm onSave từ props với thông tin thông báo
-            onSave(formData, notificationInfo);
+            // Gọi hàm onSave từ props với formData, thông tin thông báo và account gốc
+            onSave(formData, notificationInfo, account);
             
             // Đóng modal chính ngay lập tức
             onClose();

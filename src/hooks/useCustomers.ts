@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
-import { getAllCustomers } from "@/services/customers";
+import { getAllCustomers, updateCustomer } from "@/services/customers";
 import { callActivateKhachHang, callDeactivateKhachHang } from "@/config/api";
+import { User } from "@/types/interfaces/user";
 
 export const useAllCustomers = () => {
   const [data, setData] = useState<any[]>([]);
@@ -132,6 +133,58 @@ export const useActivateCustomer = () => {
 
   return {
     activateCustomer,
+    isLoading,
+    error,
+    success,
+    resetState
+  };
+};
+
+// Hook for updating customer
+export const useUpdateCustomer = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [success, setSuccess] = useState(false);
+
+  const updateCustomerData = useCallback(async (customer: User, customerId: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setSuccess(false);
+      
+      const startTime = Date.now();
+      
+      console.log("Đang cập nhật khách hàng:", customer);
+      const response = await updateCustomer(customer, customerId);
+      console.log('RESPONSE CẬP NHẬT KHÁCH HÀNG: ', response);
+      
+      // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1500 - elapsedTime);
+      
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      console.log("Cập nhật khách hàng thành công:", response.data);
+      setSuccess(true);
+      
+      return response.data;
+    } catch (err) {
+      console.error("Lỗi khi cập nhật khách hàng:", err);
+      setError(err);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const resetState = useCallback(() => {
+    setError(null);
+    setSuccess(false);
+  }, []);
+
+  return {
+    updateCustomerData,
     isLoading,
     error,
     success,
