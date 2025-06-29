@@ -107,7 +107,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
   return (
     <AnimatePresence mode="wait">
       <motion.div
-      className={`bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} relative`}
+      className={`bg-gradient-to-br ${cardStyle.gradient} rounded-3xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} relative`}
       whileHover={{
         scale: 1.02,
         boxShadow: cardStyle.hoverShadow,
@@ -256,18 +256,18 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
 
         {/* Action buttons */}
         {!finalIsSystemRole && (
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <motion.button
               onClick={() => onEdit(role.id)}
-              className={`p-2 rounded-xl ${role.type === 'customer' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 'bg-violet-100 text-violet-600 hover:bg-violet-200'} shadow-sm transition-colors duration-200`}
+              className={`p-3 rounded-xl ${role.type === 'customer' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 'bg-violet-100 text-violet-600 hover:bg-violet-200'} shadow-sm transition-colors duration-200`}
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
             >
-              <Edit2 size={18} />
+              <Edit2 size={22} />
             </motion.button>
             <motion.button
               onClick={() => onDelete(role.id)}
-              className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 shadow-sm transition-colors duration-200"
+              className="p-3 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 shadow-sm transition-colors duration-200"
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
               layoutId={`delete-role-${role.id}`}
@@ -279,7 +279,7 @@ const RoleCard = ({ role, onEdit, onDelete, isSystemRole = false }) => {
                 }
               }}
             >
-              <Trash2 size={18} />
+              <Trash2 size={22} />
             </motion.button>
           </div>
           

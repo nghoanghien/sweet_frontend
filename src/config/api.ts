@@ -1,6 +1,6 @@
 import { IForgotPasswordDTO, IRegisterDTO, IReqLoginDTO, IResetPasswordDTO, IResLoginDTO, IUserGetAccountDTO, IVerificationDTO } from '@/types/auth';
 import axios from './axios-customize';
-import { IBackendRes, IModuleDTO } from '@/types/backend.d';
+import { IBackendRes, IBaoCaoDoanhSo, IChangePasswordDTO, IChiTietBaoCaoDoanhSo, IModuleDTO } from '@/types/backend.d';
 import { IKhachHangReqDTO, IKhachHangResDTO } from '@/types/customer';
 import { IGiaoDichReqDTO, IGiaoDichResponseDTO as IGiaoDichResDTO, ILSGD_TKTTResponseDTO as ILSGD_TKTTResDTO, INapTienReqDTO, IRutTienReqDTO, ITKTTReqDTO, ITKTTResDTO } from '@/types/giaoDich';
 import { IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatReqDTO, IQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat';
@@ -37,7 +37,7 @@ export const callGetAllNhanVien = (filter?: string) =>{
 
 //update nhan vien
 export const callUpdateNhanVien = (NhanVien: INhanVienReqDTO, id: string) => {
-    return axios.put<IBackendRes<INhanVienResDTO>>(`/ap1/v1/nhan-vien/${id}`, NhanVien);
+    return axios.put<IBackendRes<INhanVienResDTO>>(`/api/v1/nhan-vien/${id}`, NhanVien);
 }
 
 //deactivate tai khoan nhan vien
@@ -246,7 +246,7 @@ export const callGetAllKhachHang = (filter?: string) =>{
 
 //update khach hang
 export const callUpdateKhachHang = (khachHang: IKhachHangReqDTO, id: string) => {
-    return axios.put<IBackendRes<IKhachHangResDTO>>(`/ap1/v1/khach-hang/${id}`, khachHang);
+    return axios.put<IBackendRes<IKhachHangResDTO>>(`/api/v1/khach-hang/${id}`, khachHang);
 }
 
 //deactivate tai khoan khach hang
@@ -389,7 +389,6 @@ export const callGetAllQuyDinhLaiSuat = () => {
 }
 
 
-
 export const callGetAllChiTietQuyDinhLaiSuat = () => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO[]>>(`/api/v1/quy-dinh-lai-suat/chi-tiet`);
 }
@@ -406,10 +405,33 @@ export const callGetChiTietQuyDinhLaiSuatByID = (id: number) => {
     return axios.get<IBackendRes<IChiTietQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat/chi-tiet/${id}`);
 }
 
+export const callCreateQuyDinhLaiSuat = (quyDinhLaiSuat: IQuyDinhLaiSuatReqDTO) => {
+    return axios.post<IBackendRes<IQuyDinhLaiSuatResDTO>>(`/api/v1/quy-dinh-lai-suat`, quyDinhLaiSuat);
+}
+
 export const callDeleteQuyDinhLaiSuat = (id: number) => {
     return axios.delete<IBackendRes<void>>(`/api/v1/quy-dinh-lai-suat/${id}`);
 }
 
 export const callCreateOrUpdateQuyDinhLaiSuat = (quyDinhLaiSuat: IQuyDinhLaiSuatReqDTO) => {
     return axios.post<IBackendRes<IQuyDinhLaiSuatResDTO>>('/api/v1/quy-dinh-lai-suat', quyDinhLaiSuat);
+}
+
+
+/**
+ * Báo cáo doanh số
+ */
+export const callGetAllBaoCaoDoanhSo = () => {
+    return axios.get<IBackendRes<IBaoCaoDoanhSo[]>>("/api/v1/bao-cao-doanh-so");
+}
+
+export const callGetAllChiTietBaoCaoByDoanhSoID = (doanhSoId: string) => {
+    return axios.get<IBackendRes<IChiTietBaoCaoDoanhSo[]>>(`/api/v1/bao-cao-doanh-so/${doanhSoId}/chi-tiet`);
+}
+
+/**
+ * API bonus
+ */
+export const callChangePassword = (id: string, changePasswordDTO: IChangePasswordDTO) => {
+    return axios.put<IBackendRes<void>>(`/api/v1/change-password/${id}`, changePasswordDTO);
 }

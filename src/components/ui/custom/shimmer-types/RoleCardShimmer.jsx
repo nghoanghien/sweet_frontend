@@ -52,7 +52,7 @@ const RoleCardShimmer = ({
         variants={cardVariants}
         initial="hidden"
         animate="visible"
-        className={`bg-gradient-to-br ${cardStyle.gradient} rounded-2xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} relative`}
+        className={`bg-gradient-to-br ${cardStyle.gradient} rounded-3xl ${cardStyle.shadow} p-6 border-2 ${cardStyle.border} relative`}
       >
         {/* Background icon placeholder */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">

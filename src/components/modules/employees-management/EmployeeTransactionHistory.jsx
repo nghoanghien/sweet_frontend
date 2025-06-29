@@ -18,6 +18,7 @@ import {
 import SearchBar, { highlightText } from '../ui/SearchBar';
 import TransactionHistoryShimmer from '@/components/ui/custom/shimmer-types/TransactionHistoryShimmer';
 import { useAllTransactionByEmployeeId } from '@/hooks/useEmployeeTransaction';
+import { FaCreditCard } from 'react-icons/fa';
 
 function EmployeeTransactionHistory({ employee }) {
   // State for expanded transaction items
@@ -107,15 +108,15 @@ function EmployeeTransactionHistory({ employee }) {
     
     switch(sourceType) {
       case "Tài khoản thanh toán":
-        return <span className="text-blue-600">Tài khoản thanh toán</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">Tài khoản thanh toán</span>;
       case "Phiếu gửi tiền":
-        return <span className="text-green-600">Phiếu gửi tiền</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">Phiếu gửi tiền</span>;
       case "Tiền mặt tại quầy":
-        return <span className="text-amber-600">Tiền mặt tại quầy</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">Tiền mặt tại quầy</span>;
       case "Ngân hàng":
-        return <span className="text-purple-600">Ngân hàng</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">Ngân hàng</span>;
       default:
-        return <span className="text-gray-600">{sourceType}</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">{sourceType}</span>;
     }
   };
   
@@ -127,15 +128,15 @@ function EmployeeTransactionHistory({ employee }) {
     
     switch(destType) {
       case "Tài khoản thanh toán":
-        return <span className="text-blue-600">Tài khoản thanh toán</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">Tài khoản thanh toán</span>;
       case "Phiếu gửi tiền":
-        return <span className="text-green-600">Phiếu gửi tiền</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">Phiếu gửi tiền</span>;
       case "Tiền mặt tại quầy":
-        return <span className="text-amber-600">Tiền mặt tại quầy</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">Tiền mặt tại quầy</span>;
       case "Ngân hàng":
-        return <span className="text-purple-600">Ngân hàng</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">Ngân hàng</span>;
       default:
-        return <span className="text-gray-600">{destType}</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">{destType}</span>;
     }
   };
   
@@ -341,26 +342,57 @@ function EmployeeTransactionHistory({ employee }) {
 
                         {/* Transaction card */}
                         <div className="ml-6">
-                          <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 overflow-hidden">
+                          <motion.div 
+                            className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                            whileHover={{ 
+                              scale: 1.02,
+                              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                              borderColor: "rgb(147 197 253)"
+                            }}
+                            transition={{ 
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 25
+                            }}
+                          >
                             {/* Collapsed view - always visible */}
-                            <div
-                              className="p-4 cursor-pointer"
+                            <motion.div
+                              className="p-4 cursor-pointer relative"
                               onClick={() =>
                                 toggleTransaction(`${date}-${txIndex}`)
                               }
+                              whileTap={{ scale: 0.98 }}
+                              transition={{ type: "spring", stiffness: 400, damping: 25 }}
                             >
+                              {/* Gradient overlay on hover */}
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-purple-50/0 group-hover:from-blue-50/50 group-hover:to-purple-50/50 transition-all duration-300 rounded-2xl"></div>
                               <div className="flex justify-between items-center">
                                 <div className="flex items-center gap-3 flex-1">
                                   {/* Transaction icon */}
-                                  <div
+                                  <motion.div
                                     className={`h-10 w-10 rounded-xl ${
                                       transaction.type === "incoming"
                                         ? "bg-gradient-to-br from-teal-500 to-cyan-600"
                                         : "bg-gradient-to-br from-rose-500 to-pink-600"
-                                    } flex items-center justify-center shadow-sm`}
+                                    } flex items-center justify-center shadow-sm relative z-10`}
+                                    whileHover={{ 
+                                      scale: 1.1,
+                                      rotate: [0, -10, 10, 0],
+                                      boxShadow: "0 8px 25px -8px rgba(0, 0, 0, 0.3)"
+                                    }}
+                                    transition={{ 
+                                      type: "spring",
+                                      stiffness: 400,
+                                      damping: 15
+                                    }}
                                   >
-                                    {getTransactionIcon(transaction.type)}
-                                  </div>
+                                    <motion.div
+                                      whileHover={{ scale: 1.2 }}
+                                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                                    >
+                                      {getTransactionIcon(transaction.type)}
+                                    </motion.div>
+                                  </motion.div>
 
                                   <div>
                                     <h5 className="font-medium text-gray-800">
@@ -374,12 +406,17 @@ function EmployeeTransactionHistory({ employee }) {
                                         ? "Tiền nhận"
                                         : "Tiền trả"}
                                       :{" "}
-                                      <span
+                                      <motion.span
                                         className={`font-semibold ${
                                           transaction.type === "incoming"
                                             ? "text-teal-600"
                                             : "text-rose-600"
                                         }`}
+                                        whileHover={{ 
+                                          scale: 1.05,
+                                          textShadow: "0 0 8px rgba(0, 0, 0, 0.3)"
+                                        }}
+                                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
                                       >
                                         {transaction.type === "incoming"
                                           ? "+"
@@ -388,172 +425,329 @@ function EmployeeTransactionHistory({ employee }) {
                                           "vi-VN"
                                         )}{" "}
                                         đ
-                                      </span>
+                                      </motion.span>
                                     </p>
                                   </div>
                                 </div>
 
                                 {/* Expand/collapse button */}
-                                <button
-                                  className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                <motion.button
+                                  className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 relative z-10"
                                   aria-label={
                                     expandedTransactions[`${date}-${txIndex}`]
                                       ? "Thu gọn"
                                       : "Mở rộng"
                                   }
+                                  whileHover={{ scale: 1.1 }}
+                                  whileTap={{ scale: 0.9 }}
+                                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                                 >
-                                  {expandedTransactions[
-                                    `${date}-${txIndex}`
-                                  ] ? (
-                                    <ChevronUp
-                                      size={18}
-                                      className="text-gray-500"
-                                    />
-                                  ) : (
+                                  <motion.div
+                                    animate={{ 
+                                      rotate: expandedTransactions[`${date}-${txIndex}`] ? 180 : 0 
+                                    }}
+                                    transition={{ 
+                                      type: "spring",
+                                      stiffness: 300,
+                                      damping: 20
+                                    }}
+                                  >
                                     <ChevronDown
                                       size={18}
                                       className="text-gray-500"
                                     />
-                                  )}
-                                </button>
+                                  </motion.div>
+                                </motion.button>
                               </div>
-                            </div>
+                            </motion.div>
 
                             {/* Expanded details */}
                             <AnimatePresence>
                               {expandedTransactions[`${date}-${txIndex}`] && (
                                 <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  transition={{ duration: 0.3 }}
+                                  initial={{ 
+                                    height: 0, 
+                                    opacity: 0,
+                                    scale: 0.95
+                                  }}
+                                  animate={{ 
+                                    height: "auto", 
+                                    opacity: 1,
+                                    scale: 1
+                                  }}
+                                  exit={{ 
+                                    height: 0, 
+                                    opacity: 0,
+                                    scale: 0.95
+                                  }}
+                                  transition={{ 
+                                    type: "spring",
+                                    stiffness: 300,
+                                    damping: 30,
+                                    mass: 0.8
+                                  }}
                                   className="overflow-hidden"
                                 >
                                   <div className="px-4 pb-4 pt-2 border-t border-gray-100">
-                                    <div className="space-y-4">
+                                    <motion.div 
+                                      className="space-y-4"
+                                      variants={{
+                                        hidden: { opacity: 0 },
+                                        visible: {
+                                          opacity: 1,
+                                          transition: {
+                                            staggerChildren: 0.1,
+                                            delayChildren: 0.1
+                                          }
+                                        }
+                                      }}
+                                      initial="hidden"
+                                      animate="visible"
+                                    >
                                       {/* Transaction type */}
-                                      <div className="flex items-center justify-between text-sm">
+                                      <motion.div 
+                                        className="flex items-center justify-between text-sm"
+                                        variants={{
+                                          hidden: { opacity: 0, x: -20 },
+                                          visible: { opacity: 1, x: 0 }
+                                        }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                      >
                                         <span className="text-gray-500">
                                           Loại giao dịch:
                                         </span>
-                                        <div className="font-medium">
+                                        <motion.div 
+                                          className="font-medium"
+                                          whileHover={{ scale: 1.02 }}
+                                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                        >
                                           {getTransactionTypeDisplay(
                                             transaction
                                           )}
-                                        </div>
-                                      </div>
+                                        </motion.div>
+                                      </motion.div>
 
                                       {/* Channel */}
-                                      <div className="flex items-center justify-between text-sm">
+                                      <motion.div 
+                                        className="flex items-center justify-between text-sm"
+                                        variants={{
+                                          hidden: { opacity: 0, x: 20 },
+                                          visible: { opacity: 1, x: 0 }
+                                        }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                      >
                                         <span className="text-gray-500">
                                           Kênh giao dịch:
                                         </span>
-                                        <div className="font-medium">
+                                        <motion.div 
+                                          className="font-medium"
+                                          whileHover={{ scale: 1.02 }}
+                                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                        >
                                           {getChannelDisplay(transaction)}
-                                        </div>
-                                      </div>
+                                        </motion.div>
+                                      </motion.div>
 
                                       {/* Source account */}
-                                      <div className="flex items-start justify-between text-sm">
+                                      <motion.div 
+                                        className="flex items-start justify-between text-sm"
+                                        variants={{
+                                          hidden: { opacity: 0, y: 20 },
+                                          visible: { opacity: 1, y: 0 }
+                                        }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                      >
                                         <span className="text-gray-500">
                                           Tài khoản nguồn:
                                         </span>
-                                        <div className="text-right">
-                                          <div className="font-medium flex items-center gap-2">
-                                            {transaction.sourceAccountType !==
-                                              "Ngân hàng" &&
-                                            transaction.sourceAccountType !==
-                                              "Tiền mặt tại quầy" &&
-                                            transaction.sourceAccountId ? (
-                                              <>
-                                                <User
-                                                  size={14}
-                                                  className="text-blue-600"
-                                                />
-                                                <span>
-                                                  {transaction.sourceAccountId}
-                                                </span>
-                                              </>
-                                            ) : (
-                                              <span className="text-gray-400">
-                                                -
-                                              </span>
-                                            )}
-                                          </div>
-                                          <div className="text-xs text-gray-500 mt-1">
-                                            {getSourceAccountTypeDisplay(
-                                              transaction
-                                            )}
-                                          </div>
+                                        <div className="text-right space-y-2">
+                                          {transaction.sourceAccountType === "Tiền mặt tại quầy" ? (
+                                            <motion.div 
+                                              className="font-medium"
+                                              whileHover={{ scale: 1.05 }}
+                                              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                            >
+                                              {getSourceAccountTypeDisplay(transaction)}
+                                            </motion.div>
+                                          ) : (
+                                            <>
+                                              <div className="font-medium flex items-center gap-2 justify-end">
+                                                {transaction.sourceAccountId ? (
+                                                  <>
+                                                    <CreditCard
+                                                      size={14}
+                                                      className="text-blue-600"
+                                                    />
+                                                    <motion.span 
+                                                      className="font-mono text-sm bg-gray-50 px-2 py-1 rounded border"
+                                                      whileHover={{ 
+                                                        scale: 1.05,
+                                                        backgroundColor: "rgb(243 244 246)",
+                                                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
+                                                      }}
+                                                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                                    >
+                                                      {transaction.sourceAccountId}
+                                                    </motion.span>
+                                                  </>
+                                                ) : (
+                                                  <span className="text-gray-400 italic">
+                                                    Không có số tài khoản
+                                                  </span>
+                                                )}
+                                              </div>
+                                              <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                              >
+                                                {getSourceAccountTypeDisplay(transaction)}
+                                              </motion.div>
+                                            </>
+                                          )}
                                         </div>
-                                      </div>
+                                      </motion.div>
 
                                       {/* Destination account */}
-                                      <div className="flex items-start justify-between text-sm">
+                                      <motion.div 
+                                        className="flex items-start justify-between text-sm"
+                                        variants={{
+                                          hidden: { opacity: 0, y: 20 },
+                                          visible: { opacity: 1, y: 0 }
+                                        }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                      >
                                         <span className="text-gray-500">
                                           Tài khoản đích:
                                         </span>
-                                        <div className="text-right">
-                                          <div className="font-medium flex items-center gap-2">
-                                            {transaction.destAccountType !==
-                                              "Ngân hàng" &&
-                                            transaction.destAccountType !==
-                                              "Tiền mặt tại quầy" &&
-                                            transaction.destAccountId ? (
-                                              <>
-                                                <User
-                                                  size={14}
-                                                  className="text-blue-600"
-                                                />
-                                                <span>
-                                                  {transaction.destAccountId}
-                                                </span>
-                                              </>
-                                            ) : (
-                                              <span className="text-gray-400">
-                                                -
-                                              </span>
-                                            )}
-                                          </div>
-                                          <div className="text-xs text-gray-500 mt-1">
-                                            {getDestAccountTypeDisplay(
-                                              transaction
-                                            )}
-                                          </div>
+                                        <div className="text-right space-y-2">
+                                          {transaction.destAccountType === "Tiền mặt tại quầy" ? (
+                                            <motion.div 
+                                              className="font-medium"
+                                              whileHover={{ scale: 1.05 }}
+                                              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                            >
+                                              {getDestAccountTypeDisplay(transaction)}
+                                            </motion.div>
+                                          ) : (
+                                            <>
+                                              <div className="font-medium flex items-center gap-2 justify-end">
+                                                {transaction.destAccountId ? (
+                                                  <>
+                                                    <CreditCard
+                                                      size={14}
+                                                      className="text-blue-600"
+                                                    />
+                                                    <motion.span 
+                                                      className="font-mono text-sm bg-gray-50 px-2 py-1 rounded border"
+                                                      whileHover={{ 
+                                                        scale: 1.05,
+                                                        backgroundColor: "rgb(243 244 246)",
+                                                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
+                                                      }}
+                                                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                                    >
+                                                      {transaction.destAccountId}
+                                                    </motion.span>
+                                                  </>
+                                                ) : (
+                                                  <span className="text-gray-400 italic">
+                                                    Không có số tài khoản
+                                                  </span>
+                                                )}
+                                              </div>
+                                              <motion.div
+                                                whileHover={{ scale: 1.05 }}
+                                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                              >
+                                                {getDestAccountTypeDisplay(transaction)}
+                                              </motion.div>
+                                            </>
+                                          )}
                                         </div>
-                                      </div>
+                                      </motion.div>
 
                                       {/* Note/Content */}
                                       {transaction.note && (
-                                        <div className="flex items-start justify-between text-sm">
+                                        <motion.div 
+                                          className="flex items-start justify-between text-sm"
+                                          variants={{
+                                            hidden: { opacity: 0, y: 20 },
+                                            visible: { opacity: 1, y: 0 }
+                                          }}
+                                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                        >
                                           <span className="text-gray-500">
                                             Nội dung:
                                           </span>
-                                          <span className="font-medium text-gray-700 text-right max-w-xs">
+                                          <motion.span 
+                                            className="font-medium text-gray-700 text-right max-w-xs"
+                                            whileHover={{ 
+                                              scale: 1.02,
+                                              color: "rgb(55 65 81)"
+                                            }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                          >
                                             {transaction.note}
-                                          </span>
-                                        </div>
+                                          </motion.span>
+                                        </motion.div>
                                       )}
 
                                       {/* Status */}
-                                      <div className="flex items-center justify-between text-sm">
+                                      <motion.div 
+                                        className="flex items-center justify-between text-sm"
+                                        variants={{
+                                          hidden: { opacity: 0, y: 20 },
+                                          visible: { opacity: 1, y: 0 }
+                                        }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                      >
                                         <span className="text-gray-500">
                                           Trạng thái:
                                         </span>
-                                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">
-                                          <CheckCircle2
-                                            size={14}
-                                            className="text-emerald-500"
-                                          />
-                                          <span>Thành công</span>
-                                        </div>
-                                      </div>
-                                    </div>
+                                        <motion.div 
+                                          className="flex items-center gap-2 px-3 py-1.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200"
+                                          whileHover={{ 
+                                            scale: 1.05,
+                                            boxShadow: "0 4px 12px rgba(16, 185, 129, 0.25)",
+                                            backgroundColor: "rgb(209 250 229)"
+                                          }}
+                                          whileTap={{ scale: 0.95 }}
+                                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                        >
+                                          <motion.div
+                                            whileHover={{ 
+                                              rotate: [0, -10, 10, 0],
+                                              scale: 1.2
+                                            }}
+                                            transition={{ 
+                                              type: "spring", 
+                                              stiffness: 400, 
+                                              damping: 15,
+                                              duration: 0.6
+                                            }}
+                                          >
+                                            <CheckCircle2
+                                              size={14}
+                                              className="text-emerald-500"
+                                            />
+                                          </motion.div>
+                                          <motion.span
+                                            whileHover={{ 
+                                              fontWeight: "600",
+                                              letterSpacing: "0.025em"
+                                            }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                          >
+                                            Thành công
+                                          </motion.span>
+                                        </motion.div>
+                                      </motion.div>
+                                    </motion.div>
                                   </div>
                                 </motion.div>
                               )}
                             </AnimatePresence>
-                          </div>
+                          </motion.div>
                         </div>
                       </div>
                     ))}

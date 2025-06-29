@@ -28,7 +28,7 @@ export interface IKhachHangReqDTO {
     diaChiThuongTru: IDiaChi;
     diaChiLienLac: IDiaChi;
     trangThaiKhachHangId?: string;
-    matKhau: string;
+    matKhau?: string;
     vaiTroId?: string;
     trangThaiTaiKhoanId?: string
 }

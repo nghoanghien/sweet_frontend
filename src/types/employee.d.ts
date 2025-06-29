@@ -29,7 +29,7 @@ export interface INhanVienReqDTO {
     diaChiThuongTru: IDiaChi;
     diaChiLienLac: IDiaChi;
     matKhau: string;
-    vaiTroId?: string;
+    vaiTroId?: number;
     trangThaiTaiKhoanId?: string;
 }
 

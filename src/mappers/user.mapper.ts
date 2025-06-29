@@ -4,6 +4,8 @@ import { Permission } from "@/types/interfaces/enums";
 import { Address, Role, User } from "@/types/interfaces/user";
 import { getAccountStatusByCode, getCustomerStatusByCode } from "@/utils/user";
 import { getPermissions } from "@/utils/permissions";
+import { mapApiToRole } from "./permissions.mapper";
+import { IKhachHangReqDTO } from "@/types/customer";
 
 export const mapApiToAddress = (item: any): Address => {
   return {
@@ -16,18 +18,6 @@ export const mapApiToAddress = (item: any): Address => {
   };
 }
 
-export const mapApiToRole = (item: any): Role => {
-  return {
-    roleID: item.id,
-    roleName: item.name,
-    description: item.description,
-    active: item.active,
-    customerRole: item.customerRole,
-    permissions: item.quyenHanIds ? getPermissions(item.quyenHanIds) : getPermissions(item.quyenHans),
-  }
-}
-
-//Còn thiếu nhân viên chưa mapping được
 export const mapApiToUser = (item: any): User => {
   return {
     fullName: item.hoTen,
@@ -39,7 +29,7 @@ export const mapApiToUser = (item: any): User => {
     permanentAddress: mapApiToAddress(item.diaChiThuongTru),
     contactAddress: mapApiToAddress(item.diaChiLienLac),
     role: mapApiToRole(item.vaiTro),
-    accountStatus: getAccountStatusByCode(item.trangThaiTaiKhoan.trangThaiID),
+    accountStatus: getAccountStatusByCode(item.trangThaiTaiKhoan.maTrangThai),
 
     //only for customer
     customerID: item?.khachHangID || null,
@@ -72,6 +62,19 @@ export const mapUserToINhanVienReqDTO = (item: User): INhanVienReqDTO => {
     soDienThoai: item.phoneNumber,
     diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
     diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
-    
+    ...(item.role && { vaiTroId: item.role.roleID })
   };
+}
+
+export const mapUserToIKhachHangReqDTO = (item: User): IKhachHangReqDTO => {
+  return {
+    hoTen: item.fullName,
+    ngaySinh: item.dateOfBirth.toISOString(),
+    cccd: item.idCardNumber,
+    email: item.email,
+    soDienThoai: item.phoneNumber,
+    diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
+    diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
+    ...(item.role && { vaiTroId: item.role.roleID })
+  }
 }

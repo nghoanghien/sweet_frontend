@@ -6,8 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AddressFields from '../../../components/ui/custom/AddressFields';
 import SwipeConfirmationModal from '../ConfirmationModal/SwipeConfirmationModal';
 import ExportNotification from '../../common/ExportNotification';
+import { useUser } from '@/store/useUserStore';
 
-const ProfileModal = ({ isOpen = false, onClose }) => {
+
+const ProfileModal = ({ isOpen = false, onClose  }) => {
   const [editMode, setEditMode] = useState(false);
   const [activeTab, setActiveTab] = useState('personal');
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -47,6 +49,7 @@ const ProfileModal = ({ isOpen = false, onClose }) => {
   
   // Reset edit data when modal opens
   useEffect(() => {
+
     if (isOpen) {
       setEditData({
         phone: profileData.phone,

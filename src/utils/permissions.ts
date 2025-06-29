@@ -148,13 +148,23 @@ export const isSubsetOf = (mainArray: number[], subArray: number[]): boolean => 
 };
 
 /**
- * Lấy danh sách permissions dựa trên array object có thuộc tính .id
- * @param actionObjects - Array các object có thuộc tính .id
+ * Lấy danh sách permissions dựa trên array object có thuộc tính .id hoặc array số nguyên
+ * @param actionInput - Array các object có thuộc tính .id hoặc array số nguyên
  * @returns Array các permissions có action codes thuộc về actionCodes đầu vào
  */
-export const getPermissions = (actionObjects: any[]): Permission[] => {
-  // Trích xuất tất cả .id từ array object thành mảng số
-  const actionCodes = actionObjects.map(obj => obj.id).filter(id => typeof id === 'number');
+export const getPermissions = (actionInput: any[] | number[]): Permission[] => {
+  // Xử lý input để lấy ra mảng action codes
+  let actionCodes: number[];
+  
+  if (actionInput.length === 0) {
+    actionCodes = [];
+  } else if (typeof actionInput[0] === 'number') {
+    // Nếu phần tử đầu tiên là số, coi như toàn bộ array là số
+    actionCodes = actionInput.filter(item => typeof item === 'number') as number[];
+  } else {
+    // Nếu phần tử đầu tiên không phải số, coi như array object có thuộc tính .id
+    actionCodes = actionInput.map((obj: any) => obj.id).filter(id => typeof id === 'number');
+  }
   
   const permissions: Permission[] = [];
   

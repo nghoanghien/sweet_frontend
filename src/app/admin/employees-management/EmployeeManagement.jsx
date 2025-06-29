@@ -15,7 +15,6 @@ import CalendarDatePicker from '../../../components/ui/CalendarDatePicker';
 import ExportDataModal from '../../../components/common/ExportDataModal';
 import ExportNotification from '../../../components/common/ExportNotification';
 import InputField from '../../../components/ui/custom/Inputfield';
-import CustomSelect from '../../../components/ui/custom/CustomSelect';
 import AddressFields from '../../../components/ui/custom/AddressFields';
 import StatusBadge from '../../../components/ui/custom/StatusBadge';
 import SearchFilterBar from '../../../components/common/SearchFilterBar';
@@ -26,12 +25,13 @@ import EmployeeTransactionHistory from '../../../components/modules/employees-ma
 import DataTableShimmer from '../../../components/ui/custom/shimmer-types/DataTableShimmer';
 import SearchFilterBarShimmer from '../../../components/ui/custom/shimmer-types/SearchFilterBarShimmer';
 import FormShimmer from '../../../components/ui/custom/shimmer-types/FormShimmer';
-import { useAllEmployees } from '@/hooks/useEmployees';
+import { useAllEmployees, useUpdateEmployee } from '@/hooks/useEmployees';
 import { formatDate } from '@/utils/saving-account';
 import { createNewEmployee } from '@/utils/functionalUtil';
 export default function EmployeeManagement() {
   // Using real data from API
   const { allEmployees, isLoading, error, refreshEmployees } = useAllEmployees();
+  const { updateEmployeeData, isLoading: isUpdatingEmployee, error: updateError, success: updateSuccess, resetState: resetUpdateState } = useUpdateEmployee();
 
   // State for employee detail modal
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -148,75 +148,6 @@ export default function EmployeeManagement() {
       label: 'Trạng thái',
       sortable: true,
       type: 'status' // Sử dụng StatusBadge component
-    }
-  ];
-
-  const addEmployeeFormFields = [
-    {
-      name: 'fullName',
-      type: 'text',
-      label: 'Họ và tên',
-      placeholder: 'Nhập họ và tên...',
-      required: true,
-      getValue: (data) => data.fullName || ''
-    },
-    {
-      name: 'dateOfBirth',
-      type: 'date',
-      label: 'Ngày sinh',
-      placeholder: 'DD/MM/YYYY',
-      required: true,
-      getValue: (data) => data.dateOfBirth || ''
-    },
-    {
-      name: 'idCardNumber',
-      type: 'text',
-      label: 'Số CCCD/CMND',
-      placeholder: 'Nhập số CCCD/CMND...',
-      required: true,
-      getValue: (data) => data.idCardNumber || ''
-    },
-    {
-      name: 'email',
-      type: 'email',
-      label: 'Email',
-      placeholder: 'example@email.com',
-      required: true,
-      getValue: (data) => data.email || ''
-    },
-    {
-      name: 'phoneNumber',
-      type: 'tel',
-      label: 'Số điện thoại',
-      placeholder: 'Nhập số điện thoại...',
-      required: true,
-      getValue: (data) => data.phoneNumber || ''
-    },
-    {
-      name: 'permanentAddress',
-      type: 'address',
-      label: 'Địa chỉ thường trú',
-      required: true,
-      getValue: (data) => data.permanentAddress || {
-        province: '',
-        district: '',
-        ward: '',
-        streetName: '',
-        houseNumber: ''
-      }
-    },
-    {
-      name: 'contactAddress',
-      type: 'address',
-      label: 'Địa chỉ liên lạc',
-      required: true,
-      getValue: (data) => data.contactAddress || {
-        province: '',
-        district: '',
-        ward: '',
-        streetName: '',
-        houseNumber: ''
-      }
     }
   ];
 
@@ -490,31 +421,60 @@ export default function EmployeeManagement() {
     setErrors(newErrors);
 
     if (isValid) {
-      // Note: In a real application, you would call an API to update the employee
-      // For now, we just update the selected employee for display purposes
-      setIsEditMode(false);
-      setSelectedEmployee(prev => ({
-        ...prev,
-        contactAddress: editedEmployee.contactAddress,
-        phoneNumber: editedEmployee.phoneNumber,
-        accountStatus: editedEmployee.accountStatus
-      }));
-      
-      // Refresh data from API to get the latest updates
-      await refreshEmployees();
+      try {
+        // Tạo đối tượng User từ editedEmployee
+        const updatedUser = {
+          fullName: editedEmployee.fullName,
+          dateOfBirth: editedEmployee.dateOfBirth,
+          idCardNumber: editedEmployee.idCardNumber,
+          email: editedEmployee.email,
+          phoneNumber: editedEmployee.phoneNumber,
+          permanentAddress: editedEmployee.permanentAddress,
+          contactAddress: editedEmployee.contactAddress
+        };
 
-      // Hiển thị thông báo thành công
-      setExportNotification({
-        visible: true,
-        type: 'success',
-        message: 'Lưu thay đổi thành công!',
-        format: 'Hệ thống đã ghi nhận thay đổi.'
-      });
+        console.log("CHUẨN BỊ UPDATE NÈ");
+        // Gọi API cập nhật nhân viên
+        await updateEmployeeData(updatedUser, editedEmployee.employeeID);
+        
+        // Cập nhật state cục bộ
+        setIsEditMode(false);
+        setSelectedEmployee(prev => ({
+          ...prev,
+          contactAddress: editedEmployee.contactAddress,
+          phoneNumber: editedEmployee.phoneNumber,
+        }));
+        
+        // Refresh danh sách nhân viên
+        await refreshEmployees();
 
-      // Tự động ẩn thông báo sau 5 giây
-      setTimeout(() => {
-        setExportNotification(prev => ({ ...prev, visible: false }));
-      }, 5000);
+        // Hiển thị thông báo thành công
+        setExportNotification({
+          visible: true,
+          type: 'success',
+          message: 'Lưu thay đổi thành công!',
+          format: 'Hệ thống đã cập nhật thông tin nhân viên'
+        });
+
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+          setExportNotification(prev => ({ ...prev, visible: false }));
+        }, 5000);
+      } catch (error) {
+        console.error('Lỗi khi cập nhật nhân viên:', error);
+        // Hiển thị thông báo lỗi
+        setExportNotification({
+          visible: true,
+          type: 'error',
+          message: 'Không thể lưu thay đổi!',
+          format: 'Có lỗi khi cập nhật thông tin nhân viên. Vui lòng thử lại!'
+        });
+
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+          setExportNotification(prev => ({ ...prev, visible: false }));
+        }, 5000);
+      }
     } else {
       // Hiển thị thông báo lỗi nếu không hợp lệ
       setExportNotification({
@@ -1353,7 +1313,6 @@ export default function EmployeeManagement() {
       {/* Employee Detail Modal */}
       <AnimatePresence mode="wait">
         {isModalOpen && selectedEmployee && (
-          console.log("Thong tin nhan vien", selectedEmployee),
           <motion.div
             key="employee-detail-modal"
             initial={{ opacity: 0 }}
@@ -1717,31 +1676,6 @@ export default function EmployeeManagement() {
                                 required={true}
                               />
                             </motion.div>
-
-                            <motion.div
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.2 }}
-                            >
-                              <CustomSelect
-                                label="Trạng thái"
-                                value={
-                                  editedEmployee.accountStatus === "active"
-                                    ? "Hoạt động"
-                                    : "Vô hiệu hóa"
-                                }
-                                onChange={(value) =>
-                                  handleFormChange(
-                                    "accountStatus",
-                                    value === "Hoạt động"
-                                      ? "active"
-                                      : "disabled"
-                                  )
-                                }
-                                options={["Hoạt động", "Vô hiệu hóa"]}
-                                required={true}
-                              />
-                            </motion.div>
                           </div>
                         </motion.div>
 
@@ -1871,10 +1805,24 @@ export default function EmployeeManagement() {
                               }}
                               whileTap={{ scale: 0.95 }}
                               onClick={saveEmployeeChanges}
-                              className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white rounded-xl shadow-md transition-all duration-500 flex items-center"
+                              disabled={isUpdatingEmployee}
+                              className={`px-6 py-3 font-semibold rounded-xl shadow-md transition-all duration-500 flex items-center ${
+                                isUpdatingEmployee 
+                                  ? 'bg-gray-400 cursor-not-allowed' 
+                                  : 'bg-gradient-to-r from-indigo-600 via-blue-500 to-indigo-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white'
+                              }`}
                             >
-                              <Save size={16} className="mr-2" />
-                              Lưu thay đổi
+                              {isUpdatingEmployee ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                  Đang lưu...
+                                </>
+                              ) : (
+                                <>
+                                  <Save size={16} className="mr-2" />
+                                  Lưu thay đổi
+                                </>
+                              )}
                             </motion.button>
                           </motion.div>
                         ) : (

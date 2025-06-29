@@ -1,11 +1,98 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone, Crown, Star, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, User, UserCheck, Users, Settings, Shield, CheckCircle, XCircle, IdCard, Phone, Crown, Star, Eye, ChevronDown, ChevronUp, CreditCard, PiggyBank, UserCog, Package, BarChart3 } from 'lucide-react';
 import PermissionsShimmer from '../../../ui/custom/shimmer-types/PermissionsShimmer';
+import { Permission, PermissionInfo } from '../../../../types/interfaces/enums';
+import { getPermissionLabel, getPermissionDescription } from '../../../../utils/permissions';
 
 const AccountDetailModal = ({ isOpen, onClose, account }) => {
   const [expandedPermissions, setExpandedPermissions] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [permissions, setPermissions] = useState([]);
+
+  // Hàm chọn icon cho quyền hạn
+  const getPermissionIcon = (permissionId) => {
+    const iconMap = {
+      [Permission.PAYMENT_ACCOUNT]: CreditCard,
+      [Permission.SAVING_ACCOUNTS]: PiggyBank,
+      [Permission.CUSTOMERS]: Users,
+      [Permission.EMPLOYEES]: UserCog,
+      [Permission.SAVING_PRODUCTS]: Package,
+      [Permission.SALE_REPORTS]: BarChart3,
+      [Permission.SETTINGS]: Settings,
+      [Permission.PERMISSIONS]: Shield
+    };
+    return iconMap[permissionId] || Shield;
+  };
+
+  // Tạo permissions từ account.role.permissions với functions mở rộng
+  const getPermissionsFromRole = (role) => {
+    if (!role || !role.permissions) return [];
+    
+    return role.permissions.map(permission => {
+      const label = getPermissionLabel(permission);
+      const description = getPermissionDescription(permission);
+      
+      // Định nghĩa các chức năng cụ thể cho từng quyền
+      const permissionFunctions = {
+        [Permission.CUSTOMERS]: [
+          'Xem danh sách khách hàng',
+          'Thêm khách hàng mới',
+          'Chỉnh sửa thông tin khách hàng',
+          'Vô hiệu hóa tài khoản khách hàng'
+        ],
+        [Permission.EMPLOYEES]: [
+          'Xem danh sách nhân viên',
+          'Thêm nhân viên mới',
+          'Chỉnh sửa thông tin nhân viên',
+          'Quản lý vai trò nhân viên'
+        ],
+        [Permission.SAVING_PRODUCTS]: [
+          'Xem danh sách sản phẩm tiết kiệm',
+          'Tạo sản phẩm tiết kiệm mới',
+          'Chỉnh sửa thông tin sản phẩm',
+          'Thiết lập lãi suất'
+        ],
+        [Permission.SALE_REPORTS]: [
+          'Xem báo cáo doanh số',
+          'Xuất báo cáo Excel/PDF',
+          'Phân tích xu hướng kinh doanh',
+          'Theo dõi KPI'
+        ],
+        [Permission.SETTINGS]: [
+          'Cấu hình hệ thống',
+          'Quản lý tham số',
+          'Thiết lập quy định',
+          'Backup & Restore'
+        ],
+        [Permission.PERMISSIONS]: [
+          'Xem danh sách vai trò',
+          'Tạo vai trò mới',
+          'Phân quyền cho vai trò',
+          'Quản lý quyền hạn hệ thống'
+        ],
+        [Permission.PAYMENT_ACCOUNT]: [
+          'Xem tài khoản thanh toán',
+          'Thực hiện giao dịch',
+          'Kiểm tra số dư',
+          'Lịch sử giao dịch'
+        ],
+        [Permission.SAVING_ACCOUNTS]: [
+          'Xem tài khoản tiết kiệm',
+          'Mở sổ tiết kiệm mới',
+          'Tính lãi suất',
+          'Rút tiền tiết kiệm'
+        ]
+      };
+      
+      return {
+        id: permission,
+        name: label,
+        description: description,
+        functions: permissionFunctions[permission] || ['Chức năng cơ bản']
+      };
+    });
+  };
 
   // Simulate loading for 3 seconds when modal opens
   useEffect(() => {
@@ -13,47 +100,35 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
       setIsLoading(true);
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 3000);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+  
+  // Cập nhật permissions khi account thay đổi
+  useEffect(() => {
+    if (account?.role) {
+      const allPermissions = getPermissionsFromRole(account.role);
+      // Lọc bỏ PAYMENT_ACCOUNT và SAVING_ACCOUNTS cho nhân viên (không phải khách hàng)
+      const filteredPermissions = account.customerID 
+        ? allPermissions 
+        : allPermissions.filter(permission => 
+            permission.id !== Permission.PAYMENT_ACCOUNT && 
+            permission.id !== Permission.SAVING_ACCOUNTS
+          );
+      setPermissions(filteredPermissions);
+    }
+  }, [account]);
 
-  if (!isOpen || !account) return null;
-
-  // Mock data cho chi tiết quyền hạn của vai trò
-  const rolePermissions = {
-    'role1': [], // Không có quyền
-    'role2': [
-      { id: 'perm1', name: 'Thanh toán', functions: ['Chuyển tiền nội bộ', 'Thanh toán hóa đơn', 'Nạp tiền điện thoại', 'Thanh toán QR code'] }
-    ],
-    'role3': [
-      { id: 'perm1', name: 'Thanh toán', functions: ['Chuyển tiền nội bộ', 'Thanh toán hóa đơn', 'Nạp tiền điện thoại', 'Thanh toán QR code'] },
-      { id: 'perm2', name: 'Tiết kiệm', functions: ['Mở sổ tiết kiệm', 'Rút tiền tiết kiệm', 'Xem lãi suất', 'Tất toán sổ tiết kiệm'] }
-    ],
-    'role4': [
-      { id: 'perm3', name: 'Xem tổng quan ngân hàng', functions: ['Xem báo cáo tổng quan', 'Xem biểu đồ hoạt động', 'Xem thống kê giao dịch'] },
-      { id: 'perm4', name: 'Quản lý khách hàng & tiền gửi', functions: ['Xem danh sách khách hàng', 'Thêm khách hàng mới', 'Cập nhật thông tin khách hàng', 'Xem lịch sử giao dịch'] },
-      { id: 'perm5', name: 'Quản lý nhân viên', functions: ['Xem danh sách nhân viên', 'Thêm nhân viên mới', 'Cập nhật thông tin nhân viên', 'Phân công công việc'] },
-      { id: 'perm6', name: 'Tra cứu phiếu gửi tiền', functions: ['Xem danh sách phiếu gửi', 'Tạo phiếu gửi mới', 'Duyệt phiếu gửi', 'In phiếu gửi'] },
-      { id: 'perm7', name: 'Quản lý sản phẩm tiết kiệm', functions: ['Xem danh sách sản phẩm', 'Thêm sản phẩm mới', 'Cập nhật thông tin sản phẩm', 'Quản lý lãi suất'] },
-      { id: 'perm8', name: 'Báo cáo doanh số', functions: ['Xem báo cáo doanh số', 'Xuất báo cáo Excel', 'Xuất báo cáo PDF', 'Gửi báo cáo qua email'] },
-      { id: 'perm9', name: 'Cài đặt hệ thống', functions: ['Cấu hình thông số hệ thống', 'Quản lý thông báo', 'Cấu hình email', 'Sao lưu dữ liệu'] },
-      { id: 'perm10', name: 'Quản lý phân quyền', functions: ['Xem danh sách vai trò', 'Tạo vai trò mới', 'Phân quyền cho vai trò', 'Gán vai trò cho tài khoản'] }
-    ],
-    'role5': [
-      { id: 'perm3', name: 'Xem tổng quan ngân hàng', functions: ['Xem báo cáo tổng quan', 'Xem biểu đồ hoạt động', 'Xem thống kê giao dịch'] },
-      { id: 'perm4', name: 'Quản lý khách hàng & tiền gửi', functions: ['Xem danh sách khách hàng', 'Thêm khách hàng mới', 'Cập nhật thông tin khách hàng', 'Xem lịch sử giao dịch'] },
-      { id: 'perm6', name: 'Quản lý phiếu gửi tiền', functions: ['Xem danh sách phiếu gửi', 'Tạo phiếu gửi mới', 'Duyệt phiếu gửi', 'In phiếu gửi'] }
-    ],
-    'role6': [
-      { id: 'perm3', name: 'Xem tổng quan ngân hàng', functions: ['Xem báo cáo tổng quan', 'Xem biểu đồ hoạt động', 'Xem thống kê giao dịch'] },
-      { id: 'perm7', name: 'Quản lý sản phẩm tiết kiệm', functions: ['Xem danh sách sản phẩm', 'Thêm sản phẩm mới', 'Cập nhật thông tin sản phẩm', 'Quản lý lãi suất'] },
-      { id: 'perm8', name: 'Báo cáo doanh số', functions: ['Xem báo cáo doanh số', 'Xuất báo cáo Excel', 'Xuất báo cáo PDF', 'Gửi báo cáo qua email'] }
-    ]
+  // Hàm toggle permission expansion
+  const togglePermission = (permissionId) => {
+    setExpandedPermissions(prev => ({
+      ...prev,
+      [permissionId]: !prev[permissionId]
+    }));
   };
 
-  // Lấy danh sách quyền hạn của vai trò
-  const permissions = rolePermissions[account.role.id] || [];
+  if (!isOpen || !account) return null;
 
   // Hàm tạo avatar từ tên người dùng
   const getInitials = (name) => {
@@ -66,10 +141,13 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
   };
 
   // Hàm chọn màu nền cho avatar dựa trên ID và trạng thái
-  const getAvatarColor = (id, disabled) => {
+  const getAvatarColor = (account, disabled) => {
     if (disabled) {
       return 'from-gray-400 to-gray-600';
     }
+    
+    // Sử dụng employeeID hoặc customerID để tạo màu
+    const id = account.employeeID || account.customerID || '0';
     const colors = [
       'from-blue-500 to-indigo-600',
       'from-indigo-500 to-purple-600',
@@ -80,17 +158,11 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
       'from-orange-500 to-red-600',
       'from-yellow-500 to-orange-600',
     ];
-    const index = parseInt(id.replace(/[^0-9]/g, '')) % colors.length;
+    const index = parseInt(String(id).replace(/[^0-9]/g, '') || '0') % colors.length;
     return colors[index];
   };
 
-  // Toggle expanded state for permissions
-  const togglePermission = (permissionId) => {
-    setExpandedPermissions(prev => ({
-      ...prev,
-      [permissionId]: !prev[permissionId]
-    }));
-  };
+
 
   return (
     <AnimatePresence mode="wait">
@@ -130,7 +202,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
 
           <motion.div
             className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden relative"
-            layoutId={`detail-account-${account.id}`}
+            layoutId={`detail-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}`}
             transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
             onClick={(e) => e.stopPropagation()}
             style={{
@@ -170,7 +242,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                   >
                     <Crown size={22} className="text-white drop-shadow-lg" />
                   </motion.div>
-                  <span className="drop-shadow-lg">{account.role.name}</span>
+                  <span className="drop-shadow-lg">{account.role.roleName}</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -250,7 +322,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
               >
                 <div className="flex items-start gap-6">
                   <motion.div
-                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account.id, account.disabled)} hidden md:flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
+                    className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${getAvatarColor(account, account.accountStatus === 'disabled')} hidden md:flex items-center justify-center text-white text-2xl font-bold shadow-xl relative overflow-hidden`}
                     whileHover={{ scale: 1.05, rotate: 5 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -261,7 +333,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                       animate={{ x: '100%' }}
                       transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                     />
-                    <span className="relative z-10">{getInitials(account.name)}</span>
+                    <span className="relative z-10">{getInitials(account.fullName)}</span>
                   </motion.div>
                   
                   <div className="flex-1">
@@ -271,7 +343,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4, duration: 0.3 }}
                     >
-                      {account.name}
+                      {account.fullName}
                     </motion.h4>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -296,7 +368,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                         <div className="p-2 bg-green-100 rounded-lg mr-3">
                           <Phone size={16} className="text-green-600" />
                         </div>
-                        <span className="font-medium">{account.phone}</span>
+                        <span className="font-medium">{account.phoneNumber}</span>
                       </motion.div>
                       
                       <motion.div 
@@ -308,14 +380,14 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                         <div className="p-2 bg-purple-100 rounded-lg mr-3">
                           <IdCard size={16} className="text-purple-600" />
                         </div>
-                        <span className="font-medium">{account.CCCD}</span>
+                        <span className="font-medium">{account.idCardNumber}</span>
                       </motion.div>
                     </div>
                     
                     <div className="flex items-center gap-3">
                       <motion.span 
                         className={`px-4 py-2 rounded-2xl text-sm font-semibold md:font-bold flex items-center gap-2 shadow-md ${
-                          account.type === 'customer' 
+                          account.customerID 
                             ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
                             : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
                         }`}
@@ -324,7 +396,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                         transition={{ delay: 0.8, duration: 0.3 }}
                         whileHover={{ scale: 1.05 }}
                       >
-                        {account.type === 'customer' ? (
+                        {account.customerID ? (
                           <>
                             <Users size={16} /> Khách hàng
                           </>
@@ -337,7 +409,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                       
                       <motion.span 
                         className={`px-4 py-2 rounded-2xl text-sm font-semibold md:font-bold flex items-center gap-2 shadow-md ${
-                          account.disabled
+                          account.accountStatus === 'disabled'
                             ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white'
                             : 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
                         }`}
@@ -346,7 +418,7 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                         transition={{ delay: 0.9, duration: 0.3 }}
                         whileHover={{ scale: 1.05 }}
                       >
-                        {account.disabled ? (
+                        {account.accountStatus === 'disabled' ? (
                           <>
                             <XCircle size={16} /> Vô hiệu hóa
                           </>
@@ -362,7 +434,6 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
               </motion.div>
               
               {/* Permissions */}
-              {/* Permissions */}
               {isLoading ? (
                 <PermissionsShimmer permissionCount={4} />
               ) : (
@@ -372,135 +443,138 @@ const AccountDetailModal = ({ isOpen, onClose, account }) => {
                   transition={{ delay: 0.5, duration: 0.3 }}
                 >
                   <h5 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Shield size={20} className={account.disabled ? "text-gray-400" : "text-blue-600"} />
+                    <Shield size={20} className={account.accountStatus === 'disabled' ? "text-gray-400" : "text-blue-600"} />
                     Quyền hạn ({permissions.length})
                   </h5>
                   
                   {permissions.length > 0 ? (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {permissions.map((permission, idx) => (
-                        <motion.div
-                          key={permission.id}
-                          className={`rounded-2xl p-6 border shadow-lg relative overflow-hidden group cursor-pointer ${
-                            account.disabled 
-                              ? 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border-gray-200'
-                              : 'bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 border-blue-100'
-                          }`}
-                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ delay: 0.6 + idx * 0.1, duration: 0.4 }}
-                          whileHover={{ 
-                            scale: 1.02, 
-                            y: -4,
-                            boxShadow: account.disabled 
-                              ? '0 12px 40px rgba(156, 163, 175, 0.15)'
-                              : '0 12px 40px rgba(59, 130, 246, 0.15)'
-                          }}
-                          onClick={() => togglePermission(permission.id)}
-                        >
-                          {/* Animated background gradient */}
+                      {permissions.map((permission, idx) => {
+                        const IconComponent = getPermissionIcon(permission.id);
+                        return (
                           <motion.div
-                            className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                              account.disabled
-                                ? 'bg-gradient-to-r from-gray-500/5 via-gray-400/5 to-gray-500/5'
-                                : 'bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5'
+                            key={permission.id}
+                            className={`rounded-2xl p-6 border shadow-lg relative overflow-hidden group cursor-pointer ${
+                              account.accountStatus === 'disabled' 
+                                ? 'bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 border-gray-200'
+                                : 'bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 border-blue-100'
                             }`}
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: '100%' }}
-                            transition={{ duration: 1.5 }}
-                          />
-                          
-                          <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center">
-                                <motion.div 
-                                  className={`p-3 rounded-xl shadow-md mr-4 ${
-                                    account.disabled
-                                      ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
-                                      : account.type === 'customer' 
-                                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
-                                        : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                                  }`}
-                                  whileHover={{ rotate: 360 }}
-                                  transition={{ duration: 0.6 }}
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            transition={{ delay: 0.6 + idx * 0.1, duration: 0.4 }}
+                            whileHover={{ 
+                              scale: 1.02, 
+                              y: -4,
+                              boxShadow: account.accountStatus === 'disabled' 
+                                ? '0 12px 40px rgba(156, 163, 175, 0.15)'
+                                : '0 12px 40px rgba(59, 130, 246, 0.15)'
+                            }}
+                            onClick={() => togglePermission(permission.id)}
+                          >
+                            {/* Animated background gradient */}
+                            <motion.div
+                              className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                                account.accountStatus === 'disabled'
+                                  ? 'bg-gradient-to-r from-gray-500/5 via-gray-400/5 to-gray-500/5'
+                                  : 'bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-purple-500/5'
+                              }`}
+                              initial={{ x: '-100%' }}
+                              whileHover={{ x: '100%' }}
+                              transition={{ duration: 1.5 }}
+                            />
+                            
+                            <div className="relative z-10">
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center">
+                                  <motion.div 
+                                    className={`p-3 rounded-xl shadow-md mr-4 ${
+                                      account.accountStatus === 'disabled'
+                                        ? 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
+                                        : account.customerID 
+                                          ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white' 
+                                          : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                                    }`}
+                                    whileHover={{ rotate: 360 }}
+                                    transition={{ duration: 0.6 }}
+                                  >
+                                    <IconComponent size={18} />
+                                  </motion.div>
+                                  <h6 className={`font-bold text-lg ${account.accountStatus === 'disabled' ? 'text-gray-500' : 'text-gray-800'}`}>
+                                    {permission.name}
+                                  </h6>
+                                </div>
+                                
+                                <motion.div
+                                  animate={{ rotate: expandedPermissions[permission.id] ? 180 : 0 }}
+                                  transition={{ duration: 0.3 }}
+                                  className={account.accountStatus === 'disabled' ? 'text-gray-400' : 'text-blue-500'}
                                 >
-                                  <Shield size={18} />
+                                  <ChevronDown size={20} />
                                 </motion.div>
-                                <h6 className={`font-bold text-lg ${account.disabled ? 'text-gray-500' : 'text-gray-800'}`}>
-                                  {permission.name}
-                                </h6>
                               </div>
                               
-                              <motion.div
-                                animate={{ rotate: expandedPermissions[permission.id] ? 180 : 0 }}
-                                transition={{ duration: 0.3 }}
-                                className={account.disabled ? 'text-gray-400' : 'text-blue-500'}
-                              >
-                                <ChevronDown size={20} />
-                              </motion.div>
-                            </div>
-                            
-                            <AnimatePresence>
-                              {expandedPermissions[permission.id] && (
-                                <motion.div 
-                                  className="space-y-3"
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                                >
-                                  <p className={`text-sm font-semibold flex items-center gap-2 ${
-                                    account.disabled ? 'text-gray-500' : 'text-gray-600'
-                                  }`}>
-                                    <Star size={14} className={account.disabled ? "text-gray-400" : "text-yellow-500"} />
-                                    Chức năng được phép:
-                                  </p>
-                                  <div className="grid grid-cols-1 gap-2">
-                                    {permission.functions.map((func, index) => (
-                                      <motion.div 
-                                        key={index} 
-                                        className={`text-sm flex items-start p-3 rounded-xl border ${
-                                          account.disabled 
-                                            ? 'text-gray-500 bg-gray-50 border-gray-200'
-                                            : 'text-gray-700 bg-white/60 border-gray-100'
-                                        }`}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: index * 0.05, duration: 0.3 }}
-                                      >
+                              <AnimatePresence>
+                                {expandedPermissions[permission.id] && (
+                                  <motion.div 
+                                    className="space-y-3"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                  >
+                                    <p className={`text-sm font-semibold flex items-center gap-2 ${
+                                      account.accountStatus === 'disabled' ? 'text-gray-500' : 'text-gray-600'
+                                    }`}>
+                                      <Star size={14} className={account.accountStatus === 'disabled' ? "text-gray-400" : "text-yellow-500"} />
+                                      Chức năng được phép:
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                      {permission.functions.map((func, index) => (
                                         <motion.div 
-                                          className={`p-1 rounded-full mr-3 flex-shrink-0 ${
-                                            account.disabled 
-                                              ? 'text-gray-400' 
-                                              : account.type === 'customer' ? 'text-blue-500' : 'text-indigo-500'
+                                          key={index} 
+                                          className={`text-sm flex items-start p-3 rounded-xl border ${
+                                            account.accountStatus === 'disabled' 
+                                              ? 'text-gray-500 bg-gray-50 border-gray-200'
+                                              : 'text-gray-700 bg-white/60 border-gray-100'
                                           }`}
-                                          whileHover={{ scale: 1.2 }}
+                                          initial={{ opacity: 0, x: -10 }}
+                                          animate={{ opacity: 1, x: 0 }}
+                                          transition={{ delay: index * 0.05, duration: 0.3 }}
                                         >
-                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                          </svg>
+                                          <motion.div 
+                                            className={`p-1 rounded-full mr-3 flex-shrink-0 ${
+                                              account.accountStatus === 'disabled' 
+                                                ? 'text-gray-400' 
+                                                : account.customerID ? 'text-blue-500' : 'text-indigo-500'
+                                            }`}
+                                            whileHover={{ scale: 1.2 }}
+                                          >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                              <polyline points="20 6 9 17 4 12"></polyline>
+                                            </svg>
+                                          </motion.div>
+                                          <span className="font-medium">{func}</span>
                                         </motion.div>
-                                        <span className="font-medium">{func}</span>
-                                      </motion.div>
-                                    ))}
-                                  </div>
-                                </motion.div>
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                              
+                              {!expandedPermissions[permission.id] && (
+                                <motion.p 
+                                  className={`text-sm ${account.accountStatus === 'disabled' ? 'text-gray-400' : 'text-gray-500'}`}
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  transition={{ delay: 0.2 }}
+                                >
+                                  Nhấn để xem {permission.functions.length} chức năng...
+                                </motion.p>
                               )}
-                            </AnimatePresence>
-                            
-                            {!expandedPermissions[permission.id] && (
-                              <motion.p 
-                                className={`text-sm ${account.disabled ? 'text-gray-400' : 'text-gray-500'}`}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.2 }}
-                              >
-                                Nhấn để xem {permission.functions.length} chức năng...
-                              </motion.p>
-                            )}
-                          </div>
-                        </motion.div>
-                      ))}
+                            </div>
+                          </motion.div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <motion.div 

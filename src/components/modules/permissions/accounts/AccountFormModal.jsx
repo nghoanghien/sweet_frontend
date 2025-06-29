@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, UserCheck, Users, Settings, Save, PlusCircle, Check, Phone, IdCard, Info, Shield, Crown } from 'lucide-react';
-import InputField from '@/components/ui/custom/Inputfield';
+import { X, User, UserCheck, Users, Settings, Save, Check, Phone, IdCard, Info, Shield, Crown } from 'lucide-react';
 import SwipeConfirmationModal from '@/components/modals/ConfirmationModal/SwipeConfirmationModal';
 import RoleSelectionShimmer from '@/components/ui/custom/shimmer-types/RoleSelectionShimmer';
+import { useAllRoles } from '@/hooks/useAllRoles';
 
-const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEditing, rolesList }) => {
+const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEditing }) => {
   // State cho loading
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Hook để lấy danh sách vai trò
+  const { allRoles, isLoading: rolesLoading, error: rolesError } = useAllRoles();
   
   // State cho form
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    confirmPassword: '',
     type: 'staff',
     role: null,
     disabled: false
   });
   
-  // State cho account tìm thấy được
-  const [foundAccount, setFoundAccount] = useState(null);
+
   // State cho lỗi validation
   const [errors, setErrors] = useState({});
 
@@ -42,7 +42,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
       setIsLoading(true);
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 3000);
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -51,31 +51,26 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
   useEffect(() => {
     if (account && isEditing) {
       setFormData({
-        id: account.id,
-        name: account.name,
+        id: account.customerID || account.employeeID,
+        name: account.fullName,
         email: account.email,
-        password: '',
-        confirmPassword: '',
-        type: account.type,
+        type: account.customerID ? 'customer' : 'staff',
         role: account.role,
-        disabled: account.disabled
-      });
-    } else {
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        type: 'staff',
-        role: null,
-        disabled: false
+        disabled: account.accountStatus === 'disabled'
       });
     }
     setErrors({});
   }, [account, isEditing]);
 
   // Lọc danh sách vai trò theo loại tài khoản
-  const filteredRoles = rolesList.filter(role => role.type === formData.type);
+  const filteredRoles = allRoles.filter((role) => {
+    if (formData.type === 'staff') {
+      return !role.customerRole; // Vai trò nhân viên
+    } else if (formData.type === 'customer') {
+      return role.customerRole; // Vai trò khách hàng
+    }
+    return false;
+  });
 
   // Xử lý khi thay đổi input
   const handleInputChange = (name, value) => {
@@ -83,9 +78,6 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
       ...formData,
       [name]: value
     });
-
-    const foundAccount = accountList.find(account => account.type === formData.type && account.email === value);
-    setFoundAccount(foundAccount);
     
     // Xóa lỗi khi người dùng nhập lại
     if (errors[name]) {
@@ -98,8 +90,6 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
 
   // Xử lý khi thay đổi loại tài khoản
   const handleTypeChange = (type) => {
-    const foundAccount = accountList.find(account => account.type === type && account.email === formData.email);
-    setFoundAccount(foundAccount);
     // Khi thay đổi loại tài khoản, xóa vai trò đã chọn
     setFormData({
       ...formData,
@@ -152,24 +142,6 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
     // Validate form
     const newErrors = {};
     
-    if (!formData.email.trim()) {
-      newErrors.username = 'Vui lòng nhập email';
-    }
-    
-    if (!isEditing) {
-      if (!formData.password) {
-        newErrors.password = 'Vui lòng nhập mật khẩu';
-      } else if (formData.password.length < 6) {
-        newErrors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
-      }
-      
-      if (!formData.confirmPassword) {
-        newErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
-      } else if (formData.password !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Mật khẩu xác nhận không khớp';
-      }
-    }
-    
     if (!formData.role) {
       newErrors.role = 'Vui lòng chọn vai trò';
     }
@@ -184,16 +156,14 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
       'Tên người dùng': formData.name,
       'Email đăng nhập': formData.email,
       'Loại tài khoản': formData.type === 'staff' ? 'Nhân viên' : 'Khách hàng',
-      'Vai trò': formData.role ? formData.role.name : '',
+      'Vai trò': formData.role ? formData.role.roleName : '',
       'Trạng thái': formData.disabled ? 'Vô hiệu hóa' : 'Hoạt động'
     };
     
     showConfirmModal(
-      isEditing ? 'Cập nhật tài khoản' : 'Thêm tài khoản mới',
-      isEditing 
-        ? `Xác nhận cập nhật tài khoản "${formData.email}"?` 
-        : `Xác nhận thêm tài khoản "${formData.email}" vào hệ thống?`,
-      isEditing ? 'update' : 'add',
+      'Cập nhật tài khoản',
+      `Xác nhận cập nhật tài khoản "${formData.email}"?`,
+      'update',
       confirmDetails,
       () => {
         // Cập nhật trạng thái đang xử lý
@@ -204,17 +174,13 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
           try {
             // Tạo thông tin thông báo
             const notificationInfo = {
-              message: isEditing 
-                ? `Cập nhật tài khoản thành công!` 
-                : `Thêm tài khoản thành công!`,
+              message: `Cập nhật tài khoản thành công!`,
               type: 'success',
-              format: isEditing 
-              ? `Đã cập nhật tài khoản "${formData.email}" thành công!` 
-              : `Đã thêm tài khoản "${formData.email}" thành công!`
+              format: `Đã cập nhật tài khoản "${formData.email}" thành công!`
             };
             
-            // Gọi hàm onSave từ props với thông tin thông báo
-            onSave(formData, notificationInfo);
+            // Gọi hàm onSave từ props với formData, thông tin thông báo và account gốc
+            onSave(formData, notificationInfo, account);
             
             // Đóng modal chính ngay lập tức
             onClose();
@@ -269,11 +235,11 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
           </div>
 
           <motion.div
-            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[95vh] flex flex-col overflow-hidden relative"
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden relative"
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            layoutId={isEditing ? `edit-account-${account.id}` : ''}
+            layoutId={isEditing ? `edit-account-${account?.employeeID ? `employee-${account.employeeID}` : `customer-${account?.customerID}`}` : ''}
             transition={{ duration: 0.2, type: "spring", stiffness: 150, damping: 18 }}
             style={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(249,250,251,0.95) 100%)',
@@ -318,7 +284,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.2, duration: 0.3 }}
                   >
-                    {isEditing ? 'Chỉnh sửa tài khoản' : 'Thêm tài khoản mới'}
+                    Chỉnh sửa tài khoản
                   </motion.h3>
                   <motion.p 
                     className="text-white text-opacity-80 text-sm"
@@ -326,7 +292,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.3 }}
                   >
-                    {isEditing ? 'Cập nhật thông tin tài khoản' : 'Tạo mới tài khoản hệ thống'}
+                    Cập nhật thông tin tài khoản
                   </motion.p>
                 </div>
               </div>
@@ -348,212 +314,219 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
             >
-              {/* Account type selection */}
-              <motion.div 
-                className="mb-8"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.3 }}
-              >
-                <label className="block text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
-                  <Crown size={18} className="text-indigo-600" />
-                  Loại tài khoản:
-                </label>
-                <div className="flex gap-4">
-                  <motion.button
-                    type="button"
-                    onClick={() => handleTypeChange('staff')}
-                    className={`flex items-center px-6 py-3 rounded-2xl font-semibold text-base shadow-lg transition-all relative overflow-hidden
-                      ${formData.type === 'staff'
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-indigo-300'
-                        : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-indigo-300 hover:shadow-md'}
-                        ${isEditing && formData.type === 'customer'
-                        ? 'hidden' : ''}`}
-                    disabled={isEditing}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {formData.type === 'staff' && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-white to-transparent opacity-20"
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '100%' }}
-                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-                      />
-                    )}
-                    <Settings size={20} className="mr-2" />
-                    Nhân viên
-                    
-                  </motion.button>
-                  <motion.button
-                    type="button"
-                    onClick={() => handleTypeChange('customer')}
-                    className={`flex items-center px-6 py-3 rounded-2xl font-semibold text-base shadow-lg transition-all relative overflow-hidden
-                      ${formData.type === 'customer'
-                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white shadow-blue-300'
-                        : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-blue-300 hover:shadow-md'}
-                      ${isEditing && formData.type === 'staff'
-                        ? 'hidden' : ''}`}
-                    disabled={isEditing}
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {formData.type === 'customer' && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-white to-transparent opacity-20"
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '100%' }}
-                        transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
-                      />
-                    )}
-                    <Users size={20} className="mr-2" />
-                    Khách hàng
-                  </motion.button>
-                </div>
-              </motion.div>
+
               
-              {/* Name and username */}
+              {/* Thông tin tài khoản */}
               <motion.div 
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"
+                className="mb-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.3 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
               >
-                <div className="space-y-4">
-                  <InputField
-                    label="Email đăng nhập"
-                    value={formData.email}
-                    onChange={(value) => handleInputChange('email', value)}
-                    placeholder="Nhập email đăng nhập..."
-                    error={errors.email}
-                    disabled={isEditing}
-                    required
-                  />
-                  
-                  <AnimatePresence mode="wait">
-                    {formData.email === '' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl"
-                      >
-                        <p className="text-amber-700 font-medium flex items-center">
-                          <Info size={20} className="mr-2 text-amber-600" />
-                          Vui lòng nhập email để kiểm tra hồ sơ
-                        </p>
-                      </motion.div>
-                    )}
-
-                    {!isEditing && formData.email !== '' && !foundAccount && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-4 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl"
-                      >
-                        <p className="text-red-700 font-medium flex items-center">
-                          <Info size={20} className="mr-2 text-red-600" />
-                          Email không tồn tại trong hệ thống
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <AnimatePresence mode="wait">
-                  {((isEditing && account) || (!isEditing && foundAccount)) && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20, scale: 0.95 }}
-                      animate={{ opacity: 1, x: 0, scale: 1 }}
-                      exit={{ opacity: 0, x: -20, scale: 0.95 }}
-                      transition={{ duration: 0.4, type: "spring" }}
-                      className="p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-200 relative overflow-hidden"
-                    >
-                      {/* Decorative background */}
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full opacity-20 -translate-y-8 translate-x-8"></div>
-                      
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg">
-                            <User size={16} className="text-white" />
-                          </div>
-                          <h4 className="text-lg font-bold text-gray-800">
-                            {isEditing ? account.name : foundAccount.name}
-                          </h4>
-                        </div>
+                {account && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, type: "spring" }}
+                    className={`relative p-6 rounded-2xl border backdrop-blur-sm overflow-hidden ${
+                      account.customerID 
+                        ? 'bg-gradient-to-br from-emerald-50/90 via-teal-50/50 to-white border-emerald-200/60 shadow-[0_4px_25px_rgba(16,185,129,0.12)]'
+                        : 'bg-gradient-to-br from-violet-50/90 via-purple-50/50 to-white border-violet-200/60 shadow-[0_4px_25px_rgba(139,92,246,0.12)]'
+                    }`}
+                  >
+                    {/* Decorative background elements */}
+                    <div className="absolute top-0 right-0 w-24 h-24 opacity-10">
+                      <div className={`absolute top-2 right-2 w-16 h-16 rounded-full ${
+                        account.customerID 
+                          ? 'bg-gradient-to-br from-emerald-400 to-teal-500'
+                          : 'bg-gradient-to-br from-violet-400 to-purple-500'
+                      }`}></div>
+                      <div className={`absolute top-6 right-6 w-8 h-8 rounded-full ${
+                        account.customerID 
+                          ? 'bg-gradient-to-br from-teal-400 to-cyan-500'
+                          : 'bg-gradient-to-br from-purple-400 to-indigo-500'
+                      }`}></div>
+                    </div>
+                    
+                    <div className="relative z-10">
+                      {/* Header với avatar và thông tin cơ bản */}
+                      <div className="flex items-start gap-4 mb-6">
+                        {/* Avatar */}
+                        <motion.div
+                          className={`relative w-16 h-16 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg ${
+                            account.customerID 
+                              ? 'bg-gradient-to-br from-emerald-500 to-teal-600'
+                              : 'bg-gradient-to-br from-violet-500 to-purple-600'
+                          }`}
+                          whileHover={{ scale: 1.05, rotate: 5 }}
+                          transition={{ type: "spring", stiffness: 400 }}
+                        >
+                          {account.fullName
+                            ? account.fullName
+                                .split(' ')
+                                .map((n) => n[0])
+                                .join('')
+                                .toUpperCase()
+                                .substring(0, 2)
+                            : 'N/A'}
+                          
+                          {/* Floating icon */}
+                          <motion.div
+                            className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center shadow-md ${
+                              account.customerID 
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : 'bg-violet-100 text-violet-600'
+                            }`}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.3, type: "spring" }}
+                          >
+                            {account.customerID ? <Users size={14} /> : <UserCheck size={14} />}
+                          </motion.div>
+                        </motion.div>
                         
-                        <div className="space-y-2">
-                          <motion.p 
-                            className="text-gray-600 flex items-center text-sm"
+                        {/* Thông tin cơ bản */}
+                        <div className="flex-1">
+                          <motion.h4 
+                            className="text-xl font-bold text-gray-800 mb-1"
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.1, duration: 0.3 }}
+                            transition={{ delay: 0.1 }}
                           >
-                            <div className="p-1 bg-green-100 rounded-lg mr-2">
-                              <Phone size={12} className="text-green-600" />
-                            </div>
-                            {isEditing ? account.phone : foundAccount.phone}
-                          </motion.p>
-                          <motion.p 
-                            className="text-gray-600 flex items-center text-sm"
+                            {account.fullName}
+                          </motion.h4>
+                          
+                          <motion.div
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                              account.customerID 
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-violet-100 text-violet-700'
+                            }`}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2, duration: 0.3 }}
+                            transition={{ delay: 0.2 }}
                           >
-                            <div className="p-1 bg-blue-100 rounded-lg mr-2">
-                              <IdCard size={12} className="text-blue-600" />
-                            </div>
-                            {isEditing ? account.CCCD : foundAccount.CCCD}
-                          </motion.p>
+                            <div className={`w-2 h-2 rounded-full mr-2 ${
+                              account.customerID ? 'bg-emerald-500' : 'bg-violet-500'
+                            }`}></div>
+                            {account.customerID ? 'Khách hàng' : 'Nhân viên'}
+                          </motion.div>
                         </div>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                      
+                      {/* Chi tiết thông tin */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <motion.div 
+                          className="group p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 hover:bg-white/90 transition-all duration-300"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.4, duration: 0.3 }}
+                          whileHover={{ y: -2, scale: 1.02 }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg transition-colors ${
+                              account.customerID 
+                                ? 'bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200'
+                                : 'bg-violet-100 text-violet-600 group-hover:bg-violet-200'
+                            }`}>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                              </svg>
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs text-gray-500 font-medium mb-1">Email đăng nhập</p>
+                              <p className="text-gray-800 font-semibold text-sm">{account.email}</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                        
+                        <motion.div 
+                          className="group p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 hover:bg-white/90 transition-all duration-300"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5, duration: 0.3 }}
+                          whileHover={{ y: -2, scale: 1.02 }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg transition-colors ${
+                              account.customerID 
+                                ? 'bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200'
+                                : 'bg-violet-100 text-violet-600 group-hover:bg-violet-200'
+                            }`}>
+                              <Phone size={16} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs text-gray-500 font-medium mb-1">Số điện thoại</p>
+                              <p className="text-gray-800 font-semibold text-sm">{account.phoneNumber}</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                        
+                        <motion.div 
+                          className="group p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 hover:bg-white/90 transition-all duration-300"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.6, duration: 0.3 }}
+                          whileHover={{ y: -2, scale: 1.02 }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg transition-colors ${
+                              account.customerID 
+                                ? 'bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200'
+                                : 'bg-violet-100 text-violet-600 group-hover:bg-violet-200'
+                            }`}>
+                              <IdCard size={16} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs text-gray-500 font-medium mb-1">CCCD/CMND</p>
+                              <p className="text-gray-800 font-semibold text-sm">{account.idCardNumber}</p>
+                            </div>
+                          </div>
+                        </motion.div>
+                        
+                        {/* Vai trò hiện tại */}
+                        {account.role && (
+                          <motion.div 
+                            className="group p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 hover:bg-white/90 transition-all duration-300"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.7, duration: 0.3 }}
+                            whileHover={{ y: -2, scale: 1.02 }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-lg transition-colors ${
+                                account.customerID 
+                                  ? 'bg-emerald-100 text-emerald-600 group-hover:bg-emerald-200'
+                                  : 'bg-violet-100 text-violet-600 group-hover:bg-violet-200'
+                              }`}>
+                                <Shield size={16} />
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-xs text-gray-500 font-medium mb-1">Vai trò hiện tại</p>
+                                <p className="text-gray-800 font-semibold text-sm">{account.role.roleName}</p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
               
-              {/* Password fields - only show when adding new account */}
-              {!isEditing && (
-                <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.3 }}
-                >
-                  <InputField
-                    label="Mật khẩu"
-                    type="password"
-                    value={formData.password}
-                    onChange={(value) => handleInputChange('password', value)}
-                    placeholder="Nhập mật khẩu..."
-                    error={errors.password}
-                    required
-                  />
-                  
-                  <InputField
-                    label="Xác nhận mật khẩu"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(value) => handleInputChange('confirmPassword', value)}
-                    placeholder="Xác nhận mật khẩu..."
-                    error={errors.confirmPassword}
-                    required
-                  />
-                </motion.div>
-              )}
-              
               {/* Role selection */}
-              {isLoading ? (
+              {isLoading || rolesLoading ? (
                 <RoleSelectionShimmer />
+              ) : rolesError ? (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
+                  <p className="text-red-600 text-sm">Không thể tải danh sách vai trò. Vui lòng thử lại.</p>
+                </div>
               ) : (
                 <motion.div 
                   className="mb-6"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.3 }}
+                  transition={{ delay: 0.2, duration: 0.3 }}
                 >
                   <label className="block text-gray-700 font-bold mb-4 pl-2 flex items-center gap-2">
                     <Shield size={18} className="text-blue-600" />
@@ -574,9 +547,9 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {filteredRoles.map((role, index) => (
                       <motion.div
-                        key={role.id}
+                        key={role.roleID}
                         className={`p-5 rounded-2xl border-2 cursor-pointer flex items-start transition-all relative overflow-hidden group
-                          ${formData.role && formData.role.id === role.id
+                          ${formData.role && formData.role.roleID === role.roleID
                             ? formData.type === 'staff'
                               ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-300 shadow-lg shadow-indigo-200/50'
                               : 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-300 shadow-lg shadow-blue-200/50'
@@ -589,7 +562,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                         transition={{ delay: 0.1 * index, duration: 0.3 }}
                       >
                         {/* Animated background for selected role */}
-                        {formData.role && formData.role.id === role.id && (
+                        {formData.role && formData.role.roleID === role.roleID && (
                           <motion.div
                             className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
                             initial={{ x: '-100%' }}
@@ -600,7 +573,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                         
                         <motion.div 
                           className={`p-2 rounded-xl mr-4 flex-shrink-0
-                            ${formData.role && formData.role.id === role.id
+                            ${formData.role && formData.role.roleID === role.roleID
                               ? formData.type === 'staff'
                                 ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white'
                                 : 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white'
@@ -608,7 +581,7 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                           whileHover={{ rotate: 360 }}
                           transition={{ duration: 0.6 }}
                         >
-                          {formData.role && formData.role.id === role.id ? (
+                          {formData.role && formData.role.roleID === role.roleID ? (
                             <Check size={18} />
                           ) : (
                             <UserCheck size={18} />
@@ -617,13 +590,13 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                         
                         <div className="flex-1 relative z-10">
                           <p className={`font-bold text-base mb-1
-                            ${formData.role && formData.role.id === role.id
+                            ${formData.role && formData.role.roleID === role.roleID
                               ? formData.type === 'staff'
                                 ? 'text-indigo-700'
                                 : 'text-blue-700'
                               : 'text-gray-700 group-hover:text-gray-800'}`}
                           >
-                            {role.name}
+                            {role.roleName}
                           </p>
                           <p className="text-sm text-gray-500 leading-relaxed">
                             {role.description}
@@ -670,17 +643,8 @@ const AccountFormModal = ({ isOpen, onClose, onSave, account, accountList, isEdi
                 />
                 
                 <div className="relative z-10 flex items-center">
-                  {isEditing ? (
-                    <>
-                      <Save size={20} className="mr-2" />
-                      Cập nhật
-                    </>
-                  ) : (
-                    <>
-                      <PlusCircle size={20} className="mr-2" />
-                      Thêm tài khoản
-                    </>
-                  )}
+                  <Save size={20} className="mr-2" />
+                  Cập nhật
                 </div>
               </motion.button>
             </motion.div>
