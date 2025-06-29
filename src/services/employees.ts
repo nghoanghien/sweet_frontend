@@ -8,8 +8,6 @@ export const getAllEmployees = async () => {
 }
 
 export const updateEmployee = async (employee: User, id: number) => {
-  console.log("DỮ LIỆU MAPPING: ", mapUserToINhanVienReqDTO(employee));
-  console.log("ID NHÂN VIÊN: ", id);
   const response = await callUpdateNhanVien(mapUserToINhanVienReqDTO(employee), id.toString());
   return response;
 }

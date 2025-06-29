@@ -25,7 +25,7 @@ import AddressFields from '../../../components/ui/custom/AddressFields';
 import StatusBadge from '../../../components/ui/custom/StatusBadge';
 import ModalHeader from '../../../components/ui/custom/ModalHeader';
 import AnimatedTabNavigation from '../../../components/ui/custom/AnimatedTabNavigation';
-import { useAllCustomers } from '@/hooks/useCustomers';
+import { useAllCustomers, useUpdateCustomer } from '@/hooks/useCustomers';
 import { formatDate } from '@/utils/saving-account';
 import { createNewCustomer } from '@/utils/createNewCustomer';
 
@@ -96,6 +96,7 @@ export default function CustomerManagement() {
   // Remove mock data - now using real data from API
 
   const { allCustomers, isLoading, error, refreshCustomers } = useAllCustomers();
+  const { updateCustomerData, isLoading: isUpdatingCustomer, error: updateError, success: updateSuccess, resetState: resetUpdateState } = useUpdateCustomer();
 
   // State for customer detail modal
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -387,7 +388,7 @@ export default function CustomerManagement() {
   };
 
   // Save edited customer with validation
-  const saveCustomerChanges = () => {
+  const saveCustomerChanges = async () => {
     // Validate all fields before saving
     const fieldsToValidate = ['phoneNumber'];
     const addressFields = ['province', 'district', 'ward', 'streetName', 'houseNumber'];
@@ -417,28 +418,60 @@ export default function CustomerManagement() {
     setErrors(newErrors);
 
     if (isValid) {
-      // TODO: Call API to update customer data
-      // For now, just update the selected customer state
-      setIsEditMode(false);
-      setSelectedCustomer(prev => ({
-        ...prev,
-        contactAddress: editedCustomer.contactAddress,
-        phoneNumber: editedCustomer.phoneNumber,
-        status: editedCustomer.status
-      }));
+      try {
+        // Tạo đối tượng User từ editedCustomer
+        const updatedUser = {
+          fullName: editedCustomer.fullName,
+          dateOfBirth: editedCustomer.dateOfBirth,
+          idCardNumber: editedCustomer.idCardNumber,
+          email: editedCustomer.email,
+          phoneNumber: editedCustomer.phoneNumber,
+          permanentAddress: editedCustomer.permanentAddress,
+          contactAddress: editedCustomer.contactAddress
+        };
 
-      // Hiển thị thông báo thành công
-      setExportNotification({
-        visible: true,
-        type: 'success',
-        message: 'Lưu thay đổi thành công!',
-        format: 'Hệ thống đã lưu thay đổi'
-      });
+        // Gọi API cập nhật khách hàng
+        await updateCustomerData(updatedUser, editedCustomer.customerID);
+        
+        // Cập nhật state cục bộ
+        setIsEditMode(false);
+        setSelectedCustomer(prev => ({
+          ...prev,
+          contactAddress: editedCustomer.contactAddress,
+          phoneNumber: editedCustomer.phoneNumber,
+          status: editedCustomer.status
+        }));
 
-      // Tự động ẩn thông báo sau 5 giây
-      setTimeout(() => {
-        setExportNotification(prev => ({ ...prev, visible: false }));
-      }, 5000);
+        // Refresh danh sách khách hàng
+        await refreshCustomers();
+
+        // Hiển thị thông báo thành công
+        setExportNotification({
+          visible: true,
+          type: 'success',
+          message: 'Lưu thay đổi thành công!',
+          format: 'Hệ thống đã cập nhật thông tin khách hàng'
+        });
+
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+          setExportNotification(prev => ({ ...prev, visible: false }));
+        }, 5000);
+      } catch (error) {
+        console.error('Lỗi khi cập nhật khách hàng:', error);
+        // Hiển thị thông báo lỗi
+        setExportNotification({
+          visible: true,
+          type: 'error',
+          message: 'Không thể lưu thay đổi!',
+          format: 'Có lỗi khi cập nhật thông tin khách hàng. Vui lòng thử lại!'
+        });
+
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+          setExportNotification(prev => ({ ...prev, visible: false }));
+        }, 5000);
+      }
     } else {
       // Hiển thị thông báo lỗi nếu không hợp lệ
       setExportNotification({
@@ -1720,10 +1753,24 @@ export default function CustomerManagement() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={saveCustomerChanges}
-                              className="px-6 py-3 font-semibold bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center"
+                              disabled={isUpdatingCustomer}
+                              className={`px-6 py-3 font-semibold rounded-xl transition-all duration-300 flex items-center ${
+                                isUpdatingCustomer 
+                                  ? 'bg-gray-400 cursor-not-allowed' 
+                                  : 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:shadow-lg'
+                              }`}
                             >
-                              <Save size={16} className="mr-2" />
-                              Lưu thay đổi
+                              {isUpdatingCustomer ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                  Đang lưu...
+                                </>
+                              ) : (
+                                <>
+                                  <Save size={16} className="mr-2" />
+                                  Lưu thay đổi
+                                </>
+                              )}
                             </motion.button>
                           </motion.div>
                         ) : (

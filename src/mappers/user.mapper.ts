@@ -62,7 +62,7 @@ export const mapUserToINhanVienReqDTO = (item: User): INhanVienReqDTO => {
     soDienThoai: item.phoneNumber,
     diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
     diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
-    vaiTroId: item.role.roleID
+    ...(item.role && { vaiTroId: item.role.roleID })
   };
 }
 
@@ -75,6 +75,6 @@ export const mapUserToIKhachHangReqDTO = (item: User): IKhachHangReqDTO => {
     soDienThoai: item.phoneNumber,
     diaChiThuongTru: mapAddressToIDiaChi(item.permanentAddress),
     diaChiLienLac: mapAddressToIDiaChi(item.contactAddress),
-    vaiTroId: item.role.roleID.toString()
+    ...(item.role && { vaiTroId: item.role.roleID })
   }
 }
