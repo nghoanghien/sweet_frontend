@@ -372,7 +372,7 @@ const availableTermsByInterestType = {
       interestAmount = (amountValue * interestRate * termMonths / 12);
     } else {
       const periodsPerYear = interestPaymentType === "monthly" ? 12 : 
-                            interestPaymentType === "quarterly" ? 4 : 1;
+                            interestPaymentType === "quarterly" ? 4 : 12;
       
       const periodsTotal = periodsPerYear * termMonths / 12;
       const ratePerPeriod = interestRate / periodsPerYear;
@@ -388,7 +388,7 @@ const availableTermsByInterestType = {
 
     console.log('Interest Calculation Results:', {
       periodsPerYear: interestPaymentType === "monthly" ? 12 : 
-                     interestPaymentType === "quarterly" ? 4 : 1,
+                     interestPaymentType === "quarterly" ? 4 : 12,
       interestAmount,
       totalAmount: amountValue + interestAmount
     });

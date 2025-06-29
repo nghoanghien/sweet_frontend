@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getRegulationCurrent } from '@/services/RegulationHistoryService';
+import { getRegulationCurrent, createOrUpdateRegulation } from '@/services/RegulationHistoryService';
+import { IQuyDinhLaiSuatReqDTO } from '@/types/quyDinhLaiSuat.d';
 
 interface IRegulation {
   id: string;
@@ -33,7 +34,53 @@ interface IRegulation {
   isCancelled: boolean;
 }
 
-export const useRegulationHistory = () => {
+export const useCreateRegulation = () => {
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [createdRegulation, setCreatedRegulation] = useState<IRegulation | null>(null);
+
+  const createRegulation = useCallback(async (regulationData: IQuyDinhLaiSuatReqDTO) => {
+    try {
+      setIsCreating(true);
+      setError(null);
+      
+      const startTime = Date.now();
+      
+      // Gọi API để tạo quy định mới
+      const response = await createOrUpdateRegulation(regulationData);
+      console.log("Response:", response);
+      
+      // Đảm bảo loading tối thiểu 1s để tránh nhấp nháy giao diện
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 1000 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      if (response.error) {
+        console.log("Error:", response.error);
+        setError(response.error);
+        throw response.error;
+      }
+      
+      setCreatedRegulation(response.data);
+      return response;
+    } catch (err) {
+      console.error('Lỗi khi tạo quy định mới:', err);
+      setError(err);
+      throw err;
+    } finally {
+      setIsCreating(false);
+    }
+  }, []);
+
+  return {
+    createRegulation,
+    isCreating,
+    error,
+    createdRegulation
+  };
+};
+
+export const useRegulationCurrent = () => {
   const [regulations, setRegulations] = useState<IRegulation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>(null);
@@ -62,17 +109,6 @@ export const useRegulationHistory = () => {
       setIsLoading(false);
     }
   }, []);
-
-//   const cancelRegulation = async (regulationId: number) => {
-//     try {
-//       await cancelQuyDinhLaiSuat(regulationId);
-//       await fetchRegulations();
-//       return { success: true };
-//     } catch (err) {
-//       console.error('Error cancelling regulation:', err);
-//       throw err;
-//     }
-//   };
 
   useEffect(() => {
     console.log("Fetching regulations........");

@@ -14,6 +14,8 @@ import {
 import SwipeConfirmationModal from "@/components/modals/ConfirmationModal/SwipeConfirmationModal";
 import SavingsTypeToggle from "./SavingsTypeToggle";
 import InterestRateTable from "./InterestRateTable";
+import { useCreateRegulation } from "@/hooks/InterestRateRegulation";
+import { mapFrontendToApiRegulation } from "@/mappers/regulationHistory.mapper";
 
 const RegulationComparisonModal = ({
   isOpen,
@@ -26,6 +28,7 @@ const RegulationComparisonModal = ({
 }) => {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { createRegulation } = useCreateRegulation();
   const [activeSavingsType, setActiveSavingsType] = useState(
     newRegulation &&
       newRegulation.savingsTypes &&
@@ -43,26 +46,33 @@ const RegulationComparisonModal = ({
   const [removedSavingsTypes, setRemovedSavingsTypes] = useState([]);
 
   // Handle regulation confirmation with processing state
-  const handleConfirmRegulation = () => {
-    // Set processing state to true
-    setIsProcessing(true);
+  const handleConfirmRegulation = async () => {
+    try {
+      setIsProcessing(true);
+      
+      // Log dữ liệu trước khi tạo
+      console.log("Dữ liệu quy định mới:", newRegulation);
+      console.log("Dữ liệu sau khi chuyển đổi:", mapFrontendToApiRegulation(newRegulation));
 
-    // Simulate API call with timeout
-    setTimeout(() => {
-      try {
-        // Call the original onConfirm function
+      // Gọi API để tạo quy định mới
+      await createRegulation(mapFrontendToApiRegulation(newRegulation));
+
+      // Gọi callback onConfirm nếu có
+      if (onConfirm) {
         onConfirm();
-
-        // Close confirmation modal after successful confirmation
-        setConfirmModalOpen(false);
-      } catch (error) {
-        console.error("Error confirming regulation:", error);
-        // In a real app, show error notification here
-      } finally {
-        // Reset processing state
-        setIsProcessing(false);
       }
-    }, 1500); // 1.5 second delay to simulate API call
+
+      // Đóng modal xác nhận
+      setConfirmModalOpen(false);
+      
+      // Đóng modal chính
+      onClose();
+    } catch (error) {
+      console.error("Lỗi khi tạo quy định mới:", error);
+      // Ở đây bạn có thể thêm xử lý hiển thị thông báo lỗi
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   // Set active savings type when newRegulation changes

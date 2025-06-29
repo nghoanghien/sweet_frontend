@@ -1,4 +1,4 @@
-import { IQuyDinhLaiSuatResDTO, IChiTietQuyDinhLaiSuatResDTO } from '@/types/quyDinhLaiSuat.d';
+import { IQuyDinhLaiSuatResDTO, IChiTietQuyDinhLaiSuatResDTO, IQuyDinhLaiSuatReqDTO, IChiTietQuyDinhLaiSuatReqDTO } from '@/types/quyDinhLaiSuat.d';
 import { formatDate } from '@/utils/saving-account';
 import { ITanSuatNhanLai } from '@/types/loai';
 
@@ -39,6 +39,74 @@ interface ITerm {
   months: number;
 }
 
+const mapFrequencyIdToNumber = (frequencyId: string): number => {
+  switch (frequencyId) {
+    case 'monthly':
+      return 1;    // Hàng tháng
+    case 'quarterly':
+      return 2;    // Hàng quý
+    case 'end':
+      return 3;    // Cuối kỳ hạn
+    case 'start':
+      return 4;    // Đầu kỳ hạn
+    default:
+      return 3;    // Default to Cuối kỳ hạn
+  }
+};
+
+export const mapFrontendToApiRegulation = (frontendData: any): IQuyDinhLaiSuatReqDTO => {
+  const chiTietQuyDinhLaiSuats: IChiTietQuyDinhLaiSuatReqDTO[] = [];
+
+  // Process each savings type and its interest rates
+  frontendData.savingsTypes.forEach((savingsType: any) => {
+    const loaiTietKiemID = parseInt(savingsType.id);
+
+    // For each term and frequency combination
+    savingsType.interestRates.forEach((rate: any) => {
+      // Find the corresponding term
+      const term = savingsType.terms.find((t: any) => t.id === rate.termId);
+      
+      if (term) {
+        // Skip if this frequency is disabled for this savings type
+        if (savingsType.disabledFrequencies?.includes(rate.frequencyId)) {
+          return;
+        }
+
+        chiTietQuyDinhLaiSuats.push({
+          chiTietQuyDinhID: undefined,
+          quyDinhLaiSuatID: undefined,
+          loaiTietKiemID: loaiTietKiemID,
+          tanSuatNhanLaiID: mapFrequencyIdToNumber(rate.frequencyId),
+          loaiKyHan: {
+            loaiKyHanID: term.id ? parseInt(term.id) : null,
+            tenLoaiKyHan: `Tháng ${term.months}`,
+            soThang: term.months
+          },
+          laiSuat: rate.rate / 100
+        });
+      }
+    });
+  });
+
+  // Convert date from DD/MM/YYYY to YYYY-MM-DD if needed
+  const formatDateForApi = (dateString: string) => {
+    if (!dateString) return undefined;
+    const [day, month, year] = dateString.split('/');
+    return `${year}-${month}-${day}`;
+  };
+
+  return {
+    quyDinhLaiSuatID: undefined,
+    ngayBatDau: formatDateForApi(frontendData.applicationDate) || new Date().toISOString().split('T')[0],
+    ngayKetThuc: undefined,
+    moTa: frontendData.description || '',
+    nguoiLapQuyDinhID: frontendData.creator?.id,
+    laiSuatKhongKyHan: frontendData.noTermRate,
+    soTienGuiToiThieu: frontendData.minimumDeposit,
+    chiTietQuyDinhLaiSuats: chiTietQuyDinhLaiSuats
+  };
+};
+
 export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
   // Đầu tiên, gom nhóm theo loại tiết kiệm
   const savingsTypeMap = new Map();
@@ -77,7 +145,7 @@ export const mapApiToRegulationHistory = (item: IQuyDinhLaiSuatResDTO) => {
     savingsType.interestRates.push({
       termId: detail.loaiKyHan.loaiKyHanID?.toString() || '',
       frequencyId: mapFrequencyId(detail.tanSuatNhanLai?.maTanSoNhanLai), // Default to 'end' if null
-      rate: detail.laiSuat || 0
+      rate: detail.laiSuat * 100 || 0
     });
   });
 

@@ -33,6 +33,13 @@ const ApplicationDateSelector = ({
     return `${day}/${month}/${year}`;
   };
 
+  // Handle button click
+  const handleTypeButtonClick = (typeId) => {
+    if (!readOnly) {
+      onApplicationTypeChange(typeId);
+    }
+  };
+
   return (
     <div className="mb-6">
       <h3 className="text-sm font-bold text-blue-800 mb-3 flex items-center gap-2">
@@ -66,7 +73,7 @@ const ApplicationDateSelector = ({
             {applicationTypes.map((type) => (
               <motion.button
                 key={type.id}
-                onClick={() => onApplicationTypeChange(type.id)}
+                onClick={() => handleTypeButtonClick(type.id)}
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
                 className={`flex items-center justify-center px-5 py-3 rounded-xl font-semibold text-base transition-all border-2 w-full sm:w-auto

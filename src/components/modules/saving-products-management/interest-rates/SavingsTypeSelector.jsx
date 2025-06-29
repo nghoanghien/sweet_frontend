@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, PiggyBank, AlertCircle, Plus } from 'lucide-react';
+import { Check, PiggyBank, AlertCircle, Plus, Loader2 } from 'lucide-react';
 
 const SavingsTypeSelector = ({ 
   allSavingsTypes, 
@@ -10,7 +10,8 @@ const SavingsTypeSelector = ({
   readOnly = false,
   error = null,
   removedSavingsTypes = [],
-  onAddRemovedSavingsType
+  onAddRemovedSavingsType,
+  loadingAddedType = null
 }) => {
   return (
     <div className="mb-6">
@@ -86,22 +87,42 @@ const SavingsTypeSelector = ({
             Loại tiết kiệm đã xóa
           </h4>
           <div className="grid grid-cols-2 gap-4">
-            {removedSavingsTypes.map((type) => (
-              <motion.button
-                key={type.id}
-                onClick={() => onAddRemovedSavingsType(type.id)}
-                className="flex items-center justify-between px-5 py-4 rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/40 hover:bg-blue-100/60 transition-all text-blue-700 font-semibold tracking-wide shadow-sm"
-                whileHover={{ scale: 1.04, boxShadow: '0 0 12px rgba(0,170,255,0.10)' }}
-                whileTap={{ scale: 0.97 }}
-              >
-                <span className="text-base font-semibold text-blue-700">
-                  {type.name}
-                </span>
-                <span className="flex items-center justify-center h-6 w-6 bg-blue-100 text-blue-600 rounded-full">
-                  <Plus size={14} />
-                </span>
-              </motion.button>
-            ))}
+            {removedSavingsTypes.map((type) => {
+              const isLoading = loadingAddedType === type.id;
+              return (
+                <motion.button
+                  key={type.id}
+                  onClick={() => !isLoading && onAddRemovedSavingsType(type.id)}
+                  disabled={isLoading}
+                  className={`
+                    flex items-center justify-between px-5 py-4 rounded-2xl border-2 border-dashed 
+                    ${isLoading 
+                      ? 'border-blue-200 bg-blue-50/20 cursor-wait' 
+                      : 'border-blue-300 bg-blue-50/40 hover:bg-blue-100/60'
+                    } 
+                    transition-all text-blue-700 font-semibold tracking-wide shadow-sm
+                  `}
+                  whileHover={!isLoading ? { scale: 1.04, boxShadow: '0 0 12px rgba(0,170,255,0.10)' } : {}}
+                  whileTap={!isLoading ? { scale: 0.97 } : {}}
+                >
+                  <span className="text-base font-semibold text-blue-700">
+                    {type.name}
+                  </span>
+                  <span className="flex items-center justify-center h-6 w-6 bg-blue-100 text-blue-600 rounded-full">
+                    {isLoading ? (
+                      <motion.span
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      >
+                        <Loader2 size={14} />
+                      </motion.span>
+                    ) : (
+                      <Plus size={14} />
+                    )}
+                  </span>
+                </motion.button>
+              );
+            })}
           </div>
           <p className="mt-2 text-xs text-blue-600">
             Bạn có thể thêm lại các loại tiết kiệm đã xóa trước đó

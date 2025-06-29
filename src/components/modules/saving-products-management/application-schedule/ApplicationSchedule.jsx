@@ -375,9 +375,9 @@ const ApplicationSchedule = () => {
 
   // Generate timeline view
   const generateTimelineView = () => {
-    // Sort regulations by application date in ascending order
+    // Sort regulations by application date in descending order
     const sortedRegulations = [...regulations].sort((a, b) => 
-      new Date(a.applicationDate) - new Date(b.applicationDate)
+      new Date(b.applicationDate) - new Date(a.applicationDate)
     );
     const todayString = formatDateForComparison(today);
     const currentRegulation = getRegulationForDate(todayString);

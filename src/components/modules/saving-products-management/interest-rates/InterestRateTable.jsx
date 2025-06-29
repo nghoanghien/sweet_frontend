@@ -87,7 +87,7 @@ const InterestRateTable = ({
       return '-';
     }
     // Convert to percentage with 2 decimal places, then remove trailing zeros
-    return `${parseFloat((rate * 100).toFixed(2))}%`;
+    return `${parseFloat((rate).toFixed(2))}%`;
   };
   
   // Check if a term is divisible by 3 (for quarterly frequency)
@@ -345,12 +345,12 @@ const InterestRateTable = ({
                       </div>
                       
                       {isEditing && !readOnly && !isDisabled ? (
-                        <div className="w-28">
+                        <div className="w-32">
                           <NumberInput
                             value={rate}
                             onChange={(value) => handleRateChange(term.id, frequency.id, value)}
                             min={0}
-                            max={20}
+                            max={100}
                             step={0.1}
                             decimalPlaces={1}
                             suffix="%"
@@ -621,7 +621,7 @@ const InterestRateTable = ({
                           >
                             {isEditing && !readOnly && !isDisabled ? (
                               <motion.div
-                                className="w-28 mx-auto"
+                                className="w-32 mx-auto"
                                 initial={cellChanged ? { scale: 1.08, boxShadow: (highlightColor === 'red' ? '0 0 0 2px #ef4444' : '0 0 0 2px #22d3ee') } : {}}
                                 animate={cellChanged ? { scale: 1, boxShadow: '0 0 0 0px #fff' } : {}}
                                 transition={{ duration: 0.5 }}
@@ -630,7 +630,7 @@ const InterestRateTable = ({
                                   value={rate}
                                   onChange={(value) => handleRateChange(term.id, frequency.id, value)}
                                   min={0}
-                                  max={20}
+                                  max={100}
                                   step={0.1}
                                   decimalPlaces={1}
                                   suffix="%"
