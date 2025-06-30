@@ -14,7 +14,9 @@ import {
   Info
 } from 'lucide-react';
 import { FaFilePdf, FaFileExcel } from 'react-icons/fa';
-
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 /**
  * ExportDataModal - A reusable component for exporting data with customizable columns
  * 
@@ -469,119 +471,241 @@ const ExportDataModal = ({
   };
   
   // Handle export action
-  const handleExport = () => {
-    setIsProcessing(true);
+ const exportToPDF = async (data, labels) => {
+    const doc = new jsPDF();
     
-    // Prepare export data
-    const exportData = data.map(item => {
-      const row = {};
-      
-      // Process columns from columnCategories first
-      if (enableGrouping && columnCategories) {
-        Object.entries(columnCategories).forEach(([category, columns]) => {
-          if (Array.isArray(columns)) {
-            columns.forEach(column => {
-              // Check if this column is selected or is a complex object
-              const isSelected = selectedColumns[column];
-              const isComplexObject = item[column] !== null && 
-                                     typeof item[column] === 'object' && 
-                                     !Array.isArray(item[column]);
-              
-              if (isSelected || isComplexObject) {
-                // Handle nested properties like 'customer.fullName'
-                if (column.includes('.')) {
-                  const parts = column.split('.');
-                  let value = item;
-                  
-                  // Navigate through the nested properties
-                  for (const part of parts) {
-                    if (value && typeof value === 'object') {
-                      value = value[part];
-                    } else {
-                      value = undefined;
-                      break;
-                    }
-                  }
-                  
-                  // Format the value if needed
-                  if (formatData) {
-                    row[column] = formatData(value, column);
-                  } else {
-                    row[column] = value;
-                  }
-                } 
-                // Handle complex objects like addresses
-                else if (isComplexObject) {
-                  // Format the complex object if formatData is provided
-                  if (formatData) {
-                    row[column] = formatData(item[column], column);
-                  } else {
-                    // Default formatting for complex objects
-                    row[column] = JSON.stringify(item[column]);
-                  }
-                } 
-                // Handle regular properties
-                else {
-                  // Format the value if needed
-                  if (formatData) {
-                    row[column] = formatData(item[column], column);
-                  } else {
-                    row[column] = item[column];
-                  }
-                }
-              }
-            });
+    try {
+        // Thêm font hỗ trợ tiếng Việt (NotoSans)
+        // Bạn cần tải font NotoSans và convert sang base64
+        // Hoặc sử dụng font có sẵn như Arial Unicode MS
+        
+        // Cách 1: Sử dụng font mặc định với encoding UTF-8
+        doc.setFont('helvetica');
+        
+        // Cách 2: Nếu có font file, uncomment và sử dụng
+        // const fontUrl = 'path/to/NotoSans-Regular.ttf';
+        // doc.addFileToVFS('NotoSans.ttf', fontBase64String);
+        // doc.addFont('NotoSans.ttf', 'NotoSans', 'normal');
+        // doc.setFont('NotoSans');
+
+        // Tiêu đề file - sử dụng hàm text với encoding UTF-8
+        doc.setFontSize(16);
+        const titleText = title || 'Báo cáo dữ liệu';
+        doc.text(titleText, 14, 20);
+        
+        // Chuẩn bị headers với xử lý tiếng Việt
+        const headers = Object.keys(selectedColumns)
+          .filter(column => selectedColumns[column])
+          .map(column => {
+            const label = labels?.[column] || column;
+            // Đảm bảo text được encode đúng
+            return String(label);
+          });
+        
+        // Chuẩn bị rows với xử lý tiếng Việt
+        const rows = data.map(item => 
+          Object.keys(selectedColumns)
+            .filter(column => selectedColumns[column])
+            .map(column => {
+              const value = item[column];
+              if (value === null || value === undefined) return '';
+              // Chuyển đổi sang string và đảm bảo encoding đúng
+              return String(value);
+            })
+        );
+        
+        // Tạo bảng với autoTable và cấu hình hỗ trợ tiếng Việt
+        doc.autoTable({
+          head: [headers],
+          body: rows,
+          startY: 30,
+          styles: { 
+            font: 'helvetica', // Sử dụng helvetica thay vì Times
+            fontSize: 9,
+            cellPadding: 3,
+            overflow: 'linebreak',
+            halign: 'left',
+            valign: 'middle'
+          },
+          headStyles: { 
+            fillColor: [79, 70, 229], 
+            textColor: [255, 255, 255],
+            fontStyle: 'bold',
+            fontSize: 10
+          },
+          alternateRowStyles: { 
+            fillColor: [248, 250, 252] 
+          },
+          margin: { top: 30, left: 14, right: 14 },
+          tableWidth: 'auto',
+          columnStyles: {
+            // Tự động điều chỉnh độ rộng cột
+          },
+          didParseCell: (data) => {
+            // Đảm bảo font được áp dụng đúng
+            data.cell.styles.font = 'helvetica';
+            
+            // Xử lý text tiếng Việt trong cell
+            if (data.cell.text && Array.isArray(data.cell.text)) {
+              data.cell.text = data.cell.text.map(text => String(text));
+            }
+          },
+          didDrawCell: (data) => {
+            // Có thể thêm xử lý bổ sung nếu cần
           }
         });
-      }
-      
-      // Process any remaining selected columns not in columnCategories
-      Object.keys(selectedColumns).forEach(column => {
-        // Skip if already processed
-        if (column in row) return;
         
-        if (selectedColumns[column]) {
-          // Handle nested properties like 'customer.fullName'
-          if (column.includes('.')) {
-            const parts = column.split('.');
-            let value = item;
-            
-            // Navigate through the nested properties
-            for (const part of parts) {
-              if (value && typeof value === 'object') {
-                value = value[part];
+        // Thêm thông tin footer
+        const pageCount = doc.internal.getNumberOfPages();
+        const pageHeight = doc.internal.pageSize.height;
+        
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(8);
+          doc.setTextColor(128);
+          
+          // Footer với ngày xuất
+          const exportDate = new Date().toLocaleDateString('vi-VN');
+          const footerText = `Xuất ngày: ${exportDate} - Trang ${i}/${pageCount}`;
+          doc.text(footerText, 14, pageHeight - 10);
+        }
+        
+        // Lưu file với tên tiếng Việt
+        const fileName = `bao-cao-du-lieu-${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(fileName);
+        
+    } catch (error) {
+        console.error('Lỗi khi tạo PDF:', error);
+        throw error;
+    }
+};
+
+// Hàm xử lý xuất dữ liệu được cập nhật
+const handleExport = async () => {
+    setIsProcessing(true);
+
+    try {
+        // Chuẩn bị dữ liệu xuất với xử lý tiếng Việt
+        const exportData = data.map(item => {
+          const row = {};
+          Object.keys(selectedColumns).forEach(column => {
+            if (selectedColumns[column]) {
+              let value;
+              if (column.includes('.')) {
+                value = getNestedValue(item, column);
               } else {
-                value = undefined;
-                break;
+                value = item[column];
+              }
+              
+              // Áp dụng format nếu có và xử lý tiếng Việt
+              if (formatData) {
+                value = formatData(value, column);
+              }
+              
+              // Đảm bảo giá trị được xử lý đúng cho tiếng Việt
+              if (value !== null && value !== undefined) {
+                row[column] = String(value);
+              } else {
+                row[column] = '';
               }
             }
-            
-            // Format the value if needed
-            if (formatData) {
-              row[column] = formatData(value, column);
-            } else {
-              row[column] = value;
-            }
-          } else {
-            // Format the value if needed
-            if (formatData) {
-              row[column] = formatData(item[column], column);
-            } else {
-              row[column] = item[column];
-            }
-          }
+          });
+          return row;
+        });
+
+        // Gọi hàm xuất dữ liệu
+        if (exportFormat === 'pdf') {
+            await exportToPDF(exportData, columnLabels);
+        } else if (exportFormat === 'excel') {
+            await exportToExcel(exportData, columnLabels);
         }
-      });
-      
+        
+        // Callback sau khi xuất thành công
+        if (onExport) {
+            onExport(exportData, exportFormat);
+        }
+        
+    } catch (error) {
+        console.error('Lỗi khi xuất dữ liệu:', error);
+        
+        // Thông báo lỗi chi tiết hơn
+        let errorMessage = 'Có lỗi xảy ra khi xuất dữ liệu.';
+        if (error.message) {
+            errorMessage += ` Chi tiết: ${error.message}`;
+        }
+        
+        alert(errorMessage + ' Vui lòng thử lại.');
+    } finally {
+        setIsProcessing(false);
+        if (onClose) {
+            onClose();
+        }
+    }
+};
+
+// Hàm hỗ trợ: Load font tiếng Việt (tùy chọn nâng cao)
+const loadVietnameseFont = async () => {
+    try {
+        // Tải font NotoSans từ Google Fonts hoặc local
+        const fontUrl = 'https://fonts.gstatic.com/s/notosans/v27/o-0IIpQlx3QUlC5A4PNr5TRASf6M7Q.woff2';
+        
+        // Convert font to base64 (cần thêm utility function)
+        // const fontBase64 = await fetchFontAsBase64(fontUrl);
+        
+        // return fontBase64;
+        return null; // Tạm thời return null
+    } catch (error) {
+        console.warn('Không thể tải font tiếng Việt:', error);
+        return null;
+    }
+};
+
+// Utility function để convert font (nếu cần)
+const fetchFontAsBase64 = async (url) => {
+    try {
+        const response = await fetch(url);
+        const buffer = await response.arrayBuffer();
+        const binary = new Uint8Array(buffer);
+        let base64String = '';
+        
+        for (let i = 0; i < binary.length; i++) {
+            base64String += String.fromCharCode(binary[i]);
+        }
+        
+        return btoa(base64String);
+    } catch (error) {
+        throw error;
+    }
+};
+  // Hàm xuất file Excel
+  const exportToExcel = (data, labels) => {
+    // Chuẩn bị headers
+    const headers = Object.keys(selectedColumns)
+      .filter(column => selectedColumns[column])
+      .map(column => labels?.[column] || column);
+    
+    // Chuẩn bị rows
+    const rows = data.map(item => {
+      const row = {};
+      Object.keys(selectedColumns)
+        .filter(column => selectedColumns[column])
+        .forEach(column => {
+          row[labels?.[column] || column] = item[column] === null || item[column] === undefined 
+            ? '' 
+            : String(item[column]);
+        });
       return row;
     });
     
-    // Simulate export process
-    setTimeout(() => {
-      onExport(exportData, exportFormat);
-      setIsProcessing(false);
-      onClose();
-    }, 1000);
+    // Tạo worksheet
+    const worksheet = XLSX.utils.json_to_sheet(rows, { header: headers });
+    
+    // Tạo workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
+    
+    // Lưu file
+    XLSX.writeFile(workbook, `data-export-${new Date().toISOString().split('T')[0]}.xlsx`);
   };
   
   // Categorize columns
