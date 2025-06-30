@@ -649,8 +649,8 @@ export default function CustomerManagement() {
 
     if (field.includes('houseNumber')) {
       if (!value.trim()) return 'Số nhà không được để trống';
-      // Add validation for house number - should be a valid number or number with letters (e.g., 123A)
-      if (!/^[0-9]+[A-Za-z]?$/.test(value)) return 'Số nhà phải là số hoặc số kèm chữ cái (VD: 123 hoặc 123A)';
+      // Kiểm tra có chứa ít nhất một chữ số
+      if (!/\d/.test(value)) return 'Số nhà phải chứa ít nhất một chữ số';
       return '';
     }
 
