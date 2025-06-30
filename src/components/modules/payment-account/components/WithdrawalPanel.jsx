@@ -27,6 +27,7 @@ const WithdrawalPanel = ({
   const [isValidAmount, setIsValidAmount] = useState(false);
   const [isFullAmount, setIsFullAmount] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
 
@@ -133,12 +134,16 @@ const WithdrawalPanel = ({
   // Đóng modal xác nhận
   const closeConfirmModal = () => {
     setIsConfirmModalOpen(false);
+    setIsConfirming(false);
   };
 
   // Xử lý xác nhận rút tiền
   const handleConfirmWithdrawal = () => {
+    if (isConfirming || isProcessing) return; // Prevent multiple calls
+    
     // Đặt trạng thái đang xử lý
     setIsProcessing(true);
+    setIsConfirming(true);
     
     try {
       // Gọi callback từ parent component
@@ -149,6 +154,7 @@ const WithdrawalPanel = ({
       // Hiển thị thông báo lỗi nếu có
       console.error('Error processing withdrawal:', error);
       setIsProcessing(false);
+      setIsConfirming(false);
     }
   };
 

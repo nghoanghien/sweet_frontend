@@ -19,6 +19,7 @@ const DepositPanel = ({
   const [inputError, setInputError] = useState(null);
   const [isValidAmount, setIsValidAmount] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [dynamicSuggestions, setDynamicSuggestions] = useState([]);
 
@@ -112,10 +113,14 @@ const DepositPanel = ({
 
   const closeConfirmModal = () => {
     setIsConfirmModalOpen(false);
+    setIsConfirming(false);
   };
 
   const handleConfirmDeposit = () => {
+    if (isConfirming || isProcessing) return; // Prevent multiple calls
+    
     setIsProcessing(true);
+    setIsConfirming(true);
     
     try {
       onConfirm(parseFloat(depositAmount));
@@ -123,6 +128,7 @@ const DepositPanel = ({
     } catch (error) {
       console.error('Error processing deposit:', error);
       setIsProcessing(false);
+      setIsConfirming(false);
     }
   };
 
