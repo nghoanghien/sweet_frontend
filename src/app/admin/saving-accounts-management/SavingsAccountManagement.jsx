@@ -125,7 +125,8 @@ export default function SavingsAccountManagement() {
 
   // State cho export
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [exportData, setExporData] = useState([]);
+  const [exportData, setExporData] = useState([
+  ]);
   const [exportFormat, setExportFormat] = useState('pdf');
   const [exportNotification, setExportNotification] = useState({
     visible: false,
