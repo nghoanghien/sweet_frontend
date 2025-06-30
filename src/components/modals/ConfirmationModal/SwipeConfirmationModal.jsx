@@ -18,12 +18,14 @@ const SwipeConfirmationModal = ({
 }) => {
   const [isCompleted, setIsCompleted] = useState(false);
   const [showProcessing, setShowProcessing] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setIsCompleted(false);
       setShowProcessing(false);
+      setIsConfirming(false);
     }
   }, [isOpen]);
 
@@ -41,10 +43,16 @@ const SwipeConfirmationModal = ({
   }, [isProcessing, isCompleted]);
   
   const handleConfirmComplete = () => {
+    if (isConfirming) return; // Prevent multiple calls
+    
     setIsCompleted(true);
+    setIsConfirming(true);
+    
     // Add small delay before calling onConfirm to allow UI to update
     setTimeout(() => {
-      onConfirm && onConfirm();
+      if (onConfirm) {
+        onConfirm();
+      }
     }, 100);
   };
   

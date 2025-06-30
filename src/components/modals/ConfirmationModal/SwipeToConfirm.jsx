@@ -14,6 +14,7 @@ const SwipeToConfirm = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragPosition, setDragPosition] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [hasCompleted, setHasCompleted] = useState(false);
   const sliderRef = useRef(null);
   const knobRef = useRef(null);
   const initialTouchPos = useRef(null);
@@ -69,8 +70,9 @@ const SwipeToConfirm = ({
     setDragPosition(newPosition);
     
     // Check if complete
-    if (newPosition >= maxDrag * 0.95) { // 95% threshold for completion
+    if (newPosition >= maxDrag * 0.95 && !hasCompleted) { // 95% threshold for completion
       setIsComplete(true);
+      setHasCompleted(true);
       setDragPosition(maxDrag);
       setIsDragging(false);
       onComplete && onComplete();
@@ -90,6 +92,7 @@ const SwipeToConfirm = ({
   const resetSlider = () => {
     setDragPosition(0);
     setIsComplete(false);
+    setHasCompleted(false);
   };
   
   // Calculate completion percentage for background gradient
