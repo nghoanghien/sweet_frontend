@@ -62,7 +62,7 @@ export const getActionCodes = (permission: Permission): number[] => {
         57. get LSGD by tktt ID
          */} 
     case Permission.SAVING_ACCOUNTS:
-      return [11, 25, 62, 80, 81, 93];
+      return [25, 62, 80, 81, 93];
       {/*
         11. Tạo phiếu rút tiền
         25. Tạo mới phiếu gửi tiền
@@ -72,7 +72,7 @@ export const getActionCodes = (permission: Permission): number[] => {
         93. lấy lịch sử giao dịch phiếu gửi tiền theo ID
          */} 
     case Permission.CUSTOMERS:
-      return [11, 13, 15, 24, 25, 42, 43, 47, 49, 57, 62, 77, 80, 81, 90, 93];
+      return [13, 15, 24, 25, 42, 43, 47, 49, 57, 62, 77, 80, 81, 90, 93];
       {/*
         11. Tạo phiếu rút tiền
         13. get all khách hàng
@@ -112,7 +112,7 @@ export const getActionCodes = (permission: Permission): number[] => {
         67. thêm quy định lãi suất
          */} 
     case Permission.SALE_REPORTS:
-      return [];
+      return [10, 11];
       {/*
          */} 
     case Permission.SETTINGS:

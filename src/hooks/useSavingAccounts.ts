@@ -1,4 +1,4 @@
-import { getAllSavingAccounts, getSavingAccountsById } from "@/services/savingAccounts";
+import { getAllSavingAccounts, getSavingAccountsById, withdrawMoneyFromSaving } from "@/services/savingAccounts";
 import { SavingAccount } from "@/types/interfaces/savingAccount";
 import { useEffect, useState, useCallback } from "react"
 
@@ -82,4 +82,37 @@ export const useSavingAccountsByCustomerId = (customerId: number) => {
   }, [fetchData]);
 
   return { data: data, savingAccounts: data, isLoading, error, refreshSavingAccounts };
+}
+
+export const useWithdrawFromSaving = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+  const [success, setSuccess] = useState(false);
+  
+  const withdrawMoney = useCallback(async (phieuGuiTienID: number, soTienRut: number, kenhGiaoDichID: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setSuccess(false);
+      
+      const response = await withdrawMoneyFromSaving(phieuGuiTienID, soTienRut, kenhGiaoDichID);
+      console.log("Ket qua rut tien:", response);
+      
+      setSuccess(true);
+      return response;
+    } catch (err) {
+      setError(err);
+      console.log("Loi khi rut tien:", err);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  
+  const resetState = useCallback(() => {
+    setError(null);
+    setSuccess(false);
+  }, []);
+  
+  return { withdrawMoney, isLoading, error, success, resetState };
 }

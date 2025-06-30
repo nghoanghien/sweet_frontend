@@ -435,3 +435,7 @@ export const callGetAllChiTietBaoCaoByDoanhSoID = (doanhSoId: string) => {
 export const callChangePassword = (id: string, changePasswordDTO: IChangePasswordDTO) => {
     return axios.put<IBackendRes<void>>(`/api/v1/change-password/${id}`, changePasswordDTO);
 }
+
+export const withdrawMoney = (info: any) => {
+    return axios.post<IBackendRes<any>>('/api/v1/phieu-rut-tien', info);
+}

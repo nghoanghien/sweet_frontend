@@ -19,6 +19,8 @@ import DetailInfo from './DetailInfo';
 import SavingAccountDetail from './SavingAccountDetail';
 import { useAllTransactionBySavingsAccountId } from '../../../../hooks/useSavingsTransaction';
 import { useInterestHistoryBySavingsAccountId } from '../../../../hooks/useInterestHistory';
+import { useWithdrawFromSaving } from '../../../../hooks/useSavingAccounts';
+import { useUser } from '../../../../store/useUserStore';
 import { Channel } from '../../../../types/interfaces/enums';
 
 // Import các component con
@@ -111,6 +113,18 @@ const SavingsAccountDetailDrawer = ({
     refreshInterestHistory 
   } = useInterestHistoryBySavingsAccountId(account?.id);
   
+  // Sử dụng hook để rút tiền
+  const { 
+    withdrawMoney, 
+    isLoading: withdrawLoading, 
+    error: withdrawError, 
+    success: withdrawSuccess, 
+    resetState: resetWithdrawState 
+  } = useWithdrawFromSaving();
+  
+  // Lấy thông tin user để có employeeID
+  const { detailInfo } = useUser();
+  
   // Lưu trữ dữ liệu tab để tránh mất khi chuyển tab
   const [tabData, setTabData] = useState({
     transactions: [],
@@ -143,6 +157,21 @@ const SavingsAccountDetailDrawer = ({
       });
     }
   }, [account?.id]);
+  
+  // Xử lý trạng thái success và error từ hook withdraw
+  useEffect(() => {
+    if (withdrawSuccess) {
+      // Reset state sau khi xử lý thành công
+      resetWithdrawState();
+    }
+    
+    if (withdrawError) {
+      console.error('Lỗi từ hook withdraw:', withdrawError);
+      setNotificationMessage('Có lỗi xảy ra khi rút tiền. Vui lòng thử lại.');
+      setNotificationVisible(true);
+      resetWithdrawState();
+    }
+  }, [withdrawSuccess, withdrawError, resetWithdrawState]);
   
   // Lưu trữ dữ liệu gốc để tham chiếu khi cần
   const [originalData] = useState({
@@ -288,7 +317,7 @@ const SavingsAccountDetailDrawer = ({
       // Sau một khoảng thời gian ngắn, khởi tạo và hiển thị panel rút tiền
       setTimeout(() => {
         // Check if it's a standard deposit and set withdrawal type accordingly
-        const isStandardDeposit = account && account.depositType === "Tiền gửi tiêu chuẩn";
+        const isStandardDeposit = account && account.depositType === "standard";
         setWithdrawalType(isStandardDeposit ? 'full' : 'partial');
         
         // Khởi tạo panel rút tiền với rút toàn bộ hoặc một phần dựa trên loại tiết kiệm
@@ -321,7 +350,7 @@ const SavingsAccountDetailDrawer = ({
     const withdrawAmount = isFullWithdrawal ? currentAmount : Math.min(withdrawalAmountValue, currentAmount);
     
     // Đối với tiền gửi tiêu chuẩn, chỉ cho phép rút toàn bộ
-    if (savings.depositType === "Tiền gửi tiêu chuẩn" && !isFullWithdrawal) {
+    if (savings.depositType === "standard" && !isFullWithdrawal) {
       return null;
     }
     
@@ -358,7 +387,7 @@ const SavingsAccountDetailDrawer = ({
   // Xử lý thay đổi loại rút tiền (toàn bộ hoặc một phần)
   const handleWithdrawalTypeChange = (type) => {
     // Check if it's a standard deposit
-    const isStandardDeposit = account && account.depositType === "Tiền gửi tiêu chuẩn";
+    const isStandardDeposit = account && account.depositType === "standard";
     
     // If it's a standard deposit, only allow full withdrawal
     if (isStandardDeposit && type === 'partial') {
@@ -406,86 +435,110 @@ const SavingsAccountDetailDrawer = ({
   };
   
   // Xác nhận rút tiền trước hạn
-  const confirmEarlyWithdrawal = () => {
-    // Tạo đối tượng giao dịch mới
-    const newTransaction = {
-      id: Date.now(),
-      time: new Date().toLocaleString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      }).replace(',', ' -'),
-      withdrawnAmount: withdrawalData.withdrawAmount,
-      interestAmount: withdrawalData.withdrawalInterest,
-      remainingBalance: withdrawalData.remainingBalance,
-      isPartial: withdrawalType === 'partial',
-      channel: "Internet Banking",
-      status: "Thành công"
-    };
-    
-    // Nếu rút toàn bộ, tạo sự kiện để thông báo cho component cha
-    if (withdrawalType === 'full') {
-      // Tạo và dispatch sự kiện rút toàn bộ
-      const fullWithdrawalEvent = new CustomEvent('accountFullyWithdrawn', {
-        detail: {
-          accountId: account.id,
-          // Không cần gửi amount vì chúng ta chỉ cập nhật remainingAmount
-          // và giữ nguyên amount (số tiền gốc ban đầu)
-        }
-      });
-      window.dispatchEvent(fullWithdrawalEvent);
-      
-      // Hoặc sử dụng callback nếu đã được cung cấp
-      if (window.removeAccount) {
-        window.removeAccount(account.id);
+  const confirmEarlyWithdrawal = async () => {
+    try {
+      // Kiểm tra thông tin nhân viên
+      if (!detailInfo.id) {
+        setNotificationMessage('Không thể xác định thông tin nhân viên');
+        setNotificationVisible(true);
+        return;
       }
       
-      // Đóng drawer
-      onClose();
+      // Gọi API rút tiền
+      const response = await withdrawMoney(
+        account.id, // phieuGuiTienID
+        withdrawalData.withdrawAmount, // soTienRut
+        1 // kenhGiaoDichID - 1 cho Internet Banking, có thể điều chỉnh theo enum
+      );
       
-      // Không hiển thị thông báo ở đây vì component sẽ bị unmount
-      // Thông báo sẽ được hiển thị bởi component cha (SavingsAccounts.jsx)
-    } else {
-      // Nếu rút một phần, cập nhật tài khoản và thêm giao dịch vào lịch sử
-      // Chỉ cập nhật remainingAmount, giữ nguyên amount (số tiền gốc ban đầu)
-      const updatedAccount = {
-        ...account,
-        remainingAmount: withdrawalData.remainingBalance
+      console.log('Kết quả rút tiền:', response);
+      
+      // Tạo đối tượng giao dịch mới từ response
+      const newTransaction = {
+        id: Date.now(),
+        time: new Date().toLocaleString('vi-VN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).replace(',', ' -'),
+        withdrawnAmount: withdrawalData.withdrawAmount,
+        interestAmount: withdrawalData.withdrawalInterest,
+        remainingBalance: withdrawalData.remainingBalance,
+        isPartial: withdrawalType === 'partial',
+        channel: "Internet Banking",
+        status: "Thành công"
       };
-      
-      // Tạo và dispatch sự kiện rút một phần
-      const partialWithdrawalEvent = new CustomEvent('accountPartiallyWithdrawn', {
-        detail: {
-          accountId: account.id,
-          updatedAccount,
-          transaction: newTransaction
+    
+      // Nếu rút toàn bộ, tạo sự kiện để thông báo cho component cha
+      if (withdrawalType === 'full') {
+        // Tạo và dispatch sự kiện rút toàn bộ
+        const fullWithdrawalEvent = new CustomEvent('accountFullyWithdrawn', {
+          detail: {
+            accountId: account.id,
+            // Không cần gửi amount vì chúng ta chỉ cập nhật remainingAmount
+            // và giữ nguyên amount (số tiền gốc ban đầu)
+          }
+        });
+        window.dispatchEvent(fullWithdrawalEvent);
+        
+        // Hoặc sử dụng callback nếu đã được cung cấp
+        if (window.removeAccount) {
+          window.removeAccount(account.id);
         }
-      });
-      window.dispatchEvent(partialWithdrawalEvent);
-      
-      // Hoặc sử dụng callback nếu đã được cung cấp
-      if (window.updateAccount) {
-        window.updateAccount(updatedAccount);
+        
+        // Đóng drawer
+        onClose();
+        
+        // Không hiển thị thông báo ở đây vì component sẽ bị unmount
+        // Thông báo sẽ được hiển thị bởi component cha (SavingsAccounts.jsx)
+      } else {
+        // Nếu rút một phần, cập nhật tài khoản và thêm giao dịch vào lịch sử
+        // Chỉ cập nhật remainingAmount, giữ nguyên amount (số tiền gốc ban đầu)
+        const updatedAccount = {
+          ...account,
+          remainingAmount: withdrawalData.remainingBalance
+        };
+        
+        // Tạo và dispatch sự kiện rút một phần
+        const partialWithdrawalEvent = new CustomEvent('accountPartiallyWithdrawn', {
+          detail: {
+            accountId: account.id,
+            updatedAccount,
+            transaction: newTransaction
+          }
+        });
+        window.dispatchEvent(partialWithdrawalEvent);
+        
+        // Hoặc sử dụng callback nếu đã được cung cấp
+        if (window.updateAccount) {
+          window.updateAccount(updatedAccount);
+        }
+        
+        // Cập nhật dữ liệu tab
+        setTabData(prevData => ({
+          ...prevData,
+          withdrawals: [newTransaction, ...prevData.withdrawals]
+        }));
+        
+        // Đóng panel rút tiền và quay lại tab giao dịch
+        toggleWithdrawalPanel();
+        setSelectedTab('transactions');
       }
       
-      // Cập nhật dữ liệu tab
-      setTabData(prevData => ({
-        ...prevData,
-        withdrawals: [newTransaction, ...prevData.withdrawals]
-      }));
+      // Chỉ hiển thị thông báo nếu là rút một phần (partial withdrawal)
+      // vì khi rút toàn bộ, component này sẽ bị unmount
+      if (withdrawalType === 'partial') {
+        setNotificationMessage(`Rút tiền trước hạn thành công: ${formatCurrency(withdrawalData.withdrawAmount)}`);
+        setNotificationVisible(true);
+      }
       
-      // Đóng panel rút tiền và quay lại tab giao dịch
-      toggleWithdrawalPanel();
-      setSelectedTab('transactions');
-    }
-    
-    // Chỉ hiển thị thông báo nếu là rút một phần (partial withdrawal)
-    // vì khi rút toàn bộ, component này sẽ bị unmount
-    if (withdrawalType === 'partial') {
-      setNotificationMessage(`Rút tiền trước hạn thành công: ${formatCurrency(withdrawalData.withdrawAmount)}`);
+    } catch (error) {
+      console.error('Lỗi khi rút tiền:', error);
+      setNotificationMessage('Có lỗi xảy ra khi rút tiền. Vui lòng thử lại.');
       setNotificationVisible(true);
+      return;
     }
   };
   
@@ -983,6 +1036,7 @@ const SavingsAccountDetailDrawer = ({
                   onWithdrawalAmountChange={handleWithdrawalAmountChange}
                   onCancel={toggleWithdrawalPanel}
                   onConfirm={confirmEarlyWithdrawal}
+                  isLoading={withdrawLoading}
                 />
               )}
             </div>

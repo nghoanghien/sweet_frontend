@@ -29,7 +29,8 @@ const EarlyWithdrawalPanel = ({
   onWithdrawalAmountChange = () => {},
   onCancel = () => {},
   onConfirm = () => {},
-  isAdmin = true
+  isAdmin = true,
+  isLoading: externalIsLoading = false
 }) => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [inputError, setInputError] = useState(null);
@@ -264,7 +265,7 @@ const EarlyWithdrawalPanel = ({
                 </div>
               </motion.button>
 
-              {account.depositType !== "Tiền gửi tiêu chuẩn" && (
+              {account.depositType !== "standard" && (
                 <motion.button
                   className={`relative group p-5 rounded-3xl border-2 transition-all duration-500 ${
                     withdrawalType === "partial"
@@ -420,7 +421,7 @@ const EarlyWithdrawalPanel = ({
                           {
                             label: "(1) Số tiền rút trước hạn",
                             value: formatCurrency(
-                              withdrawalData.originalAmount
+                              account.remainingAmount
                             ),
                             color: "text-gray-800",
                           },
@@ -447,7 +448,7 @@ const EarlyWithdrawalPanel = ({
                           {
                             label: "(1) Tổng tiền gửi",
                             value: formatCurrency(
-                              withdrawalData.originalAmount
+                              account.remainingAmount
                             ),
                             color: "text-gray-800",
                           },
@@ -720,21 +721,30 @@ const EarlyWithdrawalPanel = ({
         </motion.button>
         <motion.button
           onClick={openConfirmModal}
-          disabled={withdrawalType === "partial" && !isValidAmount}
+          disabled={(withdrawalType === "partial" && !isValidAmount) || externalIsLoading}
           className={`flex-1 font-medium py-4 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-lg ${
-            withdrawalType === "partial" && !isValidAmount
+            (withdrawalType === "partial" && !isValidAmount) || externalIsLoading
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 hover:shadow-xl"
           }`}
           whileHover={
-            withdrawalType !== "partial" || isValidAmount ? { scale: 1.02 } : {}
+            (withdrawalType !== "partial" || isValidAmount) && !externalIsLoading ? { scale: 1.02 } : {}
           }
           whileTap={
-            withdrawalType !== "partial" || isValidAmount ? { scale: 0.98 } : {}
+            (withdrawalType !== "partial" || isValidAmount) && !externalIsLoading ? { scale: 0.98 } : {}
           }
         >
-          <ArrowUpRight size={18} className="mr-2" />
-          Rút tiền ngay
+          {externalIsLoading ? (
+            <div className="flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              Đang xử lý...
+            </div>
+          ) : (
+            <>
+              <ArrowUpRight size={18} className="mr-2" />
+              Rút tiền ngay
+            </>
+          )}
         </motion.button>
       </div>
 
@@ -765,7 +775,7 @@ const EarlyWithdrawalPanel = ({
           } tiền`}
           type="warning"
           icon={<ArrowUpRight className="h-6 w-6 text-amber-500" />}
-          isProcessing={isProcessing}
+          isProcessing={externalIsLoading}
           confirmDetails={{
             "Số tiền gốc": formatCurrency(withdrawalData.withdrawAmount),
             "Lãi rút trước hạn": formatCurrency(

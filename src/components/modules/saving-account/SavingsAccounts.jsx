@@ -381,23 +381,27 @@ const SavingsAccounts = ({ customerId }) => {
 
   }, [customerId]);
 
-  // Tính tổng số dư và số tài khoản
-  const totalDeposit = savingAccounts.reduce((sum, account) => sum + account.remainingAmount, 0);
-  const totalInterest = savingAccounts.reduce((sum, account) => sum + (account.totalReceivable), 0);
-  const activeAccountsCount = savingAccounts.length;
+  // Tính tổng số dư và số tài khoản (chỉ tính các tài khoản có remainingAmount > 0)
+  const activeAccounts = savingAccounts.filter(account => account.remainingAmount > 0);
+  const totalDeposit = activeAccounts.reduce((sum, account) => sum + account.remainingAmount, 0);
+  const totalInterest = activeAccounts.reduce((sum, account) => sum + (account.totalReceivable), 0);
+  const activeAccountsCount = activeAccounts.length;
 
   // Toggle ẩn/hiện tất cả thông tin nhạy cảm
   const toggleAllSensitiveInfo = () => {
     setHideAllSensitiveInfo(!hideAllSensitiveInfo);
   };
 
-  // Lọc tài khoản dựa trên từ khóa tìm kiếm
+  // Lọc tài khoản dựa trên từ khóa tìm kiếm và chỉ hiển thị tài khoản có remainingAmount > 0
   useEffect(() => {
+    // Lọc trước các tài khoản có remainingAmount > 0
+    const activeAccounts = savingAccounts.filter(account => account.remainingAmount > 0);
+    
     if (searchQuery.trim() === '') {
-      setFilteredAccounts(savingAccounts);
+      setFilteredAccounts(activeAccounts);
     } else {
       const query = searchQuery.toLowerCase();
-      const filtered = savingAccounts.filter(account => 
+      const filtered = activeAccounts.filter(account => 
         account.nickname.toLowerCase().includes(query) || 
         account.id.toLowerCase().includes(query) || 
         account.term.toLowerCase().includes(query) ||
@@ -550,8 +554,8 @@ const SavingsAccounts = ({ customerId }) => {
     setNotificationVisible(false);
   };
 
-  // Hiển thị khi không có tài khoản nào và không đang loading
-  if (!isLoading && savingAccounts.length === 0) {
+  // Hiển thị khi không có tài khoản nào có remainingAmount > 0 và không đang loading
+  if (!isLoading && activeAccounts.length === 0) {
     return (
       <>
         <EmptySavingAccounts onOpenNewAccount={() => setIsNewAccountModalOpen(true)} />
