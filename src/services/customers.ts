@@ -12,8 +12,10 @@ export const getCustomerById = async (id: string) => {
   return mapApiToUser(response.data);
 }
 
-export const updateCustomer = async (customer: User, id: number) => {
-  const response = await callUpdateKhachHang(mapUserToIKhachHangReqDTO(customer), id.toString());
+export const updateCustomer = async (customer: User, id: number, newPassword?: string) => {
+  const mappedData = mapUserToIKhachHangReqDTO(customer);
+  const requestData = newPassword ? { ...mappedData, matKhau: newPassword } : mappedData;
+  const response = await callUpdateKhachHang(requestData, id.toString());
   return response;
 }
 

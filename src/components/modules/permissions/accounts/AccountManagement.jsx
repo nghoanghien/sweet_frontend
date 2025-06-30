@@ -675,17 +675,34 @@ const AccountManagement = () => {
    };
 
   // Xử lý khi xác nhận đặt lại mật khẩu
-  const handleConfirmResetPassword = (password, notificationInfo) => {
-    // Trong thực tế, đây là nơi gọi API để đặt lại mật khẩu
-    console.log(`Đặt lại mật khẩu cho tài khoản ${selectedAccount.email}: ${password}`);
-    setShowResetPasswordModal(false);
-    
-    // Hiển thị thông báo nếu có
-    if (notificationInfo) {
+  const handleConfirmResetPassword = async (password, notificationInfo) => {
+    try {
+      // Xác định loại tài khoản và gọi API tương ứng
+      if (selectedAccount.customerID) {
+        // Đặt lại mật khẩu cho khách hàng
+        await updateCustomerData(selectedAccount, parseInt(selectedAccount.customerID), password);
+      } else if (selectedAccount.employeeID) {
+        // Đặt lại mật khẩu cho nhân viên
+        await updateEmployeeData(selectedAccount, parseInt(selectedAccount.employeeID), password);
+      }
+      
+      setShowResetPasswordModal(false);
+      
+      // Hiển thị thông báo thành công
       showNotification(
-        notificationInfo.message,
-        notificationInfo.type,
-        notificationInfo.format || ''
+        'Đặt lại mật khẩu thành công!',
+        'success',
+        `Đã đặt lại mật khẩu cho tài khoản "${selectedAccount.email}" thành công!`
+      );
+      
+    } catch (error) {
+      console.error('Lỗi khi đặt lại mật khẩu:', error);
+      
+      // Hiển thị thông báo lỗi
+      showNotification(
+        'Đặt lại mật khẩu thất bại!',
+        'error',
+        `Không thể đặt lại mật khẩu cho tài khoản "${selectedAccount.email}". Vui lòng thử lại.`
       );
     }
   };
@@ -1071,6 +1088,7 @@ const AccountManagement = () => {
         onClose={() => setShowResetPasswordModal(false)}
         onConfirm={handleConfirmResetPassword}
         account={selectedAccount}
+        isLoading={isToggleActionLoading}
       />
 
       {/* SwipeConfirmationModal */}
@@ -1110,6 +1128,7 @@ const AccountManagement = () => {
         onClose={() => setShowResetPasswordModal(false)}
         onConfirm={handleConfirmResetPassword}
         account={selectedAccount}
+        isLoading={isToggleActionLoading}
       />
     </div>
   );

@@ -146,7 +146,7 @@ export const useUpdateCustomer = () => {
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState(false);
 
-  const updateCustomerData = useCallback(async (customer: User, customerId: number) => {
+  const updateCustomerData = useCallback(async (customer: User, customerId: number, newPassword?: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -155,7 +155,7 @@ export const useUpdateCustomer = () => {
       const startTime = Date.now();
       
       console.log("Đang cập nhật khách hàng:", customer);
-      const response = await updateCustomer(customer, customerId);
+      const response = await updateCustomer(customer, customerId, newPassword);
       console.log('RESPONSE CẬP NHẬT KHÁCH HÀNG: ', response);
       
       // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện

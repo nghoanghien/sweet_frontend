@@ -7,7 +7,9 @@ export const getAllEmployees = async () => {
   return response.data?.map(mapApiToUser);
 }
 
-export const updateEmployee = async (employee: User, id: number) => {
-  const response = await callUpdateNhanVien(mapUserToINhanVienReqDTO(employee), id.toString());
+export const updateEmployee = async (employee: User, id: number, newPassword?: string) => {
+  const mappedData = mapUserToINhanVienReqDTO(employee);
+  const requestData = newPassword ? { ...mappedData, matKhau: newPassword } : mappedData;
+  const response = await callUpdateNhanVien(requestData, id.toString());
   return response;
 }

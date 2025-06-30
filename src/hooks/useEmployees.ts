@@ -145,7 +145,7 @@ export const useUpdateEmployee = () => {
   const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState(false);
 
-  const updateEmployeeData = useCallback(async (employee: User, employeeId: number) => {
+  const updateEmployeeData = useCallback(async (employee: User, employeeId: number, newPassword?: string) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -154,7 +154,7 @@ export const useUpdateEmployee = () => {
       const startTime = Date.now();
       
       console.log("Đang cập nhật nhân viên:", employee);
-      const response = await updateEmployee(employee, employeeId);
+      const response = await updateEmployee(employee, employeeId, newPassword);
       console.log('RESPONSE CẬP NHẬT NHÂN VIÊN: ', response);
       
       // Đảm bảo loading tối thiểu 1.5s để tránh nhấp nháy giao diện

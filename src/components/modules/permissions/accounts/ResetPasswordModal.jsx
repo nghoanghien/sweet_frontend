@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Lock, Eye, EyeOff, RefreshCw } from 'lucide-react';
 import InputField from '@/components/ui/custom/Inputfield';
@@ -22,6 +22,17 @@ const ResetPasswordModal = ({ isOpen, onClose, onConfirm, account }) => {
     onConfirm: () => {},
     isProcessing: false,
   });
+
+  // Reset form khi modal mở
+  useEffect(() => {
+    if (isOpen) {
+      setPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+      setErrors({});
+      setIsGenerating(false);
+    }
+  }, [isOpen]);
 
   if (!isOpen || !account) return null;
 
@@ -73,8 +84,8 @@ const ResetPasswordModal = ({ isOpen, onClose, onConfirm, account }) => {
     // Hiển thị modal xác nhận
     const confirmDetails = {
       'Tài khoản': account.email,
-      'Tên người dùng': account.name,
-      'Vai trò': account.role.name
+      'Tên người dùng': account.fullName,
+      'Vai trò': account.role.roleName
     };
     
     showConfirmModal(
@@ -165,7 +176,7 @@ const ResetPasswordModal = ({ isOpen, onClose, onConfirm, account }) => {
             <div className="p-6 overflow-y-auto">
               <div className="mb-6">
                 <p className="text-gray-600">
-                  Đặt lại mật khẩu cho tài khoản <span className="font-semibold">{account.name}</span> ({account.email})
+                  Đặt lại mật khẩu cho tài khoản <span className="font-semibold">{account.fullName}</span> ({account.email})
                 </p>
               </div>
               
